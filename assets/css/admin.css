@@ -1,0 +1,975 @@
+/**
+ * WB Ad Manager - Admin Styles
+ *
+ * @package WB_Ad_Manager
+ * @since   1.0.0
+ */
+
+/* ==========================================================================
+   Metabox Common
+   ========================================================================== */
+
+.wbam-metabox {
+	padding: 15px 0;
+}
+
+.wbam-label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 10px;
+	color: #1d2327;
+}
+
+.wbam-description {
+	color: #646970;
+	font-size: 13px;
+	font-style: italic;
+	margin-top: 5px;
+}
+
+/* ==========================================================================
+   Ad Type Tabs
+   ========================================================================== */
+
+.wbam-adtype-tabs {
+	position: relative;
+}
+
+.wbam-adtype-radio {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.wbam-adtype-nav {
+	display: flex;
+	border-bottom: 1px solid #c3c4c7;
+	margin-bottom: 0;
+}
+
+.wbam-adtype-tab {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 20px;
+	color: #50575e;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	border: 1px solid transparent;
+	border-bottom: none;
+	margin-bottom: -1px;
+	background: #f6f7f7;
+	text-decoration: none;
+	transition: all 0.15s ease;
+}
+
+.wbam-adtype-tab:hover {
+	color: #2271b1;
+	background: #fff;
+}
+
+.wbam-adtype-tab:focus {
+	box-shadow: none;
+	outline: none;
+}
+
+.wbam-adtype-tab-active,
+.wbam-adtype-tab-active:hover {
+	background: #fff;
+	color: #1d2327;
+	border-color: #c3c4c7;
+	border-bottom-color: #fff;
+}
+
+.wbam-adtype-tab-active .dashicons {
+	color: #2271b1;
+}
+
+.wbam-adtype-tab .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+}
+
+.wbam-adtype-content {
+	display: none;
+	padding: 20px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-top: none;
+}
+
+.wbam-adtype-desc {
+	margin: 0 0 20px;
+	padding: 12px 15px;
+	background: #f0f6fc;
+	border-left: 4px solid #2271b1;
+	color: #1d2327;
+	font-size: 13px;
+}
+
+@media screen and (max-width: 600px) {
+	.wbam-adtype-nav {
+		flex-direction: column;
+		border-bottom: none;
+	}
+
+	.wbam-adtype-tab {
+		border: 1px solid #c3c4c7;
+		margin-bottom: -1px;
+		background: #f6f7f7;
+	}
+
+	.wbam-adtype-tab-active,
+	.wbam-adtype-tab-active:hover {
+		background: #2271b1;
+		color: #fff;
+		border-color: #2271b1;
+	}
+
+	.wbam-adtype-tab-active .dashicons {
+		color: #fff;
+	}
+
+	.wbam-adtype-content {
+		border-top: 1px solid #c3c4c7;
+	}
+}
+
+/* ==========================================================================
+   Form Fields
+   ========================================================================== */
+
+.wbam-field {
+	margin-bottom: 20px;
+}
+
+.wbam-field:last-child {
+	margin-bottom: 0;
+}
+
+.wbam-field label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 8px;
+	color: #1d2327;
+}
+
+.wbam-field input[type="text"],
+.wbam-field input[type="url"],
+.wbam-field input[type="number"],
+.wbam-field select,
+.wbam-field textarea {
+	width: 100%;
+	max-width: 500px;
+	padding: 8px 12px;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.wbam-field-input {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 10px;
+}
+
+.wbam-field-input input[type="url"],
+.wbam-field-input input[type="text"] {
+	flex: 1;
+	min-width: 200px;
+}
+
+.wbam-field-input .description {
+	width: 100%;
+	margin: 5px 0 0;
+}
+
+.wbam-field-input .wbam-image-preview {
+	width: 100%;
+	margin-top: 10px;
+	background: #f6f7f7;
+	border: 1px dashed #c3c4c7;
+	border-radius: 4px;
+	padding: 15px;
+	text-align: center;
+	min-height: 100px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.wbam-field-input .wbam-image-preview:empty {
+	display: none;
+}
+
+.wbam-field-input .wbam-image-preview img {
+	max-width: 100%;
+	max-height: 200px;
+	height: auto;
+	border-radius: 4px;
+}
+
+.wbam-field input[type="text"]:focus,
+.wbam-field input[type="url"]:focus,
+.wbam-field input[type="number"]:focus,
+.wbam-field select:focus,
+.wbam-field textarea:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
+}
+
+.wbam-field textarea {
+	min-height: 150px;
+	font-family: Consolas, Monaco, monospace;
+}
+
+.wbam-field input[type="number"] {
+	width: 80px;
+	max-width: 80px;
+}
+
+/* ==========================================================================
+   Image Uploader
+   ========================================================================== */
+
+.wbam-image-upload-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-width: 500px;
+}
+
+.wbam-image-preview {
+	background: #f6f7f7;
+	border: 1px dashed #c3c4c7;
+	border-radius: 4px;
+	padding: 20px;
+	text-align: center;
+	min-height: 150px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.wbam-image-preview img {
+	max-width: 100%;
+	max-height: 200px;
+	height: auto;
+	border-radius: 4px;
+}
+
+.wbam-image-preview .dashicons {
+	font-size: 48px;
+	width: 48px;
+	height: 48px;
+	color: #c3c4c7;
+}
+
+.wbam-image-buttons {
+	display: flex;
+	gap: 10px;
+}
+
+.wbam-image-buttons .button {
+	flex: 1;
+}
+
+/* ==========================================================================
+   Placements
+   ========================================================================== */
+
+.wbam-placement-group {
+	margin-bottom: 25px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.wbam-placement-group:last-child {
+	margin-bottom: 0;
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+.wbam-placement-group h4 {
+	margin: 0 0 15px;
+	font-size: 14px;
+	color: #1d2327;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.wbam-placement-options {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 10px;
+}
+
+.wbam-placement-option {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 12px 15px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.wbam-placement-option:hover {
+	background: #fff;
+	border-color: #2271b1;
+}
+
+.wbam-placement-option input[type="checkbox"] {
+	margin: 2px 0 0;
+	flex-shrink: 0;
+}
+
+.wbam-placement-option input[type="checkbox"]:checked + .wbam-option-title {
+	color: #2271b1;
+}
+
+.wbam-option-title {
+	display: block;
+	font-weight: 600;
+	font-size: 13px;
+	color: #1d2327;
+	margin-bottom: 2px;
+}
+
+.wbam-option-desc {
+	display: block;
+	font-size: 12px;
+	color: #646970;
+	line-height: 1.4;
+}
+
+/* ==========================================================================
+   Extra Settings
+   ========================================================================== */
+
+.wbam-extra-settings {
+	margin-top: 20px;
+	padding: 20px;
+	background: #fff8e5;
+	border: 1px solid #dba617;
+	border-radius: 4px;
+}
+
+.wbam-extra-settings h4 {
+	margin: 0 0 15px;
+	font-size: 14px;
+	color: #1d2327;
+}
+
+.wbam-extra-settings .wbam-field {
+	margin-bottom: 15px;
+}
+
+.wbam-extra-settings .wbam-field:last-child {
+	margin-bottom: 0;
+}
+
+.wbam-extra-settings label {
+	font-weight: normal;
+}
+
+/* ==========================================================================
+   Status Metabox
+   ========================================================================== */
+
+.wbam-status-options {
+	display: flex;
+	gap: 15px;
+}
+
+.wbam-status-option {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 15px;
+	background: #f6f7f7;
+	border: 2px solid #dcdcde;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	flex: 1;
+	justify-content: center;
+}
+
+.wbam-status-option:hover {
+	border-color: #2271b1;
+}
+
+.wbam-status-option input[type="radio"] {
+	margin: 0;
+}
+
+.wbam-status-option input[type="radio"]:checked ~ .wbam-status-enabled {
+	color: #00a32a;
+	font-weight: 600;
+}
+
+.wbam-status-option input[type="radio"]:checked ~ .wbam-status-disabled {
+	color: #d63638;
+	font-weight: 600;
+}
+
+/* ==========================================================================
+   Admin Columns
+   ========================================================================== */
+
+.wbam-status-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 3px;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.wbam-status-badge.wbam-enabled {
+	background: #d4edda;
+	color: #155724;
+}
+
+.wbam-status-badge.wbam-disabled {
+	background: #f8d7da;
+	color: #721c24;
+}
+
+/* ==========================================================================
+   Full Width Fields
+   ========================================================================== */
+
+.wbam-field-full .wbam-field-input {
+	display: block;
+}
+
+.wbam-field-full textarea {
+	width: 100%;
+	max-width: 100%;
+}
+
+/* ==========================================================================
+   Code Editor
+   ========================================================================== */
+
+.wbam-code-editor-wrapper {
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.wbam-code-editor-wrapper .CodeMirror {
+	height: 300px;
+	border: none;
+}
+
+.wbam-field textarea.code {
+	font-family: Consolas, Monaco, monospace;
+	font-size: 13px;
+	line-height: 1.6;
+	tab-size: 4;
+}
+
+/* ==========================================================================
+   Rich Content Editor
+   ========================================================================== */
+
+.wbam-wp-editor-wrapper {
+	margin-top: 10px;
+}
+
+.wbam-wp-editor-wrapper .wp-editor-container {
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media screen and (max-width: 782px) {
+	.wbam-ad-type-cards {
+		grid-template-columns: 1fr;
+	}
+
+	.wbam-placement-options {
+		grid-template-columns: 1fr;
+	}
+
+	.wbam-status-options {
+		flex-direction: column;
+	}
+
+	.wbam-field input[type="text"],
+	.wbam-field input[type="url"],
+	.wbam-field select,
+	.wbam-field textarea {
+		max-width: 100%;
+	}
+}
+
+/* ==========================================================================
+   Settings Page
+   ========================================================================== */
+
+.wbam-settings-wrap {
+	max-width: 1200px;
+}
+
+.wbam-settings-wrap h1 {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 20px;
+}
+
+.wbam-settings-container {
+	display: grid;
+	grid-template-columns: 1fr 300px;
+	gap: 30px;
+	align-items: start;
+}
+
+.wbam-settings-form {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 20px 25px;
+}
+
+.wbam-settings-form h2 {
+	font-size: 16px;
+	font-weight: 600;
+	color: #1d2327;
+	margin: 25px 0 15px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.wbam-settings-form h2:first-child {
+	margin-top: 0;
+}
+
+.wbam-settings-form table.form-table {
+	margin-top: 0;
+}
+
+.wbam-settings-form table.form-table th {
+	padding-left: 0;
+	font-weight: 500;
+}
+
+.wbam-settings-form table.form-table td {
+	padding-right: 0;
+}
+
+.wbam-settings-form .submit {
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.wbam-settings-sidebar {
+	position: sticky;
+	top: 50px;
+}
+
+.wbam-sidebar-box {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 15px 20px;
+	margin-bottom: 20px;
+}
+
+.wbam-sidebar-box h3 {
+	margin: 0 0 15px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #e0e0e0;
+	font-size: 14px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.wbam-sidebar-box ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.wbam-sidebar-box ul li {
+	margin-bottom: 8px;
+}
+
+.wbam-sidebar-box ul li:last-child {
+	margin-bottom: 0;
+}
+
+.wbam-sidebar-box ul li a {
+	color: #2271b1;
+	text-decoration: none;
+}
+
+.wbam-sidebar-box ul li a:hover {
+	color: #135e96;
+	text-decoration: underline;
+}
+
+.wbam-sidebar-box code {
+	display: block;
+	padding: 8px 12px;
+	background: #f6f7f7;
+	border-radius: 4px;
+	font-size: 12px;
+	margin-bottom: 5px;
+}
+
+.wbam-sidebar-box p.description {
+	margin: 0 0 15px;
+	font-size: 12px;
+}
+
+.wbam-sidebar-box p.description:last-child {
+	margin-bottom: 0;
+}
+
+@media screen and (max-width: 1024px) {
+	.wbam-settings-container {
+		grid-template-columns: 1fr;
+	}
+
+	.wbam-settings-sidebar {
+		position: static;
+	}
+}
+
+/* ==========================================================================
+   Display Rules Metabox
+   ========================================================================== */
+
+.wbam-display-rules {
+	padding: 10px 0;
+}
+
+.wbam-rule-section {
+	margin-bottom: 25px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.wbam-rule-section:last-child {
+	margin-bottom: 0;
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+.wbam-section-label {
+	display: block;
+	font-weight: 600;
+	font-size: 13px;
+	color: #1d2327;
+	margin-bottom: 12px;
+}
+
+.wbam-radio-group {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.wbam-radio-group.wbam-inline {
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 20px;
+}
+
+.wbam-radio-option {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 12px 16px;
+	background: #f9f9f9;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.wbam-radio-option:hover {
+	background: #fff;
+	border-color: #2271b1;
+}
+
+.wbam-radio-option input[type="radio"] {
+	margin: 0 0 4px;
+}
+
+.wbam-radio-option span:first-of-type {
+	font-weight: 500;
+	color: #1d2327;
+}
+
+.wbam-option-hint {
+	font-size: 12px;
+	color: #646970;
+	font-weight: normal;
+}
+
+.wbam-rule-row {
+	margin-bottom: 18px;
+}
+
+.wbam-rule-row:last-child {
+	margin-bottom: 0;
+}
+
+.wbam-rule-row > label {
+	display: block;
+	font-weight: 500;
+	font-size: 13px;
+	color: #1d2327;
+	margin-bottom: 8px;
+}
+
+.wbam-checkbox-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 16px;
+}
+
+.wbam-checkbox-list.wbam-inline {
+	gap: 8px 20px;
+}
+
+.wbam-checkbox-list label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	color: #50575e;
+	cursor: pointer;
+}
+
+.wbam-checkbox-list label:hover {
+	color: #1d2327;
+}
+
+.wbam-select2,
+.wbam-rule-row select {
+	width: 100%;
+	max-width: 400px;
+}
+
+.wbam-conditional-section {
+	display: none;
+}
+
+.wbam-conditional-section.wbam-visible {
+	display: block;
+}
+
+/* ==========================================================================
+   Schedule Metabox
+   ========================================================================== */
+
+.wbam-schedule {
+	padding: 5px 0;
+}
+
+.wbam-schedule-field {
+	margin-bottom: 15px;
+}
+
+.wbam-schedule-field:last-child {
+	margin-bottom: 0;
+}
+
+.wbam-schedule-field label {
+	display: block;
+	font-weight: 500;
+	font-size: 13px;
+	color: #1d2327;
+	margin-bottom: 6px;
+}
+
+.wbam-schedule-field input[type="date"] {
+	width: 100%;
+	padding: 6px 10px;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	font-size: 13px;
+}
+
+.wbam-schedule-field input[type="date"]:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
+}
+
+.wbam-schedule-field .description {
+	margin-top: 5px;
+	font-size: 12px;
+	color: #646970;
+}
+
+/* ==========================================================================
+   Visitor Conditions Metabox
+   ========================================================================== */
+
+.wbam-visitor-conditions {
+	padding: 10px 0;
+}
+
+.wbam-condition-row {
+	margin-bottom: 25px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.wbam-condition-row:last-child {
+	margin-bottom: 0;
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+.wbam-condition-row .description {
+	margin: 0 0 12px;
+	font-size: 12px;
+	color: #646970;
+}
+
+.wbam-device-options {
+	display: flex;
+	gap: 12px;
+}
+
+.wbam-device-option {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	padding: 15px 20px;
+	background: #f9f9f9;
+	border: 2px solid #e0e0e0;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	min-width: 90px;
+}
+
+.wbam-device-option:hover {
+	background: #fff;
+	border-color: #2271b1;
+}
+
+.wbam-device-option input[type="checkbox"] {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.wbam-device-option input[type="checkbox"]:checked + .dashicons {
+	color: #2271b1;
+}
+
+.wbam-device-option input[type="checkbox"]:checked ~ span:last-child {
+	color: #2271b1;
+	font-weight: 600;
+}
+
+.wbam-device-option:has(input:checked) {
+	border-color: #2271b1;
+	background: #f0f6fc;
+}
+
+.wbam-device-option .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: #646970;
+	transition: color 0.15s ease;
+}
+
+.wbam-device-option span:last-child {
+	font-size: 12px;
+	color: #50575e;
+}
+
+/* ==========================================================================
+   Responsive - Display Rules
+   ========================================================================== */
+
+@media screen and (max-width: 782px) {
+	.wbam-device-options {
+		flex-direction: column;
+	}
+
+	.wbam-device-option {
+		flex-direction: row;
+		min-width: 100%;
+		padding: 12px 15px;
+	}
+
+	.wbam-radio-group.wbam-inline {
+		flex-direction: column;
+	}
+}
+
+/* ==========================================================================
+   Geo Targeting Metabox
+   ========================================================================== */
+
+.wbam-geo-targeting {
+	padding: 10px 0;
+}
+
+.wbam-geo-toggle {
+	margin-bottom: 20px;
+}
+
+.wbam-toggle-label {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.wbam-toggle-label input[type="checkbox"] {
+	width: 18px;
+	height: 18px;
+}
+
+.wbam-geo-options {
+	padding: 20px;
+	background: #f9f9f9;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+}
+
+.wbam-geo-row {
+	margin-bottom: 20px;
+}
+
+.wbam-geo-row:last-child {
+	margin-bottom: 0;
+}
+
+.wbam-geo-row .description {
+	margin: 0 0 10px;
+	font-size: 12px;
+	color: #646970;
+}
+
+.wbam-country-select {
+	width: 100%;
+	max-width: 500px;
+}
