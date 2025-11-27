@@ -421,6 +421,57 @@
 	font-weight: 600;
 }
 
+.wbam-priority-field,
+.wbam-session-limit-field {
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.wbam-priority-field label,
+.wbam-session-limit-field label {
+	display: block;
+	font-weight: 500;
+	font-size: 13px;
+	color: #1d2327;
+	margin-bottom: 8px;
+}
+
+.wbam-priority-field input[type="range"] {
+	width: calc(100% - 40px);
+	vertical-align: middle;
+}
+
+.wbam-priority-value {
+	display: inline-block;
+	width: 30px;
+	text-align: center;
+	font-weight: 600;
+	color: #2271b1;
+	vertical-align: middle;
+}
+
+.wbam-session-limit-field input[type="number"] {
+	width: 100%;
+	padding: 6px 10px;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	font-size: 13px;
+}
+
+.wbam-session-limit-field input[type="number"]:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
+}
+
+.wbam-priority-field .description,
+.wbam-session-limit-field .description {
+	margin-top: 5px;
+	font-size: 12px;
+	color: #646970;
+}
+
 /* ==========================================================================
    Admin Columns
    ========================================================================== */
@@ -818,6 +869,64 @@
 	margin-top: 5px;
 	font-size: 12px;
 	color: #646970;
+}
+
+.wbam-days-selector {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.wbam-day-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 10px;
+	background: #f9f9f9;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	font-size: 12px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.wbam-day-checkbox:hover {
+	background: #fff;
+	border-color: #2271b1;
+}
+
+.wbam-day-checkbox input[type="checkbox"] {
+	margin: 0;
+}
+
+.wbam-day-checkbox:has(input:checked) {
+	background: #f0f6fc;
+	border-color: #2271b1;
+	color: #2271b1;
+}
+
+.wbam-time-range {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.wbam-time-range input[type="time"] {
+	padding: 6px 10px;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	font-size: 13px;
+}
+
+.wbam-time-range input[type="time"]:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
+}
+
+.wbam-time-range span {
+	color: #646970;
+	font-size: 13px;
 }
 
 /* ==========================================================================

@@ -132,6 +132,27 @@ class Targeting_Engine {
 			}
 		}
 
+		// Check day of week.
+		if ( ! empty( $schedule['days'] ) && is_array( $schedule['days'] ) ) {
+			$current_day = strtolower( current_time( 'D' ) );
+			if ( ! in_array( $current_day, $schedule['days'], true ) ) {
+				return false;
+			}
+		}
+
+		// Check time of day.
+		if ( ! empty( $schedule['time_start'] ) || ! empty( $schedule['time_end'] ) ) {
+			$current_time = current_time( 'H:i' );
+
+			if ( ! empty( $schedule['time_start'] ) && $current_time < $schedule['time_start'] ) {
+				return false;
+			}
+
+			if ( ! empty( $schedule['time_end'] ) && $current_time > $schedule['time_end'] ) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 

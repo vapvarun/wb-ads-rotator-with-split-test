@@ -10,6 +10,7 @@ namespace WBAM\Core;
 
 use WBAM\Modules\Placements\Placement_Engine;
 use WBAM\Modules\Targeting\Targeting_Engine;
+use WBAM\Modules\Targeting\Frequency_Manager;
 use WBAM\Admin\Admin;
 use WBAM\Admin\Settings;
 use WBAM\Admin\Display_Options;
@@ -71,6 +72,10 @@ class Plugin {
 		$this->placements = Placement_Engine::get_instance();
 		$this->placements->init();
 
+		// Frequency manager.
+		$frequency = Frequency_Manager::get_instance();
+		$frequency->init();
+
 		// Admin.
 		if ( is_admin() ) {
 			$this->admin = Admin::get_instance();
@@ -91,6 +96,12 @@ class Plugin {
 		if ( class_exists( 'BuddyPress' ) ) {
 			$bp = new \WBAM\Modules\BuddyPress\BP_Module();
 			$bp->init();
+		}
+
+		// bbPress module.
+		if ( class_exists( 'bbPress' ) ) {
+			$bbpress = new \WBAM\Modules\bbPress\bbPress_Module();
+			$bbpress->init();
 		}
 	}
 

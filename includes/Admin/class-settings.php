@@ -35,8 +35,11 @@ class Settings {
 		'container_class'        => '',
 		'disable_on_post_types'  => array(),
 		'min_content_length'     => 0,
+		'max_ads_per_page'       => 0,
 		'cache_ads'              => false,
 		'lazy_load'              => false,
+		'geo_primary_provider'   => 'ip-api',
+		'geo_ipinfo_key'         => '',
 	);
 
 	/**
@@ -127,6 +130,18 @@ class Settings {
 			)
 		);
 
+		add_settings_field(
+			'max_ads_per_page',
+			__( 'Maximum Ads Per Page', 'wb-ad-manager' ),
+			array( $this, 'render_number_field' ),
+			'wbam-settings',
+			'wbam_general',
+			array(
+				'id'          => 'max_ads_per_page',
+				'description' => __( 'Maximum number of ads to show per page. Set 0 for unlimited.', 'wb-ad-manager' ),
+			)
+		);
+
 		// Display Section.
 		add_settings_section(
 			'wbam_display',
@@ -207,6 +222,38 @@ class Settings {
 				'description' => __( 'Cache ad queries for better performance (uses transients).', 'wb-ad-manager' ),
 			)
 		);
+
+		// Geo Targeting Section.
+		add_settings_section(
+			'wbam_geo',
+			__( 'Geo Targeting', 'wb-ad-manager' ),
+			array( $this, 'render_geo_section' ),
+			'wbam-settings'
+		);
+
+		add_settings_field(
+			'geo_primary_provider',
+			__( 'Primary Provider', 'wb-ad-manager' ),
+			array( $this, 'render_geo_provider_field' ),
+			'wbam-settings',
+			'wbam_geo',
+			array(
+				'id' => 'geo_primary_provider',
+			)
+		);
+
+		add_settings_field(
+			'geo_ipinfo_key',
+			__( 'ipinfo.io API Key', 'wb-ad-manager' ),
+			array( $this, 'render_text_field' ),
+			'wbam-settings',
+			'wbam_geo',
+			array(
+				'id'          => 'geo_ipinfo_key',
+				'placeholder' => __( 'Enter API key (optional)', 'wb-ad-manager' ),
+				'description' => __( 'Get a free API key from ipinfo.io for 50K requests/month.', 'wb-ad-manager' ),
+			)
+		);
 	}
 
 	/**
@@ -249,6 +296,7 @@ class Settings {
 		$sanitized['ad_label_position']     = in_array( $input['ad_label_position'] ?? '', array( 'above', 'below' ), true ) ? $input['ad_label_position'] : 'above';
 		$sanitized['container_class']       = sanitize_html_class( $input['container_class'] ?? '' );
 		$sanitized['min_content_length']    = absint( $input['min_content_length'] ?? 0 );
+		$sanitized['max_ads_per_page']      = absint( $input['max_ads_per_page'] ?? 0 );
 		$sanitized['cache_ads']             = ! empty( $input['cache_ads'] );
 		$sanitized['lazy_load']             = ! empty( $input['lazy_load'] );
 
@@ -257,6 +305,12 @@ class Settings {
 		} else {
 			$sanitized['disable_on_post_types'] = array();
 		}
+
+		// Geo targeting settings.
+		$valid_providers                     = array( 'ip-api', 'ipinfo', 'ipapi-co' );
+		$geo_provider                        = isset( $input['geo_primary_provider'] ) ? sanitize_key( $input['geo_primary_provider'] ) : 'ip-api';
+		$sanitized['geo_primary_provider']   = in_array( $geo_provider, $valid_providers, true ) ? $geo_provider : 'ip-api';
+		$sanitized['geo_ipinfo_key']         = sanitize_text_field( $input['geo_ipinfo_key'] ?? '' );
 
 		return $sanitized;
 	}
@@ -329,6 +383,53 @@ class Settings {
 	 */
 	public function render_performance_section() {
 		echo '<p>' . esc_html__( 'Optimize ad loading performance.', 'wb-ad-manager' ) . '</p>';
+	}
+
+	/**
+	 * Render geo section.
+	 */
+	public function render_geo_section() {
+		echo '<p>' . esc_html__( 'Configure IP geolocation providers for geo-targeting. The system will try providers in order until one succeeds.', 'wb-ad-manager' ) . '</p>';
+	}
+
+	/**
+	 * Render geo provider field.
+	 *
+	 * @param array $args Field arguments.
+	 */
+	public function render_geo_provider_field( $args ) {
+		$settings = $this->get_settings();
+		$id       = $args['id'];
+		$value    = isset( $settings[ $id ] ) ? $settings[ $id ] : 'ip-api';
+
+		$providers = array(
+			'ip-api'   => array(
+				'name'  => 'ip-api.com',
+				'limit' => __( '45 requests/minute, no API key', 'wb-ad-manager' ),
+			),
+			'ipinfo'   => array(
+				'name'  => 'ipinfo.io',
+				'limit' => __( '50K requests/month, API key optional', 'wb-ad-manager' ),
+			),
+			'ipapi-co' => array(
+				'name'  => 'ipapi.co',
+				'limit' => __( '1K requests/day, no API key', 'wb-ad-manager' ),
+			),
+		);
+		?>
+		<fieldset>
+			<?php foreach ( $providers as $key => $provider ) : ?>
+				<label style="display: block; margin-bottom: 8px;">
+					<input type="radio" name="<?php echo esc_attr( self::OPTION_NAME . '[' . $id . ']' ); ?>" value="<?php echo esc_attr( $key ); ?>" <?php checked( $value, $key ); ?> />
+					<strong><?php echo esc_html( $provider['name'] ); ?></strong>
+					<span class="description" style="margin-left: 5px;">(<?php echo esc_html( $provider['limit'] ); ?>)</span>
+				</label>
+			<?php endforeach; ?>
+		</fieldset>
+		<p class="description" style="margin-top: 10px;">
+			<?php esc_html_e( 'If the primary provider fails, the system will automatically try the next provider.', 'wb-ad-manager' ); ?>
+		</p>
+		<?php
 	}
 
 	/**

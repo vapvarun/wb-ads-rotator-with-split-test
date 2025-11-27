@@ -21,6 +21,7 @@ class BP_Module {
 	public function init() {
 		$this->register_placements();
 		$this->setup_hooks();
+		BP_Widgets::init();
 	}
 
 	/**
@@ -30,6 +31,7 @@ class BP_Module {
 		$engine = Placement_Engine::get_instance();
 
 		$engine->register_placement( new BP_Activity_Placement() );
+		$engine->register_placement( new BP_Directory_Placement() );
 	}
 
 	/**

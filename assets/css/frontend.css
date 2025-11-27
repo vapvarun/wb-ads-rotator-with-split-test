@@ -320,3 +320,332 @@
 [data-theme="dark"] .wbam-ad-label {
 	color: #999;
 }
+
+/* ==========================================================================
+   Sticky/Floating Ads
+   ========================================================================== */
+
+.wbam-sticky-ad {
+	position: fixed;
+	z-index: 9999;
+	background: #fff;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	border-radius: var(--wbam-border-radius);
+	padding: 10px;
+	max-width: 350px;
+	animation: wbam-slide-in 0.3s ease;
+}
+
+.wbam-sticky-ad .wbam-placement {
+	margin: 0;
+}
+
+.wbam-sticky-bottom-right {
+	bottom: 20px;
+	right: 20px;
+}
+
+.wbam-sticky-bottom-left {
+	bottom: 20px;
+	left: 20px;
+}
+
+.wbam-sticky-bottom-bar {
+	bottom: 0;
+	left: 0;
+	right: 0;
+	max-width: 100%;
+	border-radius: 0;
+	padding: 15px 20px;
+}
+
+.wbam-sticky-top-bar {
+	top: 0;
+	left: 0;
+	right: 0;
+	max-width: 100%;
+	border-radius: 0;
+	padding: 15px 20px;
+}
+
+.wbam-sticky-close {
+	position: absolute;
+	top: -10px;
+	right: -10px;
+	width: 28px;
+	height: 28px;
+	background: #333;
+	color: #fff;
+	border: none;
+	border-radius: 50%;
+	font-size: 18px;
+	line-height: 1;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s ease;
+}
+
+.wbam-sticky-close:hover {
+	background: #000;
+}
+
+.wbam-sticky-bottom-bar .wbam-sticky-close,
+.wbam-sticky-top-bar .wbam-sticky-close {
+	top: 50%;
+	right: 15px;
+	transform: translateY(-50%);
+}
+
+@keyframes wbam-slide-in {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* ==========================================================================
+   Popup/Modal Ads
+   ========================================================================== */
+
+.wbam-popup-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.7);
+	z-index: 99999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	animation: wbam-fade-in 0.3s ease;
+}
+
+.wbam-popup-modal {
+	position: relative;
+	background: #fff;
+	border-radius: 8px;
+	max-width: 600px;
+	max-height: 90vh;
+	overflow: auto;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+	animation: wbam-scale-in 0.3s ease;
+}
+
+.wbam-popup-content {
+	padding: 25px;
+}
+
+.wbam-popup-content .wbam-placement {
+	margin: 0;
+}
+
+.wbam-popup-close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 32px;
+	height: 32px;
+	background: rgba(0, 0, 0, 0.1);
+	color: #333;
+	border: none;
+	border-radius: 50%;
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+	z-index: 1;
+}
+
+.wbam-popup-close:hover {
+	background: rgba(0, 0, 0, 0.2);
+}
+
+@keyframes wbam-fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes wbam-scale-in {
+	from {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+/* ==========================================================================
+   BuddyPress Directory Ads
+   ========================================================================== */
+
+.wbam-bp-directory-ad {
+	padding: 20px;
+	background: #f9f9f9;
+	border-radius: var(--wbam-border-radius);
+	margin: 15px 0;
+}
+
+.wbam-bp-directory-ad .wbam-placement {
+	margin: 0;
+}
+
+.wbam-bp-between-item {
+	list-style: none !important;
+	padding: 15px !important;
+	background: #f9f9f9;
+	margin: 10px 0 !important;
+	border-radius: var(--wbam-border-radius);
+}
+
+/* ==========================================================================
+   Responsive - Sticky & Popup
+   ========================================================================== */
+
+@media screen and (max-width: 480px) {
+	.wbam-sticky-ad {
+		max-width: calc(100% - 40px);
+	}
+
+	.wbam-sticky-bottom-right,
+	.wbam-sticky-bottom-left {
+		left: 20px;
+		right: 20px;
+	}
+
+	.wbam-popup-modal {
+		max-width: 100%;
+		margin: 10px;
+	}
+
+	.wbam-popup-content {
+		padding: 20px;
+	}
+}
+
+/* ==========================================================================
+   Comment Ads
+   ========================================================================== */
+
+.wbam-comment-ad {
+	padding: 20px;
+	background: #f9f9f9;
+	border-radius: var(--wbam-border-radius);
+	margin: var(--wbam-spacing) 0;
+}
+
+.wbam-comment-ad .wbam-placement {
+	margin: 0;
+}
+
+.wbam-comment-before_form {
+	margin-bottom: var(--wbam-spacing);
+}
+
+.wbam-comment-after_form {
+	margin-top: var(--wbam-spacing);
+}
+
+.wbam-comment-between {
+	margin: 15px 0;
+	border-left: 3px solid #ddd;
+	padding-left: 15px;
+}
+
+/* ==========================================================================
+   bbPress Ads
+   ========================================================================== */
+
+.wbam-bbpress-ad {
+	padding: 20px;
+	background: #f9f9f9;
+	border-radius: var(--wbam-border-radius);
+	margin: var(--wbam-spacing) 0;
+}
+
+.wbam-bbpress-ad .wbam-placement {
+	margin: 0;
+}
+
+.wbam-bbpress-before_forums,
+.wbam-bbpress-before_topics,
+.wbam-bbpress-before_single_topic {
+	margin-bottom: var(--wbam-spacing);
+}
+
+.wbam-bbpress-after_forums,
+.wbam-bbpress-after_topics,
+.wbam-bbpress-after_single_topic {
+	margin-top: var(--wbam-spacing);
+}
+
+.wbam-bbpress-between-replies {
+	margin: 15px 0;
+	border-left: 3px solid #ddd;
+	padding-left: 15px;
+}
+
+/* bbPress widget styles */
+.wbam-bbpress-forum-ad-widget,
+.wbam-bbpress-topic-ad-widget {
+	margin-bottom: var(--wbam-spacing);
+}
+
+/* ==========================================================================
+   BuddyPress Widget Ads
+   ========================================================================== */
+
+.wbam-bp-profile-ad,
+.wbam-bp-group-ad,
+.wbam-bp-activity-ad-widget {
+	margin-bottom: var(--wbam-spacing);
+}
+
+.wbam-bp-profile-widget .wbam-placement,
+.wbam-bp-group-widget .wbam-placement,
+.wbam-bp-activity-widget .wbam-placement {
+	margin: 0;
+}
+
+/* Dark mode support for new sections */
+@media (prefers-color-scheme: dark) {
+	.wbam-comment-ad,
+	.wbam-bbpress-ad {
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.wbam-comment-between,
+	.wbam-bbpress-between-replies {
+		border-left-color: #444;
+	}
+}
+
+.dark-mode .wbam-comment-ad,
+.theme-dark .wbam-comment-ad,
+[data-theme="dark"] .wbam-comment-ad,
+.dark-mode .wbam-bbpress-ad,
+.theme-dark .wbam-bbpress-ad,
+[data-theme="dark"] .wbam-bbpress-ad {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .wbam-comment-between,
+.theme-dark .wbam-comment-between,
+[data-theme="dark"] .wbam-comment-between,
+.dark-mode .wbam-bbpress-between-replies,
+.theme-dark .wbam-bbpress-between-replies,
+[data-theme="dark"] .wbam-bbpress-between-replies {
+	border-left-color: #444;
+}

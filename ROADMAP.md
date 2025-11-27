@@ -19,14 +19,26 @@ WB Ad Manager is a modular WordPress ad management plugin with BuddyPress integr
 |-----------|--------|
 | Core Plugin Structure | ✅ Complete |
 | Ad Types (3) | ✅ Complete |
-| Basic Placements (7) | ✅ Complete |
+| All Placements (14) | ✅ Complete |
 | Admin UI & Metaboxes | ✅ Complete |
 | Settings Page | ✅ Complete |
 | Admin CSS/JS | ✅ Complete |
-| Frontend CSS | ✅ Complete |
+| Frontend CSS/JS | ✅ Complete |
 | BuddyPress Module | ✅ Complete |
-| Smart Targeting | 🔲 Phase 2 |
-| Geo-Targeting | 🔲 Phase 3 |
+| BuddyPress Widgets (3) | ✅ Complete |
+| bbPress Module | ✅ Complete |
+| bbPress Widgets (2) | ✅ Complete |
+| Targeting Engine | ✅ Complete |
+| Content Analyzer | ✅ Complete |
+| Display Rules (Include/Exclude) | ✅ Complete |
+| Visitor Conditions | ✅ Complete |
+| Basic Scheduling | ✅ Complete |
+| Geo-Targeting (3 providers) | ✅ Complete |
+| Advanced Scheduling | ✅ Complete |
+| Frequency Control | ✅ Complete |
+| Sticky/Floating Ads | ✅ Complete |
+| Popup/Modal Ads | ✅ Complete |
+| Comment Ads | ✅ Complete |
 | Pro Features | 🔲 Pro Plugin |
 
 ---
@@ -46,7 +58,7 @@ WB Ad Manager is a modular WordPress ad management plugin with BuddyPress integr
 
 **Ad Types Implemented:**
 - [x] Image ads (with link, alt text, target)
-- [x] Rich Content (WYSIWYG editor)
+- [x] Rich Content (HTML textarea)
 - [x] Code ads (AdSense, custom HTML/JS)
 
 **Placements Implemented:**
@@ -55,6 +67,8 @@ WB Ad Manager is a modular WordPress ad management plugin with BuddyPress integr
 - [x] Before Content
 - [x] After Content
 - [x] After Paragraph X (with repeat option)
+- [x] Archive (between posts)
+- [x] Widget
 - [x] Shortcode `[wbam_ad id="X"]` and `[wbam_ads ids="X,Y,Z"]`
 - [x] BuddyPress Activity Stream
 
@@ -68,10 +82,37 @@ WB Ad Manager is a modular WordPress ad management plugin with BuddyPress integr
 - [x] Lazy load option
 - [x] Cache ad queries option
 
+**Targeting Implemented:**
+- [x] Targeting Engine with rule processing
+- [x] Display Rules metabox
+  - [x] Show on all pages / specific pages
+  - [x] Include by post types
+  - [x] Include by page types (front, blog, archive, search, 404)
+  - [x] Include by categories
+  - [x] Include by tags
+  - [x] Exclude by page types
+  - [x] Exclude by categories
+  - [x] Exclude by tags
+- [x] Schedule metabox
+  - [x] Start date
+  - [x] End date
+- [x] Visitor Conditions metabox
+  - [x] Device targeting (desktop, tablet, mobile)
+  - [x] User status (all, logged in, logged out)
+  - [x] User roles
+- [x] Geo Targeting metabox
+  - [x] Country include/exclude
+  - [x] IP-based geolocation (ip-api.com)
+  - [x] BuddyPress profile location fallback
+  - [x] Unknown location handling
+  - [x] Geo cache with transients
+
 **Files Created:**
 ```
 wb-ad-manager/
 ├── wb-ad-manager.php
+├── readme.txt
+├── ROADMAP.md
 ├── assets/
 │   ├── css/admin.css
 │   ├── css/frontend.css
@@ -82,7 +123,8 @@ wb-ad-manager/
     │   └── class-plugin.php
     ├── Admin/
     │   ├── class-admin.php
-    │   └── class-settings.php
+    │   ├── class-settings.php
+    │   └── class-display-options.php
     ├── Frontend/
     │   └── class-frontend.php
     └── Modules/
@@ -98,7 +140,14 @@ wb-ad-manager/
         │   ├── class-footer-placement.php
         │   ├── class-content-placement.php
         │   ├── class-paragraph-placement.php
+        │   ├── class-archive-placement.php
+        │   ├── class-widget-placement.php
         │   └── class-shortcode-placement.php
+        ├── Targeting/
+        │   ├── interface-targeting-rule.php
+        │   └── class-targeting-engine.php
+        ├── GeoTargeting/
+        │   └── class-geo-engine.php
         └── BuddyPress/
             ├── class-bp-module.php
             └── class-bp-activity-placement.php
@@ -106,108 +155,84 @@ wb-ad-manager/
 
 ---
 
-### Phase 2: Smart Placement System 🔲 NEXT
+### Phase 2: Advanced Scheduling & Frequency ✅ COMPLETE
 
-**Targeting Engine:**
-- [ ] Create `Modules/Targeting/` directory structure
-- [ ] Create `interface-targeting-rule.php`
-- [ ] Create `class-targeting-engine.php` - Central targeting processor
-- [ ] Create `class-post-targeting.php` - Specific posts targeting
-- [ ] Create `class-category-targeting.php` - Category/taxonomy targeting
-- [ ] Create `class-post-type-targeting.php` - Custom post type targeting
-- [ ] Create `class-device-targeting.php` - Desktop/mobile/tablet
-- [ ] Create `class-user-targeting.php` - Logged in/out, roles
-
-**Exclusion Rules:**
-- [ ] Create `class-exclusion-engine.php`
-- [ ] Exclude specific posts
-- [ ] Exclude categories/tags
-- [ ] Exclude post types
-- [ ] Exclude by URL pattern
-
-**Scheduling:**
-- [ ] Add start date field to ad metabox
-- [ ] Add end date field to ad metabox
-- [ ] Add day-of-week targeting
-- [ ] Add time-of-day targeting
-- [ ] Create `class-schedule-manager.php`
+**Advanced Scheduling:**
+- [x] Add day-of-week targeting (Mon, Tue, Wed, etc.)
+- [x] Add time-of-day targeting (time range)
+- [x] Uses site timezone
 
 **Frequency Control:**
-- [ ] Create `class-frequency-manager.php`
-- [ ] Maximum ads per page
-- [ ] Maximum ads per session (cookie-based)
-- [ ] Ad rotation/randomization
-- [ ] Priority/weight system
+- [x] Create `class-frequency-manager.php`
+- [x] Maximum ads per page setting (in Settings)
+- [x] Maximum ads per session (cookie-based, per-ad setting)
+- [x] Ad rotation/randomization (weighted random)
+- [x] Priority/weight system for ads (1-10 scale)
+- [x] Add priority field to ad metabox
+- [x] Add session limit field to ad metabox
 
 **Content Analysis:**
-- [ ] Create `class-content-analyzer.php`
-- [ ] Detect post length
-- [ ] Count paragraphs
-- [ ] Identify content type (text-heavy, image-heavy)
-
-**Admin UI Updates:**
-- [ ] Add "Targeting" metabox
-- [ ] Add "Schedule" metabox
-- [ ] Add "Display Rules" metabox
-- [ ] Update admin CSS for new metaboxes
+- [x] Create `class-content-analyzer.php`
+- [x] Detect post length (character, word count)
+- [x] Count paragraphs, headings, images, links
+- [x] Reading time estimation
+- [x] Smart ad position suggestions based on content
 
 ---
 
-### Phase 3: Geo-Targeting 🔲 PLANNED
-
-**Geo Detection System:**
-- [ ] Create `Modules/GeoTargeting/` directory
-- [ ] Create `interface-geo-provider.php`
-- [ ] Create `class-geo-engine.php` - Main geo processor
-- [ ] Create `class-ip-api-provider.php` - ip-api.com integration (free)
-- [ ] Create `class-ipinfo-provider.php` - ipinfo.io integration
-- [ ] Create `class-bp-location-provider.php` - BuddyPress profile location
-- [ ] Create `class-geo-cache.php` - Cache geo lookups (transients)
-
-**Detection Priority Chain:**
-1. BuddyPress profile location (if logged in + BP active)
-2. IP-based geolocation with caching
-3. Browser geolocation (with consent)
-4. Default/fallback ads
-
-**Targeting Options:**
-- [ ] Country targeting (include/exclude)
-- [ ] Region/state targeting
-- [ ] City targeting
-- [ ] Radius targeting (around a point)
-- [ ] Geo-based ad groups
-
-**Admin UI:**
-- [ ] Add geo targeting fields to targeting metabox
-- [ ] Country multi-select with search
-- [ ] Region/city autocomplete
-- [ ] Map preview (optional)
-
----
-
-### Phase 4: Additional Placements 🔲 PLANNED
+### Phase 3: Additional Placements ✅ COMPLETE
 
 **New WordPress Placements:**
-- [ ] Between posts in archive/blog listing
-- [ ] After X comments
-- [ ] Sidebar widget (dedicated widget class)
-- [ ] Floating/sticky ads (corner, bottom bar)
-- [ ] Popup/modal ads (with frequency limit)
-- [ ] Exit-intent popup
+- [x] Floating/sticky ads (corner, bottom bar) - `class-sticky-placement.php`
+  - Bottom Right
+  - Bottom Left
+  - Bottom Bar (Full Width)
+  - Top Bar (Full Width)
+- [x] Popup/modal ads (with frequency limit) - `class-popup-placement.php`
+  - Time Delay trigger
+  - Scroll Percentage trigger
+  - Exit Intent trigger
+- [x] Frontend JS for sticky/popup functionality
+- [x] Comment placements - `class-comment-placement.php`
+  - Before Comment Form
+  - After Comment Form
+  - Between Comments (with repeat option)
 
 **Additional BuddyPress Placements:**
-- [ ] Before activity form
-- [ ] After activity form
-- [ ] In member directory
-- [ ] In group directory
-- [ ] Member profile sidebar
-- [ ] Group header area
+- [x] In member directory - `class-bp-directory-placement.php`
+  - Before Members List
+  - After Members List
+  - Between Members (with repeat option)
+- [x] In group directory - `class-bp-directory-placement.php`
+  - Before Groups List
+  - After Groups List
+  - Between Groups (with repeat option)
+- [x] BuddyPress Widgets - `class-bp-widgets.php`
+  - Profile Ad Widget (shows on member profiles)
+  - Group Ad Widget (shows on group pages)
+  - Activity Ad Widget (shows on activity pages)
 
 **bbPress Placements (if bbPress active):**
-- [ ] Before/after forum list
-- [ ] Before/after topic list
-- [ ] Between topic replies
-- [ ] Forum sidebar
+- [x] bbPress Module - `class-bbpress-module.php`
+  - Before/After Forum List
+  - Before/After Topic List
+  - Before/After Single Topic
+  - Between Replies (with repeat option)
+- [x] bbPress Widgets
+  - Forum Ad Widget (all bbPress pages, forum only, or topic only)
+  - Topic Sidebar Ad Widget (single topic pages)
+
+**Files Created:**
+```
+includes/Modules/Placements/class-sticky-placement.php
+includes/Modules/Placements/class-popup-placement.php
+includes/Modules/Placements/class-comment-placement.php
+includes/Modules/BuddyPress/class-bp-directory-placement.php
+includes/Modules/BuddyPress/class-bp-widgets.php
+includes/Modules/bbPress/class-bbpress-module.php
+includes/Modules/Targeting/class-content-analyzer.php
+assets/js/frontend.js
+```
 
 ---
 
@@ -304,14 +329,6 @@ wb-ad-manager/
 - [ ] BuddyPress profile tab "My Ads"
 - [ ] Email notifications (submission, approval, rejection)
 
-**Approval Workflow:**
-1. Advertiser submits ad → Status: pending
-2. Admin receives email notification
-3. Admin reviews in WP admin
-4. Admin approves/rejects with optional notes
-5. Advertiser receives email with decision
-6. If approved, ad goes live based on schedule
-
 **Payment Integration:**
 - [ ] Create `Modules/Payments/` directory
 - [ ] Create `interface-payment-gateway.php`
@@ -379,13 +396,6 @@ wb-ad-manager/
 - [ ] Placement performance
 - [ ] Revenue tracking
 
-**Reports:**
-- [ ] Performance report
-- [ ] Revenue report
-- [ ] Advertiser report
-- [ ] Geo report
-- [ ] Device report
-
 ---
 
 ### Pro Phase P5: A/B Testing 🔲
@@ -408,7 +418,7 @@ wb-ad-manager/
 - [ ] Show alternative content
 - [ ] Analytics for blocked impressions
 
-**Lazy Loading:**
+**Lazy Loading (Enhanced):**
 - [ ] Create `class-lazy-loader.php`
 - [ ] Intersection Observer implementation
 - [ ] Placeholder system
@@ -428,97 +438,26 @@ wb-ad-manager/
 
 ---
 
-## File Structure (Complete)
-
-```
-wb-ad-manager/                          # FREE PLUGIN
-├── wb-ad-manager.php
-├── uninstall.php
-├── ROADMAP.md
-├── README.md
-├── assets/
-│   ├── css/
-│   │   ├── admin.css
-│   │   └── frontend.css
-│   └── js/
-│       ├── admin.js
-│       └── frontend.js
-├── includes/
-│   ├── Core/
-│   │   ├── trait-singleton.php
-│   │   ├── class-plugin.php
-│   │   ├── class-activator.php
-│   │   └── class-deactivator.php
-│   ├── Admin/
-│   │   ├── class-admin.php
-│   │   └── class-settings.php
-│   ├── Frontend/
-│   │   └── class-frontend.php
-│   └── Modules/
-│       ├── AdTypes/
-│       │   ├── interface-ad-type.php
-│       │   ├── class-image-ad.php
-│       │   ├── class-rich-content-ad.php
-│       │   └── class-code-ad.php
-│       ├── Placements/
-│       │   ├── interface-placement.php
-│       │   ├── class-placement-engine.php
-│       │   └── [placement classes]
-│       ├── Targeting/                   # Phase 2
-│       │   ├── interface-targeting-rule.php
-│       │   ├── class-targeting-engine.php
-│       │   └── [targeting classes]
-│       ├── GeoTargeting/                # Phase 3
-│       │   ├── interface-geo-provider.php
-│       │   ├── class-geo-engine.php
-│       │   └── [geo classes]
-│       └── BuddyPress/
-│           ├── class-bp-module.php
-│           └── class-bp-activity-placement.php
-├── languages/
-│   └── wb-ad-manager.pot
-└── templates/
-    └── [template files]
-
-wb-ad-manager-pro/                       # PRO PLUGIN
-├── wb-ad-manager-pro.php
-├── includes/
-│   ├── Core/
-│   │   ├── class-pro-plugin.php
-│   │   └── class-license-manager.php
-│   └── Modules/
-│       ├── AdNetworks/                  # P1
-│       ├── WooCommerce/                 # P2
-│       ├── Advertisers/                 # P3
-│       ├── Payments/                    # P3
-│       ├── Analytics/                   # P4
-│       └── ABTesting/                   # P5
-└── assets/
-```
-
----
-
 ## Priority Order for Development
 
-### Immediate (Free v1.1.0)
+### Free Version v1.1.0 ✅ ALL COMPLETE
 1. ~~Phase 1: Core Foundation~~ ✅ DONE
-2. Bug fixes and testing
-3. WordPress.org submission preparation
-
-### Short-term (Free v1.2.0)
-4. Phase 2: Smart Placement System
-5. Phase 4: Additional Placements (partial)
-
-### Medium-term (Free v1.3.0)
-6. Phase 3: Geo-Targeting
+2. ~~Phase 2: Advanced Scheduling & Frequency~~ ✅ DONE
+3. ~~Phase 3: Additional Placements~~ ✅ DONE
+4. ~~Content Analyzer~~ ✅ DONE
+5. ~~Comment Placements~~ ✅ DONE
+6. ~~BuddyPress Widgets~~ ✅ DONE
+7. ~~bbPress Integration~~ ✅ DONE
+8. Bug fixes and testing
+9. WordPress.org submission preparation
 
 ### Pro Development
-7. Pro P1: Ad Network Integration
 8. Pro P4: Analytics Dashboard (high demand)
-9. Pro P3: Advertiser Portal & Payments
-10. Pro P2: WooCommerce Integration
-11. Pro P5: A/B Testing
-12. Pro P6: Advanced Features
+9. Pro P1: Ad Network Integration
+10. Pro P3: Advertiser Portal & Payments
+11. Pro P2: WooCommerce Integration
+12. Pro P5: A/B Testing
+13. Pro P6: Advanced Features
 
 ---
 

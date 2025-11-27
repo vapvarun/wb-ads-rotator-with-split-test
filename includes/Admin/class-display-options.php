@@ -225,6 +225,19 @@ class Display_Options {
 		$schedule   = is_array( $schedule ) ? $schedule : array();
 		$start_date = isset( $schedule['start_date'] ) ? $schedule['start_date'] : '';
 		$end_date   = isset( $schedule['end_date'] ) ? $schedule['end_date'] : '';
+		$days       = isset( $schedule['days'] ) ? (array) $schedule['days'] : array();
+		$time_start = isset( $schedule['time_start'] ) ? $schedule['time_start'] : '';
+		$time_end   = isset( $schedule['time_end'] ) ? $schedule['time_end'] : '';
+
+		$weekdays = array(
+			'mon' => __( 'Mon', 'wb-ad-manager' ),
+			'tue' => __( 'Tue', 'wb-ad-manager' ),
+			'wed' => __( 'Wed', 'wb-ad-manager' ),
+			'thu' => __( 'Thu', 'wb-ad-manager' ),
+			'fri' => __( 'Fri', 'wb-ad-manager' ),
+			'sat' => __( 'Sat', 'wb-ad-manager' ),
+			'sun' => __( 'Sun', 'wb-ad-manager' ),
+		);
 		?>
 		<div class="wbam-schedule">
 			<div class="wbam-schedule-field">
@@ -236,6 +249,27 @@ class Display_Options {
 				<label for="wbam_end_date"><?php esc_html_e( 'End Date', 'wb-ad-manager' ); ?></label>
 				<input type="date" id="wbam_end_date" name="wbam_schedule[end_date]" value="<?php echo esc_attr( $end_date ); ?>" />
 				<p class="description"><?php esc_html_e( 'Leave empty to run indefinitely.', 'wb-ad-manager' ); ?></p>
+			</div>
+			<div class="wbam-schedule-field">
+				<label><?php esc_html_e( 'Days of Week', 'wb-ad-manager' ); ?></label>
+				<div class="wbam-days-selector">
+					<?php foreach ( $weekdays as $day_key => $day_label ) : ?>
+						<label class="wbam-day-checkbox">
+							<input type="checkbox" name="wbam_schedule[days][]" value="<?php echo esc_attr( $day_key ); ?>" <?php checked( in_array( $day_key, $days, true ) ); ?> />
+							<span><?php echo esc_html( $day_label ); ?></span>
+						</label>
+					<?php endforeach; ?>
+				</div>
+				<p class="description"><?php esc_html_e( 'Leave all unchecked to show every day.', 'wb-ad-manager' ); ?></p>
+			</div>
+			<div class="wbam-schedule-field">
+				<label><?php esc_html_e( 'Time of Day', 'wb-ad-manager' ); ?></label>
+				<div class="wbam-time-range">
+					<input type="time" name="wbam_schedule[time_start]" value="<?php echo esc_attr( $time_start ); ?>" />
+					<span><?php esc_html_e( 'to', 'wb-ad-manager' ); ?></span>
+					<input type="time" name="wbam_schedule[time_end]" value="<?php echo esc_attr( $time_end ); ?>" />
+				</div>
+				<p class="description"><?php esc_html_e( 'Leave empty to show all day. Uses site timezone.', 'wb-ad-manager' ); ?></p>
 			</div>
 		</div>
 		<?php
@@ -468,6 +502,21 @@ class Display_Options {
 
 		if ( ! empty( $input['end_date'] ) ) {
 			$sanitized['end_date'] = sanitize_text_field( $input['end_date'] );
+		}
+
+		// Days of week.
+		$valid_days = array( 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun' );
+		if ( ! empty( $input['days'] ) && is_array( $input['days'] ) ) {
+			$sanitized['days'] = array_intersect( $input['days'], $valid_days );
+		}
+
+		// Time range.
+		if ( ! empty( $input['time_start'] ) ) {
+			$sanitized['time_start'] = sanitize_text_field( $input['time_start'] );
+		}
+
+		if ( ! empty( $input['time_end'] ) ) {
+			$sanitized['time_end'] = sanitize_text_field( $input['time_end'] );
 		}
 
 		return $sanitized;

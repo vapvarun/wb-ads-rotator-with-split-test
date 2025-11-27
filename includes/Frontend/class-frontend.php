@@ -34,5 +34,13 @@ class Frontend {
 			array(),
 			WBAM_VERSION
 		);
+
+		wp_enqueue_script(
+			'wbam-frontend',
+			WBAM_URL . 'assets/js/frontend.js',
+			array(),
+			WBAM_VERSION,
+			true
+		);
 	}
 }

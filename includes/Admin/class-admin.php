@@ -260,8 +260,12 @@ class Admin {
 	 * @param \WP_Post $post Post.
 	 */
 	public function render_status_metabox( $post ) {
-		$enabled = get_post_meta( $post->ID, '_wbam_enabled', true );
-		$enabled = '' === $enabled ? '1' : $enabled;
+		$enabled       = get_post_meta( $post->ID, '_wbam_enabled', true );
+		$enabled       = '' === $enabled ? '1' : $enabled;
+		$priority      = get_post_meta( $post->ID, '_wbam_priority', true );
+		$priority      = '' === $priority ? 5 : absint( $priority );
+		$session_limit = get_post_meta( $post->ID, '_wbam_session_limit', true );
+		$session_limit = '' === $session_limit ? '' : absint( $session_limit );
 		?>
 		<div class="wbam-metabox">
 			<div class="wbam-status-options">
@@ -274,7 +278,27 @@ class Admin {
 					<span class="wbam-status-disabled"><?php esc_html_e( 'Disabled', 'wb-ad-manager' ); ?></span>
 				</label>
 			</div>
+
+			<div class="wbam-priority-field">
+				<label for="wbam_priority"><?php esc_html_e( 'Priority', 'wb-ad-manager' ); ?></label>
+				<input type="range" id="wbam_priority" name="wbam_priority" min="1" max="10" value="<?php echo esc_attr( $priority ); ?>" />
+				<span class="wbam-priority-value"><?php echo esc_html( $priority ); ?></span>
+				<p class="description"><?php esc_html_e( 'Higher priority ads display first.', 'wb-ad-manager' ); ?></p>
+			</div>
+
+			<div class="wbam-session-limit-field">
+				<label for="wbam_session_limit"><?php esc_html_e( 'Session Limit', 'wb-ad-manager' ); ?></label>
+				<input type="number" id="wbam_session_limit" name="wbam_session_limit" min="0" value="<?php echo esc_attr( $session_limit ); ?>" placeholder="<?php esc_attr_e( 'Unlimited', 'wb-ad-manager' ); ?>" />
+				<p class="description"><?php esc_html_e( 'Max views per visitor session. Leave empty for unlimited.', 'wb-ad-manager' ); ?></p>
+			</div>
 		</div>
+		<script>
+		jQuery(function($) {
+			$('#wbam_priority').on('input', function() {
+				$(this).next('.wbam-priority-value').text(this.value);
+			});
+		});
+		</script>
 		<?php
 	}
 
@@ -304,6 +328,17 @@ class Admin {
 		// Save enabled status.
 		$enabled = isset( $_POST['wbam_enabled'] ) ? sanitize_text_field( wp_unslash( $_POST['wbam_enabled'] ) ) : '1';
 		update_post_meta( $post_id, '_wbam_enabled', $enabled );
+
+		// Save priority.
+		$priority = isset( $_POST['wbam_priority'] ) ? absint( wp_unslash( $_POST['wbam_priority'] ) ) : 5;
+		$priority = max( 1, min( 10, $priority ) );
+		update_post_meta( $post_id, '_wbam_priority', $priority );
+
+		// Save session limit.
+		$session_limit = isset( $_POST['wbam_session_limit'] ) && '' !== $_POST['wbam_session_limit']
+			? absint( wp_unslash( $_POST['wbam_session_limit'] ) )
+			: '';
+		update_post_meta( $post_id, '_wbam_session_limit', $session_limit );
 
 		// Save placements.
 		$placements = isset( $_POST['wbam_placements'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['wbam_placements'] ) ) : array();
