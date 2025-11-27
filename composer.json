@@ -1,0 +1,31 @@
+{
+	"name": "wbcom/wb-ad-manager",
+	"description": "WordPress Ad Management Plugin with BuddyPress Integration",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^9.5"
+	},
+	"autoload": {
+		"psr-4": {
+			"WBAM\\": "includes/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"WBAM\\Tests\\": "tests/"
+		}
+	},
+	"scripts": {
+		"test": "phpunit",
+		"test-coverage": "phpunit --coverage-html coverage/"
+	},
+	"config": {
+		"platform": {
+			"php": "7.4"
+		}
+	}
+}
