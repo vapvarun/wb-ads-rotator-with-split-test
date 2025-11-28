@@ -218,6 +218,17 @@ class Placement_Engine {
 			return '';
 		}
 
-		return $handler->render( $ad_id, $options );
+		$output    = $handler->render( $ad_id, $options );
+		$placement = isset( $options['placement'] ) ? $options['placement'] : '';
+
+		/**
+		 * Filter the ad output HTML.
+		 *
+		 * @since 1.0.0
+		 * @param string $output    Ad output HTML.
+		 * @param int    $ad_id     Ad ID.
+		 * @param string $placement Placement ID.
+		 */
+		return apply_filters( 'wbam_ad_output', $output, $ad_id, $placement );
 	}
 }

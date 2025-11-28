@@ -22,6 +22,8 @@ class Frontend {
 	 */
 	public function init() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		add_action( 'wp_ajax_wbam_track_click', array( $this, 'handle_click_tracking' ) );
+		add_action( 'wp_ajax_nopriv_wbam_track_click', array( $this, 'handle_click_tracking' ) );
 	}
 
 	/**
@@ -42,5 +44,40 @@ class Frontend {
 			WBAM_VERSION,
 			true
 		);
+
+		wp_localize_script(
+			'wbam-frontend',
+			'wbamFrontend',
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'nonce'   => wp_create_nonce( 'wbam_frontend' ),
+			)
+		);
+	}
+
+	/**
+	 * Handle click tracking AJAX request.
+	 */
+	public function handle_click_tracking() {
+		// Verify nonce.
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wbam_frontend' ) ) {
+			wp_die( 'Invalid nonce', '', array( 'response' => 403 ) );
+		}
+
+		$ad_id     = isset( $_POST['ad_id'] ) ? absint( wp_unslash( $_POST['ad_id'] ) ) : 0;
+		$placement = isset( $_POST['placement'] ) ? sanitize_text_field( wp_unslash( $_POST['placement'] ) ) : '';
+
+		if ( $ad_id > 0 ) {
+			/**
+			 * Action fired when an ad is clicked.
+			 *
+			 * @since 1.0.0
+			 * @param int    $ad_id     Ad ID.
+			 * @param string $placement Placement ID.
+			 */
+			do_action( 'wbam_ad_clicked', $ad_id, $placement );
+		}
+
+		wp_send_json_success();
 	}
 }

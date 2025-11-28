@@ -316,12 +316,59 @@
 		},
 
 		/**
+		 * Click tracking handler.
+		 */
+		clicks: {
+			/**
+			 * Initialize click tracking.
+			 */
+			init: function() {
+				var ads = document.querySelectorAll( '.wbam-ad-container[data-ad-id]' );
+
+				ads.forEach( function( ad ) {
+					var links = ad.querySelectorAll( 'a' );
+					links.forEach( function( link ) {
+						link.addEventListener( 'click', function() {
+							WBAM.clicks.track( ad );
+						} );
+					} );
+				} );
+			},
+
+			/**
+			 * Track ad click.
+			 *
+			 * @param {Element} ad Ad container element.
+			 */
+			track: function( ad ) {
+				var adId      = ad.getAttribute( 'data-ad-id' );
+				var placement = ad.getAttribute( 'data-placement' ) || '';
+
+				if ( ! adId || ! window.wbamFrontend ) {
+					return;
+				}
+
+				// Send AJAX request to track click.
+				var xhr = new XMLHttpRequest();
+				xhr.open( 'POST', window.wbamFrontend.ajaxUrl, true );
+				xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+				xhr.send(
+					'action=wbam_track_click' +
+					'&ad_id=' + encodeURIComponent( adId ) +
+					'&placement=' + encodeURIComponent( placement ) +
+					'&nonce=' + encodeURIComponent( window.wbamFrontend.nonce )
+				);
+			}
+		},
+
+		/**
 		 * Initialize all handlers.
 		 */
 		init: function() {
 			this.sticky.init();
 			this.popup.init();
 			this.lazy.init();
+			this.clicks.init();
 		}
 	};
 

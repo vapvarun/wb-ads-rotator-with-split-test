@@ -291,6 +291,16 @@ class Admin {
 				<input type="number" id="wbam_session_limit" name="wbam_session_limit" min="0" value="<?php echo esc_attr( $session_limit ); ?>" placeholder="<?php esc_attr_e( 'Unlimited', 'wb-ad-manager' ); ?>" />
 				<p class="description"><?php esc_html_e( 'Max views per visitor session. Leave empty for unlimited.', 'wb-ad-manager' ); ?></p>
 			</div>
+
+			<?php
+			/**
+			 * Action for adding additional metabox options.
+			 *
+			 * @since 1.0.0
+			 * @param \WP_Post $post Post object.
+			 */
+			do_action( 'wbam_ad_metabox_options', $post );
+			?>
 		</div>
 		<script>
 		jQuery(function($) {
@@ -373,6 +383,14 @@ class Admin {
 
 			update_post_meta( $post_id, '_wbam_ad_data', $data );
 		}
+
+		/**
+		 * Action fired after ad meta is saved.
+		 *
+		 * @since 1.0.0
+		 * @param int $post_id Post ID.
+		 */
+		do_action( 'wbam_save_ad_meta', $post_id );
 	}
 
 	/**
