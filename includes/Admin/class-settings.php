@@ -40,6 +40,8 @@ class Settings {
 		'lazy_load'              => false,
 		'geo_primary_provider'   => 'ip-api',
 		'geo_ipinfo_key'         => '',
+		'adsense_publisher_id'   => '',
+		'adsense_auto_ads'       => false,
 	);
 
 	/**
@@ -254,6 +256,39 @@ class Settings {
 				'description' => __( 'Get a free API key from ipinfo.io for 50K requests/month.', 'wb-ad-manager' ),
 			)
 		);
+
+		// AdSense Section.
+		add_settings_section(
+			'wbam_adsense',
+			__( 'Google AdSense', 'wb-ad-manager' ),
+			array( $this, 'render_adsense_section' ),
+			'wbam-settings'
+		);
+
+		add_settings_field(
+			'adsense_publisher_id',
+			__( 'Publisher ID', 'wb-ad-manager' ),
+			array( $this, 'render_text_field' ),
+			'wbam-settings',
+			'wbam_adsense',
+			array(
+				'id'          => 'adsense_publisher_id',
+				'placeholder' => 'ca-pub-1234567890123456',
+				'description' => __( 'Your AdSense Publisher ID (e.g., ca-pub-1234567890123456). Used as default for all AdSense ads.', 'wb-ad-manager' ),
+			)
+		);
+
+		add_settings_field(
+			'adsense_auto_ads',
+			__( 'Auto Ads', 'wb-ad-manager' ),
+			array( $this, 'render_checkbox_field' ),
+			'wbam-settings',
+			'wbam_adsense',
+			array(
+				'id'          => 'adsense_auto_ads',
+				'description' => __( 'Enable AdSense Auto Ads on your site. Google will automatically place ads.', 'wb-ad-manager' ),
+			)
+		);
 	}
 
 	/**
@@ -311,6 +346,10 @@ class Settings {
 		$geo_provider                        = isset( $input['geo_primary_provider'] ) ? sanitize_key( $input['geo_primary_provider'] ) : 'ip-api';
 		$sanitized['geo_primary_provider']   = in_array( $geo_provider, $valid_providers, true ) ? $geo_provider : 'ip-api';
 		$sanitized['geo_ipinfo_key']         = sanitize_text_field( $input['geo_ipinfo_key'] ?? '' );
+
+		// AdSense settings.
+		$sanitized['adsense_publisher_id']   = sanitize_text_field( $input['adsense_publisher_id'] ?? '' );
+		$sanitized['adsense_auto_ads']       = ! empty( $input['adsense_auto_ads'] );
 
 		return $sanitized;
 	}
@@ -390,6 +429,13 @@ class Settings {
 	 */
 	public function render_geo_section() {
 		echo '<p>' . esc_html__( 'Configure IP geolocation providers for geo-targeting. The system will try providers in order until one succeeds.', 'wb-ad-manager' ) . '</p>';
+	}
+
+	/**
+	 * Render AdSense section.
+	 */
+	public function render_adsense_section() {
+		echo '<p>' . esc_html__( 'Configure Google AdSense integration. The AdSense script will only be loaded once, even with multiple ad units on a page.', 'wb-ad-manager' ) . '</p>';
 	}
 
 	/**

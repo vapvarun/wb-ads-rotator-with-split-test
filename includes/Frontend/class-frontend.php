@@ -24,6 +24,7 @@ class Frontend {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'wp_ajax_wbam_track_click', array( $this, 'handle_click_tracking' ) );
 		add_action( 'wp_ajax_nopriv_wbam_track_click', array( $this, 'handle_click_tracking' ) );
+		add_action( 'wp_head', array( $this, 'maybe_add_adsense_auto_ads' ) );
 	}
 
 	/**
@@ -57,6 +58,29 @@ class Frontend {
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'wbam_frontend' ),
 			)
+		);
+	}
+
+	/**
+	 * Add AdSense Auto Ads script to head if enabled.
+	 */
+	public function maybe_add_adsense_auto_ads() {
+		$settings = get_option( 'wbam_settings', array() );
+
+		// Check if Auto Ads is enabled.
+		if ( empty( $settings['adsense_auto_ads'] ) ) {
+			return;
+		}
+
+		// Get Publisher ID.
+		$publisher_id = isset( $settings['adsense_publisher_id'] ) ? $settings['adsense_publisher_id'] : '';
+		if ( empty( $publisher_id ) ) {
+			return;
+		}
+
+		printf(
+			'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%s" crossorigin="anonymous"></script>',
+			esc_attr( $publisher_id )
 		);
 	}
 

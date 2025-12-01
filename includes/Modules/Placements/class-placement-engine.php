@@ -13,6 +13,7 @@ use WBAM\Modules\AdTypes\Ad_Type_Interface;
 use WBAM\Modules\AdTypes\Image_Ad;
 use WBAM\Modules\AdTypes\Rich_Content_Ad;
 use WBAM\Modules\AdTypes\Code_Ad;
+use WBAM\Modules\AdTypes\AdSense_Ad;
 use WBAM\Modules\Targeting\Targeting_Engine;
 
 /**
@@ -59,6 +60,7 @@ class Placement_Engine {
 		$this->register_ad_type( new Image_Ad() );
 		$this->register_ad_type( new Rich_Content_Ad() );
 		$this->register_ad_type( new Code_Ad() );
+		$this->register_ad_type( new AdSense_Ad() );
 
 		do_action( 'wbam_register_ad_types', $this );
 	}

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Wbcom Designs - WB Ad Manager 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wbcomdesigns.com/support/\n"
-"POT-Creation-Date: 2025-12-01 08:57:28+00:00\n"
+"POT-Creation-Date: 2025-12-01 09:09:32+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -138,7 +138,7 @@ msgid "Visitor Conditions"
 msgstr ""
 
 #: includes/Admin/class-display-options.php:62
-#: includes/Admin/class-settings.php:229
+#: includes/Admin/class-settings.php:231
 msgid "Geo Targeting"
 msgstr ""
 
@@ -361,201 +361,230 @@ msgstr ""
 msgid "Show ad to visitors with unknown location"
 msgstr ""
 
-#: includes/Admin/class-settings.php:59 includes/Admin/class-settings.php:60
-#: includes/Admin/class-setup-wizard.php:439
+#: includes/Admin/class-settings.php:61 includes/Admin/class-settings.php:62
+#: includes/Admin/class-setup-wizard.php:442
 msgid "Settings"
 msgstr ""
 
-#: includes/Admin/class-settings.php:80
+#: includes/Admin/class-settings.php:82
 msgid "General Settings"
 msgstr ""
 
-#: includes/Admin/class-settings.php:87
+#: includes/Admin/class-settings.php:89
 msgid "Disable for Logged-in Users"
 msgstr ""
 
-#: includes/Admin/class-settings.php:93
+#: includes/Admin/class-settings.php:95
 msgid "Hide ads for logged-in users."
 msgstr ""
 
-#: includes/Admin/class-settings.php:99
+#: includes/Admin/class-settings.php:101
 msgid "Disable for Admins"
 msgstr ""
 
-#: includes/Admin/class-settings.php:105
+#: includes/Admin/class-settings.php:107
 msgid "Hide ads for administrators."
 msgstr ""
 
-#: includes/Admin/class-settings.php:111
+#: includes/Admin/class-settings.php:113
 msgid "Minimum Content Length"
 msgstr ""
 
-#: includes/Admin/class-settings.php:117
+#: includes/Admin/class-settings.php:119
 msgid "Minimum characters required to show paragraph ads. Set 0 to disable."
 msgstr ""
 
-#: includes/Admin/class-settings.php:123
+#: includes/Admin/class-settings.php:125
 msgid "Disable on Post Types"
 msgstr ""
 
-#: includes/Admin/class-settings.php:129
+#: includes/Admin/class-settings.php:131
 msgid "Select post types where ads should be disabled."
 msgstr ""
 
-#: includes/Admin/class-settings.php:135
+#: includes/Admin/class-settings.php:137
 msgid "Maximum Ads Per Page"
 msgstr ""
 
-#: includes/Admin/class-settings.php:141
+#: includes/Admin/class-settings.php:143
 msgid "Maximum number of ads to show per page. Set 0 for unlimited."
 msgstr ""
 
-#: includes/Admin/class-settings.php:148
+#: includes/Admin/class-settings.php:150
 msgid "Display Settings"
 msgstr ""
 
-#: includes/Admin/class-settings.php:155
+#: includes/Admin/class-settings.php:157
 msgid "Ad Label Text"
 msgstr ""
 
-#: includes/Admin/class-settings.php:161
+#: includes/Admin/class-settings.php:163
 msgid "e.g., Advertisement"
 msgstr ""
 
-#: includes/Admin/class-settings.php:162
+#: includes/Admin/class-settings.php:164
 msgid "Optional label to display above/below ads."
 msgstr ""
 
-#: includes/Admin/class-settings.php:168
+#: includes/Admin/class-settings.php:170
 msgid "Label Position"
 msgstr ""
 
-#: includes/Admin/class-settings.php:175
+#: includes/Admin/class-settings.php:177
 msgid "Above Ad"
 msgstr ""
 
-#: includes/Admin/class-settings.php:176
+#: includes/Admin/class-settings.php:178
 msgid "Below Ad"
 msgstr ""
 
-#: includes/Admin/class-settings.php:183
+#: includes/Admin/class-settings.php:185
 msgid "Custom Container Class"
 msgstr ""
 
-#: includes/Admin/class-settings.php:189
+#: includes/Admin/class-settings.php:191
 msgid "e.g., my-ad-wrapper"
 msgstr ""
 
-#: includes/Admin/class-settings.php:190
+#: includes/Admin/class-settings.php:192
 msgid "Additional CSS class for ad containers."
 msgstr ""
 
-#: includes/Admin/class-settings.php:197
+#: includes/Admin/class-settings.php:199
 msgid "Performance"
 msgstr ""
 
-#: includes/Admin/class-settings.php:204
+#: includes/Admin/class-settings.php:206
 msgid "Lazy Load Ads"
 msgstr ""
 
-#: includes/Admin/class-settings.php:210
+#: includes/Admin/class-settings.php:212
 msgid "Load ads only when they come into viewport."
 msgstr ""
 
-#: includes/Admin/class-settings.php:216
+#: includes/Admin/class-settings.php:218
 msgid "Cache Ad Queries"
 msgstr ""
 
-#: includes/Admin/class-settings.php:222
+#: includes/Admin/class-settings.php:224
 msgid "Cache ad queries for better performance (uses transients)."
 msgstr ""
 
-#: includes/Admin/class-settings.php:236
+#: includes/Admin/class-settings.php:238
 msgid "Primary Provider"
 msgstr ""
 
-#: includes/Admin/class-settings.php:247
+#: includes/Admin/class-settings.php:249
 msgid "ipinfo.io API Key"
 msgstr ""
 
-#: includes/Admin/class-settings.php:253
+#: includes/Admin/class-settings.php:255
 msgid "Enter API key (optional)"
 msgstr ""
 
-#: includes/Admin/class-settings.php:254
+#: includes/Admin/class-settings.php:256
 msgid "Get a free API key from ipinfo.io for 50K requests/month."
 msgstr ""
 
-#: includes/Admin/class-settings.php:328
+#: includes/Admin/class-settings.php:263
+#: includes/Modules/AdTypes/class-adsense-ad.php:56
+msgid "Google AdSense"
+msgstr ""
+
+#: includes/Admin/class-settings.php:270
+msgid "Publisher ID"
+msgstr ""
+
+#: includes/Admin/class-settings.php:277
+msgid ""
+"Your AdSense Publisher ID (e.g., ca-pub-1234567890123456). Used as default "
+"for all AdSense ads."
+msgstr ""
+
+#: includes/Admin/class-settings.php:283
+msgid "Auto Ads"
+msgstr ""
+
+#: includes/Admin/class-settings.php:289
+msgid "Enable AdSense Auto Ads on your site. Google will automatically place ads."
+msgstr ""
+
+#: includes/Admin/class-settings.php:367
 msgid "Settings saved."
 msgstr ""
 
-#: includes/Admin/class-settings.php:341
+#: includes/Admin/class-settings.php:380
 msgid "Save Settings"
 msgstr ""
 
-#: includes/Admin/class-settings.php:347
+#: includes/Admin/class-settings.php:386
 msgid "Quick Links"
 msgstr ""
 
-#: includes/Admin/class-settings.php:349 includes/Core/class-plugin.php:136
+#: includes/Admin/class-settings.php:388 includes/Core/class-plugin.php:136
 msgid "All Ads"
 msgstr ""
 
-#: includes/Admin/class-settings.php:350 includes/Core/class-plugin.php:137
+#: includes/Admin/class-settings.php:389 includes/Core/class-plugin.php:137
 msgid "Add New Ad"
 msgstr ""
 
-#: includes/Admin/class-settings.php:355
+#: includes/Admin/class-settings.php:394
 msgid "Shortcodes"
 msgstr ""
 
-#: includes/Admin/class-settings.php:357
+#: includes/Admin/class-settings.php:396
 msgid "Display a single ad by ID."
 msgstr ""
 
-#: includes/Admin/class-settings.php:359
+#: includes/Admin/class-settings.php:398
 msgid "Display multiple ads."
 msgstr ""
 
-#: includes/Admin/class-settings.php:371
+#: includes/Admin/class-settings.php:410
 msgid "Configure general ad display settings."
 msgstr ""
 
-#: includes/Admin/class-settings.php:378
+#: includes/Admin/class-settings.php:417
 msgid "Customize how ads appear on your site."
 msgstr ""
 
-#: includes/Admin/class-settings.php:385
+#: includes/Admin/class-settings.php:424
 msgid "Optimize ad loading performance."
 msgstr ""
 
-#: includes/Admin/class-settings.php:392
+#: includes/Admin/class-settings.php:431
 msgid ""
 "Configure IP geolocation providers for geo-targeting. The system will try "
 "providers in order until one succeeds."
 msgstr ""
 
-#: includes/Admin/class-settings.php:408
+#: includes/Admin/class-settings.php:438
+msgid ""
+"Configure Google AdSense integration. The AdSense script will only be "
+"loaded once, even with multiple ad units on a page."
+msgstr ""
+
+#: includes/Admin/class-settings.php:454
 msgid "45 requests/minute, no API key"
 msgstr ""
 
-#: includes/Admin/class-settings.php:412
+#: includes/Admin/class-settings.php:458
 msgid "50K requests/month, API key optional"
 msgstr ""
 
-#: includes/Admin/class-settings.php:416
+#: includes/Admin/class-settings.php:462
 msgid "1K requests/day, no API key"
 msgstr ""
 
-#: includes/Admin/class-settings.php:430
+#: includes/Admin/class-settings.php:476
 msgid ""
 "If the primary provider fails, the system will automatically try the next "
 "provider."
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:69
-#: includes/Admin/class-setup-wizard.php:250
+#: includes/Admin/class-setup-wizard.php:253
 msgid "Welcome to WB Ad Manager!"
 msgstr ""
 
@@ -570,7 +599,7 @@ msgid "Run Setup Wizard"
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:77
-#: includes/Admin/class-setup-wizard.php:265
+#: includes/Admin/class-setup-wizard.php:268
 msgid "Skip Setup"
 msgstr ""
 
@@ -590,144 +619,144 @@ msgstr ""
 msgid "WB Ad Manager Setup"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:168 includes/Core/class-plugin.php:135
+#: includes/Admin/class-setup-wizard.php:171 includes/Core/class-plugin.php:135
 #: includes/Modules/Placements/class-widget-placement.php:59
 msgid "WB Ad Manager"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:223
+#: includes/Admin/class-setup-wizard.php:226
 msgid "Exit Setup Wizard"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:251
+#: includes/Admin/class-setup-wizard.php:254
 msgid ""
 "Thank you for installing WB Ad Manager. This quick setup wizard will help "
 "you get started by:"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:253
+#: includes/Admin/class-setup-wizard.php:256
 msgid "Creating sample ads to demonstrate features"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:254
+#: includes/Admin/class-setup-wizard.php:257
 msgid "Setting up different ad placements"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:255
+#: includes/Admin/class-setup-wizard.php:258
 msgid "Getting you ready to manage your own ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:258
+#: includes/Admin/class-setup-wizard.php:261
 msgid "This wizard is optional. You can skip it and create ads manually anytime."
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:262
+#: includes/Admin/class-setup-wizard.php:265
 msgid "Let's Go!"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:278
-#: includes/Admin/class-setup-wizard.php:312
+#: includes/Admin/class-setup-wizard.php:281
+#: includes/Admin/class-setup-wizard.php:315
 msgid "Create Sample Ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:279
+#: includes/Admin/class-setup-wizard.php:282
 msgid ""
 "Select which sample ads you would like to create. These will help you "
 "understand how different ad types and placements work."
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:288
+#: includes/Admin/class-setup-wizard.php:291
 msgid "Header Banner"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:289
+#: includes/Admin/class-setup-wizard.php:292
 msgid "Image ad displayed in the header area"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:296
+#: includes/Admin/class-setup-wizard.php:299
 msgid "Sidebar Widget Ad"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:297
+#: includes/Admin/class-setup-wizard.php:300
 msgid "Code ad for sidebar widget placement"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:304
+#: includes/Admin/class-setup-wizard.php:307
 msgid "In-Content Promotion"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:305
+#: includes/Admin/class-setup-wizard.php:308
 msgid "Rich content ad after paragraph 2"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:315
+#: includes/Admin/class-setup-wizard.php:318
 msgid "Skip This Step"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:347
-#: includes/Admin/class-setup-wizard.php:354
+#: includes/Admin/class-setup-wizard.php:350
+#: includes/Admin/class-setup-wizard.php:357
 msgid "Sample Header Banner"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:359
+#: includes/Admin/class-setup-wizard.php:362
 msgid "Sample Sidebar Ad"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:365
+#: includes/Admin/class-setup-wizard.php:368
 msgid "Advertise Here!"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:366
+#: includes/Admin/class-setup-wizard.php:369
 msgid "This is a sample sidebar ad using custom HTML code."
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:367
+#: includes/Admin/class-setup-wizard.php:370
 msgid "Learn More"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:372
+#: includes/Admin/class-setup-wizard.php:375
 msgid "Sample In-Content Promo"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:378
+#: includes/Admin/class-setup-wizard.php:381
 msgid "Pro Tip:"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:379
+#: includes/Admin/class-setup-wizard.php:382
 msgid ""
 "This is a sample in-content promotion. It appears after paragraph 2 in your "
 "posts. Great for newsletter signups, related content, or special offers!"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:421
+#: includes/Admin/class-setup-wizard.php:424
 msgid "You're All Set!"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:422
+#: includes/Admin/class-setup-wizard.php:425
 msgid "WB Ad Manager is ready to use. Here are some next steps:"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:427
+#: includes/Admin/class-setup-wizard.php:430
 msgid "View Your Ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:428
+#: includes/Admin/class-setup-wizard.php:431
 msgid "See and manage all your ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:433
+#: includes/Admin/class-setup-wizard.php:436
 msgid "Create New Ad"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:434
+#: includes/Admin/class-setup-wizard.php:437
 msgid "Add your own custom ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:440
+#: includes/Admin/class-setup-wizard.php:443
 msgid "Configure plugin options"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:446
+#: includes/Admin/class-setup-wizard.php:449
 msgid "Go to Ads Dashboard"
 msgstr ""
 
@@ -769,6 +798,102 @@ msgstr ""
 
 #: includes/Core/class-plugin.php:201
 msgid "BuddyPress is not active. BuddyPress activity placements are disabled."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:65
+msgid "Display Google AdSense ads with automatic script management."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:212
+msgid "Ad Slot ID"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:215
+msgid "Enter the Ad Slot ID from your AdSense account (e.g., 1234567890)."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:220
+msgid "Publisher ID (Optional)"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:228
+#. translators: %s: Publisher ID
+msgid "Leave empty to use global Publisher ID: %s"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:232
+msgid ""
+"Enter your Publisher ID (e.g., ca-pub-1234567890123456) or set it in plugin "
+"settings."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:240
+msgid "Ad Format"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:243
+msgid "Auto (Responsive)"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:244
+msgid "Horizontal Banner"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:245
+msgid "Vertical Banner"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:246
+msgid "Rectangle"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:247
+msgid "In-Article"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:248
+msgid "In-Feed"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:249
+msgid "Multiplex"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:250
+msgid "Fixed Size"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:256
+msgid "Layout Key"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:259
+msgid "For in-feed ads, enter the layout key from AdSense."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:264
+msgid "Fixed Dimensions"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:266
+msgid "Width"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:268
+msgid "Height"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:276
+msgid "Enable full-width responsive"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:297
+#. translators: %s: Settings link
+msgid "No global Publisher ID configured. %s to set it up for all AdSense ads."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-adsense-ad.php:298
+msgid "Go to Settings"
 msgstr ""
 
 #: includes/Modules/AdTypes/class-code-ad.php:31
