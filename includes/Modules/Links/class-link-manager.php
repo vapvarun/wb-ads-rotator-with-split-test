@@ -74,6 +74,12 @@ class Link_Manager {
 			'redirect_type'    => 307,
 			'status'           => 'active',
 			'expires_at'       => null,
+			'payment_amount'   => 0.00,
+			'payment_type'     => 'one_time',
+			'payment_currency' => 'USD',
+			'payment_status'   => 'unpaid',
+			'commission_rate'  => 0.00,
+			'total_revenue'    => 0.00,
 			'created_by'       => get_current_user_id(),
 		);
 
@@ -105,9 +111,15 @@ class Link_Manager {
 				'redirect_type'    => $data['redirect_type'],
 				'status'           => $data['status'],
 				'expires_at'       => $data['expires_at'],
+				'payment_amount'   => $data['payment_amount'],
+				'payment_type'     => $data['payment_type'],
+				'payment_currency' => $data['payment_currency'],
+				'payment_status'   => $data['payment_status'],
+				'commission_rate'  => $data['commission_rate'],
+				'total_revenue'    => $data['total_revenue'],
 				'created_by'       => $data['created_by'],
 			),
-			array( '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%d' )
+			array( '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%f', '%s', '%s', '%s', '%f', '%f', '%d' )
 		);
 
 		if ( false === $result ) {
@@ -335,6 +347,12 @@ class Link_Manager {
 			'redirect_type'    => '%d',
 			'status'           => '%s',
 			'expires_at'       => '%s',
+			'payment_amount'   => '%f',
+			'payment_type'     => '%s',
+			'payment_currency' => '%s',
+			'payment_status'   => '%s',
+			'commission_rate'  => '%f',
+			'total_revenue'    => '%f',
 		);
 
 		foreach ( $allowed_fields as $field => $format ) {
@@ -552,6 +570,36 @@ class Link_Manager {
 		foreach ( $int_fields as $field ) {
 			if ( isset( $data[ $field ] ) ) {
 				$data[ $field ] = (int) $data[ $field ];
+			}
+		}
+
+		// Sanitize payment fields.
+		if ( isset( $data['payment_type'] ) ) {
+			$valid_payment_types = array_keys( Link::get_payment_types() );
+			if ( ! in_array( $data['payment_type'], $valid_payment_types, true ) ) {
+				$data['payment_type'] = 'one_time';
+			}
+		}
+
+		if ( isset( $data['payment_status'] ) ) {
+			$valid_payment_statuses = array_keys( Link::get_payment_statuses() );
+			if ( ! in_array( $data['payment_status'], $valid_payment_statuses, true ) ) {
+				$data['payment_status'] = 'unpaid';
+			}
+		}
+
+		if ( isset( $data['payment_currency'] ) ) {
+			$data['payment_currency'] = strtoupper( sanitize_text_field( $data['payment_currency'] ) );
+			if ( strlen( $data['payment_currency'] ) !== 3 ) {
+				$data['payment_currency'] = 'USD';
+			}
+		}
+
+		// Cast float fields (payment amounts).
+		$float_fields = array( 'payment_amount', 'commission_rate', 'total_revenue' );
+		foreach ( $float_fields as $field ) {
+			if ( isset( $data[ $field ] ) ) {
+				$data[ $field ] = max( 0, (float) $data[ $field ] );
 			}
 		}
 

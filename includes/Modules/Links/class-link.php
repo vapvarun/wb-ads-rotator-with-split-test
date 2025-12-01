@@ -126,6 +126,48 @@ class Link {
 	public $expires_at = null;
 
 	/**
+	 * Payment amount for this link.
+	 *
+	 * @var float
+	 */
+	public $payment_amount = 0.00;
+
+	/**
+	 * Payment type (one_time, recurring, per_click, commission).
+	 *
+	 * @var string
+	 */
+	public $payment_type = 'one_time';
+
+	/**
+	 * Payment currency.
+	 *
+	 * @var string
+	 */
+	public $payment_currency = 'USD';
+
+	/**
+	 * Payment status (pending, paid, unpaid).
+	 *
+	 * @var string
+	 */
+	public $payment_status = 'unpaid';
+
+	/**
+	 * Commission percentage (for affiliate links).
+	 *
+	 * @var float
+	 */
+	public $commission_rate = 0.00;
+
+	/**
+	 * Total revenue generated from this link.
+	 *
+	 * @var float
+	 */
+	public $total_revenue = 0.00;
+
+	/**
 	 * User who created the link.
 	 *
 	 * @var int
@@ -183,6 +225,11 @@ class Link {
 		$this->redirect_type = (int) $this->redirect_type;
 		$this->click_count   = (int) $this->click_count;
 		$this->created_by    = (int) $this->created_by;
+
+		// Cast payment fields.
+		$this->payment_amount  = (float) $this->payment_amount;
+		$this->commission_rate = (float) $this->commission_rate;
+		$this->total_revenue   = (float) $this->total_revenue;
 	}
 
 	/**
@@ -349,6 +396,116 @@ class Link {
 			302 => __( '302 Temporary', 'wb-ad-manager' ),
 			307 => __( '307 Temporary (Recommended)', 'wb-ad-manager' ),
 		);
+	}
+
+	/**
+	 * Get available payment types.
+	 *
+	 * @return array
+	 */
+	public static function get_payment_types() {
+		return array(
+			'one_time'   => __( 'One Time', 'wb-ad-manager' ),
+			'recurring'  => __( 'Recurring', 'wb-ad-manager' ),
+			'per_click'  => __( 'Per Click', 'wb-ad-manager' ),
+			'commission' => __( 'Commission', 'wb-ad-manager' ),
+		);
+	}
+
+	/**
+	 * Get available payment statuses.
+	 *
+	 * @return array
+	 */
+	public static function get_payment_statuses() {
+		return array(
+			'unpaid'  => __( 'Unpaid', 'wb-ad-manager' ),
+			'pending' => __( 'Pending', 'wb-ad-manager' ),
+			'paid'    => __( 'Paid', 'wb-ad-manager' ),
+		);
+	}
+
+	/**
+	 * Get formatted payment amount.
+	 *
+	 * @return string
+	 */
+	public function get_formatted_payment() {
+		if ( $this->payment_amount <= 0 ) {
+			return '—';
+		}
+
+		$currencies = array(
+			'USD' => '$',
+			'EUR' => '€',
+			'GBP' => '£',
+			'INR' => '₹',
+			'AUD' => 'A$',
+			'CAD' => 'C$',
+		);
+
+		$symbol = isset( $currencies[ $this->payment_currency ] ) ? $currencies[ $this->payment_currency ] : $this->payment_currency . ' ';
+		return $symbol . number_format( $this->payment_amount, 2 );
+	}
+
+	/**
+	 * Get formatted total revenue.
+	 *
+	 * @return string
+	 */
+	public function get_formatted_revenue() {
+		if ( $this->total_revenue <= 0 ) {
+			return '—';
+		}
+
+		$currencies = array(
+			'USD' => '$',
+			'EUR' => '€',
+			'GBP' => '£',
+			'INR' => '₹',
+			'AUD' => 'A$',
+			'CAD' => 'C$',
+		);
+
+		$symbol = isset( $currencies[ $this->payment_currency ] ) ? $currencies[ $this->payment_currency ] : $this->payment_currency . ' ';
+		return $symbol . number_format( $this->total_revenue, 2 );
+	}
+
+	/**
+	 * Get payment type label.
+	 *
+	 * @return string
+	 */
+	public function get_payment_type_label() {
+		$types = self::get_payment_types();
+		return isset( $types[ $this->payment_type ] ) ? $types[ $this->payment_type ] : $this->payment_type;
+	}
+
+	/**
+	 * Get payment status label.
+	 *
+	 * @return string
+	 */
+	public function get_payment_status_label() {
+		$statuses = self::get_payment_statuses();
+		return isset( $statuses[ $this->payment_status ] ) ? $statuses[ $this->payment_status ] : $this->payment_status;
+	}
+
+	/**
+	 * Calculate estimated revenue based on clicks and payment type.
+	 *
+	 * @return float
+	 */
+	public function calculate_estimated_revenue() {
+		if ( 'per_click' === $this->payment_type && $this->payment_amount > 0 ) {
+			return $this->click_count * $this->payment_amount;
+		}
+
+		if ( 'one_time' === $this->payment_type && 'paid' === $this->payment_status ) {
+			return (float) $this->payment_amount;
+		}
+
+		return $this->total_revenue;
 	}
 
 	/**

@@ -316,6 +316,154 @@
 		},
 
 		/**
+		 * Email capture handler.
+		 */
+		emailCapture: {
+			/**
+			 * Initialize email capture forms.
+			 */
+			init: function() {
+				var forms = document.querySelectorAll( '.wbam-ad-email-capture' );
+
+				forms.forEach( function( container ) {
+					var adId       = parseInt( container.getAttribute( 'data-ad-id' ), 10 );
+					var cookieDays = parseInt( container.getAttribute( 'data-cookie-days' ), 10 ) || 7;
+					var form       = container.querySelector( '.wbam-email-form' );
+					var closeBtn   = container.querySelector( '.wbam-email-close' );
+
+					// Close button handler.
+					if ( closeBtn ) {
+						closeBtn.addEventListener( 'click', function( e ) {
+							e.preventDefault();
+							WBAM.emailCapture.dismiss( container, adId, cookieDays );
+						} );
+					}
+
+					// Form submission handler.
+					if ( form ) {
+						form.addEventListener( 'submit', function( e ) {
+							e.preventDefault();
+							WBAM.emailCapture.submit( form, container, adId, cookieDays );
+						} );
+					}
+				} );
+			},
+
+			/**
+			 * Dismiss email capture form.
+			 *
+			 * @param {Element} container Container element.
+			 * @param {number}  adId      Ad ID.
+			 * @param {number}  days      Cookie days.
+			 */
+			dismiss: function( container, adId, days ) {
+				container.style.display = 'none';
+				if ( days > 0 ) {
+					WBAM.cookies.set( 'wbam_email_dismiss_' + adId, '1', days );
+				}
+			},
+
+			/**
+			 * Submit email capture form.
+			 *
+			 * @param {Element} form      Form element.
+			 * @param {Element} container Container element.
+			 * @param {number}  adId      Ad ID.
+			 * @param {number}  days      Cookie days.
+			 */
+			submit: function( form, container, adId, days ) {
+				var submitBtn     = form.querySelector( '.wbam-email-button' );
+				var successEl     = container.querySelector( '.wbam-email-success' );
+				var errorEl       = container.querySelector( '.wbam-email-error' );
+				var errorMsgEl    = container.querySelector( '.wbam-email-error-message' );
+				var formData      = new FormData( form );
+
+				if ( ! window.wbamFrontend ) {
+					return;
+				}
+
+				// Set loading state.
+				container.classList.add( 'wbam-loading' );
+				if ( submitBtn ) {
+					submitBtn.disabled = true;
+				}
+
+				// Hide previous error.
+				if ( errorEl ) {
+					errorEl.style.display = 'none';
+				}
+
+				// Send AJAX request.
+				var xhr = new XMLHttpRequest();
+				xhr.open( 'POST', window.wbamFrontend.ajaxUrl, true );
+				xhr.onreadystatechange = function() {
+					if ( xhr.readyState !== 4 ) {
+						return;
+					}
+
+					container.classList.remove( 'wbam-loading' );
+					if ( submitBtn ) {
+						submitBtn.disabled = false;
+					}
+
+					var response;
+					try {
+						response = JSON.parse( xhr.responseText );
+					} catch ( e ) {
+						WBAM.emailCapture.showError( errorEl, errorMsgEl, 'An error occurred. Please try again.' );
+						return;
+					}
+
+					if ( response.success ) {
+						// Set cookie to prevent showing again.
+						if ( days > 0 ) {
+							WBAM.cookies.set( 'wbam_email_dismiss_' + adId, '1', days );
+						}
+
+						// Check for redirect.
+						if ( response.data && response.data.redirect ) {
+							window.location.href = response.data.redirect;
+							return;
+						}
+
+						// Show success message.
+						form.style.display = 'none';
+						if ( successEl ) {
+							successEl.style.display = 'block';
+						}
+
+						// Auto-hide after 5 seconds.
+						setTimeout( function() {
+							container.style.display = 'none';
+						}, 5000 );
+					} else {
+						var message = response.data && response.data.message ? response.data.message : 'An error occurred. Please try again.';
+						WBAM.emailCapture.showError( errorEl, errorMsgEl, message );
+					}
+				};
+
+				// Convert FormData to URL-encoded string.
+				var params = new URLSearchParams( formData ).toString();
+				xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+				xhr.send( params );
+			},
+
+			/**
+			 * Show error message.
+			 *
+			 * @param {Element} errorEl    Error container.
+			 * @param {Element} errorMsgEl Error message element.
+			 * @param {string}  message    Error message.
+			 */
+			showError: function( errorEl, errorMsgEl, message ) {
+				if ( errorEl && errorMsgEl ) {
+					errorMsgEl.textContent = message;
+					errorEl.style.display = 'block';
+				}
+			}
+		},
+
+		/**
 		 * Click tracking handler.
 		 */
 		clicks: {
@@ -369,6 +517,7 @@
 			this.popup.init();
 			this.lazy.init();
 			this.clicks.init();
+			this.emailCapture.init();
 		}
 	};
 

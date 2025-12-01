@@ -22,7 +22,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.0.0';
+	const DB_VERSION = '1.1.0';
 
 	/**
 	 * Option name for database version.
@@ -78,6 +78,12 @@ class Installer {
 			click_count bigint(20) UNSIGNED DEFAULT 0,
 			status varchar(20) DEFAULT 'active',
 			expires_at datetime DEFAULT NULL,
+			payment_amount decimal(10,2) DEFAULT 0.00,
+			payment_type varchar(20) DEFAULT 'one_time',
+			payment_currency varchar(3) DEFAULT 'USD',
+			payment_status varchar(20) DEFAULT 'unpaid',
+			commission_rate decimal(5,2) DEFAULT 0.00,
+			total_revenue decimal(10,2) DEFAULT 0.00,
 			created_by bigint(20) UNSIGNED DEFAULT 0,
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
 			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -85,7 +91,8 @@ class Installer {
 			UNIQUE KEY slug (slug),
 			KEY status (status),
 			KEY link_type (link_type),
-			KEY category_id (category_id)
+			KEY category_id (category_id),
+			KEY payment_status (payment_status)
 		) {$charset_collate};";
 
 		dbDelta( $sql_links );
