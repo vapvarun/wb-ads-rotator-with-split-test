@@ -1,52 +1,71 @@
 === Wbcom Designs - WB Ad Manager ===
 Contributors: vapvarun, wbcomdesigns
 Donate link: https://wbcomdesigns.com/
-Tags: ads, ad manager, advertising, banners, buddypress
-Requires at least: 5.0
+Tags: ads, ad manager, advertising, banners, buddypress, adsense, bbpress
+Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Comprehensive ad management for WordPress with support for multiple placements, ad types, and BuddyPress activity streams.
+Comprehensive ad management for WordPress with support for multiple placements, ad types, Google AdSense, BuddyPress, and bbPress integration.
 
 == Description ==
 
-WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. It allows you to create and manage ads with multiple placement options, targeting rules, and supports BuddyPress activity streams.
+WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. It allows you to create and manage ads with multiple placement options, targeting rules, and supports BuddyPress and bbPress.
 
-**Features:**
+**Key Features:**
 
-* **Multiple Ad Types** - Image ads, Rich Content ads, and HTML/JS code ads
-* **Flexible Placements** - Header, Footer, Before/After Content, After Paragraph, Shortcode, Widget, Archive pages
-* **BuddyPress Integration** - Display ads in activity streams
-* **Device Targeting** - Show ads on desktop, tablet, or mobile devices
-* **Scheduling** - Set start and end dates for ad campaigns
-* **Easy Management** - Simple interface to manage all your ads
+* **4 Ad Types** - Image, Rich Content, HTML/JS Code, and Google AdSense
+* **10+ Placements** - Header, Footer, Content, Paragraph, Sticky, Popup, Comments, Archive, Shortcode, Widget
+* **Google AdSense** - Native AdSense support with automatic script management
+* **BuddyPress Integration** - Activity stream, member/group directories, profile widgets
+* **bbPress Integration** - Forum, topic, and reply ad placements
+* **Geo-Targeting** - Target ads by country using IP geolocation
+* **Device Targeting** - Desktop, tablet, or mobile specific ads
+* **Scheduling** - Start/end dates, day-of-week, and time-of-day targeting
+* **Frequency Control** - Limit ad impressions per session
+* **Setup Wizard** - Easy first-time configuration with sample ads
 
 **Ad Types:**
 
-1. **Image Ad** - Upload an image with optional link
-2. **Rich Content** - Create ads with HTML content
-3. **HTML/JS Code** - Paste ad network code (AdSense, Media.net, etc.)
+1. **Image Ad** - Banner images with link, alt text, and target options
+2. **Rich Content** - WYSIWYG editor for HTML content
+3. **HTML/JS Code** - Paste ad network code (custom scripts)
+4. **Google AdSense** - Native integration with auto script management
 
 **Placements:**
 
-* Header (before content)
-* Footer (after content)
-* Before Post Content
-* After Post Content
-* After Paragraph (specify which paragraph)
+* Header (wp_head)
+* Footer (wp_footer)
+* Before/After Post Content
+* After Paragraph X (with repeat option)
 * Archive Pages (between posts)
-* Shortcode [wbam_ad id="123"]
-* Widget
+* Sticky/Floating Ads (corners, bars)
+* Popup/Modal Ads (time delay, scroll, exit intent)
+* Comment Areas
+* Shortcode `[wbam_ad id="123"]`
+* Widget Areas
 * BuddyPress Activity Stream
+* BuddyPress Member/Group Directories
+* bbPress Forums and Topics
+
+**Targeting Options:**
+
+* Post types and page types
+* Categories and tags
+* Device type (desktop/tablet/mobile)
+* User status (logged in/out)
+* User roles
+* Geographic location (country)
+* Custom scheduling
 
 == Installation ==
 
 1. Upload the plugin files to `/wp-content/plugins/wb-ad-manager/` directory, or install through WordPress plugins screen.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Go to WB Ad Manager menu to create your first ad.
+3. Complete the Setup Wizard or go to WB Ad Manager menu to create your first ad.
 
 == Frequently Asked Questions ==
 
@@ -56,34 +75,54 @@ Go to WB Ad Manager > Add New. Enter a title, select the ad type, add your conte
 
 = How do I display an ad using shortcode? =
 
-Use the shortcode [wbam_ad id="123"] where 123 is your ad ID.
+Use the shortcode `[wbam_ad id="123"]` where 123 is your ad ID. For multiple ads: `[wbam_ads ids="1,2,3"]`
+
+= Does this plugin support Google AdSense? =
+
+Yes! WB Ad Manager has native AdSense support. Set your Publisher ID in Settings, then create AdSense ad types. The AdSense script is automatically managed and only loads once per page.
 
 = Does this plugin support BuddyPress? =
 
-Yes! If BuddyPress is active, you can display ads in the activity stream.
+Yes! If BuddyPress is active, you can display ads in activity streams, member directories, group directories, and use BuddyPress-specific widgets.
+
+= Does this plugin support bbPress? =
+
+Yes! If bbPress is active, you can display ads in forums, topics, and between replies.
 
 = Can I schedule ads? =
 
-Yes, you can set start and end dates for each ad in the Schedule metabox.
+Yes, you can set start/end dates, specific days of the week, and time-of-day ranges for each ad.
+
+= What geo-targeting providers are supported? =
+
+The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for IP geolocation.
 
 == Screenshots ==
 
-1. Ad listing screen
-2. Add new ad screen
-3. Ad type selection
-4. Placement options
+1. Ad listing screen with status and placement info
+2. Add new ad screen with ad type selection
+3. Google AdSense ad configuration
+4. Placement options with multiple choices
+5. Targeting rules metabox
+6. Settings page with AdSense configuration
+7. Setup wizard for first-time users
 
 == Changelog ==
 
 = 1.0.0 =
 * Initial release
-* Multiple ad types support
-* Multiple placement options
-* BuddyPress activity stream integration
-* Device targeting
-* Ad scheduling
+* 4 ad types: Image, Rich Content, Code, Google AdSense
+* 10+ placement options including sticky, popup, and comment ads
+* Google AdSense integration with auto script management
+* BuddyPress integration (activity stream, directories, widgets)
+* bbPress integration (forums, topics, replies)
+* Geo-targeting with 3 IP providers
+* Device, schedule, and user targeting
+* Frequency control and ad priority
+* Setup wizard with sample ads
+* Full internationalization support
 
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of WB Ad Manager.
+Initial release of WB Ad Manager with comprehensive ad management features.
