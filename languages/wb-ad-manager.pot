@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Wbcom Designs - WB Ad Manager 2.0.0\n"
 "Report-Msgid-Bugs-To: https://wbcomdesigns.com/support/\n"
-"POT-Creation-Date: 2025-12-01 09:44:11+00:00\n"
+"POT-Creation-Date: 2025-12-01 09:53:55+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -362,7 +362,7 @@ msgid "Show ad to visitors with unknown location"
 msgstr ""
 
 #: includes/Admin/class-settings.php:61 includes/Admin/class-settings.php:62
-#: includes/Admin/class-setup-wizard.php:442
+#: includes/Admin/class-setup-wizard.php:455
 msgid "Settings"
 msgstr ""
 
@@ -584,7 +584,7 @@ msgid ""
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:69
-#: includes/Admin/class-setup-wizard.php:253
+#: includes/Admin/class-setup-wizard.php:258
 msgid "Welcome to WB Ad Manager!"
 msgstr ""
 
@@ -599,164 +599,164 @@ msgid "Run Setup Wizard"
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:77
-#: includes/Admin/class-setup-wizard.php:268
+#: includes/Admin/class-setup-wizard.php:273
 msgid "Skip Setup"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:114
+#: includes/Admin/class-setup-wizard.php:117
 msgid "Welcome"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:119
+#: includes/Admin/class-setup-wizard.php:122
 msgid "Sample Ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:124
+#: includes/Admin/class-setup-wizard.php:127
 msgid "Ready"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:160
+#: includes/Admin/class-setup-wizard.php:165
 msgid "WB Ad Manager Setup"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:171 includes/Core/class-plugin.php:135
+#: includes/Admin/class-setup-wizard.php:176 includes/Core/class-plugin.php:135
 #: includes/Modules/Placements/class-widget-placement.php:59
 msgid "WB Ad Manager"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:226
+#: includes/Admin/class-setup-wizard.php:231
 msgid "Exit Setup Wizard"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:254
+#: includes/Admin/class-setup-wizard.php:259
 msgid ""
 "Thank you for installing WB Ad Manager. This quick setup wizard will help "
 "you get started by:"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:256
+#: includes/Admin/class-setup-wizard.php:261
 msgid "Creating sample ads to demonstrate features"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:257
+#: includes/Admin/class-setup-wizard.php:262
 msgid "Setting up different ad placements"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:258
+#: includes/Admin/class-setup-wizard.php:263
 msgid "Getting you ready to manage your own ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:261
+#: includes/Admin/class-setup-wizard.php:266
 msgid "This wizard is optional. You can skip it and create ads manually anytime."
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:265
+#: includes/Admin/class-setup-wizard.php:270
 msgid "Let's Go!"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:281
-#: includes/Admin/class-setup-wizard.php:315
+#: includes/Admin/class-setup-wizard.php:286
+#: includes/Admin/class-setup-wizard.php:320
 msgid "Create Sample Ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:282
+#: includes/Admin/class-setup-wizard.php:287
 msgid ""
 "Select which sample ads you would like to create. These will help you "
 "understand how different ad types and placements work."
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:291
+#: includes/Admin/class-setup-wizard.php:296
 msgid "Header Banner"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:292
+#: includes/Admin/class-setup-wizard.php:297
 msgid "Image ad displayed in the header area"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:299
+#: includes/Admin/class-setup-wizard.php:304
 msgid "Sidebar Widget Ad"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:300
+#: includes/Admin/class-setup-wizard.php:305
 msgid "Code ad for sidebar widget placement"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:307
+#: includes/Admin/class-setup-wizard.php:312
 msgid "In-Content Promotion"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:308
+#: includes/Admin/class-setup-wizard.php:313
 msgid "Rich content ad after paragraph 2"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:318
+#: includes/Admin/class-setup-wizard.php:323
 msgid "Skip This Step"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:350
-#: includes/Admin/class-setup-wizard.php:357
+#: includes/Admin/class-setup-wizard.php:363
+#: includes/Admin/class-setup-wizard.php:370
 msgid "Sample Header Banner"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:362
+#: includes/Admin/class-setup-wizard.php:375
 msgid "Sample Sidebar Ad"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:368
+#: includes/Admin/class-setup-wizard.php:381
 msgid "Advertise Here!"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:369
+#: includes/Admin/class-setup-wizard.php:382
 msgid "This is a sample sidebar ad using custom HTML code."
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:370
+#: includes/Admin/class-setup-wizard.php:383
 msgid "Learn More"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:375
+#: includes/Admin/class-setup-wizard.php:388
 msgid "Sample In-Content Promo"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:381
+#: includes/Admin/class-setup-wizard.php:394
 msgid "Pro Tip:"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:382
+#: includes/Admin/class-setup-wizard.php:395
 msgid ""
 "This is a sample in-content promotion. It appears after paragraph 2 in your "
 "posts. Great for newsletter signups, related content, or special offers!"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:424
+#: includes/Admin/class-setup-wizard.php:437
 msgid "You're All Set!"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:425
+#: includes/Admin/class-setup-wizard.php:438
 msgid "WB Ad Manager is ready to use. Here are some next steps:"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:430
+#: includes/Admin/class-setup-wizard.php:443
 msgid "View Your Ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:431
+#: includes/Admin/class-setup-wizard.php:444
 msgid "See and manage all your ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:436
+#: includes/Admin/class-setup-wizard.php:449
 msgid "Create New Ad"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:437
+#: includes/Admin/class-setup-wizard.php:450
 msgid "Add your own custom ads"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:443
+#: includes/Admin/class-setup-wizard.php:456
 msgid "Configure plugin options"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:449
+#: includes/Admin/class-setup-wizard.php:462
 msgid "Go to Ads Dashboard"
 msgstr ""
 

@@ -109,6 +109,9 @@ class Setup_Wizard {
 			return;
 		}
 
+		// Start output buffering early to allow redirects.
+		ob_start();
+
 		$this->steps = array(
 			'welcome' => array(
 				'name'    => __( 'Welcome', 'wb-ad-manager' ),
@@ -131,13 +134,15 @@ class Setup_Wizard {
 		$this->step = isset( $_GET['step'] ) ? sanitize_key( $_GET['step'] ) : current( array_keys( $this->steps ) );
 
 		// Handle save.
-		if ( ! empty( $_POST['save_step'] ) && isset( $this->steps[ $this->step ]['handler'] ) ) {
+		if ( isset( $_POST['save_step'] ) && isset( $this->steps[ $this->step ]['handler'] ) && is_callable( $this->steps[ $this->step ]['handler'] ) ) {
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		}
 
 		// Enqueue styles.
 		wp_enqueue_style( 'wbam-setup', WBAM_URL . 'assets/css/setup-wizard.css', array(), WBAM_VERSION );
 
+		// Clean buffer and start fresh for page output.
+		ob_end_clean();
 		ob_start();
 		$this->header();
 		$this->steps_nav();
@@ -311,7 +316,7 @@ class Setup_Wizard {
 				</div>
 
 				<p class="wbam-setup-actions">
-					<button type="submit" name="save_step" class="button button-primary button-large">
+					<button type="submit" name="save_step" value="1" class="button button-primary button-large">
 						<?php esc_html_e( 'Create Sample Ads', 'wb-ad-manager' ); ?>
 					</button>
 					<a href="<?php echo esc_url( $this->get_next_step_link() ); ?>" class="button button-large">
@@ -327,12 +332,20 @@ class Setup_Wizard {
 	 * Step: Sample Ads - Save.
 	 */
 	public function step_sample_save() {
-		check_admin_referer( 'wbam_setup_sample', 'wbam_setup_nonce' );
+		// Verify nonce.
+		if ( ! isset( $_POST['wbam_setup_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wbam_setup_nonce'] ) ), 'wbam_setup_sample' ) ) {
+			return;
+		}
 
 		$sample_ads = isset( $_POST['sample_ads'] ) ? array_map( 'sanitize_key', wp_unslash( $_POST['sample_ads'] ) ) : array();
 
 		if ( ! empty( $sample_ads ) ) {
 			$this->create_sample_ads( $sample_ads );
+		}
+
+		// Clean output buffer before redirect.
+		if ( ob_get_level() ) {
+			ob_end_clean();
 		}
 
 		wp_safe_redirect( $this->get_next_step_link() );
