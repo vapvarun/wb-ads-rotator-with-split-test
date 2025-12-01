@@ -44,34 +44,35 @@ class Links_Admin {
 	}
 
 	/**
-	 * Add submenu page.
+	 * Add menu pages.
 	 */
 	public function add_submenu() {
-		// Add separator before Link Management section.
-		add_submenu_page(
-			$this->parent_slug,
-			'',
-			'<span class="wbam-menu-separator"></span>',
+		// Links - Separate top-level menu.
+		add_menu_page(
+			__( 'Links', 'wb-ad-manager' ),
+			__( 'Links', 'wb-ad-manager' ),
 			$this->capability,
-			'wbam-separator-links',
-			'__return_false'
+			'wbam-links',
+			array( $this, 'render_page' ),
+			'dashicons-admin-links',
+			25.3 // Right after Advertisers (25.2)
 		);
 
-		// Link Management section header (points to Links page).
+		// All Links (rename default submenu).
 		add_submenu_page(
-			$this->parent_slug,
-			__( 'Link Management', 'wb-ad-manager' ),
-			'<span class="wbam-menu-section">📎 ' . __( 'Link Management', 'wb-ad-manager' ) . '</span>',
+			'wbam-links',
+			__( 'All Links', 'wb-ad-manager' ),
+			__( 'All Links', 'wb-ad-manager' ),
 			$this->capability,
 			'wbam-links',
 			array( $this, 'render_page' )
 		);
 
-		// Child item: Categories (indented).
+		// Categories.
 		add_submenu_page(
-			$this->parent_slug,
+			'wbam-links',
 			__( 'Link Categories', 'wb-ad-manager' ),
-			'<span class="wbam-menu-child">' . __( 'Categories', 'wb-ad-manager' ) . '</span>',
+			__( 'Categories', 'wb-ad-manager' ),
 			$this->capability,
 			'wbam-link-categories',
 			array( $this, 'render_categories_page' )
@@ -84,10 +85,7 @@ class Links_Admin {
 	 * @param string $hook Page hook.
 	 */
 	public function enqueue_scripts( $hook ) {
-		// Always add menu styling CSS on all admin pages.
-		$this->add_menu_styles();
-
-		if ( ! in_array( $hook, array( 'wbam-ad_page_wbam-links', 'wbam-ad_page_wbam-link-categories' ), true ) ) {
+		if ( ! in_array( $hook, array( 'toplevel_page_wbam-links', 'links_page_wbam-link-categories' ), true ) ) {
 			return;
 		}
 
@@ -105,55 +103,6 @@ class Links_Admin {
 			WBAM_VERSION,
 			true
 		);
-	}
-
-	/**
-	 * Add inline styles for admin menu grouping.
-	 */
-	private function add_menu_styles() {
-		static $added = false;
-		if ( $added ) {
-			return;
-		}
-		$added = true;
-
-		add_action( 'admin_head', function() {
-			?>
-			<style>
-			/* Link Management Menu Grouping */
-			#adminmenu .wbam-menu-separator {
-				display: block;
-				height: 1px;
-				background: rgba(255,255,255,0.1);
-				margin: 5px 12px;
-			}
-			#adminmenu li a[href*="wbam-separator-links"] {
-				padding: 0 !important;
-				height: auto !important;
-				min-height: 0 !important;
-				pointer-events: none;
-				cursor: default;
-			}
-			#adminmenu .wbam-menu-section {
-				font-weight: 600;
-				opacity: 1;
-			}
-			#adminmenu .wbam-menu-child {
-				padding-left: 8px;
-				opacity: 0.85;
-			}
-			#adminmenu .wbam-menu-child::before {
-				content: "└ ";
-				opacity: 0.5;
-			}
-			/* Highlight active section */
-			#adminmenu li.current a .wbam-menu-section,
-			#adminmenu li.current a .wbam-menu-child {
-				opacity: 1;
-			}
-			</style>
-			<?php
-		} );
 	}
 
 	/**

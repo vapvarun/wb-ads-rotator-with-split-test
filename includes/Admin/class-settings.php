@@ -57,30 +57,18 @@ class Settings {
 	 * Add submenu page.
 	 */
 	public function add_menu() {
-		// Check if PRO is active - if so, use child styling under Settings section.
+		// When PRO is active, rename to "Ad Settings" to avoid confusion with PRO's "Settings".
 		$pro_active = defined( 'WBAM_PRO_VERSION' );
+		$menu_title = $pro_active ? __( 'Ad Settings', 'wb-ad-manager' ) : __( 'Settings', 'wb-ad-manager' );
 
-		if ( $pro_active ) {
-			// PRO adds the Settings section header - we just add General as a child.
-			add_submenu_page(
-				'edit.php?post_type=wbam-ad',
-				__( 'General Settings', 'wb-ad-manager' ),
-				'<span class="wbam-menu-child">' . __( 'General', 'wb-ad-manager' ) . '</span>',
-				'manage_options',
-				'wbam-settings',
-				array( $this, 'render_page' )
-			);
-		} else {
-			// Standalone FREE - show as regular Settings.
-			add_submenu_page(
-				'edit.php?post_type=wbam-ad',
-				__( 'Settings', 'wb-ad-manager' ),
-				__( 'Settings', 'wb-ad-manager' ),
-				'manage_options',
-				'wbam-settings',
-				array( $this, 'render_page' )
-			);
-		}
+		add_submenu_page(
+			'edit.php?post_type=wbam-ad',
+			__( 'Ad Settings', 'wb-ad-manager' ),
+			$menu_title,
+			'manage_options',
+			'wbam-settings',
+			array( $this, 'render_page' )
+		);
 	}
 
 	/**
