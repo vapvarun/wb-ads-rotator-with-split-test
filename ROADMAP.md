@@ -2,7 +2,7 @@
 
 **Plugin Name:** WB Ad Manager
 **Premium Name:** WB Ad Manager Pro
-**Current Version:** 1.0.0
+**Current Version:** 2.0.0
 **Last Updated:** December 1, 2024
 
 ---

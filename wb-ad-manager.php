@@ -8,9 +8,9 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Wbcom Designs - WB Ad Manager
- * Plugin URI:        https://wbcomdesigns.com/downloads/wb-ad-manager/
- * Description:       Comprehensive ad management for WordPress with support for multiple placements, ad types, and BuddyPress activity streams.
- * Version:           1.0.0
+ * Plugin URI:        https://wordpress.org/plugins/wb-ads-rotator-with-split-test/
+ * Description:       Comprehensive ad management for WordPress with ad rotation, split testing, multiple placements, Google AdSense, BuddyPress and bbPress integration.
+ * Version:           2.0.0
  * Author:            Wbcom Designs
  * Author URI:        https://wbcomdesigns.com
  * License:           GPL-2.0+
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Plugin constants.
  */
-define( 'WBAM_VERSION', '1.0.0' );
+define( 'WBAM_VERSION', '2.0.0' );
 define( 'WBAM_FILE', __FILE__ );
 define( 'WBAM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WBAM_URL', plugin_dir_url( __FILE__ ) );

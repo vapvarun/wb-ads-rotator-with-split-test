@@ -1,15 +1,15 @@
 === Wbcom Designs - WB Ad Manager ===
 Contributors: vapvarun, wbcomdesigns
 Donate link: https://wbcomdesigns.com/
-Tags: ads, ad manager, advertising, banners, buddypress, adsense, bbpress
+Tags: ads, ad manager, ad rotation, split test, advertising, banners, buddypress, adsense, bbpress
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Comprehensive ad management for WordPress with support for multiple placements, ad types, Google AdSense, BuddyPress, and bbPress integration.
+Comprehensive ad management for WordPress with ad rotation, split testing, multiple placements, Google AdSense, BuddyPress, and bbPress integration.
 
 == Description ==
 
@@ -17,9 +17,10 @@ WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. 
 
 **Key Features:**
 
+* **Ad Rotation & Split Testing** - Multiple ads rotate in same placement with weighted priority
 * **4 Ad Types** - Image, Rich Content, HTML/JS Code, and Google AdSense
-* **10+ Placements** - Header, Footer, Content, Paragraph, Sticky, Popup, Comments, Archive, Shortcode, Widget
-* **Google AdSense** - Native AdSense support with automatic script management
+* **14+ Placements** - Header, Footer, Content, Paragraph, Sticky, Popup, Comments, Archive, Shortcode, Widget, BuddyPress, bbPress
+* **Google AdSense** - Native AdSense support with automatic script management and Auto Ads
 * **BuddyPress Integration** - Activity stream, member/group directories, profile widgets
 * **bbPress Integration** - Forum, topic, and reply ad placements
 * **Geo-Targeting** - Target ads by country using IP geolocation
@@ -109,11 +110,12 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 
 == Changelog ==
 
-= 1.0.0 =
-* Initial release
+= 2.0.0 =
+* Complete rewrite with modern architecture
+* Ad rotation and split testing with weighted priority system
 * 4 ad types: Image, Rich Content, Code, Google AdSense
-* 10+ placement options including sticky, popup, and comment ads
-* Google AdSense integration with auto script management
+* 14+ placement options including sticky, popup, and comment ads
+* Google AdSense integration with Auto Ads support
 * BuddyPress integration (activity stream, directories, widgets)
 * bbPress integration (forums, topics, replies)
 * Geo-targeting with 3 IP providers
@@ -121,8 +123,12 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 * Frequency control and ad priority
 * Setup wizard with sample ads
 * Full internationalization support
+* PSR-4 style namespaces and modular architecture
+
+= 1.0.0 =
+* Legacy version
 
 == Upgrade Notice ==
 
-= 1.0.0 =
-Initial release of WB Ad Manager with comprehensive ad management features.
+= 2.0.0 =
+Major update! Complete rewrite with modern architecture, 14+ placements, Google AdSense Auto Ads, BuddyPress & bbPress integration. Backup recommended before updating.
