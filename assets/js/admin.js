@@ -81,6 +81,43 @@
 			wp.codeEditor.initialize($('#wbam_code'), wbamCodeEditor);
 		}
 
+		// Copy URL to Clipboard
+		$(document).on('click', '.wbam-copy-btn, .wbam-copy-url', function(e) {
+			e.preventDefault();
+			var url = $(this).data('clipboard') || $(this).data('url');
+			var $btn = $(this);
+			var originalHtml = $btn.html();
+
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(url).then(function() {
+					$btn.html('<span class="dashicons dashicons-yes"></span>');
+					setTimeout(function() {
+						$btn.html(originalHtml);
+					}, 1500);
+				}).catch(function() {
+					fallbackCopy(url, $btn, originalHtml);
+				});
+			} else {
+				fallbackCopy(url, $btn, originalHtml);
+			}
+		});
+
+		function fallbackCopy(text, $btn, originalHtml) {
+			var $temp = $('<textarea>');
+			$('body').append($temp);
+			$temp.val(text).select();
+			try {
+				document.execCommand('copy');
+				$btn.html('<span class="dashicons dashicons-yes"></span>');
+				setTimeout(function() {
+					$btn.html(originalHtml);
+				}, 1500);
+			} catch (err) {
+				alert('Copy failed. URL: ' + text);
+			}
+			$temp.remove();
+		}
+
 	});
 
 })(jQuery);

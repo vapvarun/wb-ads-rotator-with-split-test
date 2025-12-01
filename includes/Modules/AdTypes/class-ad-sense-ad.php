@@ -211,7 +211,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 		<div class="wbam-field">
 			<label for="wbam_adsense_slot_id"><?php esc_html_e( 'Ad Slot ID', 'wb-ad-manager' ); ?> <span class="required">*</span></label>
 			<div class="wbam-field-input">
-				<input type="text" id="wbam_adsense_slot_id" name="wbam_data[slot_id]" value="<?php echo esc_attr( $slot_id ); ?>" class="regular-text" placeholder="1234567890" required />
+				<input type="text" id="wbam_adsense_slot_id" name="wbam_data[slot_id]" value="<?php echo esc_attr( $slot_id ); ?>" class="regular-text" placeholder="1234567890" />
 				<p class="description"><?php esc_html_e( 'Enter the Ad Slot ID from your AdSense account (e.g., 1234567890).', 'wb-ad-manager' ); ?></p>
 			</div>
 		</div>

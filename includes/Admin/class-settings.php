@@ -48,7 +48,8 @@ class Settings {
 	 * Initialize.
 	 */
 	public function init() {
-		add_action( 'admin_menu', array( $this, 'add_menu' ) );
+		// Use priority 25 so Settings appears under PRO's Settings section header (priority 20) when PRO is active.
+		add_action( 'admin_menu', array( $this, 'add_menu' ), 25 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 	}
 
@@ -56,14 +57,30 @@ class Settings {
 	 * Add submenu page.
 	 */
 	public function add_menu() {
-		add_submenu_page(
-			'edit.php?post_type=wbam-ad',
-			__( 'Settings', 'wb-ad-manager' ),
-			__( 'Settings', 'wb-ad-manager' ),
-			'manage_options',
-			'wbam-settings',
-			array( $this, 'render_page' )
-		);
+		// Check if PRO is active - if so, use child styling under Settings section.
+		$pro_active = defined( 'WBAM_PRO_VERSION' );
+
+		if ( $pro_active ) {
+			// PRO adds the Settings section header - we just add General as a child.
+			add_submenu_page(
+				'edit.php?post_type=wbam-ad',
+				__( 'General Settings', 'wb-ad-manager' ),
+				'<span class="wbam-menu-child">' . __( 'General', 'wb-ad-manager' ) . '</span>',
+				'manage_options',
+				'wbam-settings',
+				array( $this, 'render_page' )
+			);
+		} else {
+			// Standalone FREE - show as regular Settings.
+			add_submenu_page(
+				'edit.php?post_type=wbam-ad',
+				__( 'Settings', 'wb-ad-manager' ),
+				__( 'Settings', 'wb-ad-manager' ),
+				'manage_options',
+				'wbam-settings',
+				array( $this, 'render_page' )
+			);
+		}
 	}
 
 	/**

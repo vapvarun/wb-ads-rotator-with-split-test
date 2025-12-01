@@ -11,10 +11,13 @@ namespace WBAM\Core;
 use WBAM\Modules\Placements\Placement_Engine;
 use WBAM\Modules\Targeting\Targeting_Engine;
 use WBAM\Modules\Targeting\Frequency_Manager;
+use WBAM\Modules\Links\Links_Module;
 use WBAM\Admin\Admin;
 use WBAM\Admin\Settings;
 use WBAM\Admin\Display_Options;
 use WBAM\Admin\Setup_Wizard;
+use WBAM\Admin\Help_Docs;
+use WBAM\Admin\Upgrade_Pro;
 use WBAM\Frontend\Frontend;
 
 /**
@@ -60,6 +63,13 @@ class Plugin {
 	private $setup_wizard;
 
 	/**
+	 * Links module instance.
+	 *
+	 * @var Links_Module
+	 */
+	private $links;
+
+	/**
 	 * Initialize the plugin.
 	 */
 	public function init() {
@@ -98,6 +108,12 @@ class Plugin {
 			// Setup wizard.
 			$this->setup_wizard = new Setup_Wizard();
 			$this->setup_wizard->init();
+
+			// Help & Documentation.
+			Help_Docs::get_instance();
+
+			// Upgrade to PRO (only when PRO is not active).
+			Upgrade_Pro::get_instance();
 		}
 
 		// Frontend.
@@ -115,6 +131,10 @@ class Plugin {
 			$bbpress = new \WBAM\Modules\bbPress\bbPress_Module();
 			$bbpress->init();
 		}
+
+		// Links module.
+		$this->links = Links_Module::get_instance();
+		$this->links->init();
 	}
 
 	/**
@@ -237,5 +257,14 @@ class Plugin {
 	 */
 	public function settings() {
 		return $this->settings;
+	}
+
+	/**
+	 * Get links module instance.
+	 *
+	 * @return Links_Module
+	 */
+	public function links() {
+		return $this->links;
 	}
 }

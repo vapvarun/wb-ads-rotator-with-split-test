@@ -89,6 +89,11 @@ function wbam_activate() {
 		add_option( 'wbam_settings', array() );
 	}
 
+	// Run installer to create database tables.
+	require_once WBAM_PATH . 'includes/Core/class-installer.php';
+	$installer = WBAM\Core\Installer::get_instance();
+	$installer->install();
+
 	set_transient( '_wbam_activation_redirect', true, 30 );
 }
 register_activation_hook( __FILE__, 'wbam_activate' );

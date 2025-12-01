@@ -1,0 +1,190 @@
+/**
+ * Upgrade to PRO Page Styles - WordPress Native
+ */
+
+.wbam-upgrade-wrap {
+	max-width: 1100px;
+	margin: 20px 0;
+}
+
+/* Header */
+.wbam-upgrade-header {
+	background: #fff;
+	padding: 30px;
+	border: 1px solid #c3c4c7;
+	border-left: 4px solid #2271b1;
+	margin-bottom: 20px;
+}
+
+.wbam-upgrade-header h1 {
+	margin: 0 0 10px;
+	font-size: 24px;
+	color: #1d2327;
+}
+
+.wbam-tagline {
+	margin: 0;
+	font-size: 14px;
+	color: #50575e;
+}
+
+/* Comparison Section */
+.wbam-comparison-section {
+	background: #fff;
+	padding: 20px;
+	border: 1px solid #c3c4c7;
+	margin-bottom: 20px;
+}
+
+.wbam-comparison-section h2 {
+	margin: 0 0 20px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+/* Comparison Table */
+.wbam-comparison-table {
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #c3c4c7;
+}
+
+.wbam-comparison-table th,
+.wbam-comparison-table td {
+	padding: 12px 15px;
+	text-align: left;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+.wbam-comparison-table thead th {
+	background: #f0f0f1;
+	font-weight: 600;
+}
+
+.wbam-comparison-table .wbam-free-col,
+.wbam-comparison-table .wbam-pro-col {
+	text-align: center;
+	width: 100px;
+}
+
+.wbam-comparison-table thead .wbam-pro-col {
+	background: #2271b1;
+	color: #fff;
+}
+
+.wbam-comparison-table tbody tr:nth-child(even) td {
+	background: #f9f9f9;
+}
+
+.wbam-section-header td {
+	background: #1d2327 !important;
+	color: #fff;
+	font-weight: 600;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.wbam-check .dashicons {
+	color: #00a32a;
+}
+
+.wbam-cross .dashicons {
+	color: #c3c4c7;
+}
+
+/* Highlights Section */
+.wbam-pro-highlights {
+	margin-bottom: 20px;
+}
+
+.wbam-pro-highlights h2 {
+	margin-bottom: 20px;
+}
+
+.wbam-highlights-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 15px;
+}
+
+.wbam-highlight-card {
+	background: #fff;
+	padding: 20px;
+	border: 1px solid #c3c4c7;
+}
+
+.wbam-highlight-card .dashicons {
+	font-size: 32px;
+	width: 32px;
+	height: 32px;
+	color: #2271b1;
+	margin-bottom: 10px;
+}
+
+.wbam-highlight-card h3 {
+	margin: 0 0 8px;
+	font-size: 14px;
+}
+
+.wbam-highlight-card p {
+	margin: 0;
+	color: #50575e;
+	font-size: 13px;
+}
+
+/* CTA Section */
+.wbam-cta-section {
+	background: #fff;
+	padding: 30px;
+	border: 1px solid #c3c4c7;
+	border-left: 4px solid #00a32a;
+	text-align: center;
+}
+
+.wbam-cta-section h2 {
+	margin: 0 0 10px;
+	font-size: 18px;
+}
+
+.wbam-cta-section > p {
+	margin: 0 0 20px;
+	color: #50575e;
+}
+
+.wbam-cta-buttons {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.wbam-cta-buttons .button-hero {
+	font-size: 14px;
+	padding: 8px 20px;
+	height: auto;
+}
+
+.wbam-guarantee {
+	margin-top: 15px;
+	font-size: 12px;
+	color: #50575e;
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+	.wbam-comparison-table th,
+	.wbam-comparison-table td {
+		padding: 8px 10px;
+		font-size: 12px;
+	}
+
+	.wbam-comparison-table .wbam-free-col,
+	.wbam-comparison-table .wbam-pro-col {
+		width: 70px;
+	}
+
+	.wbam-highlights-grid {
+		grid-template-columns: 1fr;
+	}
+}
