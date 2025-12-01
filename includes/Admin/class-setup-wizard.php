@@ -352,7 +352,7 @@ class Setup_Wizard {
 				'placements' => array( 'header' ),
 				'data'       => array(
 					'type'      => 'image',
-					'image_url' => 'https://via.placeholder.com/728x90/4a90d9/ffffff?text=Header+Banner+Ad',
+					'image_url' => 'https://placehold.co/728x90/4a90d9/ffffff?text=Header+Banner+Ad',
 					'link_url'  => '#',
 					'alt_text'  => __( 'Sample Header Banner', 'wb-ad-manager' ),
 					'new_tab'   => true,
