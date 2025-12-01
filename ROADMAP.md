@@ -3,7 +3,7 @@
 **Plugin Name:** WB Ad Manager
 **Premium Name:** WB Ad Manager Pro
 **Current Version:** 1.0.0
-**Last Updated:** November 28, 2024
+**Last Updated:** December 1, 2024
 
 ---
 
@@ -18,7 +18,8 @@ WB Ad Manager is a modular WordPress ad management plugin with BuddyPress integr
 | Component | Status |
 |-----------|--------|
 | Core Plugin Structure | ✅ Complete |
-| Ad Types (3) | ✅ Complete |
+| Ad Types (4) | ✅ Complete |
+| Setup Wizard | ✅ Complete |
 | All Placements (14) | ✅ Complete |
 | Admin UI & Metaboxes | ✅ Complete |
 | Settings Page | ✅ Complete |
@@ -59,7 +60,8 @@ WB Ad Manager is a modular WordPress ad management plugin with BuddyPress integr
 **Ad Types Implemented:**
 - [x] Image ads (with link, alt text, target)
 - [x] Rich Content (HTML textarea)
-- [x] Code ads (AdSense, custom HTML/JS)
+- [x] Code ads (custom HTML/JS)
+- [x] Google AdSense (auto script management, multiple formats, Auto Ads support)
 
 **Placements Implemented:**
 - [x] Header (`wp_head`)
@@ -81,6 +83,14 @@ WB Ad Manager is a modular WordPress ad management plugin with BuddyPress integr
 - [x] Custom container CSS class
 - [x] Lazy load option
 - [x] Cache ad queries option
+- [x] Google AdSense Publisher ID (global)
+- [x] Google AdSense Auto Ads toggle
+
+**Setup Wizard:**
+- [x] First-time activation wizard
+- [x] 3 sample ads creation (image, rich content, code)
+- [x] Auto-placement setup
+- [x] Skip/dismiss option
 
 **Targeting Implemented:**
 - [x] Targeting Engine with rule processing
@@ -113,10 +123,19 @@ wb-ad-manager/
 ├── wb-ad-manager.php
 ├── readme.txt
 ├── ROADMAP.md
+├── Gruntfile.js
+├── package.json
 ├── assets/
 │   ├── css/admin.css
+│   ├── css/admin.min.css
 │   ├── css/frontend.css
-│   └── js/admin.js
+│   ├── css/frontend.min.css
+│   ├── js/admin.js
+│   ├── js/admin.min.js
+│   ├── js/frontend.js
+│   └── js/frontend.min.js
+├── languages/
+│   └── wb-ad-manager.pot
 └── includes/
     ├── Core/
     │   ├── trait-singleton.php
@@ -124,7 +143,8 @@ wb-ad-manager/
     ├── Admin/
     │   ├── class-admin.php
     │   ├── class-settings.php
-    │   └── class-display-options.php
+    │   ├── class-display-options.php
+    │   └── class-setup-wizard.php
     ├── Frontend/
     │   └── class-frontend.php
     └── Modules/
@@ -132,7 +152,8 @@ wb-ad-manager/
         │   ├── interface-ad-type.php
         │   ├── class-image-ad.php
         │   ├── class-rich-content-ad.php
-        │   └── class-code-ad.php
+        │   ├── class-code-ad.php
+        │   └── class-ad-sense-ad.php
         ├── Placements/
         │   ├── interface-placement.php
         │   ├── class-placement-engine.php
@@ -233,6 +254,41 @@ includes/Modules/bbPress/class-bbpress-module.php
 includes/Modules/Targeting/class-content-analyzer.php
 assets/js/frontend.js
 ```
+
+---
+
+## FREE VERSION v1.1+ - Future Enhancements
+
+### Ad Groups & Rotation 🔲
+**Priority:** High | **Complexity:** High
+
+- [ ] Create `wbam-ad-group` custom taxonomy or CPT
+- [ ] Group multiple ads together
+- [ ] Rotation types: Random, Weighted, Sequential
+- [ ] Fallback ad if group is empty
+- [ ] `[wbam_group id="X"]` shortcode
+
+### Impression Tracking 🔲
+**Priority:** Medium | **Complexity:** Medium
+
+- [ ] Create `wbam_impressions` database table
+- [ ] AJAX/beacon tracking endpoint
+- [ ] Daily aggregation (no PII storage)
+- [ ] Simple stats column in ads list table
+
+### ads.txt Editor 🔲
+**Priority:** Low | **Complexity:** Low
+
+- [ ] Settings page textarea for ads.txt
+- [ ] Auto-add AdSense entry option
+- [ ] Format validation
+
+### Ad Blocker Detection 🔲
+**Priority:** Low | **Complexity:** Medium
+
+- [ ] JavaScript bait element detection
+- [ ] Customizable fallback message
+- [ ] CSS class for blocked state styling
 
 ---
 
