@@ -95,6 +95,7 @@ module.exports = function( grunt ) {
 						'!vendor/**',
 						'!dist/**',
 						'!tests/**',
+						'!docs/**',
 						'!.git/**',
 						'!.gitignore',
 						'!.distignore',
@@ -105,7 +106,7 @@ module.exports = function( grunt ) {
 						'!composer.lock',
 						'!phpcs.xml',
 						'!phpunit.xml',
-						'!*.md',
+						'!**/*.md',
 						'!*.log'
 					],
 					dest: 'dist/<%= pkg.name %>'
