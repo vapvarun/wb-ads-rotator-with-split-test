@@ -14,6 +14,7 @@ use WBAM\Modules\Targeting\Frequency_Manager;
 use WBAM\Admin\Admin;
 use WBAM\Admin\Settings;
 use WBAM\Admin\Display_Options;
+use WBAM\Admin\Setup_Wizard;
 use WBAM\Frontend\Frontend;
 
 /**
@@ -52,6 +53,13 @@ class Plugin {
 	private $frontend;
 
 	/**
+	 * Setup wizard instance.
+	 *
+	 * @var Setup_Wizard
+	 */
+	private $setup_wizard;
+
+	/**
 	 * Initialize the plugin.
 	 */
 	public function init() {
@@ -86,6 +94,10 @@ class Plugin {
 
 			$display_options = Display_Options::get_instance();
 			$display_options->init();
+
+			// Setup wizard.
+			$this->setup_wizard = new Setup_Wizard();
+			$this->setup_wizard->init();
 		}
 
 		// Frontend.
@@ -164,7 +176,12 @@ class Plugin {
 			delete_transient( '_wbam_activation_redirect' );
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No form data processed, just checking activation type.
 			if ( ! isset( $_GET['activate-multi'] ) ) {
-				wp_safe_redirect( admin_url( 'edit.php?post_type=wbam-ad' ) );
+				// Redirect to setup wizard if not completed.
+				if ( ! get_option( 'wbam_setup_complete' ) && ! get_option( 'wbam_setup_dismissed' ) ) {
+					wp_safe_redirect( admin_url( 'index.php?page=wbam-setup' ) );
+				} else {
+					wp_safe_redirect( admin_url( 'edit.php?post_type=wbam-ad' ) );
+				}
 				exit;
 			}
 		}
