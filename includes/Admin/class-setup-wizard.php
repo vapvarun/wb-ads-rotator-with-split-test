@@ -158,8 +158,11 @@ class Setup_Wizard {
 			<meta name="viewport" content="width=device-width" />
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 			<title><?php esc_html_e( 'WB Ad Manager Setup', 'wb-ad-manager' ); ?></title>
-			<?php wp_print_styles( 'wbam-setup' ); ?>
-			<?php do_action( 'admin_print_styles' ); ?>
+			<?php
+			wp_enqueue_style( 'dashicons' );
+			wp_enqueue_style( 'buttons' );
+			wp_print_styles( array( 'dashicons', 'buttons', 'wbam-setup' ) );
+			?>
 		</head>
 		<body class="wbam-setup wp-core-ui">
 			<div class="wbam-setup-wrapper">
