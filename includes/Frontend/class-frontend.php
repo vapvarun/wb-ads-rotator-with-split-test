@@ -30,19 +30,24 @@ class Frontend {
 	 * Enqueue frontend assets.
 	 */
 	public function enqueue_assets() {
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 		wp_enqueue_style(
 			'wbam-frontend',
-			WBAM_URL . 'assets/css/frontend.css',
+			WBAM_URL . 'assets/css/frontend' . $suffix . '.css',
 			array(),
 			WBAM_VERSION
 		);
 
 		wp_enqueue_script(
 			'wbam-frontend',
-			WBAM_URL . 'assets/js/frontend.js',
+			WBAM_URL . 'assets/js/frontend' . $suffix . '.js',
 			array(),
 			WBAM_VERSION,
-			true
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
 		);
 
 		wp_localize_script(

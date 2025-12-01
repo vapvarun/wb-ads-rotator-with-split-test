@@ -1,0 +1,44 @@
+# Directories
+.git
+.github
+node_modules
+tests
+vendor
+dist
+docs
+
+# Build files
+.distignore
+.editorconfig
+.gitattributes
+.gitignore
+.phpunit.result.cache
+composer.json
+composer.lock
+package.json
+package-lock.json
+Gruntfile.js
+phpunit.xml
+phpunit.xml.dist
+phpcs.xml
+phpcs.xml.dist
+
+# Documentation
+README.md
+CHANGELOG.md
+ROADMAP.md
+CONTRIBUTING.md
+
+# IDE/Editor files
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
