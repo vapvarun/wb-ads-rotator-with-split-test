@@ -13,6 +13,13 @@ namespace WBAM\Modules\Placements;
  */
 class Header_Placement implements Placement_Interface {
 
+	/**
+	 * Flag to track if header ads have been displayed.
+	 *
+	 * @var bool
+	 */
+	private $displayed = false;
+
 	public function get_id() {
 		return 'header';
 	}
@@ -34,16 +41,35 @@ class Header_Placement implements Placement_Interface {
 	}
 
 	public function register() {
-		add_action( 'wp_head', array( $this, 'display' ), 100 );
+		// Primary: Use wp_body_open for visible header ads (after <body> tag).
+		add_action( 'wp_body_open', array( $this, 'display' ), 10 );
+
+		// Theme-specific hooks for better compatibility.
+		add_action( 'buddyx_body_top', array( $this, 'display' ), 10 );  // BuddyX theme.
+		add_action( 'reign_body_top', array( $this, 'display' ), 10 );   // Reign theme.
+		add_action( 'genesis_before_header', array( $this, 'display' ), 10 ); // Genesis.
+		add_action( 'theme_body_top', array( $this, 'display' ), 10 );   // Generic.
 	}
 
 	public function display() {
+		// Prevent duplicate display if multiple hooks fire.
+		if ( $this->displayed ) {
+			return;
+		}
+
+		// Only display on frontend.
+		if ( is_admin() ) {
+			return;
+		}
+
 		$engine = Placement_Engine::get_instance();
 		$ads    = $engine->get_ads_for_placement( $this->get_id() );
 
 		if ( empty( $ads ) ) {
 			return;
 		}
+
+		$this->displayed = true;
 
 		echo '<div class="wbam-placement wbam-placement-header">';
 		foreach ( $ads as $ad_id ) {

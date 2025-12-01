@@ -122,21 +122,19 @@ class Archive_Placement implements Placement_Interface {
 	 * @param Placement_Engine $engine Engine.
 	 */
 	private function output_ad( $ad_id, $engine ) {
-		add_action(
-			'the_content',
-			function ( $content ) use ( $ad_id, $engine ) {
-				static $done = false;
-				if ( $done ) {
-					return $content;
-				}
-				$done   = true;
-				$ad_html = '<div class="wbam-placement wbam-placement-archive">';
-				$ad_html .= $engine->render_ad( $ad_id, array( 'placement' => 'archive' ) );
-				$ad_html .= '</div>';
+		$ad_html = '<div class="wbam-placement wbam-placement-archive">';
+		$ad_html .= $engine->render_ad( $ad_id, array( 'placement' => 'archive' ) );
+		$ad_html .= '</div>';
 
-				return $content . $ad_html;
-			},
-			999
-		);
+		// Add to both content and excerpt to support different themes.
+		$output_filter = function ( $content ) use ( $ad_html, &$output_filter ) {
+			// Remove filter to prevent multiple outputs.
+			remove_filter( 'the_content', $output_filter, 999 );
+			remove_filter( 'the_excerpt', $output_filter, 999 );
+			return $content . $ad_html;
+		};
+
+		add_filter( 'the_content', $output_filter, 999 );
+		add_filter( 'the_excerpt', $output_filter, 999 );
 	}
 }

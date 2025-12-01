@@ -97,6 +97,11 @@ class Placement_Engine {
 	 */
 	public function register_placement( Placement_Interface $placement ) {
 		$this->placements[ $placement->get_id() ] = $placement;
+
+		// If init already ran, register the placement now.
+		if ( did_action( 'wbam_placements_init' ) && $placement->is_available() ) {
+			$placement->register();
+		}
 	}
 
 	/**

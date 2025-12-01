@@ -44,8 +44,12 @@ class Content_Placement implements Placement_Interface {
 
 		$engine = Placement_Engine::get_instance();
 
-		// Before content.
+		// Get ads with 'content' placement (shows both before and after).
+		$content_ads = $engine->get_ads_for_placement( 'content' );
+
+		// Before content - includes 'before_content' and 'content' placements.
 		$before_ads = $engine->get_ads_for_placement( 'before_content' );
+		$before_ads = array_unique( array_merge( $before_ads, $content_ads ) );
 		$before     = '';
 		if ( ! empty( $before_ads ) ) {
 			$before = '<div class="wbam-placement wbam-placement-before-content">';
@@ -55,8 +59,9 @@ class Content_Placement implements Placement_Interface {
 			$before .= '</div>';
 		}
 
-		// After content.
+		// After content - includes 'after_content' and 'content' placements.
 		$after_ads = $engine->get_ads_for_placement( 'after_content' );
+		$after_ads = array_unique( array_merge( $after_ads, $content_ads ) );
 		$after     = '';
 		if ( ! empty( $after_ads ) ) {
 			$after = '<div class="wbam-placement wbam-placement-after-content">';

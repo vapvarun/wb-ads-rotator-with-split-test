@@ -404,9 +404,11 @@ class Admin {
 		foreach ( $columns as $key => $value ) {
 			$new[ $key ] = $value;
 			if ( 'title' === $key ) {
-				$new['ad_type']    = __( 'Type', 'wb-ad-manager' );
-				$new['placements'] = __( 'Placements', 'wb-ad-manager' );
-				$new['status']     = __( 'Status', 'wb-ad-manager' );
+				$new['ad_type']     = __( 'Type', 'wb-ad-manager' );
+				$new['placements']  = __( 'Placements', 'wb-ad-manager' );
+				$new['impressions'] = __( 'Impressions', 'wb-ad-manager' );
+				$new['clicks']      = __( 'Clicks', 'wb-ad-manager' );
+				$new['status']      = __( 'Status', 'wb-ad-manager' );
 			}
 		}
 		return $new;
@@ -433,6 +435,30 @@ class Admin {
 			case 'placements':
 				$placements = get_post_meta( $post_id, '_wbam_placements', true );
 				echo ! empty( $placements ) ? esc_html( implode( ', ', $placements ) ) : '—';
+				break;
+
+			case 'impressions':
+				global $wpdb;
+				$table = $wpdb->prefix . 'wbam_analytics';
+				$count = $wpdb->get_var( // phpcs:ignore
+					$wpdb->prepare(
+						"SELECT COUNT(*) FROM {$table} WHERE ad_id = %d AND event_type = 'impression'",
+						$post_id
+					)
+				);
+				echo '<strong>' . esc_html( number_format_i18n( absint( $count ) ) ) . '</strong>';
+				break;
+
+			case 'clicks':
+				global $wpdb;
+				$table = $wpdb->prefix . 'wbam_analytics';
+				$count = $wpdb->get_var( // phpcs:ignore
+					$wpdb->prepare(
+						"SELECT COUNT(*) FROM {$table} WHERE ad_id = %d AND event_type = 'click'",
+						$post_id
+					)
+				);
+				echo '<strong>' . esc_html( number_format_i18n( absint( $count ) ) ) . '</strong>';
 				break;
 
 			case 'status':

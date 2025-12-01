@@ -17,14 +17,7 @@ use WBAM\Modules\Placements\Placement_Engine;
 class BP_Activity_Placement implements Placement_Interface {
 
 	/**
-	 * Activity counter.
-	 *
-	 * @var int
-	 */
-	private $activity_count = 0;
-
-	/**
-	 * Ads already displayed.
+	 * Ads already displayed (non-repeating).
 	 *
 	 * @var array
 	 */
@@ -51,30 +44,21 @@ class BP_Activity_Placement implements Placement_Interface {
 	}
 
 	public function register() {
-		add_action( 'bp_before_activity_entry', array( $this, 'before_activity' ) );
 		add_action( 'bp_after_activity_entry', array( $this, 'after_activity' ) );
 
-		// Reset counter on activity loop start.
-		add_action( 'bp_before_activity_loop', array( $this, 'reset_counter' ) );
+		// Reset displayed ads on activity loop start.
+		add_action( 'bp_before_activity_loop', array( $this, 'reset_displayed' ) );
 	}
 
 	/**
-	 * Reset activity counter.
+	 * Reset displayed ads tracker.
 	 */
-	public function reset_counter() {
-		$this->activity_count = 0;
-		$this->displayed_ads  = array();
+	public function reset_displayed() {
+		$this->displayed_ads = array();
 	}
 
 	/**
-	 * Before activity entry.
-	 */
-	public function before_activity() {
-		$this->activity_count++;
-	}
-
-	/**
-	 * After activity entry - inject ads.
+	 * After activity entry - inject ads using did_action() for accurate counting.
 	 */
 	public function after_activity() {
 		$engine = Placement_Engine::get_instance();
@@ -84,8 +68,11 @@ class BP_Activity_Placement implements Placement_Interface {
 			return;
 		}
 
+		// Use did_action() to get accurate activity count (like BP Ads plugin).
+		$activity_count = did_action( 'bp_after_activity_entry' );
+
 		foreach ( $ads as $ad_id ) {
-			// Skip if already displayed.
+			// Skip if already displayed (non-repeating ads).
 			if ( in_array( $ad_id, $this->displayed_ads, true ) ) {
 				continue;
 			}
@@ -96,11 +83,13 @@ class BP_Activity_Placement implements Placement_Interface {
 
 			// Check if we should show ad at this position.
 			if ( $repeat ) {
-				if ( $this->activity_count >= $after_activity && ( $this->activity_count % $after_activity ) === 0 ) {
+				// Repeating: show every N activities.
+				if ( $activity_count >= $after_activity && ( $activity_count % $after_activity ) === 0 ) {
 					$this->render_ad( $ad_id, $engine );
 				}
 			} else {
-				if ( $this->activity_count === $after_activity ) {
+				// Non-repeating: show only once at position N.
+				if ( $activity_count === $after_activity ) {
 					$this->render_ad( $ad_id, $engine );
 					$this->displayed_ads[] = $ad_id;
 				}
