@@ -42,22 +42,20 @@ class Admin {
 
 		wp_enqueue_media();
 
-		// Use file modification time for cache busting during development.
-		$css_version = WBAM_VERSION . '.' . filemtime( WBAM_PATH . 'assets/css/admin.css' );
-		$js_version  = WBAM_VERSION . '.' . filemtime( WBAM_PATH . 'assets/js/admin.js' );
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_enqueue_style(
 			'wbam-admin',
-			WBAM_URL . 'assets/css/admin.css',
+			WBAM_URL . 'assets/css/admin' . $suffix . '.css',
 			array(),
-			$css_version
+			WBAM_VERSION
 		);
 
 		wp_enqueue_script(
 			'wbam-admin',
-			WBAM_URL . 'assets/js/admin.js',
+			WBAM_URL . 'assets/js/admin' . $suffix . '.js',
 			array( 'jquery' ),
-			$js_version,
+			WBAM_VERSION,
 			true
 		);
 
@@ -438,26 +436,40 @@ class Admin {
 				break;
 
 			case 'impressions':
-				global $wpdb;
-				$table = $wpdb->prefix . 'wbam_analytics';
-				$count = $wpdb->get_var( // phpcs:ignore
-					$wpdb->prepare(
-						"SELECT COUNT(*) FROM {$table} WHERE ad_id = %d AND event_type = 'impression'",
-						$post_id
-					)
-				);
+				$cache_key = 'wbam_impressions_' . $post_id;
+				$count     = wp_cache_get( $cache_key, 'wbam' );
+				if ( false === $count ) {
+					global $wpdb;
+					// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$count = $wpdb->get_var(
+						$wpdb->prepare(
+							'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
+							$post_id,
+							'impression'
+						)
+					);
+					// phpcs:enable
+					wp_cache_set( $cache_key, $count, 'wbam', HOUR_IN_SECONDS );
+				}
 				echo '<strong>' . esc_html( number_format_i18n( absint( $count ) ) ) . '</strong>';
 				break;
 
 			case 'clicks':
-				global $wpdb;
-				$table = $wpdb->prefix . 'wbam_analytics';
-				$count = $wpdb->get_var( // phpcs:ignore
-					$wpdb->prepare(
-						"SELECT COUNT(*) FROM {$table} WHERE ad_id = %d AND event_type = 'click'",
-						$post_id
-					)
-				);
+				$cache_key = 'wbam_clicks_' . $post_id;
+				$count     = wp_cache_get( $cache_key, 'wbam' );
+				if ( false === $count ) {
+					global $wpdb;
+					// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$count = $wpdb->get_var(
+						$wpdb->prepare(
+							'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
+							$post_id,
+							'click'
+						)
+					);
+					// phpcs:enable
+					wp_cache_set( $cache_key, $count, 'wbam', HOUR_IN_SECONDS );
+				}
 				echo '<strong>' . esc_html( number_format_i18n( absint( $count ) ) ) . '</strong>';
 				break;
 

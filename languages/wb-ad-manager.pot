@@ -1,0 +1,1889 @@
+# Copyright (C) 2025 Wbcom Designs
+# This file is distributed under the GPL-2.0+.
+msgid ""
+msgstr ""
+"Project-Id-Version: Wbcom Designs - WB Ad Manager 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wbcomdesigns.com/support/\n"
+"POT-Creation-Date: 2025-12-01 08:46:19+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2025-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Wbcom Designs <developer@wbcomdesigns.com>\n"
+"Language-Team: Wbcom Designs <developer@wbcomdesigns.com>\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Country: United States\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: "
+"__;_e;_x:1,2c;_ex:1,2c;_n:1,2;_nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_"
+"attr__;esc_html__;esc_attr_e;esc_html_e;esc_attr_x:1,2c;esc_html_x:1,2c;\n"
+"X-Poedit-Basepath: ../\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-Bookmarks: \n"
+"X-Textdomain-Support: yes\n"
+"X-Generator: grunt-wp-i18n 1.0.4\n"
+
+#: includes/Admin/class-admin.php:71
+msgid "Select Image"
+msgstr ""
+
+#: includes/Admin/class-admin.php:72
+msgid "Use This Image"
+msgstr ""
+
+#: includes/Admin/class-admin.php:92
+msgid "Ad Settings"
+msgstr ""
+
+#: includes/Admin/class-admin.php:101 includes/Admin/class-admin.php:198
+#: includes/Admin/class-admin.php:408
+msgid "Placements"
+msgstr ""
+
+#: includes/Admin/class-admin.php:110
+msgid "Ad Status"
+msgstr ""
+
+#: includes/Admin/class-admin.php:213
+msgid "Paragraph Settings"
+msgstr ""
+
+#: includes/Admin/class-admin.php:215
+msgid "Insert after paragraph:"
+msgstr ""
+
+#: includes/Admin/class-admin.php:221
+msgid "Repeat after every X paragraphs"
+msgstr ""
+
+#: includes/Admin/class-admin.php:227
+msgid "Activity Stream Settings"
+msgstr ""
+
+#: includes/Admin/class-admin.php:229
+msgid "Insert after activity:"
+msgstr ""
+
+#: includes/Admin/class-admin.php:235
+msgid "Repeat after every X activities"
+msgstr ""
+
+#: includes/Admin/class-admin.php:241
+msgid "Archive Settings"
+msgstr ""
+
+#: includes/Admin/class-admin.php:243
+msgid "Insert after post:"
+msgstr ""
+
+#: includes/Admin/class-admin.php:249
+msgid "Repeat after every X posts"
+msgstr ""
+
+#: includes/Admin/class-admin.php:274 includes/Admin/class-admin.php:481
+msgid "Enabled"
+msgstr ""
+
+#: includes/Admin/class-admin.php:278 includes/Admin/class-admin.php:481
+msgid "Disabled"
+msgstr ""
+
+#: includes/Admin/class-admin.php:283
+msgid "Priority"
+msgstr ""
+
+#: includes/Admin/class-admin.php:286
+msgid "Higher priority ads display first."
+msgstr ""
+
+#: includes/Admin/class-admin.php:290
+msgid "Session Limit"
+msgstr ""
+
+#: includes/Admin/class-admin.php:291
+msgid "Unlimited"
+msgstr ""
+
+#: includes/Admin/class-admin.php:292
+msgid "Max views per visitor session. Leave empty for unlimited."
+msgstr ""
+
+#: includes/Admin/class-admin.php:407
+msgid "Type"
+msgstr ""
+
+#: includes/Admin/class-admin.php:409
+msgid "Impressions"
+msgstr ""
+
+#: includes/Admin/class-admin.php:410
+msgid "Clicks"
+msgstr ""
+
+#: includes/Admin/class-admin.php:411
+msgid "Status"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:35
+msgid "Display Rules"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:44
+msgid "Schedule"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:53
+msgid "Visitor Conditions"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:62
+#: includes/Admin/class-settings.php:229
+msgid "Geo Targeting"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:91
+msgid "Show this ad on:"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:95
+msgid "All pages"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:96
+msgid "Show everywhere, with optional exclusions below"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:100
+msgid "Specific pages"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:101
+msgid "Only show on selected pages below"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:107
+msgid "Include on:"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:110
+msgid "Post Types"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:128
+#: includes/Admin/class-display-options.php:181
+msgid "Page Types"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:132
+msgid "Front Page"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:133
+msgid "Blog Page"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:134
+msgid "Archives"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:135
+msgid "Search Results"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:136
+msgid "404 Page"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:149
+#: includes/Admin/class-display-options.php:193
+msgid "Categories"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:150
+msgid "Select categories..."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:163
+#: includes/Admin/class-display-options.php:204
+msgid "Tags"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:164
+msgid "Select tags..."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:178
+msgid "Exclude from:"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:194
+msgid "Select categories to exclude..."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:205
+msgid "Select tags to exclude..."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:233
+msgid "Mon"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:234
+msgid "Tue"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:235
+msgid "Wed"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:236
+msgid "Thu"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:237
+msgid "Fri"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:238
+msgid "Sat"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:239
+msgid "Sun"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:244
+msgid "Start Date"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:246
+msgid "Leave empty to start immediately."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:249
+msgid "End Date"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:251
+msgid "Leave empty to run indefinitely."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:254
+msgid "Days of Week"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:263
+msgid "Leave all unchecked to show every day."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:266
+msgid "Time of Day"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:269
+msgid "to"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:272
+msgid "Leave empty to show all day. Uses site timezone."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:292
+msgid "Devices"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:293
+msgid "Show on selected devices. Leave all unchecked to show on all devices."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:298
+msgid "Desktop"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:303
+msgid "Tablet"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:308
+msgid "Mobile"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:314
+msgid "User Status"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:318
+msgid "All visitors"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:322
+msgid "Logged in only"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:326
+msgid "Logged out only"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:332
+msgid "User Roles"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:333
+msgid "Limit to specific roles. Leave all unchecked to show to all roles."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:370
+msgid "Enable geo targeting for this ad"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:376
+msgid "Show only in these countries"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:377
+msgid "Leave empty to show in all countries."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:378
+msgid "Select countries..."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:388
+msgid "Exclude these countries"
+msgstr ""
+
+#: includes/Admin/class-display-options.php:389
+msgid "Select countries to exclude..."
+msgstr ""
+
+#: includes/Admin/class-display-options.php:401
+msgid "Show ad to visitors with unknown location"
+msgstr ""
+
+#: includes/Admin/class-settings.php:59 includes/Admin/class-settings.php:60
+msgid "Settings"
+msgstr ""
+
+#: includes/Admin/class-settings.php:80
+msgid "General Settings"
+msgstr ""
+
+#: includes/Admin/class-settings.php:87
+msgid "Disable for Logged-in Users"
+msgstr ""
+
+#: includes/Admin/class-settings.php:93
+msgid "Hide ads for logged-in users."
+msgstr ""
+
+#: includes/Admin/class-settings.php:99
+msgid "Disable for Admins"
+msgstr ""
+
+#: includes/Admin/class-settings.php:105
+msgid "Hide ads for administrators."
+msgstr ""
+
+#: includes/Admin/class-settings.php:111
+msgid "Minimum Content Length"
+msgstr ""
+
+#: includes/Admin/class-settings.php:117
+msgid "Minimum characters required to show paragraph ads. Set 0 to disable."
+msgstr ""
+
+#: includes/Admin/class-settings.php:123
+msgid "Disable on Post Types"
+msgstr ""
+
+#: includes/Admin/class-settings.php:129
+msgid "Select post types where ads should be disabled."
+msgstr ""
+
+#: includes/Admin/class-settings.php:135
+msgid "Maximum Ads Per Page"
+msgstr ""
+
+#: includes/Admin/class-settings.php:141
+msgid "Maximum number of ads to show per page. Set 0 for unlimited."
+msgstr ""
+
+#: includes/Admin/class-settings.php:148
+msgid "Display Settings"
+msgstr ""
+
+#: includes/Admin/class-settings.php:155
+msgid "Ad Label Text"
+msgstr ""
+
+#: includes/Admin/class-settings.php:161
+msgid "e.g., Advertisement"
+msgstr ""
+
+#: includes/Admin/class-settings.php:162
+msgid "Optional label to display above/below ads."
+msgstr ""
+
+#: includes/Admin/class-settings.php:168
+msgid "Label Position"
+msgstr ""
+
+#: includes/Admin/class-settings.php:175
+msgid "Above Ad"
+msgstr ""
+
+#: includes/Admin/class-settings.php:176
+msgid "Below Ad"
+msgstr ""
+
+#: includes/Admin/class-settings.php:183
+msgid "Custom Container Class"
+msgstr ""
+
+#: includes/Admin/class-settings.php:189
+msgid "e.g., my-ad-wrapper"
+msgstr ""
+
+#: includes/Admin/class-settings.php:190
+msgid "Additional CSS class for ad containers."
+msgstr ""
+
+#: includes/Admin/class-settings.php:197
+msgid "Performance"
+msgstr ""
+
+#: includes/Admin/class-settings.php:204
+msgid "Lazy Load Ads"
+msgstr ""
+
+#: includes/Admin/class-settings.php:210
+msgid "Load ads only when they come into viewport."
+msgstr ""
+
+#: includes/Admin/class-settings.php:216
+msgid "Cache Ad Queries"
+msgstr ""
+
+#: includes/Admin/class-settings.php:222
+msgid "Cache ad queries for better performance (uses transients)."
+msgstr ""
+
+#: includes/Admin/class-settings.php:236
+msgid "Primary Provider"
+msgstr ""
+
+#: includes/Admin/class-settings.php:247
+msgid "ipinfo.io API Key"
+msgstr ""
+
+#: includes/Admin/class-settings.php:253
+msgid "Enter API key (optional)"
+msgstr ""
+
+#: includes/Admin/class-settings.php:254
+msgid "Get a free API key from ipinfo.io for 50K requests/month."
+msgstr ""
+
+#: includes/Admin/class-settings.php:328
+msgid "Settings saved."
+msgstr ""
+
+#: includes/Admin/class-settings.php:341
+msgid "Save Settings"
+msgstr ""
+
+#: includes/Admin/class-settings.php:347
+msgid "Quick Links"
+msgstr ""
+
+#: includes/Admin/class-settings.php:349 includes/Core/class-plugin.php:124
+msgid "All Ads"
+msgstr ""
+
+#: includes/Admin/class-settings.php:350 includes/Core/class-plugin.php:125
+msgid "Add New Ad"
+msgstr ""
+
+#: includes/Admin/class-settings.php:355
+msgid "Shortcodes"
+msgstr ""
+
+#: includes/Admin/class-settings.php:357
+msgid "Display a single ad by ID."
+msgstr ""
+
+#: includes/Admin/class-settings.php:359
+msgid "Display multiple ads."
+msgstr ""
+
+#: includes/Admin/class-settings.php:371
+msgid "Configure general ad display settings."
+msgstr ""
+
+#: includes/Admin/class-settings.php:378
+msgid "Customize how ads appear on your site."
+msgstr ""
+
+#: includes/Admin/class-settings.php:385
+msgid "Optimize ad loading performance."
+msgstr ""
+
+#: includes/Admin/class-settings.php:392
+msgid ""
+"Configure IP geolocation providers for geo-targeting. The system will try "
+"providers in order until one succeeds."
+msgstr ""
+
+#: includes/Admin/class-settings.php:408
+msgid "45 requests/minute, no API key"
+msgstr ""
+
+#: includes/Admin/class-settings.php:412
+msgid "50K requests/month, API key optional"
+msgstr ""
+
+#: includes/Admin/class-settings.php:416
+msgid "1K requests/day, no API key"
+msgstr ""
+
+#: includes/Admin/class-settings.php:430
+msgid ""
+"If the primary provider fails, the system will automatically try the next "
+"provider."
+msgstr ""
+
+#: includes/Core/class-plugin.php:123
+#: includes/Modules/Placements/class-widget-placement.php:59
+msgid "WB Ad Manager"
+msgstr ""
+
+#: includes/Core/class-plugin.php:126
+msgid "Add New"
+msgstr ""
+
+#: includes/Core/class-plugin.php:127
+msgid "New Ad"
+msgstr ""
+
+#: includes/Core/class-plugin.php:128
+msgid "Edit Ad"
+msgstr ""
+
+#: includes/Core/class-plugin.php:129
+msgid "Update Ad"
+msgstr ""
+
+#: includes/Core/class-plugin.php:130
+msgid "View Ad"
+msgstr ""
+
+#: includes/Core/class-plugin.php:131
+msgid "Search Ads"
+msgstr ""
+
+#: includes/Core/class-plugin.php:132
+msgid "Not found"
+msgstr ""
+
+#: includes/Core/class-plugin.php:133
+msgid "Not found in Trash"
+msgstr ""
+
+#: includes/Core/class-plugin.php:137
+msgid "Ad"
+msgstr ""
+
+#: includes/Core/class-plugin.php:184
+msgid "BuddyPress is not active. BuddyPress activity placements are disabled."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-code-ad.php:31
+msgid "HTML/JS Code"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-code-ad.php:40
+msgid "Paste ad network code (AdSense, etc.)."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-code-ad.php:89
+msgid "Ad Code"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-code-ad.php:91
+msgid ""
+"Paste your ad network code (AdSense, Media.net, etc.) or custom "
+"HTML/JavaScript."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:31
+msgid "Image Ad"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:40
+msgid "Display an image with optional link."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:105
+msgid "Image URL"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:108
+msgid "Upload"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:109
+msgid "Remove"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:119
+msgid "Link URL"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:122
+msgid "Where users go when clicking the ad."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:127
+msgid "Alt Text"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:134
+msgid "Link Target"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:137
+msgid "New Tab"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-image-ad.php:138
+msgid "Same Tab"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-rich-content-ad.php:31
+msgid "Rich Content"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-rich-content-ad.php:40
+msgid "Create ads with the WordPress editor."
+msgstr ""
+
+#: includes/Modules/AdTypes/class-rich-content-ad.php:89
+msgid "Ad Content"
+msgstr ""
+
+#: includes/Modules/AdTypes/class-rich-content-ad.php:91
+msgid "Enter HTML content for your ad. Basic HTML tags are supported."
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-activity-placement.php:31
+msgid "BuddyPress Activity"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-activity-placement.php:35
+msgid "Display ads in the BuddyPress activity stream."
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:34
+msgid "BuddyPress Directories"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:43
+msgid "Display ads in member or group directory listings."
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:226
+msgid "Before Members List"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:227
+msgid "After Members List"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:228
+msgid "Between Members"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:229
+msgid "Before Groups List"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:230
+msgid "After Groups List"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:231
+msgid "Between Groups"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:235
+#: includes/Modules/Placements/class-comment-placement.php:220
+#: includes/Modules/Placements/class-sticky-placement.php:121
+#: includes/Modules/bbPress/class-bbpress-module.php:285
+msgid "Position"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:245
+#: includes/Modules/Placements/class-comment-placement.php:230
+#: includes/Modules/bbPress/class-bbpress-module.php:295
+msgid "Show after every"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:247
+msgid "items"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-directory-placement.php:250
+#: includes/Modules/Placements/class-comment-placement.php:235
+#: includes/Modules/bbPress/class-bbpress-module.php:300
+msgid "Repeat"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:46
+msgid "WBAM: BuddyPress Profile Ad"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:48
+msgid "Display ads on BuddyPress member profiles."
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:111
+#: includes/Modules/BuddyPress/class-bp-widgets.php:226
+#: includes/Modules/BuddyPress/class-bp-widgets.php:341
+#: includes/Modules/Placements/class-widget-placement.php:128
+#: includes/Modules/bbPress/class-bbpress-module.php:443
+#: includes/Modules/bbPress/class-bbpress-module.php:566
+msgid "Title (optional):"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:117
+#: includes/Modules/BuddyPress/class-bp-widgets.php:232
+#: includes/Modules/BuddyPress/class-bp-widgets.php:347
+#: includes/Modules/Placements/class-widget-placement.php:140
+#: includes/Modules/bbPress/class-bbpress-module.php:449
+#: includes/Modules/bbPress/class-bbpress-module.php:572
+msgid "Select Ad:"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:120
+#: includes/Modules/BuddyPress/class-bp-widgets.php:235
+#: includes/Modules/BuddyPress/class-bp-widgets.php:350
+#: includes/Modules/bbPress/class-bbpress-module.php:452
+#: includes/Modules/bbPress/class-bbpress-module.php:575
+msgid "— Select Ad —"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:129
+msgid "This widget only displays on BuddyPress member profile pages."
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:161
+msgid "WBAM: BuddyPress Group Ad"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:163
+msgid "Display ads on BuddyPress group pages."
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:244
+msgid "This widget only displays on BuddyPress group pages."
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:276
+msgid "WBAM: BuddyPress Activity Ad"
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:278
+msgid "Display ads on BuddyPress activity pages."
+msgstr ""
+
+#: includes/Modules/BuddyPress/class-bp-widgets.php:359
+msgid "This widget only displays on BuddyPress activity pages."
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:462
+msgid "Afghanistan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:463
+msgid "Albania"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:464
+msgid "Algeria"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:465
+msgid "Andorra"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:466
+msgid "Angola"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:467
+msgid "Antigua and Barbuda"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:468
+msgid "Argentina"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:469
+msgid "Armenia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:470
+msgid "Australia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:471
+msgid "Austria"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:472
+msgid "Azerbaijan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:473
+msgid "Bahamas"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:474
+msgid "Bahrain"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:475
+msgid "Bangladesh"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:476
+msgid "Barbados"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:477
+msgid "Belarus"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:478
+msgid "Belgium"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:479
+msgid "Belize"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:480
+msgid "Benin"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:481
+msgid "Bhutan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:482
+msgid "Bolivia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:483
+msgid "Bosnia and Herzegovina"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:484
+msgid "Botswana"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:485
+msgid "Brazil"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:486
+msgid "Brunei"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:487
+msgid "Bulgaria"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:488
+msgid "Burkina Faso"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:489
+msgid "Burundi"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:490
+msgid "Cambodia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:491
+msgid "Cameroon"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:492
+msgid "Canada"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:493
+msgid "Cape Verde"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:494
+msgid "Central African Republic"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:495
+msgid "Chad"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:496
+msgid "Chile"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:497
+msgid "China"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:498
+msgid "Colombia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:499
+msgid "Comoros"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:500
+msgid "Congo"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:501
+msgid "Congo (DRC)"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:502
+msgid "Costa Rica"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:503
+msgid "Côte d'Ivoire"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:504
+msgid "Croatia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:505
+msgid "Cuba"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:506
+msgid "Cyprus"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:507
+msgid "Czech Republic"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:508
+msgid "Denmark"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:509
+msgid "Djibouti"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:510
+msgid "Dominica"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:511
+msgid "Dominican Republic"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:512
+msgid "Ecuador"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:513
+msgid "Egypt"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:514
+msgid "El Salvador"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:515
+msgid "Equatorial Guinea"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:516
+msgid "Eritrea"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:517
+msgid "Estonia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:518
+msgid "Ethiopia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:519
+msgid "Fiji"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:520
+msgid "Finland"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:521
+msgid "France"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:522
+msgid "Gabon"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:523
+msgid "Gambia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:524
+msgid "Georgia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:525
+msgid "Germany"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:526
+msgid "Ghana"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:527
+msgid "Greece"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:528
+msgid "Grenada"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:529
+msgid "Guatemala"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:530
+msgid "Guinea"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:531
+msgid "Guinea-Bissau"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:532
+msgid "Guyana"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:533
+msgid "Haiti"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:534
+msgid "Honduras"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:535
+msgid "Hong Kong"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:536
+msgid "Hungary"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:537
+msgid "Iceland"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:538
+msgid "India"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:539
+msgid "Indonesia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:540
+msgid "Iran"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:541
+msgid "Iraq"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:542
+msgid "Ireland"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:543
+msgid "Israel"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:544
+msgid "Italy"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:545
+msgid "Jamaica"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:546
+msgid "Japan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:547
+msgid "Jordan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:548
+msgid "Kazakhstan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:549
+msgid "Kenya"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:550
+msgid "Kiribati"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:551
+msgid "North Korea"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:552
+msgid "South Korea"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:553
+msgid "Kuwait"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:554
+msgid "Kyrgyzstan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:555
+msgid "Laos"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:556
+msgid "Latvia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:557
+msgid "Lebanon"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:558
+msgid "Lesotho"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:559
+msgid "Liberia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:560
+msgid "Libya"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:561
+msgid "Liechtenstein"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:562
+msgid "Lithuania"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:563
+msgid "Luxembourg"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:564
+msgid "Macau"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:565
+msgid "North Macedonia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:566
+msgid "Madagascar"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:567
+msgid "Malawi"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:568
+msgid "Malaysia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:569
+msgid "Maldives"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:570
+msgid "Mali"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:571
+msgid "Malta"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:572
+msgid "Marshall Islands"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:573
+msgid "Mauritania"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:574
+msgid "Mauritius"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:575
+msgid "Mexico"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:576
+msgid "Micronesia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:577
+msgid "Moldova"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:578
+msgid "Monaco"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:579
+msgid "Mongolia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:580
+msgid "Montenegro"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:581
+msgid "Morocco"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:582
+msgid "Mozambique"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:583
+msgid "Myanmar"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:584
+msgid "Namibia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:585
+msgid "Nauru"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:586
+msgid "Nepal"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:587
+msgid "Netherlands"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:588
+msgid "New Zealand"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:589
+msgid "Nicaragua"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:590
+msgid "Niger"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:591
+msgid "Nigeria"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:592
+msgid "Norway"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:593
+msgid "Oman"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:594
+msgid "Pakistan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:595
+msgid "Palau"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:596
+msgid "Palestine"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:597
+msgid "Panama"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:598
+msgid "Papua New Guinea"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:599
+msgid "Paraguay"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:600
+msgid "Peru"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:601
+msgid "Philippines"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:602
+msgid "Poland"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:603
+msgid "Portugal"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:604
+msgid "Puerto Rico"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:605
+msgid "Qatar"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:606
+msgid "Romania"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:607
+msgid "Russia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:608
+msgid "Rwanda"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:609
+msgid "Saint Kitts and Nevis"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:610
+msgid "Saint Lucia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:611
+msgid "Saint Vincent and the Grenadines"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:612
+msgid "Samoa"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:613
+msgid "San Marino"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:614
+msgid "São Tomé and Príncipe"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:615
+msgid "Saudi Arabia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:616
+msgid "Senegal"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:617
+msgid "Serbia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:618
+msgid "Seychelles"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:619
+msgid "Sierra Leone"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:620
+msgid "Singapore"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:621
+msgid "Slovakia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:622
+msgid "Slovenia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:623
+msgid "Solomon Islands"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:624
+msgid "Somalia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:625
+msgid "South Africa"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:626
+msgid "South Sudan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:627
+msgid "Spain"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:628
+msgid "Sri Lanka"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:629
+msgid "Sudan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:630
+msgid "Suriname"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:631
+msgid "Eswatini"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:632
+msgid "Sweden"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:633
+msgid "Switzerland"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:634
+msgid "Syria"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:635
+msgid "Taiwan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:636
+msgid "Tajikistan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:637
+msgid "Tanzania"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:638
+msgid "Thailand"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:639
+msgid "Timor-Leste"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:640
+msgid "Togo"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:641
+msgid "Tonga"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:642
+msgid "Trinidad and Tobago"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:643
+msgid "Tunisia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:644
+msgid "Turkey"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:645
+msgid "Turkmenistan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:646
+msgid "Tuvalu"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:647
+msgid "Uganda"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:648
+msgid "Ukraine"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:649
+msgid "United Arab Emirates"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:650
+msgid "United Kingdom"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:651
+msgid "United States"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:652
+msgid "Uruguay"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:653
+msgid "Uzbekistan"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:654
+msgid "Vanuatu"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:655
+msgid "Vatican City"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:656
+msgid "Venezuela"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:657
+msgid "Vietnam"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:658
+msgid "Yemen"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:659
+msgid "Zambia"
+msgstr ""
+
+#: includes/Modules/GeoTargeting/class-geo-engine.php:660
+msgid "Zimbabwe"
+msgstr ""
+
+#: includes/Modules/Placements/class-archive-placement.php:35
+msgid "Between Posts"
+msgstr ""
+
+#: includes/Modules/Placements/class-archive-placement.php:39
+msgid "Display ads between posts on archive pages."
+msgstr ""
+
+#: includes/Modules/Placements/class-comment-placement.php:38
+msgid "Comments"
+msgstr ""
+
+#: includes/Modules/Placements/class-comment-placement.php:47
+msgid "Display ads before, after, or between comments."
+msgstr ""
+
+#: includes/Modules/Placements/class-comment-placement.php:214
+msgid "Before Comment Form"
+msgstr ""
+
+#: includes/Modules/Placements/class-comment-placement.php:215
+msgid "After Comment Form"
+msgstr ""
+
+#: includes/Modules/Placements/class-comment-placement.php:216
+msgid "Between Comments"
+msgstr ""
+
+#: includes/Modules/Placements/class-comment-placement.php:232
+msgid "comments"
+msgstr ""
+
+#: includes/Modules/Placements/class-content-placement.php:21
+msgid "Before/After Content"
+msgstr ""
+
+#: includes/Modules/Placements/class-content-placement.php:25
+msgid "Display ads before or after post content."
+msgstr ""
+
+#: includes/Modules/Placements/class-footer-placement.php:21
+msgid "Footer"
+msgstr ""
+
+#: includes/Modules/Placements/class-footer-placement.php:25
+msgid "Display ads in the site footer."
+msgstr ""
+
+#: includes/Modules/Placements/class-header-placement.php:28
+msgid "Header"
+msgstr ""
+
+#: includes/Modules/Placements/class-header-placement.php:32
+msgid "Display ads in the site header."
+msgstr ""
+
+#: includes/Modules/Placements/class-paragraph-placement.php:21
+msgid "After Paragraph"
+msgstr ""
+
+#: includes/Modules/Placements/class-paragraph-placement.php:25
+msgid "Insert ads after a specific paragraph."
+msgstr ""
+
+#: includes/Modules/Placements/class-popup-placement.php:31
+msgid "Popup/Modal"
+msgstr ""
+
+#: includes/Modules/Placements/class-popup-placement.php:40
+msgid "Display ad in a modal popup with configurable trigger."
+msgstr ""
+
+#: includes/Modules/Placements/class-popup-placement.php:105
+#: includes/Modules/Placements/class-sticky-placement.php:97
+msgid "Close"
+msgstr ""
+
+#: includes/Modules/Placements/class-popup-placement.php:124
+msgid "Time Delay"
+msgstr ""
+
+#: includes/Modules/Placements/class-popup-placement.php:125
+#: includes/Modules/Placements/class-popup-placement.php:144
+msgid "Scroll Percentage"
+msgstr ""
+
+#: includes/Modules/Placements/class-popup-placement.php:126
+msgid "Exit Intent"
+msgstr ""
+
+#: includes/Modules/Placements/class-popup-placement.php:130
+msgid "Trigger"
+msgstr ""
+
+#: includes/Modules/Placements/class-popup-placement.php:140
+msgid "Delay (seconds)"
+msgstr ""
+
+#: includes/Modules/Placements/class-shortcode-placement.php:21
+msgid "Shortcode"
+msgstr ""
+
+#: includes/Modules/Placements/class-shortcode-placement.php:25
+msgid "Display ads using [wbam_ad] shortcode."
+msgstr ""
+
+#: includes/Modules/Placements/class-sticky-placement.php:31
+msgid "Sticky/Floating"
+msgstr ""
+
+#: includes/Modules/Placements/class-sticky-placement.php:40
+msgid "Fixed position ad that stays visible while scrolling."
+msgstr ""
+
+#: includes/Modules/Placements/class-sticky-placement.php:114
+msgid "Bottom Right"
+msgstr ""
+
+#: includes/Modules/Placements/class-sticky-placement.php:115
+msgid "Bottom Left"
+msgstr ""
+
+#: includes/Modules/Placements/class-sticky-placement.php:116
+msgid "Bottom Bar (Full Width)"
+msgstr ""
+
+#: includes/Modules/Placements/class-sticky-placement.php:117
+msgid "Top Bar (Full Width)"
+msgstr ""
+
+#: includes/Modules/Placements/class-widget-placement.php:21
+msgid "Widget"
+msgstr ""
+
+#: includes/Modules/Placements/class-widget-placement.php:25
+msgid "Display ads in sidebar using widget."
+msgstr ""
+
+#: includes/Modules/Placements/class-widget-placement.php:61
+msgid "Display an ad from WB Ad Manager."
+msgstr ""
+
+#: includes/Modules/Placements/class-widget-placement.php:147
+msgid "— Select an ad —"
+msgstr ""
+
+#: includes/Modules/Placements/class-widget-placement.php:160
+#. translators: %s: URL to create new ad
+msgid "No ads found. %s"
+msgstr ""
+
+#: includes/Modules/Placements/class-widget-placement.php:161
+msgid "Create one"
+msgstr ""
+
+#: includes/Modules/Targeting/class-content-analyzer.php:192
+msgid "Content is short, ad after content only"
+msgstr ""
+
+#: includes/Modules/Targeting/class-content-analyzer.php:203
+msgid "Medium content with enough paragraphs"
+msgstr ""
+
+#: includes/Modules/Targeting/class-content-analyzer.php:208
+msgid "End of medium content"
+msgstr ""
+
+#: includes/Modules/Targeting/class-content-analyzer.php:222
+msgid "Early in long content"
+msgstr ""
+
+#: includes/Modules/Targeting/class-content-analyzer.php:232
+msgid "Middle of long content"
+msgstr ""
+
+#: includes/Modules/Targeting/class-content-analyzer.php:241
+msgid "Near end of long content"
+msgstr ""
+
+#: includes/Modules/Targeting/class-content-analyzer.php:247
+msgid "End of long content"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:81
+msgid "bbPress Forums"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:90
+msgid "Display ads in bbPress forums, topics, and replies."
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:275
+msgid "Before Forum List"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:276
+msgid "After Forum List"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:277
+msgid "Before Topic List"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:278
+msgid "After Topic List"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:279
+msgid "Before Single Topic"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:280
+msgid "After Single Topic"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:281
+msgid "Between Replies"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:297
+msgid "replies"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:366
+msgid "WBAM: bbPress Forum Ad"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:368
+msgid "Display ads on bbPress forum pages."
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:462
+msgid "Show On:"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:465
+msgid "All bbPress Pages"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:466
+msgid "Forum Pages Only"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:467
+msgid "Topic Pages Only"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:501
+msgid "WBAM: bbPress Topic Sidebar Ad"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:503
+msgid "Display ads in sidebar on single topic pages."
+msgstr ""
+
+#: includes/Modules/bbPress/class-bbpress-module.php:584
+msgid "This widget only displays on single topic pages."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Wbcom Designs - WB Ad Manager"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://wbcomdesigns.com/downloads/wb-ad-manager/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Comprehensive ad management for WordPress with support for multiple "
+"placements, ad types, and BuddyPress activity streams."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Wbcom Designs"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://wbcomdesigns.com"
+msgstr ""
+
+#: includes/Core/class-plugin.php:121
+msgctxt "Post Type General Name"
+msgid "Ads"
+msgstr ""
+
+#: includes/Core/class-plugin.php:122
+msgctxt "Post Type Singular Name"
+msgid "Ad"
+msgstr ""
