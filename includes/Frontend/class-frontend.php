@@ -8,6 +8,7 @@
 
 namespace WBAM\Frontend;
 
+use WBAM\Core\Settings_Helper;
 use WBAM\Core\Singleton;
 
 /**
@@ -67,15 +68,13 @@ class Frontend {
 	 * Add AdSense Auto Ads script to head if enabled.
 	 */
 	public function maybe_add_adsense_auto_ads() {
-		$settings = get_option( 'wbam_settings', array() );
-
 		// Check if Auto Ads is enabled.
-		if ( empty( $settings['adsense_auto_ads'] ) ) {
+		if ( ! Settings_Helper::is_enabled( 'adsense_auto_ads' ) ) {
 			return;
 		}
 
 		// Get Publisher ID.
-		$publisher_id = isset( $settings['adsense_publisher_id'] ) ? $settings['adsense_publisher_id'] : '';
+		$publisher_id = Settings_Helper::get( 'adsense_publisher_id', '' );
 		if ( empty( $publisher_id ) ) {
 			return;
 		}

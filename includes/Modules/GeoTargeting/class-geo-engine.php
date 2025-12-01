@@ -8,6 +8,7 @@
 
 namespace WBAM\Modules\GeoTargeting;
 
+use WBAM\Core\Settings_Helper;
 use WBAM\Core\Singleton;
 
 /**
@@ -196,8 +197,7 @@ class Geo_Engine {
 		}
 
 		// Get provider order from settings.
-		$settings       = get_option( 'wbam_settings', array() );
-		$primary        = isset( $settings['geo_primary_provider'] ) ? $settings['geo_primary_provider'] : 'ip-api';
+		$primary        = Settings_Helper::get( 'geo_primary_provider', 'ip-api' );
 		$provider_order = $this->get_provider_order( $primary );
 
 		$location = null;
@@ -688,8 +688,6 @@ class Geo_Engine {
 			$ip = '8.8.8.8'; // Google DNS as test IP.
 		}
 
-		$settings = get_option( 'wbam_settings', array() );
-
-		return $this->query_provider( $provider, $ip, $settings );
+		return $this->query_provider( $provider, $ip, Settings_Helper::get() );
 	}
 }

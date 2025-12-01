@@ -10,6 +10,7 @@
 
 namespace WBAM\Modules\Links;
 
+use WBAM\Core\Settings_Helper;
 use WBAM\Core\Singleton;
 
 /**
@@ -43,10 +44,8 @@ class Link_Cloaker {
 	 * @return string
 	 */
 	public function get_cloak_prefix() {
-		$settings = get_option( 'wbam_settings', array() );
-		return isset( $settings['link_cloak_prefix'] ) && ! empty( $settings['link_cloak_prefix'] )
-			? sanitize_title( $settings['link_cloak_prefix'] )
-			: 'go';
+		$prefix = Settings_Helper::get( 'link_cloak_prefix', 'go' );
+		return ! empty( $prefix ) ? sanitize_title( $prefix ) : 'go';
 	}
 
 	/**
@@ -161,8 +160,7 @@ class Link_Cloaker {
 	 * @param Link $link The link object.
 	 */
 	private function handle_inactive_link( $link ) {
-		$settings        = get_option( 'wbam_settings', array() );
-		$inactive_action = isset( $settings['link_inactive_action'] ) ? $settings['link_inactive_action'] : '404';
+		$inactive_action = Settings_Helper::get( 'link_inactive_action', '404' );
 
 		switch ( $inactive_action ) {
 			case 'home':
@@ -170,7 +168,7 @@ class Link_Cloaker {
 				exit;
 
 			case 'custom':
-				$custom_url = isset( $settings['link_inactive_url'] ) ? $settings['link_inactive_url'] : '';
+				$custom_url = Settings_Helper::get( 'link_inactive_url', '' );
 				if ( ! empty( $custom_url ) ) {
 					wp_redirect( $custom_url, 302 );
 					exit;

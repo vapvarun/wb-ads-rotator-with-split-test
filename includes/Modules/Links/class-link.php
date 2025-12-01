@@ -8,6 +8,9 @@
 
 namespace WBAM\Modules\Links;
 
+use WBAM\Core\Formatter;
+use WBAM\Core\Settings_Helper;
+
 /**
  * Link class.
  */
@@ -268,8 +271,7 @@ class Link {
 	 * @return string
 	 */
 	public function get_cloak_prefix() {
-		$settings = get_option( 'wbam_settings', array() );
-		return isset( $settings['link_cloak_prefix'] ) ? $settings['link_cloak_prefix'] : 'go';
+		return Settings_Helper::get( 'link_cloak_prefix', 'go' );
 	}
 
 	/**
@@ -435,17 +437,7 @@ class Link {
 			return '—';
 		}
 
-		$currencies = array(
-			'USD' => '$',
-			'EUR' => '€',
-			'GBP' => '£',
-			'INR' => '₹',
-			'AUD' => 'A$',
-			'CAD' => 'C$',
-		);
-
-		$symbol = isset( $currencies[ $this->payment_currency ] ) ? $currencies[ $this->payment_currency ] : $this->payment_currency . ' ';
-		return $symbol . number_format( $this->payment_amount, 2 );
+		return Formatter::currency( $this->payment_amount, $this->payment_currency );
 	}
 
 	/**
@@ -458,17 +450,7 @@ class Link {
 			return '—';
 		}
 
-		$currencies = array(
-			'USD' => '$',
-			'EUR' => '€',
-			'GBP' => '£',
-			'INR' => '₹',
-			'AUD' => 'A$',
-			'CAD' => 'C$',
-		);
-
-		$symbol = isset( $currencies[ $this->payment_currency ] ) ? $currencies[ $this->payment_currency ] : $this->payment_currency . ' ';
-		return $symbol . number_format( $this->total_revenue, 2 );
+		return Formatter::currency( $this->total_revenue, $this->payment_currency );
 	}
 
 	/**

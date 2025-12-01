@@ -8,6 +8,8 @@
 
 namespace WBAM\Modules\AdTypes;
 
+use WBAM\Core\Settings_Helper;
+
 /**
  * AdSense Ad class.
  */
@@ -31,8 +33,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$settings             = get_option( 'wbam_settings', array() );
-		$this->publisher_id   = isset( $settings['adsense_publisher_id'] ) ? $settings['adsense_publisher_id'] : '';
+		$this->publisher_id   = Settings_Helper::get( 'adsense_publisher_id', '' );
 
 		// Enqueue AdSense script in footer if we have ads.
 		add_action( 'wp_footer', array( $this, 'maybe_enqueue_adsense_script' ), 5 );
@@ -84,8 +85,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 		}
 
 		// Skip if Auto Ads is enabled (script already in head).
-		$settings = get_option( 'wbam_settings', array() );
-		if ( ! empty( $settings['adsense_auto_ads'] ) && ! empty( $settings['adsense_publisher_id'] ) ) {
+		if ( Settings_Helper::is_enabled( 'adsense_auto_ads' ) && Settings_Helper::get( 'adsense_publisher_id' ) ) {
 			return;
 		}
 
