@@ -440,15 +440,23 @@ class Admin {
 				$count     = wp_cache_get( $cache_key, 'wbam' );
 				if ( false === $count ) {
 					global $wpdb;
-					// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-					$count = $wpdb->get_var(
-						$wpdb->prepare(
-							'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
-							$post_id,
-							'impression'
-						)
-					);
-					// phpcs:enable
+					$table_name = $wpdb->prefix . 'wbam_analytics';
+					// Check if table exists before querying.
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+					if ( $table_exists ) {
+						// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+						$count = $wpdb->get_var(
+							$wpdb->prepare(
+								'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
+								$post_id,
+								'impression'
+							)
+						);
+						// phpcs:enable
+					} else {
+						$count = 0;
+					}
 					wp_cache_set( $cache_key, $count, 'wbam', HOUR_IN_SECONDS );
 				}
 				echo '<strong>' . esc_html( number_format_i18n( absint( $count ) ) ) . '</strong>';
@@ -459,15 +467,23 @@ class Admin {
 				$count     = wp_cache_get( $cache_key, 'wbam' );
 				if ( false === $count ) {
 					global $wpdb;
-					// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-					$count = $wpdb->get_var(
-						$wpdb->prepare(
-							'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
-							$post_id,
-							'click'
-						)
-					);
-					// phpcs:enable
+					$table_name = $wpdb->prefix . 'wbam_analytics';
+					// Check if table exists before querying.
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+					if ( $table_exists ) {
+						// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+						$count = $wpdb->get_var(
+							$wpdb->prepare(
+								'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
+								$post_id,
+								'click'
+							)
+						);
+						// phpcs:enable
+					} else {
+						$count = 0;
+					}
 					wp_cache_set( $cache_key, $count, 'wbam', HOUR_IN_SECONDS );
 				}
 				echo '<strong>' . esc_html( number_format_i18n( absint( $count ) ) ) . '</strong>';
