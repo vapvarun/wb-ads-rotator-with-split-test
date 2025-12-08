@@ -22,7 +22,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.1.0';
+	const DB_VERSION = '1.2.0';
 
 	/**
 	 * Option name for database version.
@@ -126,6 +126,44 @@ class Installer {
 		) {$charset_collate};";
 
 		dbDelta( $sql_clicks );
+
+		// Analytics table for ad impressions and clicks.
+		$table_analytics = $wpdb->prefix . 'wbam_analytics';
+		$sql_analytics   = "CREATE TABLE {$table_analytics} (
+			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			ad_id bigint(20) UNSIGNED NOT NULL,
+			event_type varchar(20) NOT NULL,
+			placement varchar(100) DEFAULT NULL,
+			visitor_hash varchar(64) DEFAULT NULL,
+			ip_address varchar(45) DEFAULT NULL,
+			user_agent text,
+			referer varchar(2000) DEFAULT NULL,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY  (id),
+			KEY ad_id (ad_id),
+			KEY event_type (event_type),
+			KEY created_at (created_at),
+			KEY ad_event (ad_id, event_type)
+		) {$charset_collate};";
+
+		dbDelta( $sql_analytics );
+
+		// Email submissions table.
+		$table_submissions = $wpdb->prefix . 'wbam_email_submissions';
+		$sql_submissions   = "CREATE TABLE {$table_submissions} (
+			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			ad_id bigint(20) UNSIGNED NOT NULL,
+			email varchar(255) NOT NULL,
+			name varchar(255) DEFAULT NULL,
+			ip_address varchar(45) DEFAULT NULL,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY  (id),
+			KEY ad_id (ad_id),
+			KEY email (email),
+			KEY created_at (created_at)
+		) {$charset_collate};";
+
+		dbDelta( $sql_submissions );
 	}
 
 	/**
@@ -145,6 +183,8 @@ class Installer {
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_links" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_categories" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_clicks" );
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_analytics" );
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_email_submissions" );
 		// phpcs:enable
 
 		delete_option( self::DB_VERSION_OPTION );
