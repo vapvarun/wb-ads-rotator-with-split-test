@@ -361,15 +361,21 @@ class Targeting_Engine {
 			return 'desktop';
 		}
 
-		$ua = strtolower( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) );
+		$ua = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) );
 
-		// Check for tablets first.
-		if ( preg_match( '/(tablet|ipad|playbook|silk)|(android(?!.*mobile))/i', $ua ) ) {
+		// Check for tablets first (iPad, Android tablets, etc.).
+		// Note: Android tablets don't have "Mobile" in UA, Android phones do.
+		if ( preg_match( '/tablet|ipad|playbook|silk|kindle/i', $ua ) ) {
 			return 'tablet';
 		}
 
-		// Check for mobile.
-		if ( preg_match( '/(mobile|iphone|ipod|android|blackberry|opera mini|iemobile|wpdesktop)/i', $ua ) ) {
+		// Android without "Mobile" is typically a tablet.
+		if ( preg_match( '/android/i', $ua ) && ! preg_match( '/mobile/i', $ua ) ) {
+			return 'tablet';
+		}
+
+		// Check for mobile devices.
+		if ( preg_match( '/mobile|iphone|ipod|android|blackberry|opera mini|opera mobi|iemobile|windows phone|webos|palm|symbian|nokia|samsung|lg-|htc|mot-|sonyericsson/i', $ua ) ) {
 			return 'mobile';
 		}
 
