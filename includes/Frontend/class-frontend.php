@@ -89,6 +89,11 @@ class Frontend {
 	 * Handle click tracking AJAX request.
 	 */
 	public function handle_click_tracking() {
+		// Rate limiting: 30 requests per minute per IP.
+		if ( ! $this->check_rate_limit( 'click_tracking', 30, 60 ) ) {
+			wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'wb-ad-manager' ) ), 429 );
+		}
+
 		// Verify nonce.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wbam_frontend' ) ) {
 			wp_die( 'Invalid nonce', '', array( 'response' => 403 ) );
@@ -177,6 +182,11 @@ class Frontend {
 	 * Handle email capture AJAX request.
 	 */
 	public function handle_email_capture() {
+		// Rate limiting: 10 email submissions per minute per IP.
+		if ( ! $this->check_rate_limit( 'email_capture', 10, 60 ) ) {
+			wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'wb-ad-manager' ) ) );
+		}
+
 		$ad_id = isset( $_POST['ad_id'] ) ? absint( wp_unslash( $_POST['ad_id'] ) ) : 0;
 		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
 
@@ -271,5 +281,39 @@ class Frontend {
 			),
 			array( '%d', '%s', '%s', '%s', '%s' )
 		);
+	}
+
+	/**
+	 * Check rate limit for an action.
+	 *
+	 * Uses transients for simple IP-based rate limiting.
+	 *
+	 * @param string $action    Action identifier.
+	 * @param int    $limit     Maximum requests allowed.
+	 * @param int    $window    Time window in seconds.
+	 * @return bool True if within limit, false if exceeded.
+	 */
+	private function check_rate_limit( $action, $limit, $window ) {
+		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		if ( empty( $ip ) ) {
+			return true; // Can't rate limit without IP.
+		}
+
+		$key   = 'wbam_rl_' . $action . '_' . md5( $ip );
+		$count = get_transient( $key );
+
+		if ( false === $count ) {
+			// First request in this window.
+			set_transient( $key, 1, $window );
+			return true;
+		}
+
+		if ( $count >= $limit ) {
+			return false; // Rate limit exceeded.
+		}
+
+		// Increment counter.
+		set_transient( $key, $count + 1, $window );
+		return true;
 	}
 }
