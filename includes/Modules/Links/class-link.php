@@ -367,10 +367,13 @@ class Link {
 	 */
 	public static function get_link_types() {
 		return array(
-			'affiliate'  => __( 'Affiliate', 'wb-ad-manager' ),
-			'guest_post' => __( 'Guest Post', 'wb-ad-manager' ),
-			'external'   => __( 'External', 'wb-ad-manager' ),
-			'internal'   => __( 'Internal', 'wb-ad-manager' ),
+			'affiliate'      => __( 'Affiliate', 'wb-ad-manager' ),
+			'guest_post'     => __( 'Guest Post', 'wb-ad-manager' ),
+			'external'       => __( 'External', 'wb-ad-manager' ),
+			'internal'       => __( 'Internal', 'wb-ad-manager' ),
+			'paid_link'      => __( 'Paid Link', 'wb-ad-manager' ),
+			'exchange'       => __( 'Link Exchange', 'wb-ad-manager' ),
+			'sponsored_post' => __( 'Sponsored Post', 'wb-ad-manager' ),
 		);
 	}
 

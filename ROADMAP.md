@@ -338,6 +338,60 @@ includes/Modules/Targeting/class-frequency-manager.php (rotation logic)
 
 ---
 
+### Link Partnership Manager (Basic) 🔲
+**Priority:** High | **Complexity:** High
+
+Allow site owners to receive and manage link partnership inquiries from other sites/advertisers. This is an inquiry-based system where the site owner is in full control.
+
+**Core Features:**
+- [ ] New link types: `paid_link`, `exchange`, `sponsored_post`
+- [ ] Create `wbam_link_partnerships` database table
+- [ ] Partnership entity class with all properties
+- [ ] Inquiry form shortcode `[wbam_partnership_inquiry]`
+- [ ] Admin inbox page to view incoming inquiries
+- [ ] Accept/Reject actions with optional reason
+- [ ] Basic email notifications (new inquiry, accepted, rejected)
+
+**Partnership Types:**
+- `paid_link` - Paid link placement on site
+- `exchange` - Reciprocal link exchange
+- `sponsored_post` - Guest post with link
+
+**Inquiry Form Fields:**
+- Name & Email (required)
+- Website URL (required)
+- Partnership type selection
+- Target page/post (if applicable)
+- Proposed anchor text
+- Message/notes
+- Budget range (for paid links)
+
+**Admin Inbox:**
+- List of pending/accepted/rejected inquiries
+- Quick view of inquiry details
+- Accept/Reject/Mark as spam actions
+- Filter by status, date, type
+
+**Database Table: `wbam_link_partnerships`**
+```sql
+id, name, email, website_url, partnership_type, target_post_id,
+anchor_text, message, budget_min, budget_max, status (pending/accepted/rejected/spam),
+admin_notes, created_at, responded_at
+```
+
+**Files:**
+```
+includes/Modules/Links/
+├── class-partnership.php
+├── class-partnership-manager.php
+├── class-partnership-form.php
+└── class-partnership-admin.php
+```
+
+**Note:** Advanced features (pricing presets, negotiation, revenue tracking, exchange monitoring) are in PRO version.
+
+---
+
 ### Ad Groups & Rotation 🔲
 **Priority:** High | **Complexity:** High
 

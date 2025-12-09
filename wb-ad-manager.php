@@ -90,6 +90,7 @@ function wbam_activate() {
 	}
 
 	// Run installer to create database tables.
+	require_once WBAM_PATH . 'includes/Core/trait-singleton.php';
 	require_once WBAM_PATH . 'includes/Core/class-installer.php';
 	$installer = WBAM\Core\Installer::get_instance();
 	$installer->install();

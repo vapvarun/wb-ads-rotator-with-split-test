@@ -48,6 +48,27 @@ class Links_Module {
 	private $admin;
 
 	/**
+	 * Partnership Form instance.
+	 *
+	 * @var Partnership_Form
+	 */
+	private $partnership_form;
+
+	/**
+	 * Partnership Admin instance.
+	 *
+	 * @var Partnership_Admin
+	 */
+	private $partnership_admin;
+
+	/**
+	 * Partnership Emails instance.
+	 *
+	 * @var Partnership_Emails
+	 */
+	private $partnership_emails;
+
+	/**
 	 * Initialize the module.
 	 */
 	public function init() {
@@ -62,10 +83,22 @@ class Links_Module {
 		$this->shortcodes = Link_Shortcodes::get_instance();
 		$this->shortcodes->init();
 
+		// Initialize partnership form (frontend shortcode).
+		$this->partnership_form = Partnership_Form::get_instance();
+		$this->partnership_form->init();
+
+		// Initialize partnership email notifications.
+		$this->partnership_emails = Partnership_Emails::get_instance();
+		$this->partnership_emails->init();
+
 		// Initialize admin.
 		if ( is_admin() ) {
 			$this->admin = Links_Admin::get_instance();
 			$this->admin->init();
+
+			// Initialize partnership admin.
+			$this->partnership_admin = Partnership_Admin::get_instance();
+			$this->partnership_admin->init();
 		}
 
 		// Frontend scripts for click tracking.

@@ -73,6 +73,9 @@ class Plugin {
 	 * Initialize the plugin.
 	 */
 	public function init() {
+		// Check for database updates (for existing installations).
+		$this->maybe_update_database();
+
 		// Register post type on init hook (rewrite rules need this).
 		add_action( 'init', array( $this, 'register_post_type' ), 5 );
 
@@ -80,6 +83,20 @@ class Plugin {
 		$this->setup_hooks();
 
 		do_action( 'wbam_init' );
+	}
+
+	/**
+	 * Check and run database updates if needed.
+	 *
+	 * This ensures existing installations get new tables
+	 * without requiring plugin deactivation/reactivation.
+	 */
+	private function maybe_update_database() {
+		$installer = Installer::get_instance();
+
+		if ( $installer->needs_update() ) {
+			$installer->install();
+		}
 	}
 
 	/**

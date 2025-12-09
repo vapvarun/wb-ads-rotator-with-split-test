@@ -22,7 +22,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.2.0';
+	const DB_VERSION = '1.3.0';
 
 	/**
 	 * Option name for database version.
@@ -164,6 +164,33 @@ class Installer {
 		) {$charset_collate};";
 
 		dbDelta( $sql_submissions );
+
+		// Link partnerships table.
+		$table_partnerships = $wpdb->prefix . 'wbam_link_partnerships';
+		$sql_partnerships   = "CREATE TABLE {$table_partnerships} (
+			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			name varchar(255) NOT NULL,
+			email varchar(255) NOT NULL,
+			website_url varchar(2000) NOT NULL,
+			partnership_type varchar(30) NOT NULL DEFAULT 'paid_link',
+			target_post_id bigint(20) UNSIGNED DEFAULT NULL,
+			anchor_text varchar(255) DEFAULT NULL,
+			message text,
+			budget_min decimal(10,2) DEFAULT NULL,
+			budget_max decimal(10,2) DEFAULT NULL,
+			status varchar(20) DEFAULT 'pending',
+			admin_notes text,
+			ip_address varchar(45) DEFAULT NULL,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			responded_at datetime DEFAULT NULL,
+			PRIMARY KEY  (id),
+			KEY status (status),
+			KEY partnership_type (partnership_type),
+			KEY email (email),
+			KEY created_at (created_at)
+		) {$charset_collate};";
+
+		dbDelta( $sql_partnerships );
 	}
 
 	/**
@@ -185,6 +212,7 @@ class Installer {
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_clicks" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_analytics" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_email_submissions" );
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_partnerships" );
 		// phpcs:enable
 
 		delete_option( self::DB_VERSION_OPTION );
