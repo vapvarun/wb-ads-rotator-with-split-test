@@ -189,7 +189,7 @@ class Content_Analyzer {
 		if ( 'short' === $analysis['content_length'] ) {
 			$positions[] = array(
 				'type'     => 'after_content',
-				'reason'   => __( 'Content is short, ad after content only', 'wb-ad-manager' ),
+				'reason'   => __( 'Content is short, ad after content only', 'wb-ads-rotator-with-split-test' ),
 			);
 			return $positions;
 		}
@@ -200,12 +200,12 @@ class Content_Analyzer {
 				$positions[] = array(
 					'type'      => 'after_paragraph',
 					'paragraph' => 2,
-					'reason'    => __( 'Medium content with enough paragraphs', 'wb-ad-manager' ),
+					'reason'    => __( 'Medium content with enough paragraphs', 'wb-ads-rotator-with-split-test' ),
 				);
 			}
 			$positions[] = array(
 				'type'   => 'after_content',
-				'reason' => __( 'End of medium content', 'wb-ad-manager' ),
+				'reason' => __( 'End of medium content', 'wb-ads-rotator-with-split-test' ),
 			);
 			return $positions;
 		}
@@ -219,7 +219,7 @@ class Content_Analyzer {
 				$positions[] = array(
 					'type'      => 'after_paragraph',
 					'paragraph' => 2,
-					'reason'    => __( 'Early in long content', 'wb-ad-manager' ),
+					'reason'    => __( 'Early in long content', 'wb-ads-rotator-with-split-test' ),
 				);
 			}
 
@@ -229,7 +229,7 @@ class Content_Analyzer {
 				$positions[] = array(
 					'type'      => 'after_paragraph',
 					'paragraph' => $middle,
-					'reason'    => __( 'Middle of long content', 'wb-ad-manager' ),
+					'reason'    => __( 'Middle of long content', 'wb-ads-rotator-with-split-test' ),
 				);
 			}
 
@@ -238,13 +238,13 @@ class Content_Analyzer {
 				$positions[] = array(
 					'type'      => 'after_paragraph',
 					'paragraph' => $paragraphs - 2,
-					'reason'    => __( 'Near end of long content', 'wb-ad-manager' ),
+					'reason'    => __( 'Near end of long content', 'wb-ads-rotator-with-split-test' ),
 				);
 			}
 
 			$positions[] = array(
 				'type'   => 'after_content',
-				'reason' => __( 'End of long content', 'wb-ad-manager' ),
+				'reason' => __( 'End of long content', 'wb-ads-rotator-with-split-test' ),
 			);
 		}
 

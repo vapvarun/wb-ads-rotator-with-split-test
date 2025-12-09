@@ -18,11 +18,11 @@ class Widget_Placement implements Placement_Interface {
 	}
 
 	public function get_name() {
-		return __( 'Widget', 'wb-ad-manager' );
+		return __( 'Widget', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_description() {
-		return __( 'Display ads in sidebar using widget.', 'wb-ad-manager' );
+		return __( 'Display ads in sidebar using widget.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_group() {
@@ -56,9 +56,9 @@ class WBAM_Ad_Widget extends \WP_Widget {
 	public function __construct() {
 		parent::__construct(
 			'wbam_ad_widget',
-			__( 'WB Ad Manager', 'wb-ad-manager' ),
+			__( 'WB Ad Manager', 'wb-ads-rotator-with-split-test' ),
 			array(
-				'description' => __( 'Display an ad from WB Ad Manager.', 'wb-ad-manager' ),
+				'description' => __( 'Display an ad from WB Ad Manager.', 'wb-ads-rotator-with-split-test' ),
 				'classname'   => 'wbam-widget',
 			)
 		);
@@ -125,7 +125,7 @@ class WBAM_Ad_Widget extends \WP_Widget {
 		?>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
-				<?php esc_html_e( 'Title (optional):', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Title (optional):', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<input
 				type="text"
@@ -137,14 +137,14 @@ class WBAM_Ad_Widget extends \WP_Widget {
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>">
-				<?php esc_html_e( 'Select Ad:', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Select Ad:', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<select
 				class="widefat"
 				id="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>"
 				name="<?php echo esc_attr( $this->get_field_name( 'ad_id' ) ); ?>"
 			>
-				<option value=""><?php esc_html_e( '— Select an ad —', 'wb-ad-manager' ); ?></option>
+				<option value=""><?php esc_html_e( '— Select an ad —', 'wb-ads-rotator-with-split-test' ); ?></option>
 				<?php foreach ( $ads as $ad ) : ?>
 					<option value="<?php echo esc_attr( $ad->ID ); ?>" <?php selected( $ad_id, $ad->ID ); ?>>
 						<?php echo esc_html( $ad->post_title ); ?>
@@ -157,8 +157,8 @@ class WBAM_Ad_Widget extends \WP_Widget {
 				<?php
 				printf(
 					/* translators: %s: URL to create new ad */
-					esc_html__( 'No ads found. %s', 'wb-ad-manager' ),
-					'<a href="' . esc_url( admin_url( 'post-new.php?post_type=wbam-ad' ) ) . '">' . esc_html__( 'Create one', 'wb-ad-manager' ) . '</a>'
+					esc_html__( 'No ads found. %s', 'wb-ads-rotator-with-split-test' ),
+					'<a href="' . esc_url( admin_url( 'post-new.php?post_type=wbam-ad' ) ) . '">' . esc_html__( 'Create one', 'wb-ads-rotator-with-split-test' ) . '</a>'
 				);
 				?>
 			</p>

@@ -49,13 +49,13 @@ class Links_List_Table extends \WP_List_Table {
 	public function get_columns() {
 		return array(
 			'cb'              => '<input type="checkbox">',
-			'name'            => __( 'Name', 'wb-ad-manager' ),
-			'destination_url' => __( 'Destination', 'wb-ad-manager' ),
-			'cloaked_url'     => __( 'Cloaked URL', 'wb-ad-manager' ),
-			'link_type'       => __( 'Type', 'wb-ad-manager' ),
-			'click_count'     => __( 'Clicks', 'wb-ad-manager' ),
-			'status'          => __( 'Status', 'wb-ad-manager' ),
-			'created_at'      => __( 'Created', 'wb-ad-manager' ),
+			'name'            => __( 'Name', 'wb-ads-rotator-with-split-test' ),
+			'destination_url' => __( 'Destination', 'wb-ads-rotator-with-split-test' ),
+			'cloaked_url'     => __( 'Cloaked URL', 'wb-ads-rotator-with-split-test' ),
+			'link_type'       => __( 'Type', 'wb-ads-rotator-with-split-test' ),
+			'click_count'     => __( 'Clicks', 'wb-ads-rotator-with-split-test' ),
+			'status'          => __( 'Status', 'wb-ads-rotator-with-split-test' ),
+			'created_at'      => __( 'Created', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 
@@ -80,9 +80,9 @@ class Links_List_Table extends \WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 		return array(
-			'delete'     => __( 'Delete', 'wb-ad-manager' ),
-			'activate'   => __( 'Activate', 'wb-ad-manager' ),
-			'deactivate' => __( 'Deactivate', 'wb-ad-manager' ),
+			'delete'     => __( 'Delete', 'wb-ads-rotator-with-split-test' ),
+			'activate'   => __( 'Activate', 'wb-ads-rotator-with-split-test' ),
+			'deactivate' => __( 'Deactivate', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 
@@ -104,7 +104,7 @@ class Links_List_Table extends \WP_List_Table {
 			'<a href="%s" class="%s">%s <span class="count">(%s)</span></a>',
 			esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-links' ) ),
 			'all' === $current ? 'current' : '',
-			__( 'All', 'wb-ad-manager' ),
+			__( 'All', 'wb-ads-rotator-with-split-test' ),
 			number_format_i18n( $all_count )
 		);
 
@@ -112,7 +112,7 @@ class Links_List_Table extends \WP_List_Table {
 			'<a href="%s" class="%s">%s <span class="count">(%s)</span></a>',
 			esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-links&status=active' ) ),
 			'active' === $current ? 'current' : '',
-			__( 'Active', 'wb-ad-manager' ),
+			__( 'Active', 'wb-ads-rotator-with-split-test' ),
 			number_format_i18n( $active_count )
 		);
 
@@ -120,7 +120,7 @@ class Links_List_Table extends \WP_List_Table {
 			'<a href="%s" class="%s">%s <span class="count">(%s)</span></a>',
 			esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-links&status=inactive' ) ),
 			'inactive' === $current ? 'current' : '',
-			__( 'Inactive', 'wb-ad-manager' ),
+			__( 'Inactive', 'wb-ads-rotator-with-split-test' ),
 			number_format_i18n( $inactive_count )
 		);
 
@@ -128,7 +128,7 @@ class Links_List_Table extends \WP_List_Table {
 			'<a href="%s" class="%s">%s <span class="count">(%s)</span></a>',
 			esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-links&status=expired' ) ),
 			'expired' === $current ? 'current' : '',
-			__( 'Expired', 'wb-ad-manager' ),
+			__( 'Expired', 'wb-ads-rotator-with-split-test' ),
 			number_format_i18n( $expired_count )
 		);
 
@@ -151,7 +151,7 @@ class Links_List_Table extends \WP_List_Table {
 		?>
 		<div class="alignleft actions">
 			<select name="link_type">
-				<option value=""><?php esc_html_e( 'All Types', 'wb-ad-manager' ); ?></option>
+				<option value=""><?php esc_html_e( 'All Types', 'wb-ads-rotator-with-split-test' ); ?></option>
 				<?php foreach ( Link::get_link_types() as $value => $label ) : ?>
 					<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $link_type, $value ); ?>>
 						<?php echo esc_html( $label ); ?>
@@ -160,7 +160,7 @@ class Links_List_Table extends \WP_List_Table {
 			</select>
 
 			<select name="category_id">
-				<option value=""><?php esc_html_e( 'All Categories', 'wb-ad-manager' ); ?></option>
+				<option value=""><?php esc_html_e( 'All Categories', 'wb-ads-rotator-with-split-test' ); ?></option>
 				<?php
 				$categories = $this->link_manager->get_categories();
 				foreach ( $categories as $cat ) :
@@ -171,7 +171,7 @@ class Links_List_Table extends \WP_List_Table {
 				<?php endforeach; ?>
 			</select>
 
-			<?php submit_button( __( 'Filter', 'wb-ad-manager' ), '', 'filter_action', false ); ?>
+			<?php submit_button( __( 'Filter', 'wb-ads-rotator-with-split-test' ), '', 'filter_action', false ); ?>
 		</div>
 		<?php
 	}
@@ -299,13 +299,13 @@ class Links_List_Table extends \WP_List_Table {
 			'edit'   => sprintf(
 				'<a href="%s">%s</a>',
 				esc_url( $edit_url ),
-				__( 'Edit', 'wb-ad-manager' )
+				__( 'Edit', 'wb-ads-rotator-with-split-test' )
 			),
 			'delete' => sprintf(
 				'<a href="%s" onclick="return confirm(\'%s\');" class="delete">%s</a>',
 				esc_url( $delete_url ),
-				esc_attr__( 'Are you sure you want to delete this link?', 'wb-ad-manager' ),
-				__( 'Delete', 'wb-ad-manager' )
+				esc_attr__( 'Are you sure you want to delete this link?', 'wb-ads-rotator-with-split-test' ),
+				__( 'Delete', 'wb-ads-rotator-with-split-test' )
 			),
 		);
 
@@ -345,7 +345,7 @@ class Links_List_Table extends \WP_List_Table {
 	 */
 	public function column_cloaked_url( $item ) {
 		if ( ! $item->cloaking_enabled || empty( $item->slug ) ) {
-			return '<span class="dashicons dashicons-no-alt" title="' . esc_attr__( 'Cloaking disabled', 'wb-ad-manager' ) . '"></span>';
+			return '<span class="dashicons dashicons-no-alt" title="' . esc_attr__( 'Cloaking disabled', 'wb-ads-rotator-with-split-test' ) . '"></span>';
 		}
 
 		$cloaked_url = $item->get_url();
@@ -358,7 +358,7 @@ class Links_List_Table extends \WP_List_Table {
 			esc_url( $cloaked_url ),
 			esc_html( $item->slug ),
 			esc_attr( $cloaked_url ),
-			esc_attr__( 'Copy URL', 'wb-ad-manager' )
+			esc_attr__( 'Copy URL', 'wb-ads-rotator-with-split-test' )
 		);
 	}
 
@@ -404,7 +404,7 @@ class Links_List_Table extends \WP_List_Table {
 		// Check if expired.
 		if ( 'active' === $item->status && $item->expires_at && strtotime( $item->expires_at ) < time() ) {
 			$class = 'wbam-status wbam-status-expired';
-			$label = __( 'Expired', 'wb-ad-manager' );
+			$label = __( 'Expired', 'wb-ads-rotator-with-split-test' );
 		}
 
 		return sprintf( '<span class="%s">%s</span>', esc_attr( $class ), esc_html( $label ) );
@@ -420,7 +420,7 @@ class Links_List_Table extends \WP_List_Table {
 		return sprintf(
 			'<span title="%s">%s</span>',
 			esc_attr( $item->created_at ),
-			esc_html( human_time_diff( strtotime( $item->created_at ), time() ) . ' ' . __( 'ago', 'wb-ad-manager' ) )
+			esc_html( human_time_diff( strtotime( $item->created_at ), time() ) . ' ' . __( 'ago', 'wb-ads-rotator-with-split-test' ) )
 		);
 	}
 
@@ -439,6 +439,6 @@ class Links_List_Table extends \WP_List_Table {
 	 * Message for no items.
 	 */
 	public function no_items() {
-		esc_html_e( 'No links found.', 'wb-ad-manager' );
+		esc_html_e( 'No links found.', 'wb-ads-rotator-with-split-test' );
 	}
 }

@@ -179,11 +179,11 @@ class Partnership {
 	 */
 	public function get_target_post_title() {
 		if ( ! $this->target_post_id ) {
-			return __( 'Any page', 'wb-ad-manager' );
+			return __( 'Any page', 'wb-ads-rotator-with-split-test' );
 		}
 
 		$post = get_post( $this->target_post_id );
-		return $post ? $post->post_title : __( 'Unknown', 'wb-ad-manager' );
+		return $post ? $post->post_title : __( 'Unknown', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -193,7 +193,7 @@ class Partnership {
 	 */
 	public function get_budget_range() {
 		if ( null === $this->budget_min && null === $this->budget_max ) {
-			return __( 'Not specified', 'wb-ad-manager' );
+			return __( 'Not specified', 'wb-ads-rotator-with-split-test' );
 		}
 
 		$currency = get_option( 'wbam_currency', 'USD' );
@@ -210,7 +210,7 @@ class Partnership {
 			return $symbol . number_format( $this->budget_min, 2 ) . '+';
 		}
 
-		return __( 'Up to ', 'wb-ad-manager' ) . $symbol . number_format( $this->budget_max, 2 );
+		return __( 'Up to ', 'wb-ads-rotator-with-split-test' ) . $symbol . number_format( $this->budget_max, 2 );
 	}
 
 	/**
@@ -247,9 +247,9 @@ class Partnership {
 	 */
 	public static function get_partnership_types() {
 		return array(
-			'paid_link'      => __( 'Paid Link', 'wb-ad-manager' ),
-			'exchange'       => __( 'Link Exchange', 'wb-ad-manager' ),
-			'sponsored_post' => __( 'Sponsored Post / Guest Post', 'wb-ad-manager' ),
+			'paid_link'      => __( 'Paid Link', 'wb-ads-rotator-with-split-test' ),
+			'exchange'       => __( 'Link Exchange', 'wb-ads-rotator-with-split-test' ),
+			'sponsored_post' => __( 'Sponsored Post / Guest Post', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 
@@ -260,10 +260,10 @@ class Partnership {
 	 */
 	public static function get_statuses() {
 		return array(
-			'pending'  => __( 'Pending', 'wb-ad-manager' ),
-			'accepted' => __( 'Accepted', 'wb-ad-manager' ),
-			'rejected' => __( 'Rejected', 'wb-ad-manager' ),
-			'spam'     => __( 'Spam', 'wb-ad-manager' ),
+			'pending'  => __( 'Pending', 'wb-ads-rotator-with-split-test' ),
+			'accepted' => __( 'Accepted', 'wb-ads-rotator-with-split-test' ),
+			'rejected' => __( 'Rejected', 'wb-ads-rotator-with-split-test' ),
+			'spam'     => __( 'Spam', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 

@@ -1,9 +1,9 @@
 === Wbcom Designs - WB Ad Manager ===
 Contributors: vapvarun, wbcomdesigns
 Donate link: https://wbcomdesigns.com/
-Tags: ads, ad manager, ad rotation, split test, advertising, banners, buddypress, adsense, bbpress
+Tags: ads, ad manager, ad rotation, split test, adsense
 Requires at least: 5.8
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
 Stable tag: 2.0.0
 License: GPLv2 or later

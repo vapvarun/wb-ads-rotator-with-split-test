@@ -49,8 +49,8 @@ class Links_Admin {
 	public function add_submenu() {
 		// Links - Separate top-level menu.
 		add_menu_page(
-			__( 'Links', 'wb-ad-manager' ),
-			__( 'Links', 'wb-ad-manager' ),
+			__( 'Links', 'wb-ads-rotator-with-split-test' ),
+			__( 'Links', 'wb-ads-rotator-with-split-test' ),
 			$this->capability,
 			'wbam-links',
 			array( $this, 'render_page' ),
@@ -61,8 +61,8 @@ class Links_Admin {
 		// All Links (rename default submenu).
 		add_submenu_page(
 			'wbam-links',
-			__( 'All Links', 'wb-ad-manager' ),
-			__( 'All Links', 'wb-ad-manager' ),
+			__( 'All Links', 'wb-ads-rotator-with-split-test' ),
+			__( 'All Links', 'wb-ads-rotator-with-split-test' ),
 			$this->capability,
 			'wbam-links',
 			array( $this, 'render_page' )
@@ -71,8 +71,8 @@ class Links_Admin {
 		// Categories.
 		add_submenu_page(
 			'wbam-links',
-			__( 'Link Categories', 'wb-ad-manager' ),
-			__( 'Categories', 'wb-ad-manager' ),
+			__( 'Link Categories', 'wb-ads-rotator-with-split-test' ),
+			__( 'Categories', 'wb-ads-rotator-with-split-test' ),
 			$this->capability,
 			'wbam-link-categories',
 			array( $this, 'render_categories_page' )
@@ -166,9 +166,9 @@ class Links_Admin {
 		$list_table->prepare_items();
 
 		?>
-		<h1 class="wp-heading-inline"><?php esc_html_e( 'Links', 'wb-ad-manager' ); ?></h1>
+		<h1 class="wp-heading-inline"><?php esc_html_e( 'Links', 'wb-ads-rotator-with-split-test' ); ?></h1>
 		<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-links&action=add' ) ); ?>" class="page-title-action">
-			<?php esc_html_e( 'Add New Link', 'wb-ad-manager' ); ?>
+			<?php esc_html_e( 'Add New Link', 'wb-ads-rotator-with-split-test' ); ?>
 		</a>
 		<hr class="wp-header-end">
 
@@ -177,7 +177,7 @@ class Links_Admin {
 		<form method="get">
 			<input type="hidden" name="page" value="wbam-links">
 			<?php
-			$list_table->search_box( __( 'Search Links', 'wb-ad-manager' ), 'wbam-link' );
+			$list_table->search_box( __( 'Search Links', 'wb-ads-rotator-with-split-test' ), 'wbam-link' );
 			$list_table->display();
 			?>
 		</form>
@@ -196,12 +196,12 @@ class Links_Admin {
 			$link         = $link_manager->get( $link_id );
 
 			if ( ! $link ) {
-				wp_die( esc_html__( 'Link not found.', 'wb-ad-manager' ) );
+				wp_die( esc_html__( 'Link not found.', 'wb-ads-rotator-with-split-test' ) );
 			}
 		}
 
 		$is_edit = (bool) $link;
-		$title   = $is_edit ? __( 'Edit Link', 'wb-ad-manager' ) : __( 'Add New Link', 'wb-ad-manager' );
+		$title   = $is_edit ? __( 'Edit Link', 'wb-ads-rotator-with-split-test' ) : __( 'Add New Link', 'wb-ads-rotator-with-split-test' );
 
 		/**
 		 * Fires before the link edit form.
@@ -235,29 +235,29 @@ class Links_Admin {
 			<table class="form-table">
 				<tr>
 					<th scope="row">
-						<label for="name"><?php esc_html_e( 'Name', 'wb-ad-manager' ); ?> <span class="required">*</span></label>
+						<label for="name"><?php esc_html_e( 'Name', 'wb-ads-rotator-with-split-test' ); ?> <span class="required">*</span></label>
 					</th>
 					<td>
 						<input type="text" name="name" id="name" class="regular-text" required
 							value="<?php echo esc_attr( $link ? $link->name : '' ); ?>">
-						<p class="description"><?php esc_html_e( 'Internal name for this link.', 'wb-ad-manager' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Internal name for this link.', 'wb-ads-rotator-with-split-test' ); ?></p>
 					</td>
 				</tr>
 
 				<tr>
 					<th scope="row">
-						<label for="destination_url"><?php esc_html_e( 'Destination URL', 'wb-ad-manager' ); ?> <span class="required">*</span></label>
+						<label for="destination_url"><?php esc_html_e( 'Destination URL', 'wb-ads-rotator-with-split-test' ); ?> <span class="required">*</span></label>
 					</th>
 					<td>
 						<input type="url" name="destination_url" id="destination_url" class="large-text" required
 							value="<?php echo esc_url( $link ? $link->destination_url : '' ); ?>">
-						<p class="description"><?php esc_html_e( 'The target URL where visitors will be redirected.', 'wb-ad-manager' ); ?></p>
+						<p class="description"><?php esc_html_e( 'The target URL where visitors will be redirected.', 'wb-ads-rotator-with-split-test' ); ?></p>
 					</td>
 				</tr>
 
 				<tr>
 					<th scope="row">
-						<label for="slug"><?php esc_html_e( 'Slug', 'wb-ad-manager' ); ?></label>
+						<label for="slug"><?php esc_html_e( 'Slug', 'wb-ads-rotator-with-split-test' ); ?></label>
 					</th>
 					<td>
 						<input type="text" name="slug" id="slug" class="regular-text"
@@ -267,7 +267,7 @@ class Links_Admin {
 							$prefix = Link_Cloaker::get_instance()->get_cloak_prefix();
 							printf(
 								/* translators: %s: example URL */
-								esc_html__( 'Leave empty to auto-generate. Cloaked URL: %s', 'wb-ad-manager' ),
+								esc_html__( 'Leave empty to auto-generate. Cloaked URL: %s', 'wb-ads-rotator-with-split-test' ),
 								'<code>' . esc_html( home_url( '/' . $prefix . '/' ) ) . '<strong>your-slug</strong></code>'
 							);
 							?>
@@ -277,7 +277,7 @@ class Links_Admin {
 
 				<tr>
 					<th scope="row">
-						<label for="link_type"><?php esc_html_e( 'Link Type', 'wb-ad-manager' ); ?></label>
+						<label for="link_type"><?php esc_html_e( 'Link Type', 'wb-ads-rotator-with-split-test' ); ?></label>
 					</th>
 					<td>
 						<select name="link_type" id="link_type">
@@ -292,11 +292,11 @@ class Links_Admin {
 
 				<tr>
 					<th scope="row">
-						<label for="category_id"><?php esc_html_e( 'Category', 'wb-ad-manager' ); ?></label>
+						<label for="category_id"><?php esc_html_e( 'Category', 'wb-ads-rotator-with-split-test' ); ?></label>
 					</th>
 					<td>
 						<select name="category_id" id="category_id">
-							<option value="0"><?php esc_html_e( '— No Category —', 'wb-ad-manager' ); ?></option>
+							<option value="0"><?php esc_html_e( '— No Category —', 'wb-ads-rotator-with-split-test' ); ?></option>
 							<?php
 							$link_manager = Link_Manager::get_instance();
 							$categories   = $link_manager->get_categories();
@@ -311,31 +311,31 @@ class Links_Admin {
 				</tr>
 
 				<tr>
-					<th scope="row"><?php esc_html_e( 'Link Options', 'wb-ad-manager' ); ?></th>
+					<th scope="row"><?php esc_html_e( 'Link Options', 'wb-ads-rotator-with-split-test' ); ?></th>
 					<td>
 						<fieldset>
 							<label>
 								<input type="checkbox" name="cloaking_enabled" value="1"
 									<?php checked( $link ? $link->cloaking_enabled : true ); ?>>
-								<?php esc_html_e( 'Enable cloaking', 'wb-ad-manager' ); ?>
+								<?php esc_html_e( 'Enable cloaking', 'wb-ads-rotator-with-split-test' ); ?>
 							</label>
 							<br>
 							<label>
 								<input type="checkbox" name="nofollow" value="1"
 									<?php checked( $link ? $link->nofollow : true ); ?>>
-								<?php esc_html_e( 'Add nofollow attribute', 'wb-ad-manager' ); ?>
+								<?php esc_html_e( 'Add nofollow attribute', 'wb-ads-rotator-with-split-test' ); ?>
 							</label>
 							<br>
 							<label>
 								<input type="checkbox" name="sponsored" value="1"
 									<?php checked( $link ? $link->sponsored : false ); ?>>
-								<?php esc_html_e( 'Add sponsored attribute', 'wb-ad-manager' ); ?>
+								<?php esc_html_e( 'Add sponsored attribute', 'wb-ads-rotator-with-split-test' ); ?>
 							</label>
 							<br>
 							<label>
 								<input type="checkbox" name="new_tab" value="1"
 									<?php checked( $link ? $link->new_tab : true ); ?>>
-								<?php esc_html_e( 'Open in new tab', 'wb-ad-manager' ); ?>
+								<?php esc_html_e( 'Open in new tab', 'wb-ads-rotator-with-split-test' ); ?>
 							</label>
 						</fieldset>
 					</td>
@@ -343,7 +343,7 @@ class Links_Admin {
 
 				<tr>
 					<th scope="row">
-						<label for="redirect_type"><?php esc_html_e( 'Redirect Type', 'wb-ad-manager' ); ?></label>
+						<label for="redirect_type"><?php esc_html_e( 'Redirect Type', 'wb-ads-rotator-with-split-test' ); ?></label>
 					</th>
 					<td>
 						<select name="redirect_type" id="redirect_type">
@@ -358,7 +358,7 @@ class Links_Admin {
 
 				<tr>
 					<th scope="row">
-						<label for="status"><?php esc_html_e( 'Status', 'wb-ad-manager' ); ?></label>
+						<label for="status"><?php esc_html_e( 'Status', 'wb-ads-rotator-with-split-test' ); ?></label>
 					</th>
 					<td>
 						<select name="status" id="status">
@@ -373,22 +373,22 @@ class Links_Admin {
 
 				<tr>
 					<th scope="row">
-						<label for="expires_at"><?php esc_html_e( 'Expiration Date', 'wb-ad-manager' ); ?></label>
+						<label for="expires_at"><?php esc_html_e( 'Expiration Date', 'wb-ads-rotator-with-split-test' ); ?></label>
 					</th>
 					<td>
 						<input type="datetime-local" name="expires_at" id="expires_at"
 							value="<?php echo esc_attr( $link && $link->expires_at ? gmdate( 'Y-m-d\TH:i', strtotime( $link->expires_at ) ) : '' ); ?>">
-						<p class="description"><?php esc_html_e( 'Leave empty for no expiration.', 'wb-ad-manager' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Leave empty for no expiration.', 'wb-ads-rotator-with-split-test' ); ?></p>
 					</td>
 				</tr>
 
 				<tr>
 					<th scope="row">
-						<label for="description"><?php esc_html_e( 'Description', 'wb-ad-manager' ); ?></label>
+						<label for="description"><?php esc_html_e( 'Description', 'wb-ads-rotator-with-split-test' ); ?></label>
 					</th>
 					<td>
 						<textarea name="description" id="description" rows="3" class="large-text"><?php echo esc_textarea( $link ? $link->description : '' ); ?></textarea>
-						<p class="description"><?php esc_html_e( 'Optional notes about this link.', 'wb-ad-manager' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Optional notes about this link.', 'wb-ads-rotator-with-split-test' ); ?></p>
 					</td>
 				</tr>
 
@@ -419,9 +419,9 @@ class Links_Admin {
 
 			<p class="submit">
 				<input type="submit" name="wbam_save_link" class="button button-primary"
-					value="<?php echo esc_attr( $is_edit ? __( 'Update Link', 'wb-ad-manager' ) : __( 'Create Link', 'wb-ad-manager' ) ); ?>">
+					value="<?php echo esc_attr( $is_edit ? __( 'Update Link', 'wb-ads-rotator-with-split-test' ) : __( 'Create Link', 'wb-ads-rotator-with-split-test' ) ); ?>">
 				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-links' ) ); ?>" class="button">
-					<?php esc_html_e( 'Cancel', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'Cancel', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 			</p>
 		</form>
@@ -439,34 +439,34 @@ class Links_Admin {
 
 		<?php if ( $is_edit ) : ?>
 			<div class="wbam-link-info">
-				<h3><?php esc_html_e( 'Link Information', 'wb-ad-manager' ); ?></h3>
+				<h3><?php esc_html_e( 'Link Information', 'wb-ads-rotator-with-split-test' ); ?></h3>
 				<table class="widefat">
 					<tr>
-						<th><?php esc_html_e( 'Cloaked URL', 'wb-ad-manager' ); ?></th>
+						<th><?php esc_html_e( 'Cloaked URL', 'wb-ads-rotator-with-split-test' ); ?></th>
 						<td>
 							<code><?php echo esc_html( $link->get_url() ); ?></code>
 							<button type="button" class="button button-small wbam-copy-url" data-url="<?php echo esc_attr( $link->get_url() ); ?>">
-								<?php esc_html_e( 'Copy', 'wb-ad-manager' ); ?>
+								<?php esc_html_e( 'Copy', 'wb-ads-rotator-with-split-test' ); ?>
 							</button>
 						</td>
 					</tr>
 					<tr>
-						<th><?php esc_html_e( 'Shortcode', 'wb-ad-manager' ); ?></th>
+						<th><?php esc_html_e( 'Shortcode', 'wb-ads-rotator-with-split-test' ); ?></th>
 						<td>
 							<code>[wbam_link id="<?php echo esc_attr( $link->id ); ?>"]</code>
 							<code>[wbam_link slug="<?php echo esc_attr( $link->slug ); ?>"]</code>
 						</td>
 					</tr>
 					<tr>
-						<th><?php esc_html_e( 'Total Clicks', 'wb-ad-manager' ); ?></th>
+						<th><?php esc_html_e( 'Total Clicks', 'wb-ads-rotator-with-split-test' ); ?></th>
 						<td><?php echo esc_html( number_format_i18n( $link->click_count ) ); ?></td>
 					</tr>
 					<tr>
-						<th><?php esc_html_e( 'Created', 'wb-ad-manager' ); ?></th>
+						<th><?php esc_html_e( 'Created', 'wb-ads-rotator-with-split-test' ); ?></th>
 						<td><?php echo esc_html( $link->created_at ); ?></td>
 					</tr>
 					<tr>
-						<th><?php esc_html_e( 'Last Updated', 'wb-ad-manager' ); ?></th>
+						<th><?php esc_html_e( 'Last Updated', 'wb-ads-rotator-with-split-test' ); ?></th>
 						<td><?php echo esc_html( $link->updated_at ); ?></td>
 					</tr>
 				</table>
@@ -605,9 +605,9 @@ class Links_Admin {
 		$categories   = $link_manager->get_categories();
 
 		?>
-		<h1 class="wp-heading-inline"><?php esc_html_e( 'Link Categories', 'wb-ad-manager' ); ?></h1>
+		<h1 class="wp-heading-inline"><?php esc_html_e( 'Link Categories', 'wb-ads-rotator-with-split-test' ); ?></h1>
 		<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-link-categories&action=add_category' ) ); ?>" class="page-title-action">
-			<?php esc_html_e( 'Add New Category', 'wb-ad-manager' ); ?>
+			<?php esc_html_e( 'Add New Category', 'wb-ads-rotator-with-split-test' ); ?>
 		</a>
 		<hr class="wp-header-end">
 
@@ -616,17 +616,17 @@ class Links_Admin {
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Name', 'wb-ad-manager' ); ?></th>
-					<th><?php esc_html_e( 'Slug', 'wb-ad-manager' ); ?></th>
-					<th><?php esc_html_e( 'Description', 'wb-ad-manager' ); ?></th>
-					<th><?php esc_html_e( 'Count', 'wb-ad-manager' ); ?></th>
-					<th><?php esc_html_e( 'Actions', 'wb-ad-manager' ); ?></th>
+					<th><?php esc_html_e( 'Name', 'wb-ads-rotator-with-split-test' ); ?></th>
+					<th><?php esc_html_e( 'Slug', 'wb-ads-rotator-with-split-test' ); ?></th>
+					<th><?php esc_html_e( 'Description', 'wb-ads-rotator-with-split-test' ); ?></th>
+					<th><?php esc_html_e( 'Count', 'wb-ads-rotator-with-split-test' ); ?></th>
+					<th><?php esc_html_e( 'Actions', 'wb-ads-rotator-with-split-test' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php if ( empty( $categories ) ) : ?>
 					<tr>
-						<td colspan="5"><?php esc_html_e( 'No categories found.', 'wb-ad-manager' ); ?></td>
+						<td colspan="5"><?php esc_html_e( 'No categories found.', 'wb-ads-rotator-with-split-test' ); ?></td>
 					</tr>
 				<?php else : ?>
 					<?php foreach ( $categories as $category ) : ?>
@@ -637,11 +637,11 @@ class Links_Admin {
 							<td><?php echo esc_html( $category->count ); ?></td>
 							<td>
 								<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-link-categories&action=edit_category&category_id=' . $category->id ) ); ?>">
-									<?php esc_html_e( 'Edit', 'wb-ad-manager' ); ?>
+									<?php esc_html_e( 'Edit', 'wb-ads-rotator-with-split-test' ); ?>
 								</a> |
 								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-link-categories&action=delete_category&category_id=' . $category->id ), 'wbam_delete_category_' . $category->id ) ); ?>"
-									onclick="return confirm('<?php esc_attr_e( 'Are you sure you want to delete this category?', 'wb-ad-manager' ); ?>');" class="delete">
-									<?php esc_html_e( 'Delete', 'wb-ad-manager' ); ?>
+									onclick="return confirm('<?php esc_attr_e( 'Are you sure you want to delete this category?', 'wb-ads-rotator-with-split-test' ); ?>');" class="delete">
+									<?php esc_html_e( 'Delete', 'wb-ads-rotator-with-split-test' ); ?>
 								</a>
 							</td>
 						</tr>
@@ -664,12 +664,12 @@ class Links_Admin {
 			$category     = $link_manager->get_category( $category_id );
 
 			if ( ! $category ) {
-				wp_die( esc_html__( 'Category not found.', 'wb-ad-manager' ) );
+				wp_die( esc_html__( 'Category not found.', 'wb-ads-rotator-with-split-test' ) );
 			}
 		}
 
 		$is_edit = (bool) $category;
-		$title   = $is_edit ? __( 'Edit Category', 'wb-ad-manager' ) : __( 'Add New Category', 'wb-ad-manager' );
+		$title   = $is_edit ? __( 'Edit Category', 'wb-ads-rotator-with-split-test' ) : __( 'Add New Category', 'wb-ads-rotator-with-split-test' );
 
 		/**
 		 * Fires before the link category form.
@@ -703,7 +703,7 @@ class Links_Admin {
 			<table class="form-table">
 				<tr>
 					<th scope="row">
-						<label for="name"><?php esc_html_e( 'Name', 'wb-ad-manager' ); ?> <span class="required">*</span></label>
+						<label for="name"><?php esc_html_e( 'Name', 'wb-ads-rotator-with-split-test' ); ?> <span class="required">*</span></label>
 					</th>
 					<td>
 						<input type="text" name="name" id="name" class="regular-text" required
@@ -713,18 +713,18 @@ class Links_Admin {
 
 				<tr>
 					<th scope="row">
-						<label for="slug"><?php esc_html_e( 'Slug', 'wb-ad-manager' ); ?></label>
+						<label for="slug"><?php esc_html_e( 'Slug', 'wb-ads-rotator-with-split-test' ); ?></label>
 					</th>
 					<td>
 						<input type="text" name="slug" id="slug" class="regular-text"
 							value="<?php echo esc_attr( $category ? $category->slug : '' ); ?>">
-						<p class="description"><?php esc_html_e( 'Leave empty to auto-generate from name.', 'wb-ad-manager' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Leave empty to auto-generate from name.', 'wb-ads-rotator-with-split-test' ); ?></p>
 					</td>
 				</tr>
 
 				<tr>
 					<th scope="row">
-						<label for="description"><?php esc_html_e( 'Description', 'wb-ad-manager' ); ?></label>
+						<label for="description"><?php esc_html_e( 'Description', 'wb-ads-rotator-with-split-test' ); ?></label>
 					</th>
 					<td>
 						<textarea name="description" id="description" rows="3" class="large-text"><?php echo esc_textarea( $category ? $category->description : '' ); ?></textarea>
@@ -747,9 +747,9 @@ class Links_Admin {
 
 			<p class="submit">
 				<input type="submit" name="wbam_save_category" class="button button-primary"
-					value="<?php echo esc_attr( $is_edit ? __( 'Update Category', 'wb-ad-manager' ) : __( 'Create Category', 'wb-ad-manager' ) ); ?>">
+					value="<?php echo esc_attr( $is_edit ? __( 'Update Category', 'wb-ads-rotator-with-split-test' ) : __( 'Create Category', 'wb-ads-rotator-with-split-test' ) ); ?>">
 				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-link-categories' ) ); ?>" class="button">
-					<?php esc_html_e( 'Cancel', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'Cancel', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 			</p>
 		</form>
@@ -866,14 +866,14 @@ class Links_Admin {
 		}
 
 		$messages = array(
-			'link_created'     => array( 'success', __( 'Link created successfully.', 'wb-ad-manager' ) ),
-			'link_updated'     => array( 'success', __( 'Link updated successfully.', 'wb-ad-manager' ) ),
-			'link_deleted'     => array( 'success', __( 'Link deleted successfully.', 'wb-ad-manager' ) ),
-			'link_error'       => array( 'error', __( 'An error occurred. Please try again.', 'wb-ad-manager' ) ),
-			'category_created' => array( 'success', __( 'Category created successfully.', 'wb-ad-manager' ) ),
-			'category_updated' => array( 'success', __( 'Category updated successfully.', 'wb-ad-manager' ) ),
-			'category_deleted' => array( 'success', __( 'Category deleted successfully.', 'wb-ad-manager' ) ),
-			'category_error'   => array( 'error', __( 'An error occurred. Please try again.', 'wb-ad-manager' ) ),
+			'link_created'     => array( 'success', __( 'Link created successfully.', 'wb-ads-rotator-with-split-test' ) ),
+			'link_updated'     => array( 'success', __( 'Link updated successfully.', 'wb-ads-rotator-with-split-test' ) ),
+			'link_deleted'     => array( 'success', __( 'Link deleted successfully.', 'wb-ads-rotator-with-split-test' ) ),
+			'link_error'       => array( 'error', __( 'An error occurred. Please try again.', 'wb-ads-rotator-with-split-test' ) ),
+			'category_created' => array( 'success', __( 'Category created successfully.', 'wb-ads-rotator-with-split-test' ) ),
+			'category_updated' => array( 'success', __( 'Category updated successfully.', 'wb-ads-rotator-with-split-test' ) ),
+			'category_deleted' => array( 'success', __( 'Category deleted successfully.', 'wb-ads-rotator-with-split-test' ) ),
+			'category_error'   => array( 'error', __( 'An error occurred. Please try again.', 'wb-ads-rotator-with-split-test' ) ),
 		);
 
 		$message_key = sanitize_text_field( $_GET['message'] );

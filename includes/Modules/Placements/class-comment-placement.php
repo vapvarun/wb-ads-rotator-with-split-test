@@ -35,7 +35,7 @@ class Comment_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Comments', 'wb-ad-manager' );
+		return __( 'Comments', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -44,7 +44,7 @@ class Comment_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Display ads before, after, or between comments.', 'wb-ad-manager' );
+		return __( 'Display ads before, after, or between comments.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -211,13 +211,13 @@ class Comment_Placement implements Placement_Interface {
 		$repeat      = isset( $data['comment_repeat'] ) ? $data['comment_repeat'] : false;
 
 		$positions = array(
-			'before_form'      => __( 'Before Comment Form', 'wb-ad-manager' ),
-			'after_form'       => __( 'After Comment Form', 'wb-ad-manager' ),
-			'between_comments' => __( 'Between Comments', 'wb-ad-manager' ),
+			'before_form'      => __( 'Before Comment Form', 'wb-ads-rotator-with-split-test' ),
+			'after_form'       => __( 'After Comment Form', 'wb-ads-rotator-with-split-test' ),
+			'between_comments' => __( 'Between Comments', 'wb-ads-rotator-with-split-test' ),
 		);
 		?>
 		<div class="wbam-placement-extra">
-			<label><?php esc_html_e( 'Position', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Position', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<select name="wbam_data[comment_position]" class="wbam-comment-position-select">
 				<?php foreach ( $positions as $key => $label ) : ?>
 					<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $position, $key ); ?>>
@@ -227,12 +227,12 @@ class Comment_Placement implements Placement_Interface {
 			</select>
 		</div>
 		<div class="wbam-placement-extra wbam-comment-between-options" <?php echo ( 'between_comments' !== $position ) ? 'style="display:none;"' : ''; ?>>
-			<label><?php esc_html_e( 'Show after every', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Show after every', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<input type="number" name="wbam_data[comment_after]" value="<?php echo esc_attr( $after_count ); ?>" min="1" max="50" style="width:60px;" />
-			<?php esc_html_e( 'comments', 'wb-ad-manager' ); ?>
+			<?php esc_html_e( 'comments', 'wb-ads-rotator-with-split-test' ); ?>
 			<label style="margin-left:15px;">
 				<input type="checkbox" name="wbam_data[comment_repeat]" value="1" <?php checked( $repeat ); ?> />
-				<?php esc_html_e( 'Repeat', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Repeat', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 		</div>
 		<?php

@@ -28,7 +28,7 @@ class Popup_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Popup/Modal', 'wb-ad-manager' );
+		return __( 'Popup/Modal', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -37,7 +37,7 @@ class Popup_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Display ad in a modal popup with configurable trigger.', 'wb-ad-manager' );
+		return __( 'Display ad in a modal popup with configurable trigger.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -102,7 +102,7 @@ class Popup_Placement implements Placement_Interface {
 					esc_attr( $trigger ),
 					esc_attr( $delay ),
 					esc_attr( $scroll ),
-					esc_attr__( 'Close', 'wb-ad-manager' ),
+					esc_attr__( 'Close', 'wb-ads-rotator-with-split-test' ),
 					$output // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped in render_ad.
 				);
 			}
@@ -121,13 +121,13 @@ class Popup_Placement implements Placement_Interface {
 		$scroll  = isset( $data['popup_scroll'] ) ? absint( $data['popup_scroll'] ) : 50;
 
 		$triggers = array(
-			'delay'  => __( 'Time Delay', 'wb-ad-manager' ),
-			'scroll' => __( 'Scroll Percentage', 'wb-ad-manager' ),
-			'exit'   => __( 'Exit Intent', 'wb-ad-manager' ),
+			'delay'  => __( 'Time Delay', 'wb-ads-rotator-with-split-test' ),
+			'scroll' => __( 'Scroll Percentage', 'wb-ads-rotator-with-split-test' ),
+			'exit'   => __( 'Exit Intent', 'wb-ads-rotator-with-split-test' ),
 		);
 		?>
 		<div class="wbam-placement-extra">
-			<label><?php esc_html_e( 'Trigger', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Trigger', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<select name="wbam_data[popup_trigger]" class="wbam-popup-trigger-select">
 				<?php foreach ( $triggers as $key => $label ) : ?>
 					<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $trigger, $key ); ?>>
@@ -137,11 +137,11 @@ class Popup_Placement implements Placement_Interface {
 			</select>
 		</div>
 		<div class="wbam-placement-extra wbam-popup-delay-option" <?php echo 'delay' !== $trigger ? 'style="display:none;"' : ''; ?>>
-			<label><?php esc_html_e( 'Delay (seconds)', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Delay (seconds)', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<input type="number" name="wbam_data[popup_delay]" value="<?php echo esc_attr( $delay ); ?>" min="1" max="60" />
 		</div>
 		<div class="wbam-placement-extra wbam-popup-scroll-option" <?php echo 'scroll' !== $trigger ? 'style="display:none;"' : ''; ?>>
-			<label><?php esc_html_e( 'Scroll Percentage', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Scroll Percentage', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<input type="number" name="wbam_data[popup_scroll]" value="<?php echo esc_attr( $scroll ); ?>" min="10" max="100" />%
 		</div>
 		<?php

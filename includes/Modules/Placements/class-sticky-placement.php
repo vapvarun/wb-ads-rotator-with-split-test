@@ -28,7 +28,7 @@ class Sticky_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Sticky/Floating', 'wb-ad-manager' );
+		return __( 'Sticky/Floating', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -37,7 +37,7 @@ class Sticky_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Fixed position ad that stays visible while scrolling.', 'wb-ad-manager' );
+		return __( 'Fixed position ad that stays visible while scrolling.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -94,7 +94,7 @@ class Sticky_Placement implements Placement_Interface {
 					</div>',
 					esc_attr( $position ),
 					esc_attr( $ad_id ),
-					esc_attr__( 'Close', 'wb-ad-manager' ),
+					esc_attr__( 'Close', 'wb-ads-rotator-with-split-test' ),
 					$output // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped in render_ad.
 				);
 			}
@@ -111,14 +111,14 @@ class Sticky_Placement implements Placement_Interface {
 		$position = isset( $data['sticky_position'] ) ? $data['sticky_position'] : 'bottom-right';
 
 		$positions = array(
-			'bottom-right' => __( 'Bottom Right', 'wb-ad-manager' ),
-			'bottom-left'  => __( 'Bottom Left', 'wb-ad-manager' ),
-			'bottom-bar'   => __( 'Bottom Bar (Full Width)', 'wb-ad-manager' ),
-			'top-bar'      => __( 'Top Bar (Full Width)', 'wb-ad-manager' ),
+			'bottom-right' => __( 'Bottom Right', 'wb-ads-rotator-with-split-test' ),
+			'bottom-left'  => __( 'Bottom Left', 'wb-ads-rotator-with-split-test' ),
+			'bottom-bar'   => __( 'Bottom Bar (Full Width)', 'wb-ads-rotator-with-split-test' ),
+			'top-bar'      => __( 'Top Bar (Full Width)', 'wb-ads-rotator-with-split-test' ),
 		);
 		?>
 		<div class="wbam-placement-extra">
-			<label><?php esc_html_e( 'Position', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Position', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<select name="wbam_data[sticky_position]">
 				<?php foreach ( $positions as $key => $label ) : ?>
 					<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $position, $key ); ?>>

@@ -28,11 +28,11 @@ class BP_Activity_Placement implements Placement_Interface {
 	}
 
 	public function get_name() {
-		return __( 'BuddyPress Activity', 'wb-ad-manager' );
+		return __( 'BuddyPress Activity', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_description() {
-		return __( 'Display ads in the BuddyPress activity stream.', 'wb-ad-manager' );
+		return __( 'Display ads in the BuddyPress activity stream.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_group() {

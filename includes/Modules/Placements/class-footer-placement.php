@@ -18,11 +18,11 @@ class Footer_Placement implements Placement_Interface {
 	}
 
 	public function get_name() {
-		return __( 'Footer', 'wb-ad-manager' );
+		return __( 'Footer', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_description() {
-		return __( 'Display ads in the site footer.', 'wb-ad-manager' );
+		return __( 'Display ads in the site footer.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_group() {

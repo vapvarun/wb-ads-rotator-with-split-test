@@ -18,11 +18,11 @@ class Paragraph_Placement implements Placement_Interface {
 	}
 
 	public function get_name() {
-		return __( 'After Paragraph', 'wb-ad-manager' );
+		return __( 'After Paragraph', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_description() {
-		return __( 'Insert ads after a specific paragraph.', 'wb-ad-manager' );
+		return __( 'Insert ads after a specific paragraph.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_group() {

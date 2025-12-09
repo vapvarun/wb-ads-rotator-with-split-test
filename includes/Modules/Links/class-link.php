@@ -367,13 +367,13 @@ class Link {
 	 */
 	public static function get_link_types() {
 		return array(
-			'affiliate'      => __( 'Affiliate', 'wb-ad-manager' ),
-			'guest_post'     => __( 'Guest Post', 'wb-ad-manager' ),
-			'external'       => __( 'External', 'wb-ad-manager' ),
-			'internal'       => __( 'Internal', 'wb-ad-manager' ),
-			'paid_link'      => __( 'Paid Link', 'wb-ad-manager' ),
-			'exchange'       => __( 'Link Exchange', 'wb-ad-manager' ),
-			'sponsored_post' => __( 'Sponsored Post', 'wb-ad-manager' ),
+			'affiliate'      => __( 'Affiliate', 'wb-ads-rotator-with-split-test' ),
+			'guest_post'     => __( 'Guest Post', 'wb-ads-rotator-with-split-test' ),
+			'external'       => __( 'External', 'wb-ads-rotator-with-split-test' ),
+			'internal'       => __( 'Internal', 'wb-ads-rotator-with-split-test' ),
+			'paid_link'      => __( 'Paid Link', 'wb-ads-rotator-with-split-test' ),
+			'exchange'       => __( 'Link Exchange', 'wb-ads-rotator-with-split-test' ),
+			'sponsored_post' => __( 'Sponsored Post', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 
@@ -384,9 +384,9 @@ class Link {
 	 */
 	public static function get_statuses() {
 		return array(
-			'active'   => __( 'Active', 'wb-ad-manager' ),
-			'inactive' => __( 'Inactive', 'wb-ad-manager' ),
-			'expired'  => __( 'Expired', 'wb-ad-manager' ),
+			'active'   => __( 'Active', 'wb-ads-rotator-with-split-test' ),
+			'inactive' => __( 'Inactive', 'wb-ads-rotator-with-split-test' ),
+			'expired'  => __( 'Expired', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 
@@ -397,9 +397,9 @@ class Link {
 	 */
 	public static function get_redirect_types() {
 		return array(
-			301 => __( '301 Permanent', 'wb-ad-manager' ),
-			302 => __( '302 Temporary', 'wb-ad-manager' ),
-			307 => __( '307 Temporary (Recommended)', 'wb-ad-manager' ),
+			301 => __( '301 Permanent', 'wb-ads-rotator-with-split-test' ),
+			302 => __( '302 Temporary', 'wb-ads-rotator-with-split-test' ),
+			307 => __( '307 Temporary (Recommended)', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 
@@ -410,10 +410,10 @@ class Link {
 	 */
 	public static function get_payment_types() {
 		return array(
-			'one_time'   => __( 'One Time', 'wb-ad-manager' ),
-			'recurring'  => __( 'Recurring', 'wb-ad-manager' ),
-			'per_click'  => __( 'Per Click', 'wb-ad-manager' ),
-			'commission' => __( 'Commission', 'wb-ad-manager' ),
+			'one_time'   => __( 'One Time', 'wb-ads-rotator-with-split-test' ),
+			'recurring'  => __( 'Recurring', 'wb-ads-rotator-with-split-test' ),
+			'per_click'  => __( 'Per Click', 'wb-ads-rotator-with-split-test' ),
+			'commission' => __( 'Commission', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 
@@ -424,9 +424,9 @@ class Link {
 	 */
 	public static function get_payment_statuses() {
 		return array(
-			'unpaid'  => __( 'Unpaid', 'wb-ad-manager' ),
-			'pending' => __( 'Pending', 'wb-ad-manager' ),
-			'paid'    => __( 'Paid', 'wb-ad-manager' ),
+			'unpaid'  => __( 'Unpaid', 'wb-ads-rotator-with-split-test' ),
+			'pending' => __( 'Pending', 'wb-ads-rotator-with-split-test' ),
+			'paid'    => __( 'Paid', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 

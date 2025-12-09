@@ -28,7 +28,7 @@ class Image_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Image Ad', 'wb-ad-manager' );
+		return __( 'Image Ad', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -37,7 +37,7 @@ class Image_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Display an image with optional link.', 'wb-ad-manager' );
+		return __( 'Display an image with optional link.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -102,11 +102,11 @@ class Image_Ad implements Ad_Type_Interface {
 		$target    = isset( $data['target'] ) ? $data['target'] : '_blank';
 		?>
 		<div class="wbam-field">
-			<label for="wbam_image_url"><?php esc_html_e( 'Image URL', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_image_url"><?php esc_html_e( 'Image URL', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="url" id="wbam_image_url" name="wbam_data[image_url]" value="<?php echo esc_url( $image_url ); ?>" class="regular-text" />
-				<button type="button" class="button wbam-upload-image"><?php esc_html_e( 'Upload', 'wb-ad-manager' ); ?></button>
-				<button type="button" class="button wbam-remove-image" <?php echo empty( $image_url ) ? 'style="display:none;"' : ''; ?>><?php esc_html_e( 'Remove', 'wb-ad-manager' ); ?></button>
+				<button type="button" class="button wbam-upload-image"><?php esc_html_e( 'Upload', 'wb-ads-rotator-with-split-test' ); ?></button>
+				<button type="button" class="button wbam-remove-image" <?php echo empty( $image_url ) ? 'style="display:none;"' : ''; ?>><?php esc_html_e( 'Remove', 'wb-ads-rotator-with-split-test' ); ?></button>
 				<div class="wbam-image-preview">
 					<?php if ( ! empty( $image_url ) ) : ?>
 						<img src="<?php echo esc_url( $image_url ); ?>" alt="" />
@@ -116,26 +116,26 @@ class Image_Ad implements Ad_Type_Interface {
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_link_url"><?php esc_html_e( 'Link URL', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_link_url"><?php esc_html_e( 'Link URL', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="url" id="wbam_link_url" name="wbam_data[link_url]" value="<?php echo esc_url( $link_url ); ?>" class="regular-text" placeholder="https://" />
-				<p class="description"><?php esc_html_e( 'Where users go when clicking the ad.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Where users go when clicking the ad.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_alt_text"><?php esc_html_e( 'Alt Text', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_alt_text"><?php esc_html_e( 'Alt Text', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="text" id="wbam_alt_text" name="wbam_data[alt_text]" value="<?php echo esc_attr( $alt_text ); ?>" class="regular-text" />
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_target"><?php esc_html_e( 'Link Target', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_target"><?php esc_html_e( 'Link Target', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<select id="wbam_target" name="wbam_data[target]">
-					<option value="_blank" <?php selected( $target, '_blank' ); ?>><?php esc_html_e( 'New Tab', 'wb-ad-manager' ); ?></option>
-					<option value="_self" <?php selected( $target, '_self' ); ?>><?php esc_html_e( 'Same Tab', 'wb-ad-manager' ); ?></option>
+					<option value="_blank" <?php selected( $target, '_blank' ); ?>><?php esc_html_e( 'New Tab', 'wb-ads-rotator-with-split-test' ); ?></option>
+					<option value="_self" <?php selected( $target, '_self' ); ?>><?php esc_html_e( 'Same Tab', 'wb-ads-rotator-with-split-test' ); ?></option>
 				</select>
 			</div>
 		</div>

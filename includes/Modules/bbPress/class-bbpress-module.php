@@ -78,7 +78,7 @@ class bbPress_Placement implements \WBAM\Modules\Placements\Placement_Interface 
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'bbPress Forums', 'wb-ad-manager' );
+		return __( 'bbPress Forums', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -87,7 +87,7 @@ class bbPress_Placement implements \WBAM\Modules\Placements\Placement_Interface 
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Display ads in bbPress forums, topics, and replies.', 'wb-ad-manager' );
+		return __( 'Display ads in bbPress forums, topics, and replies.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -272,17 +272,17 @@ class bbPress_Placement implements \WBAM\Modules\Placements\Placement_Interface 
 		$repeat      = isset( $data['bbpress_repeat'] ) ? $data['bbpress_repeat'] : false;
 
 		$positions = array(
-			'before_forums'       => __( 'Before Forum List', 'wb-ad-manager' ),
-			'after_forums'        => __( 'After Forum List', 'wb-ad-manager' ),
-			'before_topics'       => __( 'Before Topic List', 'wb-ad-manager' ),
-			'after_topics'        => __( 'After Topic List', 'wb-ad-manager' ),
-			'before_single_topic' => __( 'Before Single Topic', 'wb-ad-manager' ),
-			'after_single_topic'  => __( 'After Single Topic', 'wb-ad-manager' ),
-			'between_replies'     => __( 'Between Replies', 'wb-ad-manager' ),
+			'before_forums'       => __( 'Before Forum List', 'wb-ads-rotator-with-split-test' ),
+			'after_forums'        => __( 'After Forum List', 'wb-ads-rotator-with-split-test' ),
+			'before_topics'       => __( 'Before Topic List', 'wb-ads-rotator-with-split-test' ),
+			'after_topics'        => __( 'After Topic List', 'wb-ads-rotator-with-split-test' ),
+			'before_single_topic' => __( 'Before Single Topic', 'wb-ads-rotator-with-split-test' ),
+			'after_single_topic'  => __( 'After Single Topic', 'wb-ads-rotator-with-split-test' ),
+			'between_replies'     => __( 'Between Replies', 'wb-ads-rotator-with-split-test' ),
 		);
 		?>
 		<div class="wbam-placement-extra">
-			<label><?php esc_html_e( 'Position', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Position', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<select name="wbam_data[bbpress_position]" class="wbam-bbpress-position-select">
 				<?php foreach ( $positions as $key => $label ) : ?>
 					<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $position, $key ); ?>>
@@ -292,12 +292,12 @@ class bbPress_Placement implements \WBAM\Modules\Placements\Placement_Interface 
 			</select>
 		</div>
 		<div class="wbam-placement-extra wbam-bbpress-between-options" <?php echo ( strpos( $position, 'between' ) === false ) ? 'style="display:none;"' : ''; ?>>
-			<label><?php esc_html_e( 'Show after every', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Show after every', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<input type="number" name="wbam_data[bbpress_after]" value="<?php echo esc_attr( $after_count ); ?>" min="1" max="50" style="width:60px;" />
-			<?php esc_html_e( 'replies', 'wb-ad-manager' ); ?>
+			<?php esc_html_e( 'replies', 'wb-ads-rotator-with-split-test' ); ?>
 			<label style="margin-left:15px;">
 				<input type="checkbox" name="wbam_data[bbpress_repeat]" value="1" <?php checked( $repeat ); ?> />
-				<?php esc_html_e( 'Repeat', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Repeat', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 		</div>
 		<?php
@@ -363,9 +363,9 @@ class bbPress_Forum_Ad_Widget extends \WP_Widget {
 	public function __construct() {
 		parent::__construct(
 			'wbam_bbpress_forum_ad',
-			__( 'WBAM: bbPress Forum Ad', 'wb-ad-manager' ),
+			__( 'WBAM: bbPress Forum Ad', 'wb-ads-rotator-with-split-test' ),
 			array(
-				'description' => __( 'Display ads on bbPress forum pages.', 'wb-ad-manager' ),
+				'description' => __( 'Display ads on bbPress forum pages.', 'wb-ads-rotator-with-split-test' ),
 				'classname'   => 'wbam-bbpress-forum-widget',
 			)
 		);
@@ -440,16 +440,16 @@ class bbPress_Forum_Ad_Widget extends \WP_Widget {
 		?>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
-				<?php esc_html_e( 'Title (optional):', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Title (optional):', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>">
-				<?php esc_html_e( 'Select Ad:', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Select Ad:', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'ad_id' ) ); ?>">
-				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ad-manager' ); ?></option>
+				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ads-rotator-with-split-test' ); ?></option>
 				<?php foreach ( $ads as $ad ) : ?>
 					<option value="<?php echo esc_attr( $ad->ID ); ?>" <?php selected( $ad_id, $ad->ID ); ?>>
 						<?php echo esc_html( $ad->post_title ); ?>
@@ -459,12 +459,12 @@ class bbPress_Forum_Ad_Widget extends \WP_Widget {
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'show_on' ) ); ?>">
-				<?php esc_html_e( 'Show On:', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Show On:', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'show_on' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'show_on' ) ); ?>">
-				<option value="all" <?php selected( $show_on, 'all' ); ?>><?php esc_html_e( 'All bbPress Pages', 'wb-ad-manager' ); ?></option>
-				<option value="forum" <?php selected( $show_on, 'forum' ); ?>><?php esc_html_e( 'Forum Pages Only', 'wb-ad-manager' ); ?></option>
-				<option value="topic" <?php selected( $show_on, 'topic' ); ?>><?php esc_html_e( 'Topic Pages Only', 'wb-ad-manager' ); ?></option>
+				<option value="all" <?php selected( $show_on, 'all' ); ?>><?php esc_html_e( 'All bbPress Pages', 'wb-ads-rotator-with-split-test' ); ?></option>
+				<option value="forum" <?php selected( $show_on, 'forum' ); ?>><?php esc_html_e( 'Forum Pages Only', 'wb-ads-rotator-with-split-test' ); ?></option>
+				<option value="topic" <?php selected( $show_on, 'topic' ); ?>><?php esc_html_e( 'Topic Pages Only', 'wb-ads-rotator-with-split-test' ); ?></option>
 			</select>
 		</p>
 		<?php
@@ -498,9 +498,9 @@ class bbPress_Topic_Ad_Widget extends \WP_Widget {
 	public function __construct() {
 		parent::__construct(
 			'wbam_bbpress_topic_ad',
-			__( 'WBAM: bbPress Topic Sidebar Ad', 'wb-ad-manager' ),
+			__( 'WBAM: bbPress Topic Sidebar Ad', 'wb-ads-rotator-with-split-test' ),
 			array(
-				'description' => __( 'Display ads in sidebar on single topic pages.', 'wb-ad-manager' ),
+				'description' => __( 'Display ads in sidebar on single topic pages.', 'wb-ads-rotator-with-split-test' ),
 				'classname'   => 'wbam-bbpress-topic-widget',
 			)
 		);
@@ -563,16 +563,16 @@ class bbPress_Topic_Ad_Widget extends \WP_Widget {
 		?>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
-				<?php esc_html_e( 'Title (optional):', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Title (optional):', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>">
-				<?php esc_html_e( 'Select Ad:', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Select Ad:', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'ad_id' ) ); ?>">
-				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ad-manager' ); ?></option>
+				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ads-rotator-with-split-test' ); ?></option>
 				<?php foreach ( $ads as $ad ) : ?>
 					<option value="<?php echo esc_attr( $ad->ID ); ?>" <?php selected( $ad_id, $ad->ID ); ?>>
 						<?php echo esc_html( $ad->post_title ); ?>
@@ -581,7 +581,7 @@ class bbPress_Topic_Ad_Widget extends \WP_Widget {
 			</select>
 		</p>
 		<p class="description">
-			<?php esc_html_e( 'This widget only displays on single topic pages.', 'wb-ad-manager' ); ?>
+			<?php esc_html_e( 'This widget only displays on single topic pages.', 'wb-ads-rotator-with-split-test' ); ?>
 		</p>
 		<?php
 	}

@@ -18,17 +18,17 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  *
  * By default, we keep data. Users must explicitly enable data deletion in settings.
  */
-$settings = get_option( 'wbam_settings', array() );
-$delete_data = isset( $settings['delete_data_on_uninstall'] ) && $settings['delete_data_on_uninstall'];
+$wbam_settings    = get_option( 'wbam_settings', array() );
+$wbam_delete_data = isset( $wbam_settings['delete_data_on_uninstall'] ) && $wbam_settings['delete_data_on_uninstall'];
 
-if ( ! $delete_data ) {
+if ( ! $wbam_delete_data ) {
 	return;
 }
 
 global $wpdb;
 
 // Delete custom post types and their meta.
-$ad_posts = get_posts(
+$wbam_ad_posts = get_posts(
 	array(
 		'post_type'      => 'wbam-ad',
 		'posts_per_page' => -1,
@@ -37,8 +37,8 @@ $ad_posts = get_posts(
 	)
 );
 
-foreach ( $ad_posts as $post_id ) {
-	wp_delete_post( $post_id, true );
+foreach ( $wbam_ad_posts as $wbam_post_id ) {
+	wp_delete_post( $wbam_post_id, true );
 }
 
 // Drop custom database tables.
@@ -51,15 +51,15 @@ $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_email_submissions" );
 // phpcs:enable
 
 // Delete options.
-$options_to_delete = array(
+$wbam_options_to_delete = array(
 	'wbam_settings',
 	'wbam_db_version',
 	'wbam_email_submissions', // Legacy option-based storage.
 	'wbam_activation_redirect',
 );
 
-foreach ( $options_to_delete as $option ) {
-	delete_option( $option );
+foreach ( $wbam_options_to_delete as $wbam_option ) {
+	delete_option( $wbam_option );
 }
 
 // Delete transients.

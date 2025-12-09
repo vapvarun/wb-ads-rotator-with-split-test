@@ -18,11 +18,11 @@ class Content_Placement implements Placement_Interface {
 	}
 
 	public function get_name() {
-		return __( 'Before/After Content', 'wb-ad-manager' );
+		return __( 'Before/After Content', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_description() {
-		return __( 'Display ads before or after post content.', 'wb-ad-manager' );
+		return __( 'Display ads before or after post content.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_group() {

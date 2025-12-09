@@ -28,7 +28,7 @@ class Rich_Content_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Rich Content', 'wb-ad-manager' );
+		return __( 'Rich Content', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -37,7 +37,7 @@ class Rich_Content_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Create ads with the WordPress editor.', 'wb-ad-manager' );
+		return __( 'Create ads with the WordPress editor.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -86,9 +86,9 @@ class Rich_Content_Ad implements Ad_Type_Interface {
 		$content = isset( $data['content'] ) ? $data['content'] : '';
 		?>
 		<div class="wbam-field wbam-field-full">
-			<label for="wbam_rich_content"><?php esc_html_e( 'Ad Content', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_rich_content"><?php esc_html_e( 'Ad Content', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
-				<p class="description"><?php esc_html_e( 'Enter HTML content for your ad. Basic HTML tags are supported.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Enter HTML content for your ad. Basic HTML tags are supported.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<textarea id="wbam_rich_content" name="wbam_data[content]" rows="10" class="large-text"><?php echo esc_textarea( $content ); ?></textarea>
 			</div>
 		</div>

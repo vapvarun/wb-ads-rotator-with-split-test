@@ -31,7 +31,7 @@ class BP_Directory_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'BuddyPress Directories', 'wb-ad-manager' );
+		return __( 'BuddyPress Directories', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -40,7 +40,7 @@ class BP_Directory_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Display ads in member or group directory listings.', 'wb-ad-manager' );
+		return __( 'Display ads in member or group directory listings.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -223,16 +223,16 @@ class BP_Directory_Placement implements Placement_Interface {
 		$repeat      = isset( $data['bp_directory_repeat'] ) ? $data['bp_directory_repeat'] : false;
 
 		$positions = array(
-			'before_members'  => __( 'Before Members List', 'wb-ad-manager' ),
-			'after_members'   => __( 'After Members List', 'wb-ad-manager' ),
-			'between_members' => __( 'Between Members', 'wb-ad-manager' ),
-			'before_groups'   => __( 'Before Groups List', 'wb-ad-manager' ),
-			'after_groups'    => __( 'After Groups List', 'wb-ad-manager' ),
-			'between_groups'  => __( 'Between Groups', 'wb-ad-manager' ),
+			'before_members'  => __( 'Before Members List', 'wb-ads-rotator-with-split-test' ),
+			'after_members'   => __( 'After Members List', 'wb-ads-rotator-with-split-test' ),
+			'between_members' => __( 'Between Members', 'wb-ads-rotator-with-split-test' ),
+			'before_groups'   => __( 'Before Groups List', 'wb-ads-rotator-with-split-test' ),
+			'after_groups'    => __( 'After Groups List', 'wb-ads-rotator-with-split-test' ),
+			'between_groups'  => __( 'Between Groups', 'wb-ads-rotator-with-split-test' ),
 		);
 		?>
 		<div class="wbam-placement-extra">
-			<label><?php esc_html_e( 'Position', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Position', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<select name="wbam_data[bp_directory_position]" class="wbam-bp-directory-select">
 				<?php foreach ( $positions as $key => $label ) : ?>
 					<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $position, $key ); ?>>
@@ -242,12 +242,12 @@ class BP_Directory_Placement implements Placement_Interface {
 			</select>
 		</div>
 		<div class="wbam-placement-extra wbam-bp-between-options" <?php echo ( strpos( $position, 'between' ) === false ) ? 'style="display:none;"' : ''; ?>>
-			<label><?php esc_html_e( 'Show after every', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Show after every', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<input type="number" name="wbam_data[bp_directory_after]" value="<?php echo esc_attr( $after_count ); ?>" min="1" max="20" style="width:60px;" />
-			<?php esc_html_e( 'items', 'wb-ad-manager' ); ?>
+			<?php esc_html_e( 'items', 'wb-ads-rotator-with-split-test' ); ?>
 			<label style="margin-left:15px;">
 				<input type="checkbox" name="wbam_data[bp_directory_repeat]" value="1" <?php checked( $repeat ); ?> />
-				<?php esc_html_e( 'Repeat', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Repeat', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 		</div>
 		<?php

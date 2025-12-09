@@ -32,7 +32,7 @@ class Display_Options {
 	public function add_metaboxes() {
 		add_meta_box(
 			'wbam-display-rules',
-			__( 'Display Rules', 'wb-ad-manager' ),
+			__( 'Display Rules', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_display_rules' ),
 			'wbam-ad',
 			'normal',
@@ -41,7 +41,7 @@ class Display_Options {
 
 		add_meta_box(
 			'wbam-schedule',
-			__( 'Schedule', 'wb-ad-manager' ),
+			__( 'Schedule', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_schedule' ),
 			'wbam-ad',
 			'side',
@@ -50,7 +50,7 @@ class Display_Options {
 
 		add_meta_box(
 			'wbam-visitor-conditions',
-			__( 'Visitor Conditions', 'wb-ad-manager' ),
+			__( 'Visitor Conditions', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_visitor_conditions' ),
 			'wbam-ad',
 			'normal',
@@ -59,7 +59,7 @@ class Display_Options {
 
 		add_meta_box(
 			'wbam-geo-targeting',
-			__( 'Geo Targeting', 'wb-ad-manager' ),
+			__( 'Geo Targeting', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_geo_targeting' ),
 			'wbam-ad',
 			'normal',
@@ -88,26 +88,26 @@ class Display_Options {
 		?>
 		<div class="wbam-display-rules">
 			<div class="wbam-rule-section">
-				<label class="wbam-section-label"><?php esc_html_e( 'Show this ad on:', 'wb-ad-manager' ); ?></label>
+				<label class="wbam-section-label"><?php esc_html_e( 'Show this ad on:', 'wb-ads-rotator-with-split-test' ); ?></label>
 				<div class="wbam-radio-group">
 					<label class="wbam-radio-option">
 						<input type="radio" name="wbam_display_rules[display_on]" value="all" <?php checked( $display_on, 'all' ); ?> />
-						<span><?php esc_html_e( 'All pages', 'wb-ad-manager' ); ?></span>
-						<span class="wbam-option-hint"><?php esc_html_e( 'Show everywhere, with optional exclusions below', 'wb-ad-manager' ); ?></span>
+						<span><?php esc_html_e( 'All pages', 'wb-ads-rotator-with-split-test' ); ?></span>
+						<span class="wbam-option-hint"><?php esc_html_e( 'Show everywhere, with optional exclusions below', 'wb-ads-rotator-with-split-test' ); ?></span>
 					</label>
 					<label class="wbam-radio-option">
 						<input type="radio" name="wbam_display_rules[display_on]" value="specific" <?php checked( $display_on, 'specific' ); ?> />
-						<span><?php esc_html_e( 'Specific pages', 'wb-ad-manager' ); ?></span>
-						<span class="wbam-option-hint"><?php esc_html_e( 'Only show on selected pages below', 'wb-ad-manager' ); ?></span>
+						<span><?php esc_html_e( 'Specific pages', 'wb-ads-rotator-with-split-test' ); ?></span>
+						<span class="wbam-option-hint"><?php esc_html_e( 'Only show on selected pages below', 'wb-ads-rotator-with-split-test' ); ?></span>
 					</label>
 				</div>
 			</div>
 
 			<div class="wbam-rule-section wbam-conditional-section" data-show-when="specific">
-				<label class="wbam-section-label"><?php esc_html_e( 'Include on:', 'wb-ad-manager' ); ?></label>
+				<label class="wbam-section-label"><?php esc_html_e( 'Include on:', 'wb-ads-rotator-with-split-test' ); ?></label>
 
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Post Types', 'wb-ad-manager' ); ?></label>
+					<label><?php esc_html_e( 'Post Types', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<div class="wbam-checkbox-list">
 						<?php
 						$available_types = get_post_types( array( 'public' => true ), 'objects' );
@@ -125,15 +125,15 @@ class Display_Options {
 				</div>
 
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Page Types', 'wb-ad-manager' ); ?></label>
+					<label><?php esc_html_e( 'Page Types', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<div class="wbam-checkbox-list">
 						<?php
 						$available_page_types = array(
-							'front_page' => __( 'Front Page', 'wb-ad-manager' ),
-							'blog'       => __( 'Blog Page', 'wb-ad-manager' ),
-							'archive'    => __( 'Archives', 'wb-ad-manager' ),
-							'search'     => __( 'Search Results', 'wb-ad-manager' ),
-							'404'        => __( '404 Page', 'wb-ad-manager' ),
+							'front_page' => __( 'Front Page', 'wb-ads-rotator-with-split-test' ),
+							'blog'       => __( 'Blog Page', 'wb-ads-rotator-with-split-test' ),
+							'archive'    => __( 'Archives', 'wb-ads-rotator-with-split-test' ),
+							'search'     => __( 'Search Results', 'wb-ads-rotator-with-split-test' ),
+							'404'        => __( '404 Page', 'wb-ads-rotator-with-split-test' ),
 						);
 						foreach ( $available_page_types as $key => $label ) :
 							?>
@@ -146,8 +146,8 @@ class Display_Options {
 				</div>
 
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Categories', 'wb-ad-manager' ); ?></label>
-					<select name="wbam_display_rules[categories][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select categories...', 'wb-ad-manager' ); ?>">
+					<label><?php esc_html_e( 'Categories', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<select name="wbam_display_rules[categories][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select categories...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php
 						$all_categories = get_categories( array( 'hide_empty' => false ) );
 						foreach ( $all_categories as $cat ) :
@@ -160,8 +160,8 @@ class Display_Options {
 				</div>
 
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Tags', 'wb-ad-manager' ); ?></label>
-					<select name="wbam_display_rules[tags][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select tags...', 'wb-ad-manager' ); ?>">
+					<label><?php esc_html_e( 'Tags', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<select name="wbam_display_rules[tags][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select tags...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php
 						$all_tags = get_tags( array( 'hide_empty' => false ) );
 						foreach ( $all_tags as $tag ) :
@@ -175,10 +175,10 @@ class Display_Options {
 			</div>
 
 			<div class="wbam-rule-section wbam-conditional-section" data-show-when="all">
-				<label class="wbam-section-label"><?php esc_html_e( 'Exclude from:', 'wb-ad-manager' ); ?></label>
+				<label class="wbam-section-label"><?php esc_html_e( 'Exclude from:', 'wb-ads-rotator-with-split-test' ); ?></label>
 
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Page Types', 'wb-ad-manager' ); ?></label>
+					<label><?php esc_html_e( 'Page Types', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<div class="wbam-checkbox-list">
 						<?php foreach ( $available_page_types as $key => $label ) : ?>
 							<label>
@@ -190,8 +190,8 @@ class Display_Options {
 				</div>
 
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Categories', 'wb-ad-manager' ); ?></label>
-					<select name="wbam_display_rules[exclude_categories][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select categories to exclude...', 'wb-ad-manager' ); ?>">
+					<label><?php esc_html_e( 'Categories', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<select name="wbam_display_rules[exclude_categories][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select categories to exclude...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php foreach ( $all_categories as $cat ) : ?>
 							<option value="<?php echo esc_attr( $cat->term_id ); ?>" <?php selected( in_array( $cat->term_id, $exclude_cats, true ) ); ?>>
 								<?php echo esc_html( $cat->name ); ?>
@@ -201,8 +201,8 @@ class Display_Options {
 				</div>
 
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Tags', 'wb-ad-manager' ); ?></label>
-					<select name="wbam_display_rules[exclude_tags][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select tags to exclude...', 'wb-ad-manager' ); ?>">
+					<label><?php esc_html_e( 'Tags', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<select name="wbam_display_rules[exclude_tags][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select tags to exclude...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php foreach ( $all_tags as $tag ) : ?>
 							<option value="<?php echo esc_attr( $tag->term_id ); ?>" <?php selected( in_array( $tag->term_id, $exclude_tags, true ) ); ?>>
 								<?php echo esc_html( $tag->name ); ?>
@@ -230,28 +230,28 @@ class Display_Options {
 		$time_end   = isset( $schedule['time_end'] ) ? $schedule['time_end'] : '';
 
 		$weekdays = array(
-			'mon' => __( 'Mon', 'wb-ad-manager' ),
-			'tue' => __( 'Tue', 'wb-ad-manager' ),
-			'wed' => __( 'Wed', 'wb-ad-manager' ),
-			'thu' => __( 'Thu', 'wb-ad-manager' ),
-			'fri' => __( 'Fri', 'wb-ad-manager' ),
-			'sat' => __( 'Sat', 'wb-ad-manager' ),
-			'sun' => __( 'Sun', 'wb-ad-manager' ),
+			'mon' => __( 'Mon', 'wb-ads-rotator-with-split-test' ),
+			'tue' => __( 'Tue', 'wb-ads-rotator-with-split-test' ),
+			'wed' => __( 'Wed', 'wb-ads-rotator-with-split-test' ),
+			'thu' => __( 'Thu', 'wb-ads-rotator-with-split-test' ),
+			'fri' => __( 'Fri', 'wb-ads-rotator-with-split-test' ),
+			'sat' => __( 'Sat', 'wb-ads-rotator-with-split-test' ),
+			'sun' => __( 'Sun', 'wb-ads-rotator-with-split-test' ),
 		);
 		?>
 		<div class="wbam-schedule">
 			<div class="wbam-schedule-field">
-				<label for="wbam_start_date"><?php esc_html_e( 'Start Date', 'wb-ad-manager' ); ?></label>
+				<label for="wbam_start_date"><?php esc_html_e( 'Start Date', 'wb-ads-rotator-with-split-test' ); ?></label>
 				<input type="date" id="wbam_start_date" name="wbam_schedule[start_date]" value="<?php echo esc_attr( $start_date ); ?>" />
-				<p class="description"><?php esc_html_e( 'Leave empty to start immediately.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Leave empty to start immediately.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 			<div class="wbam-schedule-field">
-				<label for="wbam_end_date"><?php esc_html_e( 'End Date', 'wb-ad-manager' ); ?></label>
+				<label for="wbam_end_date"><?php esc_html_e( 'End Date', 'wb-ads-rotator-with-split-test' ); ?></label>
 				<input type="date" id="wbam_end_date" name="wbam_schedule[end_date]" value="<?php echo esc_attr( $end_date ); ?>" />
-				<p class="description"><?php esc_html_e( 'Leave empty to run indefinitely.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Leave empty to run indefinitely.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 			<div class="wbam-schedule-field">
-				<label><?php esc_html_e( 'Days of Week', 'wb-ad-manager' ); ?></label>
+				<label><?php esc_html_e( 'Days of Week', 'wb-ads-rotator-with-split-test' ); ?></label>
 				<div class="wbam-days-selector">
 					<?php foreach ( $weekdays as $day_key => $day_label ) : ?>
 						<label class="wbam-day-checkbox">
@@ -260,16 +260,16 @@ class Display_Options {
 						</label>
 					<?php endforeach; ?>
 				</div>
-				<p class="description"><?php esc_html_e( 'Leave all unchecked to show every day.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Leave all unchecked to show every day.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 			<div class="wbam-schedule-field">
-				<label><?php esc_html_e( 'Time of Day', 'wb-ad-manager' ); ?></label>
+				<label><?php esc_html_e( 'Time of Day', 'wb-ads-rotator-with-split-test' ); ?></label>
 				<div class="wbam-time-range">
 					<input type="time" name="wbam_schedule[time_start]" value="<?php echo esc_attr( $time_start ); ?>" />
-					<span><?php esc_html_e( 'to', 'wb-ad-manager' ); ?></span>
+					<span><?php esc_html_e( 'to', 'wb-ads-rotator-with-split-test' ); ?></span>
 					<input type="time" name="wbam_schedule[time_end]" value="<?php echo esc_attr( $time_end ); ?>" />
 				</div>
-				<p class="description"><?php esc_html_e( 'Leave empty to show all day. Uses site timezone.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Leave empty to show all day. Uses site timezone.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 		<?php
@@ -289,48 +289,48 @@ class Display_Options {
 		?>
 		<div class="wbam-visitor-conditions">
 			<div class="wbam-condition-row">
-				<label class="wbam-section-label"><?php esc_html_e( 'Devices', 'wb-ad-manager' ); ?></label>
-				<p class="description"><?php esc_html_e( 'Show on selected devices. Leave all unchecked to show on all devices.', 'wb-ad-manager' ); ?></p>
+				<label class="wbam-section-label"><?php esc_html_e( 'Devices', 'wb-ads-rotator-with-split-test' ); ?></label>
+				<p class="description"><?php esc_html_e( 'Show on selected devices. Leave all unchecked to show on all devices.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<div class="wbam-device-options">
 					<label class="wbam-device-option">
 						<input type="checkbox" name="wbam_visitor_conditions[devices][]" value="desktop" <?php checked( in_array( 'desktop', $devices, true ) ); ?> />
 						<span class="dashicons dashicons-desktop"></span>
-						<span><?php esc_html_e( 'Desktop', 'wb-ad-manager' ); ?></span>
+						<span><?php esc_html_e( 'Desktop', 'wb-ads-rotator-with-split-test' ); ?></span>
 					</label>
 					<label class="wbam-device-option">
 						<input type="checkbox" name="wbam_visitor_conditions[devices][]" value="tablet" <?php checked( in_array( 'tablet', $devices, true ) ); ?> />
 						<span class="dashicons dashicons-tablet"></span>
-						<span><?php esc_html_e( 'Tablet', 'wb-ad-manager' ); ?></span>
+						<span><?php esc_html_e( 'Tablet', 'wb-ads-rotator-with-split-test' ); ?></span>
 					</label>
 					<label class="wbam-device-option">
 						<input type="checkbox" name="wbam_visitor_conditions[devices][]" value="mobile" <?php checked( in_array( 'mobile', $devices, true ) ); ?> />
 						<span class="dashicons dashicons-smartphone"></span>
-						<span><?php esc_html_e( 'Mobile', 'wb-ad-manager' ); ?></span>
+						<span><?php esc_html_e( 'Mobile', 'wb-ads-rotator-with-split-test' ); ?></span>
 					</label>
 				</div>
 			</div>
 
 			<div class="wbam-condition-row">
-				<label class="wbam-section-label"><?php esc_html_e( 'User Status', 'wb-ad-manager' ); ?></label>
+				<label class="wbam-section-label"><?php esc_html_e( 'User Status', 'wb-ads-rotator-with-split-test' ); ?></label>
 				<div class="wbam-radio-group wbam-inline">
 					<label>
 						<input type="radio" name="wbam_visitor_conditions[user_status]" value="" <?php checked( $user_status, '' ); ?> />
-						<?php esc_html_e( 'All visitors', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'All visitors', 'wb-ads-rotator-with-split-test' ); ?>
 					</label>
 					<label>
 						<input type="radio" name="wbam_visitor_conditions[user_status]" value="logged_in" <?php checked( $user_status, 'logged_in' ); ?> />
-						<?php esc_html_e( 'Logged in only', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Logged in only', 'wb-ads-rotator-with-split-test' ); ?>
 					</label>
 					<label>
 						<input type="radio" name="wbam_visitor_conditions[user_status]" value="logged_out" <?php checked( $user_status, 'logged_out' ); ?> />
-						<?php esc_html_e( 'Logged out only', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Logged out only', 'wb-ads-rotator-with-split-test' ); ?>
 					</label>
 				</div>
 			</div>
 
 			<div class="wbam-condition-row">
-				<label class="wbam-section-label"><?php esc_html_e( 'User Roles', 'wb-ad-manager' ); ?></label>
-				<p class="description"><?php esc_html_e( 'Limit to specific roles. Leave all unchecked to show to all roles.', 'wb-ad-manager' ); ?></p>
+				<label class="wbam-section-label"><?php esc_html_e( 'User Roles', 'wb-ads-rotator-with-split-test' ); ?></label>
+				<p class="description"><?php esc_html_e( 'Limit to specific roles. Leave all unchecked to show to all roles.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<div class="wbam-checkbox-list wbam-inline">
 					<?php
 					$available_roles = wp_roles()->get_names();
@@ -367,15 +367,15 @@ class Display_Options {
 			<div class="wbam-geo-toggle">
 				<label class="wbam-toggle-label">
 					<input type="checkbox" name="wbam_geo_targeting[enabled]" value="1" <?php checked( $enabled ); ?> class="wbam-geo-enable" />
-					<span><?php esc_html_e( 'Enable geo targeting for this ad', 'wb-ad-manager' ); ?></span>
+					<span><?php esc_html_e( 'Enable geo targeting for this ad', 'wb-ads-rotator-with-split-test' ); ?></span>
 				</label>
 			</div>
 
 			<div class="wbam-geo-options" <?php echo ! $enabled ? 'style="display:none;"' : ''; ?>>
 				<div class="wbam-geo-row">
-					<label class="wbam-section-label"><?php esc_html_e( 'Show only in these countries', 'wb-ad-manager' ); ?></label>
-					<p class="description"><?php esc_html_e( 'Leave empty to show in all countries.', 'wb-ad-manager' ); ?></p>
-					<select name="wbam_geo_targeting[include_countries][]" multiple class="wbam-select2 wbam-country-select" data-placeholder="<?php esc_attr_e( 'Select countries...', 'wb-ad-manager' ); ?>">
+					<label class="wbam-section-label"><?php esc_html_e( 'Show only in these countries', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<p class="description"><?php esc_html_e( 'Leave empty to show in all countries.', 'wb-ads-rotator-with-split-test' ); ?></p>
+					<select name="wbam_geo_targeting[include_countries][]" multiple class="wbam-select2 wbam-country-select" data-placeholder="<?php esc_attr_e( 'Select countries...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php foreach ( $countries as $code => $name ) : ?>
 							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( in_array( $code, $include_countries, true ) ); ?>>
 								<?php echo esc_html( $name ); ?>
@@ -385,8 +385,8 @@ class Display_Options {
 				</div>
 
 				<div class="wbam-geo-row">
-					<label class="wbam-section-label"><?php esc_html_e( 'Exclude these countries', 'wb-ad-manager' ); ?></label>
-					<select name="wbam_geo_targeting[exclude_countries][]" multiple class="wbam-select2 wbam-country-select" data-placeholder="<?php esc_attr_e( 'Select countries to exclude...', 'wb-ad-manager' ); ?>">
+					<label class="wbam-section-label"><?php esc_html_e( 'Exclude these countries', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<select name="wbam_geo_targeting[exclude_countries][]" multiple class="wbam-select2 wbam-country-select" data-placeholder="<?php esc_attr_e( 'Select countries to exclude...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php foreach ( $countries as $code => $name ) : ?>
 							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( in_array( $code, $exclude_countries, true ) ); ?>>
 								<?php echo esc_html( $name ); ?>
@@ -398,7 +398,7 @@ class Display_Options {
 				<div class="wbam-geo-row">
 					<label>
 						<input type="checkbox" name="wbam_geo_targeting[show_unknown]" value="1" <?php checked( $show_unknown ); ?> />
-						<?php esc_html_e( 'Show ad to visitors with unknown location', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Show ad to visitors with unknown location', 'wb-ads-rotator-with-split-test' ); ?>
 					</label>
 				</div>
 			</div>

@@ -32,11 +32,11 @@ class Archive_Placement implements Placement_Interface {
 	}
 
 	public function get_name() {
-		return __( 'Between Posts', 'wb-ad-manager' );
+		return __( 'Between Posts', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_description() {
-		return __( 'Display ads between posts on archive pages.', 'wb-ad-manager' );
+		return __( 'Display ads between posts on archive pages.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_group() {

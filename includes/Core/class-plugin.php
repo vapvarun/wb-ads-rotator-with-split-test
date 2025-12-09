@@ -167,23 +167,23 @@ class Plugin {
 	 */
 	public function register_post_type() {
 		$labels = array(
-			'name'               => _x( 'Ads', 'Post Type General Name', 'wb-ad-manager' ),
-			'singular_name'      => _x( 'Ad', 'Post Type Singular Name', 'wb-ad-manager' ),
-			'menu_name'          => __( 'WB Ad Manager', 'wb-ad-manager' ),
-			'all_items'          => __( 'All Ads', 'wb-ad-manager' ),
-			'add_new_item'       => __( 'Add New Ad', 'wb-ad-manager' ),
-			'add_new'            => __( 'Add New', 'wb-ad-manager' ),
-			'new_item'           => __( 'New Ad', 'wb-ad-manager' ),
-			'edit_item'          => __( 'Edit Ad', 'wb-ad-manager' ),
-			'update_item'        => __( 'Update Ad', 'wb-ad-manager' ),
-			'view_item'          => __( 'View Ad', 'wb-ad-manager' ),
-			'search_items'       => __( 'Search Ads', 'wb-ad-manager' ),
-			'not_found'          => __( 'Not found', 'wb-ad-manager' ),
-			'not_found_in_trash' => __( 'Not found in Trash', 'wb-ad-manager' ),
+			'name'               => _x( 'Ads', 'Post Type General Name', 'wb-ads-rotator-with-split-test' ),
+			'singular_name'      => _x( 'Ad', 'Post Type Singular Name', 'wb-ads-rotator-with-split-test' ),
+			'menu_name'          => __( 'WB Ad Manager', 'wb-ads-rotator-with-split-test' ),
+			'all_items'          => __( 'All Ads', 'wb-ads-rotator-with-split-test' ),
+			'add_new_item'       => __( 'Add New Ad', 'wb-ads-rotator-with-split-test' ),
+			'add_new'            => __( 'Add New', 'wb-ads-rotator-with-split-test' ),
+			'new_item'           => __( 'New Ad', 'wb-ads-rotator-with-split-test' ),
+			'edit_item'          => __( 'Edit Ad', 'wb-ads-rotator-with-split-test' ),
+			'update_item'        => __( 'Update Ad', 'wb-ads-rotator-with-split-test' ),
+			'view_item'          => __( 'View Ad', 'wb-ads-rotator-with-split-test' ),
+			'search_items'       => __( 'Search Ads', 'wb-ads-rotator-with-split-test' ),
+			'not_found'          => __( 'Not found', 'wb-ads-rotator-with-split-test' ),
+			'not_found_in_trash' => __( 'Not found in Trash', 'wb-ads-rotator-with-split-test' ),
 		);
 
 		$args = array(
-			'label'               => __( 'Ad', 'wb-ad-manager' ),
+			'label'               => __( 'Ad', 'wb-ads-rotator-with-split-test' ),
 			'labels'              => $labels,
 			'supports'            => array( 'title' ),
 			'hierarchical'        => false,
@@ -235,7 +235,7 @@ class Plugin {
 
 		if ( ! class_exists( 'BuddyPress' ) ) {
 			echo '<div class="notice notice-info"><p>';
-			esc_html_e( 'BuddyPress is not active. BuddyPress activity placements are disabled.', 'wb-ad-manager' );
+			esc_html_e( 'BuddyPress is not active. BuddyPress activity placements are disabled.', 'wb-ads-rotator-with-split-test' );
 			echo '</p></div>';
 		}
 	}

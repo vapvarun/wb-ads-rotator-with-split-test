@@ -114,13 +114,13 @@ class Partnership_Form {
 	 */
 	private function get_i18n_strings() {
 		$strings = array(
-			'submitting'   => __( 'Submitting...', 'wb-ad-manager' ),
-			'success'      => __( 'Thank you! Your inquiry has been submitted successfully. We will review it and get back to you soon.', 'wb-ad-manager' ),
-			'error'        => __( 'An error occurred. Please try again.', 'wb-ad-manager' ),
-			'duplicate'    => __( 'You have already submitted an inquiry recently. Please wait before submitting again.', 'wb-ad-manager' ),
-			'required'     => __( 'Please fill in all required fields.', 'wb-ad-manager' ),
-			'invalidEmail' => __( 'Please enter a valid email address.', 'wb-ad-manager' ),
-			'invalidUrl'   => __( 'Please enter a valid website URL.', 'wb-ad-manager' ),
+			'submitting'   => __( 'Submitting...', 'wb-ads-rotator-with-split-test' ),
+			'success'      => __( 'Thank you! Your inquiry has been submitted successfully. We will review it and get back to you soon.', 'wb-ads-rotator-with-split-test' ),
+			'error'        => __( 'An error occurred. Please try again.', 'wb-ads-rotator-with-split-test' ),
+			'duplicate'    => __( 'You have already submitted an inquiry recently. Please wait before submitting again.', 'wb-ads-rotator-with-split-test' ),
+			'required'     => __( 'Please fill in all required fields.', 'wb-ads-rotator-with-split-test' ),
+			'invalidEmail' => __( 'Please enter a valid email address.', 'wb-ads-rotator-with-split-test' ),
+			'invalidUrl'   => __( 'Please enter a valid website URL.', 'wb-ads-rotator-with-split-test' ),
 		);
 
 		/**
@@ -141,13 +141,13 @@ class Partnership_Form {
 	public function render_form( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'title'            => __( 'Link Partnership Inquiry', 'wb-ad-manager' ),
-				'description'      => __( 'Interested in a link partnership? Fill out the form below and we will get back to you.', 'wb-ad-manager' ),
+				'title'            => __( 'Link Partnership Inquiry', 'wb-ads-rotator-with-split-test' ),
+				'description'      => __( 'Interested in a link partnership? Fill out the form below and we will get back to you.', 'wb-ads-rotator-with-split-test' ),
 				'show_budget'      => 'yes',
 				'show_target_page' => 'no',
 				'show_anchor'      => 'yes',
 				'show_message'     => 'yes',
-				'button_text'      => __( 'Submit Inquiry', 'wb-ad-manager' ),
+				'button_text'      => __( 'Submit Inquiry', 'wb-ads-rotator-with-split-test' ),
 				'class'            => '',
 			),
 			$atts,
@@ -223,11 +223,11 @@ class Partnership_Form {
 				<!-- Name and Email -->
 				<div class="wbam-form-row">
 					<div class="wbam-form-field wbam-field-half">
-						<label for="wbam_partner_name"><?php esc_html_e( 'Your Name', 'wb-ad-manager' ); ?> <span class="required">*</span></label>
+						<label for="wbam_partner_name"><?php esc_html_e( 'Your Name', 'wb-ads-rotator-with-split-test' ); ?> <span class="required">*</span></label>
 						<input type="text" id="wbam_partner_name" name="name" required>
 					</div>
 					<div class="wbam-form-field wbam-field-half">
-						<label for="wbam_partner_email"><?php esc_html_e( 'Email Address', 'wb-ad-manager' ); ?> <span class="required">*</span></label>
+						<label for="wbam_partner_email"><?php esc_html_e( 'Email Address', 'wb-ads-rotator-with-split-test' ); ?> <span class="required">*</span></label>
 						<input type="email" id="wbam_partner_email" name="email" required>
 					</div>
 				</div>
@@ -245,7 +245,7 @@ class Partnership_Form {
 				<!-- Website URL -->
 				<div class="wbam-form-row">
 					<div class="wbam-form-field">
-						<label for="wbam_partner_website"><?php esc_html_e( 'Your Website URL', 'wb-ad-manager' ); ?> <span class="required">*</span></label>
+						<label for="wbam_partner_website"><?php esc_html_e( 'Your Website URL', 'wb-ads-rotator-with-split-test' ); ?> <span class="required">*</span></label>
 						<input type="url" id="wbam_partner_website" name="website_url" placeholder="https://" required>
 					</div>
 				</div>
@@ -263,7 +263,7 @@ class Partnership_Form {
 				<!-- Partnership Type -->
 				<div class="wbam-form-row">
 					<div class="wbam-form-field">
-						<label for="wbam_partnership_type"><?php esc_html_e( 'Partnership Type', 'wb-ad-manager' ); ?> <span class="required">*</span></label>
+						<label for="wbam_partnership_type"><?php esc_html_e( 'Partnership Type', 'wb-ads-rotator-with-split-test' ); ?> <span class="required">*</span></label>
 						<select id="wbam_partnership_type" name="partnership_type" required>
 							<?php foreach ( $partnership_types as $value => $label ) : ?>
 								<option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option>
@@ -286,9 +286,9 @@ class Partnership_Form {
 				<!-- Target Page -->
 				<div class="wbam-form-row">
 					<div class="wbam-form-field">
-						<label for="wbam_target_page"><?php esc_html_e( 'Target Page (Optional)', 'wb-ad-manager' ); ?></label>
+						<label for="wbam_target_page"><?php esc_html_e( 'Target Page (Optional)', 'wb-ads-rotator-with-split-test' ); ?></label>
 						<select id="wbam_target_page" name="target_post_id">
-							<option value=""><?php esc_html_e( '— Any page —', 'wb-ad-manager' ); ?></option>
+							<option value=""><?php esc_html_e( '— Any page —', 'wb-ads-rotator-with-split-test' ); ?></option>
 							<?php
 							$pages = get_pages( array( 'post_status' => 'publish' ) );
 							foreach ( $pages as $page ) :
@@ -296,7 +296,7 @@ class Partnership_Form {
 								<option value="<?php echo esc_attr( $page->ID ); ?>"><?php echo esc_html( $page->post_title ); ?></option>
 							<?php endforeach; ?>
 						</select>
-						<small class="wbam-field-help"><?php esc_html_e( 'Select a specific page where you would like the link to appear.', 'wb-ad-manager' ); ?></small>
+						<small class="wbam-field-help"><?php esc_html_e( 'Select a specific page where you would like the link to appear.', 'wb-ads-rotator-with-split-test' ); ?></small>
 					</div>
 				</div>
 				<?php endif; ?>
@@ -305,9 +305,9 @@ class Partnership_Form {
 				<!-- Anchor Text -->
 				<div class="wbam-form-row">
 					<div class="wbam-form-field">
-						<label for="wbam_anchor_text"><?php esc_html_e( 'Proposed Anchor Text', 'wb-ad-manager' ); ?></label>
-						<input type="text" id="wbam_anchor_text" name="anchor_text" placeholder="<?php esc_attr_e( 'e.g., best hosting provider', 'wb-ad-manager' ); ?>">
-						<small class="wbam-field-help"><?php esc_html_e( 'The text you would like us to use for the link.', 'wb-ad-manager' ); ?></small>
+						<label for="wbam_anchor_text"><?php esc_html_e( 'Proposed Anchor Text', 'wb-ads-rotator-with-split-test' ); ?></label>
+						<input type="text" id="wbam_anchor_text" name="anchor_text" placeholder="<?php esc_attr_e( 'e.g., best hosting provider', 'wb-ads-rotator-with-split-test' ); ?>">
+						<small class="wbam-field-help"><?php esc_html_e( 'The text you would like us to use for the link.', 'wb-ads-rotator-with-split-test' ); ?></small>
 					</div>
 				</div>
 
@@ -326,14 +326,14 @@ class Partnership_Form {
 				<!-- Budget Range -->
 				<div class="wbam-form-row wbam-budget-row" id="wbam-budget-fields">
 					<div class="wbam-form-field wbam-field-half">
-						<label for="wbam_budget_min"><?php esc_html_e( 'Budget Range (Min)', 'wb-ad-manager' ); ?></label>
+						<label for="wbam_budget_min"><?php esc_html_e( 'Budget Range (Min)', 'wb-ads-rotator-with-split-test' ); ?></label>
 						<input type="number" id="wbam_budget_min" name="budget_min" min="0" step="1" placeholder="50">
 					</div>
 					<div class="wbam-form-field wbam-field-half">
-						<label for="wbam_budget_max"><?php esc_html_e( 'Budget Range (Max)', 'wb-ad-manager' ); ?></label>
+						<label for="wbam_budget_max"><?php esc_html_e( 'Budget Range (Max)', 'wb-ads-rotator-with-split-test' ); ?></label>
 						<input type="number" id="wbam_budget_max" name="budget_max" min="0" step="1" placeholder="200">
 					</div>
-					<small class="wbam-field-help wbam-full-width"><?php esc_html_e( 'For paid link partnerships, let us know your budget range.', 'wb-ad-manager' ); ?></small>
+					<small class="wbam-field-help wbam-full-width"><?php esc_html_e( 'For paid link partnerships, let us know your budget range.', 'wb-ads-rotator-with-split-test' ); ?></small>
 				</div>
 
 				<?php
@@ -351,8 +351,8 @@ class Partnership_Form {
 				<!-- Message -->
 				<div class="wbam-form-row">
 					<div class="wbam-form-field">
-						<label for="wbam_message"><?php esc_html_e( 'Additional Message', 'wb-ad-manager' ); ?></label>
-						<textarea id="wbam_message" name="message" rows="4" placeholder="<?php esc_attr_e( 'Tell us more about your partnership proposal...', 'wb-ad-manager' ); ?>"></textarea>
+						<label for="wbam_message"><?php esc_html_e( 'Additional Message', 'wb-ads-rotator-with-split-test' ); ?></label>
+						<textarea id="wbam_message" name="message" rows="4" placeholder="<?php esc_attr_e( 'Tell us more about your partnership proposal...', 'wb-ads-rotator-with-split-test' ); ?>"></textarea>
 					</div>
 				</div>
 
@@ -555,7 +555,7 @@ class Partnership_Form {
 	public function handle_ajax_submission() {
 		// Verify nonce.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wbam_partnership_form' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		/**
@@ -592,17 +592,17 @@ class Partnership_Form {
 
 		// Validate required fields.
 		if ( empty( $data['name'] ) || empty( $data['email'] ) || empty( $data['website_url'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'Please fill in all required fields.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Please fill in all required fields.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		// Validate email.
 		if ( ! is_email( $data['email'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		// Validate URL.
 		if ( ! wp_http_validate_url( $data['website_url'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'Please enter a valid website URL.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Please enter a valid website URL.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		/**
@@ -625,14 +625,14 @@ class Partnership_Form {
 		$duplicate_hours = apply_filters( 'wbam_partnership_form_duplicate_hours', 24 );
 
 		if ( $duplicate_hours > 0 && $this->manager->has_recent_submission( $data['email'], $data['website_url'], $duplicate_hours ) ) {
-			wp_send_json_error( array( 'message' => __( 'You have already submitted an inquiry recently. Please wait before submitting again.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'You have already submitted an inquiry recently. Please wait before submitting again.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		// Create the partnership.
 		$partnership = $this->manager->create( $data );
 
 		if ( ! $partnership ) {
-			wp_send_json_error( array( 'message' => __( 'An error occurred. Please try again.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'An error occurred. Please try again.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		/**
@@ -644,7 +644,7 @@ class Partnership_Form {
 		 */
 		do_action( 'wbam_partnership_form_submission_after', $partnership, $data );
 
-		$success_message = __( 'Thank you! Your inquiry has been submitted successfully. We will review it and get back to you soon.', 'wb-ad-manager' );
+		$success_message = __( 'Thank you! Your inquiry has been submitted successfully. We will review it and get back to you soon.', 'wb-ads-rotator-with-split-test' );
 
 		/**
 		 * Filter the success message.

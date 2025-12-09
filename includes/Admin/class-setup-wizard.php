@@ -66,15 +66,15 @@ class Setup_Wizard {
 		?>
 		<div class="notice notice-info wbam-setup-notice is-dismissible" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wbam_dismiss_setup' ) ); ?>">
 			<p>
-				<strong><?php esc_html_e( 'Welcome to WB Ad Manager!', 'wb-ad-manager' ); ?></strong>
-				<?php esc_html_e( 'Get started quickly with our setup wizard to create sample ads and configure basic settings.', 'wb-ad-manager' ); ?>
+				<strong><?php esc_html_e( 'Welcome to WB Ad Manager!', 'wb-ads-rotator-with-split-test' ); ?></strong>
+				<?php esc_html_e( 'Get started quickly with our setup wizard to create sample ads and configure basic settings.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 			<p>
 				<a href="<?php echo esc_url( admin_url( 'index.php?page=wbam-setup' ) ); ?>" class="button button-primary">
-					<?php esc_html_e( 'Run Setup Wizard', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'Run Setup Wizard', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad' ) ); ?>" class="button">
-					<?php esc_html_e( 'Skip Setup', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'Skip Setup', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 			</p>
 		</div>
@@ -114,17 +114,17 @@ class Setup_Wizard {
 
 		$this->steps = array(
 			'welcome' => array(
-				'name'    => __( 'Welcome', 'wb-ad-manager' ),
+				'name'    => __( 'Welcome', 'wb-ads-rotator-with-split-test' ),
 				'view'    => array( $this, 'step_welcome' ),
 				'handler' => '',
 			),
 			'sample'  => array(
-				'name'    => __( 'Sample Ads', 'wb-ad-manager' ),
+				'name'    => __( 'Sample Ads', 'wb-ads-rotator-with-split-test' ),
 				'view'    => array( $this, 'step_sample' ),
 				'handler' => array( $this, 'step_sample_save' ),
 			),
 			'ready'   => array(
-				'name'    => __( 'Ready', 'wb-ad-manager' ),
+				'name'    => __( 'Ready', 'wb-ads-rotator-with-split-test' ),
 				'view'    => array( $this, 'step_ready' ),
 				'handler' => '',
 			),
@@ -143,8 +143,11 @@ class Setup_Wizard {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$this->step = isset( $_GET['step'] ) ? sanitize_key( $_GET['step'] ) : current( array_keys( $this->steps ) );
 
-		// Handle save.
+		// Handle save with nonce verification.
 		if ( isset( $_POST['save_step'] ) && isset( $this->steps[ $this->step ]['handler'] ) && is_callable( $this->steps[ $this->step ]['handler'] ) ) {
+			if ( ! isset( $_POST['wbam_setup_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wbam_setup_nonce'] ) ), 'wbam_setup_sample' ) ) {
+				wp_die( esc_html__( 'Security check failed.', 'wb-ads-rotator-with-split-test' ) );
+			}
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		}
 
@@ -172,7 +175,7 @@ class Setup_Wizard {
 		<head>
 			<meta name="viewport" content="width=device-width" />
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-			<title><?php esc_html_e( 'WB Ad Manager Setup', 'wb-ad-manager' ); ?></title>
+			<title><?php esc_html_e( 'WB Ad Manager Setup', 'wb-ads-rotator-with-split-test' ); ?></title>
 			<?php
 			wp_enqueue_style( 'dashicons' );
 			wp_enqueue_style( 'buttons' );
@@ -183,7 +186,7 @@ class Setup_Wizard {
 			<div class="wbam-setup-wrapper">
 				<h1 class="wbam-setup-logo">
 					<span class="dashicons dashicons-megaphone"></span>
-					<?php esc_html_e( 'WB Ad Manager', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'WB Ad Manager', 'wb-ads-rotator-with-split-test' ); ?>
 				</h1>
 		<?php
 	}
@@ -238,7 +241,7 @@ class Setup_Wizard {
 			</div>
 			<div class="wbam-setup-footer">
 				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad' ) ); ?>">
-					<?php esc_html_e( 'Exit Setup Wizard', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'Exit Setup Wizard', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 			</div>
 		</body>
@@ -265,22 +268,22 @@ class Setup_Wizard {
 	public function step_welcome() {
 		?>
 		<div class="wbam-setup-step-content">
-			<h2><?php esc_html_e( 'Welcome to WB Ad Manager!', 'wb-ad-manager' ); ?></h2>
-			<p><?php esc_html_e( 'Thank you for installing WB Ad Manager. This quick setup wizard will help you get started by:', 'wb-ad-manager' ); ?></p>
+			<h2><?php esc_html_e( 'Welcome to WB Ad Manager!', 'wb-ads-rotator-with-split-test' ); ?></h2>
+			<p><?php esc_html_e( 'Thank you for installing WB Ad Manager. This quick setup wizard will help you get started by:', 'wb-ads-rotator-with-split-test' ); ?></p>
 			<ul class="wbam-setup-features">
-				<li><span class="dashicons dashicons-yes"></span> <?php esc_html_e( 'Creating sample ads to demonstrate features', 'wb-ad-manager' ); ?></li>
-				<li><span class="dashicons dashicons-yes"></span> <?php esc_html_e( 'Setting up different ad placements', 'wb-ad-manager' ); ?></li>
-				<li><span class="dashicons dashicons-yes"></span> <?php esc_html_e( 'Getting you ready to manage your own ads', 'wb-ad-manager' ); ?></li>
+				<li><span class="dashicons dashicons-yes"></span> <?php esc_html_e( 'Creating sample ads to demonstrate features', 'wb-ads-rotator-with-split-test' ); ?></li>
+				<li><span class="dashicons dashicons-yes"></span> <?php esc_html_e( 'Setting up different ad placements', 'wb-ads-rotator-with-split-test' ); ?></li>
+				<li><span class="dashicons dashicons-yes"></span> <?php esc_html_e( 'Getting you ready to manage your own ads', 'wb-ads-rotator-with-split-test' ); ?></li>
 			</ul>
 			<p class="wbam-setup-note">
-				<?php esc_html_e( 'This wizard is optional. You can skip it and create ads manually anytime.', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'This wizard is optional. You can skip it and create ads manually anytime.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 			<p class="wbam-setup-actions">
 				<a href="<?php echo esc_url( $this->get_next_step_link() ); ?>" class="button button-primary button-large">
-					<?php esc_html_e( "Let's Go!", 'wb-ad-manager' ); ?>
+					<?php esc_html_e( "Let's Go!", 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad' ) ); ?>" class="button button-large">
-					<?php esc_html_e( 'Skip Setup', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'Skip Setup', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 			</p>
 		</div>
@@ -301,18 +304,18 @@ class Setup_Wizard {
 			'wbam_setup_wizard_sample_options',
 			array(
 				'header_banner'  => array(
-					'label'       => __( 'Header Banner', 'wb-ad-manager' ),
-					'description' => __( 'Image ad displayed in the header area', 'wb-ad-manager' ),
+					'label'       => __( 'Header Banner', 'wb-ads-rotator-with-split-test' ),
+					'description' => __( 'Image ad displayed in the header area', 'wb-ads-rotator-with-split-test' ),
 					'checked'     => true,
 				),
 				'sidebar_widget' => array(
-					'label'       => __( 'Sidebar Widget Ad', 'wb-ad-manager' ),
-					'description' => __( 'Code ad for sidebar widget placement', 'wb-ad-manager' ),
+					'label'       => __( 'Sidebar Widget Ad', 'wb-ads-rotator-with-split-test' ),
+					'description' => __( 'Code ad for sidebar widget placement', 'wb-ads-rotator-with-split-test' ),
 					'checked'     => true,
 				),
 				'content_promo'  => array(
-					'label'       => __( 'In-Content Promotion', 'wb-ad-manager' ),
-					'description' => __( 'Rich content ad after paragraph 2', 'wb-ad-manager' ),
+					'label'       => __( 'In-Content Promotion', 'wb-ads-rotator-with-split-test' ),
+					'description' => __( 'Rich content ad after paragraph 2', 'wb-ads-rotator-with-split-test' ),
 					'checked'     => true,
 				),
 			)
@@ -326,8 +329,8 @@ class Setup_Wizard {
 		do_action( 'wbam_setup_wizard_sample_before' );
 		?>
 		<div class="wbam-setup-step-content">
-			<h2><?php esc_html_e( 'Create Sample Ads', 'wb-ad-manager' ); ?></h2>
-			<p><?php esc_html_e( 'Select which sample ads you would like to create. These will help you understand how different ad types and placements work.', 'wb-ad-manager' ); ?></p>
+			<h2><?php esc_html_e( 'Create Sample Ads', 'wb-ads-rotator-with-split-test' ); ?></h2>
+			<p><?php esc_html_e( 'Select which sample ads you would like to create. These will help you understand how different ad types and placements work.', 'wb-ads-rotator-with-split-test' ); ?></p>
 
 			<form method="post">
 				<?php wp_nonce_field( 'wbam_setup_sample', 'wbam_setup_nonce' ); ?>
@@ -364,10 +367,10 @@ class Setup_Wizard {
 
 				<p class="wbam-setup-actions">
 					<button type="submit" name="save_step" value="1" class="button button-primary button-large">
-						<?php esc_html_e( 'Create Sample Ads', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Create Sample Ads', 'wb-ads-rotator-with-split-test' ); ?>
 					</button>
 					<a href="<?php echo esc_url( $this->get_next_step_link() ); ?>" class="button button-large">
-						<?php esc_html_e( 'Skip This Step', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Skip This Step', 'wb-ads-rotator-with-split-test' ); ?>
 					</a>
 				</p>
 			</form>
@@ -430,39 +433,39 @@ class Setup_Wizard {
 	private function create_sample_ads( $ads_to_create ) {
 		$sample_ads = array(
 			'header_banner'  => array(
-				'title'      => __( 'Sample Header Banner', 'wb-ad-manager' ),
+				'title'      => __( 'Sample Header Banner', 'wb-ads-rotator-with-split-test' ),
 				'type'       => 'image',
 				'placements' => array( 'header' ),
 				'data'       => array(
 					'type'      => 'image',
 					'image_url' => 'https://placehold.co/728x90/4a90d9/ffffff?text=Header+Banner+Ad',
 					'link_url'  => '#',
-					'alt_text'  => __( 'Sample Header Banner', 'wb-ad-manager' ),
+					'alt_text'  => __( 'Sample Header Banner', 'wb-ads-rotator-with-split-test' ),
 					'new_tab'   => true,
 				),
 			),
 			'sidebar_widget' => array(
-				'title'      => __( 'Sample Sidebar Ad', 'wb-ad-manager' ),
+				'title'      => __( 'Sample Sidebar Ad', 'wb-ads-rotator-with-split-test' ),
 				'type'       => 'code',
 				'placements' => array( 'widget' ),
 				'data'       => array(
 					'type' => 'code',
 					'code' => '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; text-align: center; color: #fff;">
-	<h4 style="margin: 0 0 10px; font-size: 18px;">' . esc_html__( 'Advertise Here!', 'wb-ad-manager' ) . '</h4>
-	<p style="margin: 0 0 15px; font-size: 14px;">' . esc_html__( 'This is a sample sidebar ad using custom HTML code.', 'wb-ad-manager' ) . '</p>
-	<a href="#" style="display: inline-block; background: #fff; color: #667eea; padding: 8px 20px; border-radius: 4px; text-decoration: none; font-weight: bold;">' . esc_html__( 'Learn More', 'wb-ad-manager' ) . '</a>
+	<h4 style="margin: 0 0 10px; font-size: 18px;">' . esc_html__( 'Advertise Here!', 'wb-ads-rotator-with-split-test' ) . '</h4>
+	<p style="margin: 0 0 15px; font-size: 14px;">' . esc_html__( 'This is a sample sidebar ad using custom HTML code.', 'wb-ads-rotator-with-split-test' ) . '</p>
+	<a href="#" style="display: inline-block; background: #fff; color: #667eea; padding: 8px 20px; border-radius: 4px; text-decoration: none; font-weight: bold;">' . esc_html__( 'Learn More', 'wb-ads-rotator-with-split-test' ) . '</a>
 </div>',
 				),
 			),
 			'content_promo'  => array(
-				'title'      => __( 'Sample In-Content Promo', 'wb-ad-manager' ),
+				'title'      => __( 'Sample In-Content Promo', 'wb-ads-rotator-with-split-test' ),
 				'type'       => 'rich_content',
 				'placements' => array( 'after_paragraph' ),
 				'data'       => array(
 					'type'            => 'rich_content',
 					'content'         => '<div style="background: #f8f9fa; border-left: 4px solid #28a745; padding: 15px 20px; margin: 20px 0; border-radius: 4px;">
-	<strong style="color: #28a745;">💡 ' . esc_html__( 'Pro Tip:', 'wb-ad-manager' ) . '</strong>
-	<p style="margin: 10px 0 0;">' . esc_html__( 'This is a sample in-content promotion. It appears after paragraph 2 in your posts. Great for newsletter signups, related content, or special offers!', 'wb-ad-manager' ) . '</p>
+	<strong style="color: #28a745;">💡 ' . esc_html__( 'Pro Tip:', 'wb-ads-rotator-with-split-test' ) . '</strong>
+	<p style="margin: 10px 0 0;">' . esc_html__( 'This is a sample in-content promotion. It appears after paragraph 2 in your posts. Great for newsletter signups, related content, or special offers!', 'wb-ads-rotator-with-split-test' ) . '</p>
 </div>',
 					'after_paragraph' => 2,
 				),
@@ -542,20 +545,20 @@ class Setup_Wizard {
 				'view_ads' => array(
 					'url'         => admin_url( 'edit.php?post_type=wbam-ad' ),
 					'icon'        => 'dashicons-admin-post',
-					'title'       => __( 'View Your Ads', 'wb-ad-manager' ),
-					'description' => __( 'See and manage all your ads', 'wb-ad-manager' ),
+					'title'       => __( 'View Your Ads', 'wb-ads-rotator-with-split-test' ),
+					'description' => __( 'See and manage all your ads', 'wb-ads-rotator-with-split-test' ),
 				),
 				'create'   => array(
 					'url'         => admin_url( 'post-new.php?post_type=wbam-ad' ),
 					'icon'        => 'dashicons-plus-alt',
-					'title'       => __( 'Create New Ad', 'wb-ad-manager' ),
-					'description' => __( 'Add your own custom ads', 'wb-ad-manager' ),
+					'title'       => __( 'Create New Ad', 'wb-ads-rotator-with-split-test' ),
+					'description' => __( 'Add your own custom ads', 'wb-ads-rotator-with-split-test' ),
 				),
 				'settings' => array(
 					'url'         => admin_url( 'edit.php?post_type=wbam-ad&page=wbam-settings' ),
 					'icon'        => 'dashicons-admin-settings',
-					'title'       => __( 'Settings', 'wb-ad-manager' ),
-					'description' => __( 'Configure plugin options', 'wb-ad-manager' ),
+					'title'       => __( 'Settings', 'wb-ads-rotator-with-split-test' ),
+					'description' => __( 'Configure plugin options', 'wb-ads-rotator-with-split-test' ),
 				),
 			)
 		);
@@ -569,8 +572,8 @@ class Setup_Wizard {
 		?>
 		<div class="wbam-setup-step-content wbam-setup-ready">
 			<span class="dashicons dashicons-yes-alt"></span>
-			<h2><?php esc_html_e( "You're All Set!", 'wb-ad-manager' ); ?></h2>
-			<p><?php esc_html_e( 'WB Ad Manager is ready to use. Here are some next steps:', 'wb-ad-manager' ); ?></p>
+			<h2><?php esc_html_e( "You're All Set!", 'wb-ads-rotator-with-split-test' ); ?></h2>
+			<p><?php esc_html_e( 'WB Ad Manager is ready to use. Here are some next steps:', 'wb-ads-rotator-with-split-test' ); ?></p>
 
 			<div class="wbam-setup-next-steps">
 				<?php foreach ( $next_steps as $step ) : ?>
@@ -593,7 +596,7 @@ class Setup_Wizard {
 
 			<p class="wbam-setup-actions">
 				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad' ) ); ?>" class="button button-primary button-large">
-					<?php esc_html_e( 'Go to Ads Dashboard', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'Go to Ads Dashboard', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 			</p>
 		</div>

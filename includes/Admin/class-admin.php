@@ -46,7 +46,7 @@ class Admin {
 
 		// Verify nonce.
 		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wbam_disable_ad_' . $post_id ) ) {
-			wp_die( esc_html__( 'Security check failed.', 'wb-ad-manager' ) );
+			wp_die( esc_html__( 'Security check failed.', 'wb-ads-rotator-with-split-test' ) );
 		}
 
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
@@ -69,7 +69,7 @@ class Admin {
 					'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
 					sprintf(
 						/* translators: %s: Ad title */
-						esc_html__( 'Ad "%s" has been disabled.', 'wb-ad-manager' ),
+						esc_html__( 'Ad "%s" has been disabled.', 'wb-ads-rotator-with-split-test' ),
 						esc_html( $post->post_title )
 					)
 				);
@@ -114,8 +114,8 @@ class Admin {
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'wbam-admin' ),
 				'i18n'    => array(
-					'selectImage' => __( 'Select Image', 'wb-ad-manager' ),
-					'useImage'    => __( 'Use This Image', 'wb-ad-manager' ),
+					'selectImage' => __( 'Select Image', 'wb-ads-rotator-with-split-test' ),
+					'useImage'    => __( 'Use This Image', 'wb-ads-rotator-with-split-test' ),
 				),
 			)
 		);
@@ -135,7 +135,7 @@ class Admin {
 	public function add_metaboxes() {
 		add_meta_box(
 			'wbam-ad-settings',
-			__( 'Ad Settings', 'wb-ad-manager' ),
+			__( 'Ad Settings', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_settings_metabox' ),
 			'wbam-ad',
 			'normal',
@@ -144,7 +144,7 @@ class Admin {
 
 		add_meta_box(
 			'wbam-ad-placements',
-			__( 'Placements', 'wb-ad-manager' ),
+			__( 'Placements', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_placements_metabox' ),
 			'wbam-ad',
 			'normal',
@@ -153,7 +153,7 @@ class Admin {
 
 		add_meta_box(
 			'wbam-ad-status',
-			__( 'Ad Status', 'wb-ad-manager' ),
+			__( 'Ad Status', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_status_metabox' ),
 			'wbam-ad',
 			'side',
@@ -167,7 +167,7 @@ class Admin {
 			if ( ! empty( $placements ) ) {
 				add_meta_box(
 					'wbam-ad-comparison',
-					__( 'Ad Performance Comparison', 'wb-ad-manager' ),
+					__( 'Ad Performance Comparison', 'wb-ads-rotator-with-split-test' ),
 					array( $this, 'render_comparison_metabox' ),
 					'wbam-ad',
 					'normal',
@@ -257,7 +257,7 @@ class Admin {
 		<div class="wbam-metabox">
 			<?php foreach ( $all_places as $group => $group_placements ) : ?>
 				<div class="wbam-placement-group">
-					<h4><?php echo esc_html( ucfirst( $group ) ); ?> <?php esc_html_e( 'Placements', 'wb-ad-manager' ); ?></h4>
+					<h4><?php echo esc_html( ucfirst( $group ) ); ?> <?php esc_html_e( 'Placements', 'wb-ads-rotator-with-split-test' ); ?></h4>
 					<div class="wbam-placement-options">
 						<?php foreach ( $group_placements as $placement ) : ?>
 							<?php if ( ! $placement->is_available() ) continue; ?>
@@ -272,43 +272,43 @@ class Admin {
 			<?php endforeach; ?>
 
 			<div class="wbam-extra-settings wbam-paragraph-settings" <?php echo ! in_array( 'after_paragraph', $placements, true ) ? 'style="display:none;"' : ''; ?>>
-				<h4><?php esc_html_e( 'Paragraph Settings', 'wb-ad-manager' ); ?></h4>
+				<h4><?php esc_html_e( 'Paragraph Settings', 'wb-ads-rotator-with-split-test' ); ?></h4>
 				<div class="wbam-field">
-					<label for="wbam_after_paragraph"><?php esc_html_e( 'Insert after paragraph:', 'wb-ad-manager' ); ?></label>
+					<label for="wbam_after_paragraph"><?php esc_html_e( 'Insert after paragraph:', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<input type="number" id="wbam_after_paragraph" name="wbam_data[after_paragraph]" value="<?php echo esc_attr( $after_paragraph ); ?>" min="1" max="50" />
 				</div>
 				<div class="wbam-field">
 					<label>
 						<input type="checkbox" name="wbam_data[paragraph_repeat]" value="1" <?php checked( $paragraph_repeat ); ?> />
-						<?php esc_html_e( 'Repeat after every X paragraphs', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Repeat after every X paragraphs', 'wb-ads-rotator-with-split-test' ); ?>
 					</label>
 				</div>
 			</div>
 
 			<div class="wbam-extra-settings wbam-activity-settings" <?php echo ! in_array( 'bp_activity', $placements, true ) ? 'style="display:none;"' : ''; ?>>
-				<h4><?php esc_html_e( 'Activity Stream Settings', 'wb-ad-manager' ); ?></h4>
+				<h4><?php esc_html_e( 'Activity Stream Settings', 'wb-ads-rotator-with-split-test' ); ?></h4>
 				<div class="wbam-field">
-					<label for="wbam_after_activity"><?php esc_html_e( 'Insert after activity:', 'wb-ad-manager' ); ?></label>
+					<label for="wbam_after_activity"><?php esc_html_e( 'Insert after activity:', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<input type="number" id="wbam_after_activity" name="wbam_data[after_activity]" value="<?php echo esc_attr( $after_activity ); ?>" min="1" max="50" />
 				</div>
 				<div class="wbam-field">
 					<label>
 						<input type="checkbox" name="wbam_data[activity_repeat]" value="1" <?php checked( $activity_repeat ); ?> />
-						<?php esc_html_e( 'Repeat after every X activities', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Repeat after every X activities', 'wb-ads-rotator-with-split-test' ); ?>
 					</label>
 				</div>
 			</div>
 
 			<div class="wbam-extra-settings wbam-archive-settings" <?php echo ! in_array( 'archive', $placements, true ) ? 'style="display:none;"' : ''; ?>>
-				<h4><?php esc_html_e( 'Archive Settings', 'wb-ad-manager' ); ?></h4>
+				<h4><?php esc_html_e( 'Archive Settings', 'wb-ads-rotator-with-split-test' ); ?></h4>
 				<div class="wbam-field">
-					<label for="wbam_after_posts"><?php esc_html_e( 'Insert after post:', 'wb-ad-manager' ); ?></label>
+					<label for="wbam_after_posts"><?php esc_html_e( 'Insert after post:', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<input type="number" id="wbam_after_posts" name="wbam_data[after_posts]" value="<?php echo esc_attr( $after_posts ); ?>" min="1" max="50" />
 				</div>
 				<div class="wbam-field">
 					<label>
 						<input type="checkbox" name="wbam_data[posts_repeat]" value="1" <?php checked( $posts_repeat ); ?> />
-						<?php esc_html_e( 'Repeat after every X posts', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Repeat after every X posts', 'wb-ads-rotator-with-split-test' ); ?>
 					</label>
 				</div>
 			</div>
@@ -333,25 +333,25 @@ class Admin {
 			<div class="wbam-status-options">
 				<label class="wbam-status-option">
 					<input type="radio" name="wbam_enabled" value="1" <?php checked( $enabled, '1' ); ?> />
-					<span class="wbam-status-enabled"><?php esc_html_e( 'Enabled', 'wb-ad-manager' ); ?></span>
+					<span class="wbam-status-enabled"><?php esc_html_e( 'Enabled', 'wb-ads-rotator-with-split-test' ); ?></span>
 				</label>
 				<label class="wbam-status-option">
 					<input type="radio" name="wbam_enabled" value="0" <?php checked( $enabled, '0' ); ?> />
-					<span class="wbam-status-disabled"><?php esc_html_e( 'Disabled', 'wb-ad-manager' ); ?></span>
+					<span class="wbam-status-disabled"><?php esc_html_e( 'Disabled', 'wb-ads-rotator-with-split-test' ); ?></span>
 				</label>
 			</div>
 
 			<div class="wbam-priority-field">
-				<label for="wbam_priority"><?php esc_html_e( 'Priority', 'wb-ad-manager' ); ?></label>
+				<label for="wbam_priority"><?php esc_html_e( 'Priority', 'wb-ads-rotator-with-split-test' ); ?></label>
 				<input type="range" id="wbam_priority" name="wbam_priority" min="1" max="10" value="<?php echo esc_attr( $priority ); ?>" />
 				<span class="wbam-priority-value"><?php echo esc_html( $priority ); ?></span>
-				<p class="description"><?php esc_html_e( 'Higher priority ads display first.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Higher priority ads display first.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 
 			<div class="wbam-session-limit-field">
-				<label for="wbam_session_limit"><?php esc_html_e( 'Session Limit', 'wb-ad-manager' ); ?></label>
-				<input type="number" id="wbam_session_limit" name="wbam_session_limit" min="0" value="<?php echo esc_attr( $session_limit ); ?>" placeholder="<?php esc_attr_e( 'Unlimited', 'wb-ad-manager' ); ?>" />
-				<p class="description"><?php esc_html_e( 'Max views per visitor session. Leave empty for unlimited.', 'wb-ad-manager' ); ?></p>
+				<label for="wbam_session_limit"><?php esc_html_e( 'Session Limit', 'wb-ads-rotator-with-split-test' ); ?></label>
+				<input type="number" id="wbam_session_limit" name="wbam_session_limit" min="0" value="<?php echo esc_attr( $session_limit ); ?>" placeholder="<?php esc_attr_e( 'Unlimited', 'wb-ads-rotator-with-split-test' ); ?>" />
+				<p class="description"><?php esc_html_e( 'Max views per visitor session. Leave empty for unlimited.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 
 			<?php
@@ -386,7 +386,7 @@ class Admin {
 
 		$current_placements = get_post_meta( $post->ID, '_wbam_placements', true );
 		if ( empty( $current_placements ) || ! is_array( $current_placements ) ) {
-			echo '<p>' . esc_html__( 'No placements assigned to this ad.', 'wb-ad-manager' ) . '</p>';
+			echo '<p>' . esc_html__( 'No placements assigned to this ad.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 			return;
 		}
 
@@ -420,7 +420,7 @@ class Admin {
 		}
 
 		if ( empty( $competing_ads ) ) {
-			echo '<p>' . esc_html__( 'No other enabled ads are using the same placements. Enable more ads to compare performance.', 'wb-ad-manager' ) . '</p>';
+			echo '<p>' . esc_html__( 'No other enabled ads are using the same placements. Enable more ads to compare performance.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 			return;
 		}
 
@@ -506,11 +506,11 @@ class Admin {
 		<table class="wbam-comparison-table">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Ad', 'wb-ad-manager' ); ?></th>
-					<th><?php esc_html_e( 'Impressions', 'wb-ad-manager' ); ?></th>
-					<th><?php esc_html_e( 'Clicks', 'wb-ad-manager' ); ?></th>
-					<th><?php esc_html_e( 'CTR', 'wb-ad-manager' ); ?></th>
-					<th><?php esc_html_e( 'Performance', 'wb-ad-manager' ); ?></th>
+					<th><?php esc_html_e( 'Ad', 'wb-ads-rotator-with-split-test' ); ?></th>
+					<th><?php esc_html_e( 'Impressions', 'wb-ads-rotator-with-split-test' ); ?></th>
+					<th><?php esc_html_e( 'Clicks', 'wb-ads-rotator-with-split-test' ); ?></th>
+					<th><?php esc_html_e( 'CTR', 'wb-ads-rotator-with-split-test' ); ?></th>
+					<th><?php esc_html_e( 'Performance', 'wb-ads-rotator-with-split-test' ); ?></th>
 					<th></th>
 				</tr>
 			</thead>
@@ -520,14 +520,14 @@ class Admin {
 						<td>
 							<?php if ( $stat['is_current'] ) : ?>
 								<strong><?php echo esc_html( $stat['title'] ); ?></strong>
-								<span class="wbam-current-badge"><?php esc_html_e( 'This Ad', 'wb-ad-manager' ); ?></span>
+								<span class="wbam-current-badge"><?php esc_html_e( 'This Ad', 'wb-ads-rotator-with-split-test' ); ?></span>
 							<?php else : ?>
 								<a href="<?php echo esc_url( get_edit_post_link( $stat['id'] ) ); ?>">
 									<?php echo esc_html( $stat['title'] ); ?>
 								</a>
 							<?php endif; ?>
 							<?php if ( $winner_id === $stat['id'] ) : ?>
-								<span class="wbam-winner-badge"><?php esc_html_e( 'Winner', 'wb-ad-manager' ); ?></span>
+								<span class="wbam-winner-badge"><?php esc_html_e( 'Winner', 'wb-ads-rotator-with-split-test' ); ?></span>
 							<?php endif; ?>
 						</td>
 						<td><?php echo esc_html( number_format_i18n( $stat['impressions'] ) ); ?></td>
@@ -543,8 +543,8 @@ class Admin {
 							<?php if ( ! $stat['is_current'] && $winner_id !== $stat['id'] ) : ?>
 								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'post.php?post=' . $stat['id'] . '&action=edit&wbam_disable=1' ), 'wbam_disable_ad_' . $stat['id'] ) ); ?>"
 								   class="wbam-disable-btn"
-								   onclick="return confirm('<?php esc_attr_e( 'Disable this underperforming ad?', 'wb-ad-manager' ); ?>');">
-									<?php esc_html_e( 'Disable', 'wb-ad-manager' ); ?>
+								   onclick="return confirm('<?php esc_attr_e( 'Disable this underperforming ad?', 'wb-ads-rotator-with-split-test' ); ?>');">
+									<?php esc_html_e( 'Disable', 'wb-ads-rotator-with-split-test' ); ?>
 								</a>
 							<?php endif; ?>
 						</td>
@@ -556,9 +556,9 @@ class Admin {
 		<p class="wbam-comparison-note">
 			<?php
 			if ( 0 === $winner_id ) {
-				esc_html_e( 'No winner yet — ads need at least 100 impressions each for a meaningful comparison.', 'wb-ad-manager' );
+				esc_html_e( 'No winner yet — ads need at least 100 impressions each for a meaningful comparison.', 'wb-ads-rotator-with-split-test' );
 			} else {
-				esc_html_e( 'Winner is the ad with highest CTR among those with 100+ impressions.', 'wb-ad-manager' );
+				esc_html_e( 'Winner is the ad with highest CTR among those with 100+ impressions.', 'wb-ads-rotator-with-split-test' );
 			}
 			?>
 		</p>
@@ -667,11 +667,11 @@ class Admin {
 		foreach ( $columns as $key => $value ) {
 			$new[ $key ] = $value;
 			if ( 'title' === $key ) {
-				$new['ad_type']     = __( 'Type', 'wb-ad-manager' );
-				$new['placements']  = __( 'Placements', 'wb-ad-manager' );
-				$new['impressions'] = __( 'Impressions', 'wb-ad-manager' );
-				$new['clicks']      = __( 'Clicks', 'wb-ad-manager' );
-				$new['status']      = __( 'Status', 'wb-ad-manager' );
+				$new['ad_type']     = __( 'Type', 'wb-ads-rotator-with-split-test' );
+				$new['placements']  = __( 'Placements', 'wb-ads-rotator-with-split-test' );
+				$new['impressions'] = __( 'Impressions', 'wb-ads-rotator-with-split-test' );
+				$new['clicks']      = __( 'Clicks', 'wb-ads-rotator-with-split-test' );
+				$new['status']      = __( 'Status', 'wb-ads-rotator-with-split-test' );
 			}
 		}
 		return $new;
@@ -757,7 +757,7 @@ class Admin {
 			case 'status':
 				$enabled = get_post_meta( $post_id, '_wbam_enabled', true );
 				$class   = '1' === $enabled ? 'wbam-enabled' : 'wbam-disabled';
-				$text    = '1' === $enabled ? __( 'Enabled', 'wb-ad-manager' ) : __( 'Disabled', 'wb-ad-manager' );
+				$text    = '1' === $enabled ? __( 'Enabled', 'wb-ads-rotator-with-split-test' ) : __( 'Disabled', 'wb-ads-rotator-with-split-test' );
 				echo '<span class="wbam-status-badge ' . esc_attr( $class ) . '">' . esc_html( $text ) . '</span>';
 				break;
 		}

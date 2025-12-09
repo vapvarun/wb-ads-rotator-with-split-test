@@ -43,9 +43,9 @@ class BP_Profile_Ad_Widget extends \WP_Widget {
 	public function __construct() {
 		parent::__construct(
 			'wbam_bp_profile_ad',
-			__( 'WBAM: BuddyPress Profile Ad', 'wb-ad-manager' ),
+			__( 'WBAM: BuddyPress Profile Ad', 'wb-ads-rotator-with-split-test' ),
 			array(
-				'description' => __( 'Display ads on BuddyPress member profiles.', 'wb-ad-manager' ),
+				'description' => __( 'Display ads on BuddyPress member profiles.', 'wb-ads-rotator-with-split-test' ),
 				'classname'   => 'wbam-bp-profile-widget',
 			)
 		);
@@ -108,16 +108,16 @@ class BP_Profile_Ad_Widget extends \WP_Widget {
 		?>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
-				<?php esc_html_e( 'Title (optional):', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Title (optional):', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>">
-				<?php esc_html_e( 'Select Ad:', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Select Ad:', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'ad_id' ) ); ?>">
-				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ad-manager' ); ?></option>
+				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ads-rotator-with-split-test' ); ?></option>
 				<?php foreach ( $ads as $ad ) : ?>
 					<option value="<?php echo esc_attr( $ad->ID ); ?>" <?php selected( $ad_id, $ad->ID ); ?>>
 						<?php echo esc_html( $ad->post_title ); ?>
@@ -126,7 +126,7 @@ class BP_Profile_Ad_Widget extends \WP_Widget {
 			</select>
 		</p>
 		<p class="description">
-			<?php esc_html_e( 'This widget only displays on BuddyPress member profile pages.', 'wb-ad-manager' ); ?>
+			<?php esc_html_e( 'This widget only displays on BuddyPress member profile pages.', 'wb-ads-rotator-with-split-test' ); ?>
 		</p>
 		<?php
 	}
@@ -158,9 +158,9 @@ class BP_Group_Ad_Widget extends \WP_Widget {
 	public function __construct() {
 		parent::__construct(
 			'wbam_bp_group_ad',
-			__( 'WBAM: BuddyPress Group Ad', 'wb-ad-manager' ),
+			__( 'WBAM: BuddyPress Group Ad', 'wb-ads-rotator-with-split-test' ),
 			array(
-				'description' => __( 'Display ads on BuddyPress group pages.', 'wb-ad-manager' ),
+				'description' => __( 'Display ads on BuddyPress group pages.', 'wb-ads-rotator-with-split-test' ),
 				'classname'   => 'wbam-bp-group-widget',
 			)
 		);
@@ -223,16 +223,16 @@ class BP_Group_Ad_Widget extends \WP_Widget {
 		?>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
-				<?php esc_html_e( 'Title (optional):', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Title (optional):', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>">
-				<?php esc_html_e( 'Select Ad:', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Select Ad:', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'ad_id' ) ); ?>">
-				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ad-manager' ); ?></option>
+				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ads-rotator-with-split-test' ); ?></option>
 				<?php foreach ( $ads as $ad ) : ?>
 					<option value="<?php echo esc_attr( $ad->ID ); ?>" <?php selected( $ad_id, $ad->ID ); ?>>
 						<?php echo esc_html( $ad->post_title ); ?>
@@ -241,7 +241,7 @@ class BP_Group_Ad_Widget extends \WP_Widget {
 			</select>
 		</p>
 		<p class="description">
-			<?php esc_html_e( 'This widget only displays on BuddyPress group pages.', 'wb-ad-manager' ); ?>
+			<?php esc_html_e( 'This widget only displays on BuddyPress group pages.', 'wb-ads-rotator-with-split-test' ); ?>
 		</p>
 		<?php
 	}
@@ -273,9 +273,9 @@ class BP_Activity_Ad_Widget extends \WP_Widget {
 	public function __construct() {
 		parent::__construct(
 			'wbam_bp_activity_ad',
-			__( 'WBAM: BuddyPress Activity Ad', 'wb-ad-manager' ),
+			__( 'WBAM: BuddyPress Activity Ad', 'wb-ads-rotator-with-split-test' ),
 			array(
-				'description' => __( 'Display ads on BuddyPress activity pages.', 'wb-ad-manager' ),
+				'description' => __( 'Display ads on BuddyPress activity pages.', 'wb-ads-rotator-with-split-test' ),
 				'classname'   => 'wbam-bp-activity-widget',
 			)
 		);
@@ -338,16 +338,16 @@ class BP_Activity_Ad_Widget extends \WP_Widget {
 		?>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
-				<?php esc_html_e( 'Title (optional):', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Title (optional):', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>">
-				<?php esc_html_e( 'Select Ad:', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Select Ad:', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'ad_id' ) ); ?>">
-				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ad-manager' ); ?></option>
+				<option value=""><?php esc_html_e( '— Select Ad —', 'wb-ads-rotator-with-split-test' ); ?></option>
 				<?php foreach ( $ads as $ad ) : ?>
 					<option value="<?php echo esc_attr( $ad->ID ); ?>" <?php selected( $ad_id, $ad->ID ); ?>>
 						<?php echo esc_html( $ad->post_title ); ?>
@@ -356,7 +356,7 @@ class BP_Activity_Ad_Widget extends \WP_Widget {
 			</select>
 		</p>
 		<p class="description">
-			<?php esc_html_e( 'This widget only displays on BuddyPress activity pages.', 'wb-ad-manager' ); ?>
+			<?php esc_html_e( 'This widget only displays on BuddyPress activity pages.', 'wb-ads-rotator-with-split-test' ); ?>
 		</p>
 		<?php
 	}

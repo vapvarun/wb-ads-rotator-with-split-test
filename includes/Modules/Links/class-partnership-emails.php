@@ -58,7 +58,7 @@ class Partnership_Emails {
 
 		$subject = sprintf(
 			/* translators: %s: site name */
-			__( '[%s] New Link Partnership Inquiry', 'wb-ad-manager' ),
+			__( '[%s] New Link Partnership Inquiry', 'wb-ads-rotator-with-split-test' ),
 			$site_name
 		);
 
@@ -81,7 +81,7 @@ class Partnership_Emails {
 
 		$subject = sprintf(
 			/* translators: %s: site name */
-			__( 'Your Link Partnership Inquiry Has Been Accepted - %s', 'wb-ad-manager' ),
+			__( 'Your Link Partnership Inquiry Has Been Accepted - %s', 'wb-ads-rotator-with-split-test' ),
 			$site_name
 		);
 
@@ -104,7 +104,7 @@ class Partnership_Emails {
 
 		$subject = sprintf(
 			/* translators: %s: site name */
-			__( 'Regarding Your Link Partnership Inquiry - %s', 'wb-ad-manager' ),
+			__( 'Regarding Your Link Partnership Inquiry - %s', 'wb-ads-rotator-with-split-test' ),
 			$site_name
 		);
 
@@ -124,36 +124,36 @@ class Partnership_Emails {
 		$admin_url  = admin_url( 'admin.php?page=wbam-partnerships&view=' . $partnership->id );
 
 		$message = sprintf(
-			/* translators: %s: site name */
+			/* translators: %1$s: site name, %2$s: contact name, %3$s: email, %4$s: website URL, %5$s: partnership type, %6$s: budget range, %7$s: message, %8$s: admin URL, %9$s: site name again */
 			__( 'Hello,
 
-A new link partnership inquiry has been submitted on %s.
+A new link partnership inquiry has been submitted on %1$s.
 
 Details:
 ---------
-Name: %s
-Email: %s
-Website: %s
-Partnership Type: %s
-Budget Range: %s
+Name: %2$s
+Email: %3$s
+Website: %4$s
+Partnership Type: %5$s
+Budget Range: %6$s
 
 Message:
-%s
+%7$s
 
 ---------
 
 You can review and respond to this inquiry here:
-%s
+%8$s
 
 Best regards,
-%s', 'wb-ad-manager' ),
+%9$s', 'wb-ads-rotator-with-split-test' ),
 			$site_name,
 			$partnership->name,
 			$partnership->email,
 			$partnership->website_url,
 			$partnership->get_type_label(),
 			$partnership->get_budget_range(),
-			$partnership->message ?: __( '(No message provided)', 'wb-ad-manager' ),
+			$partnership->message ? $partnership->message : __( '(No message provided)', 'wb-ads-rotator-with-split-test' ),
 			$admin_url,
 			$site_name
 		);
@@ -190,7 +190,7 @@ If you have any questions, please feel free to reply to this email.
 
 Best regards,
 %2$s
-%5$s', 'wb-ad-manager' ),
+%5$s', 'wb-ads-rotator-with-split-test' ),
 			$partnership->name,
 			$site_name,
 			$partnership->get_type_label(),
@@ -225,7 +225,7 @@ Thank you for your understanding.
 
 Best regards,
 %2$s
-%3$s', 'wb-ad-manager' ),
+%3$s', 'wb-ads-rotator-with-split-test' ),
 			$partnership->name,
 			$site_name,
 			$site_url

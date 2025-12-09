@@ -79,10 +79,30 @@ class Frontend {
 			return;
 		}
 
-		printf(
-			'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%s" crossorigin="anonymous"></script>',
-			esc_attr( $publisher_id )
-		);
+		// Enqueue AdSense script properly with async and crossorigin attributes.
+		$adsense_url = add_query_arg( 'client', $publisher_id, 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js' );
+		wp_enqueue_script( 'wbam-adsense', $adsense_url, array(), null, false ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+
+		// Add async and crossorigin attributes via filter.
+		add_filter( 'script_loader_tag', array( $this, 'add_adsense_script_attributes' ), 10, 2 );
+	}
+
+	/**
+	 * Add async and crossorigin attributes to AdSense script tag.
+	 *
+	 * @param string $tag    Script tag HTML.
+	 * @param string $handle Script handle.
+	 * @return string Modified script tag.
+	 */
+	public function add_adsense_script_attributes( $tag, $handle ) {
+		if ( 'wbam-adsense' !== $handle ) {
+			return $tag;
+		}
+
+		// Add async and crossorigin attributes.
+		$tag = str_replace( ' src=', ' async crossorigin="anonymous" src=', $tag );
+
+		return $tag;
 	}
 
 	/**
@@ -91,7 +111,7 @@ class Frontend {
 	public function handle_click_tracking() {
 		// Rate limiting: 30 requests per minute per IP.
 		if ( ! $this->check_rate_limit( 'click_tracking', 30, 60 ) ) {
-			wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'wb-ad-manager' ) ), 429 );
+			wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'wb-ads-rotator-with-split-test' ) ), 429 );
 		}
 
 		// Verify nonce.
@@ -145,7 +165,8 @@ class Frontend {
 
 		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
 			$ip_address   = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
-			$visitor_hash = hash( 'sha256', $ip_address . ( isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : '' ) );
+			$user_agent_raw = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+			$visitor_hash = hash( 'sha256', $ip_address . $user_agent_raw );
 		}
 
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
@@ -193,7 +214,7 @@ class Frontend {
 	public function handle_email_capture() {
 		// Rate limiting: 10 email submissions per minute per IP.
 		if ( ! $this->check_rate_limit( 'email_capture', 10, 60 ) ) {
-			wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		$ad_id = isset( $_POST['ad_id'] ) ? absint( wp_unslash( $_POST['ad_id'] ) ) : 0;
@@ -201,7 +222,7 @@ class Frontend {
 
 		// Verify nonce.
 		if ( ! wp_verify_nonce( $nonce, 'wbam_email_capture_' . $ad_id ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		$email = isset( $_POST['subscriber_email'] ) ? sanitize_email( wp_unslash( $_POST['subscriber_email'] ) ) : '';
@@ -220,7 +241,7 @@ class Frontend {
 
 		// Validate email.
 		if ( empty( $email ) || ! is_email( $email ) ) {
-			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		/**
@@ -270,7 +291,7 @@ class Frontend {
 		$data         = get_post_meta( $ad_id, '_wbam_ad_data', true );
 		$redirect_url = isset( $data['redirect_url'] ) ? esc_url( $data['redirect_url'] ) : '';
 
-		$success_message = __( 'Thank you for subscribing!', 'wb-ad-manager' );
+		$success_message = __( 'Thank you for subscribing!', 'wb-ads-rotator-with-split-test' );
 
 		/**
 		 * Filter the success message for email capture.

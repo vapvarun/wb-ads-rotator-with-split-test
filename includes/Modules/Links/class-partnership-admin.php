@@ -51,8 +51,8 @@ class Partnership_Admin {
 	public function add_admin_menu() {
 		add_submenu_page(
 			'wbam-links',
-			__( 'Partnership Inquiries', 'wb-ad-manager' ),
-			__( 'Partnerships', 'wb-ad-manager' ),
+			__( 'Partnership Inquiries', 'wb-ads-rotator-with-split-test' ),
+			__( 'Partnerships', 'wb-ads-rotator-with-split-test' ),
 			'manage_options',
 			'wbam-partnerships',
 			array( $this, 'render_page' )
@@ -117,7 +117,7 @@ class Partnership_Admin {
 			$id     = absint( $_GET['partnership_id'] );
 
 			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wbam_partnership_' . $action . '_' . $id ) ) {
-				wp_die( esc_html__( 'Security check failed.', 'wb-ad-manager' ) );
+				wp_die( esc_html__( 'Security check failed.', 'wb-ads-rotator-with-split-test' ) );
 			}
 
 			$redirect_url = admin_url( 'admin.php?page=wbam-partnerships' );
@@ -160,7 +160,7 @@ class Partnership_Admin {
 		// Handle form submission (update notes).
 		if ( isset( $_POST['wbam_update_partnership'] ) && isset( $_POST['wbam_partnership_nonce'] ) ) {
 			if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wbam_partnership_nonce'] ) ), 'wbam_update_partnership' ) ) {
-				wp_die( esc_html__( 'Security check failed.', 'wb-ad-manager' ) );
+				wp_die( esc_html__( 'Security check failed.', 'wb-ads-rotator-with-split-test' ) );
 			}
 
 			$id          = isset( $_POST['partnership_id'] ) ? absint( $_POST['partnership_id'] ) : 0;
@@ -214,38 +214,38 @@ class Partnership_Admin {
 		$this->show_notices();
 		?>
 		<div class="wrap wbam-partnerships-wrap">
-			<h1 class="wp-heading-inline"><?php esc_html_e( 'Partnership Inquiries', 'wb-ad-manager' ); ?></h1>
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Partnership Inquiries', 'wb-ads-rotator-with-split-test' ); ?></h1>
 			<hr class="wp-header-end">
 
 			<!-- Status Filter Tabs -->
 			<ul class="subsubsub">
 				<li>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships' ) ); ?>" class="<?php echo '' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'All', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'All', 'wb-ads-rotator-with-split-test' ); ?>
 						<span class="count">(<?php echo esc_html( $counts['all'] ); ?>)</span>
 					</a> |
 				</li>
 				<li>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=pending' ) ); ?>" class="<?php echo 'pending' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'Pending', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Pending', 'wb-ads-rotator-with-split-test' ); ?>
 						<span class="count">(<?php echo esc_html( $counts['pending'] ); ?>)</span>
 					</a> |
 				</li>
 				<li>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=accepted' ) ); ?>" class="<?php echo 'accepted' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'Accepted', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Accepted', 'wb-ads-rotator-with-split-test' ); ?>
 						<span class="count">(<?php echo esc_html( $counts['accepted'] ); ?>)</span>
 					</a> |
 				</li>
 				<li>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=rejected' ) ); ?>" class="<?php echo 'rejected' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'Rejected', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Rejected', 'wb-ads-rotator-with-split-test' ); ?>
 						<span class="count">(<?php echo esc_html( $counts['rejected'] ); ?>)</span>
 					</a> |
 				</li>
 				<li>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=spam' ) ); ?>" class="<?php echo 'spam' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'Spam', 'wb-ad-manager' ); ?>
+						<?php esc_html_e( 'Spam', 'wb-ads-rotator-with-split-test' ); ?>
 						<span class="count">(<?php echo esc_html( $counts['spam'] ); ?>)</span>
 					</a>
 				</li>
@@ -257,28 +257,28 @@ class Partnership_Admin {
 				<?php if ( $current_status ) : ?>
 					<input type="hidden" name="status" value="<?php echo esc_attr( $current_status ); ?>">
 				<?php endif; ?>
-				<label class="screen-reader-text" for="partnership-search-input"><?php esc_html_e( 'Search', 'wb-ad-manager' ); ?></label>
+				<label class="screen-reader-text" for="partnership-search-input"><?php esc_html_e( 'Search', 'wb-ads-rotator-with-split-test' ); ?></label>
 				<input type="search" id="partnership-search-input" name="s" value="<?php echo esc_attr( $search ); ?>">
-				<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search', 'wb-ad-manager' ); ?>">
+				<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search', 'wb-ads-rotator-with-split-test' ); ?>">
 			</form>
 
 			<!-- Partnerships Table -->
 			<table class="wp-list-table widefat fixed striped wbam-partnerships-table">
 				<thead>
 					<tr>
-						<th style="width: 20%;"><?php esc_html_e( 'Contact', 'wb-ad-manager' ); ?></th>
-						<th style="width: 20%;"><?php esc_html_e( 'Website', 'wb-ad-manager' ); ?></th>
-						<th style="width: 15%;"><?php esc_html_e( 'Type', 'wb-ad-manager' ); ?></th>
-						<th style="width: 15%;"><?php esc_html_e( 'Budget', 'wb-ad-manager' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Status', 'wb-ad-manager' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Date', 'wb-ad-manager' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Actions', 'wb-ad-manager' ); ?></th>
+						<th style="width: 20%;"><?php esc_html_e( 'Contact', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th style="width: 20%;"><?php esc_html_e( 'Website', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th style="width: 15%;"><?php esc_html_e( 'Type', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th style="width: 15%;"><?php esc_html_e( 'Budget', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th style="width: 10%;"><?php esc_html_e( 'Status', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th style="width: 10%;"><?php esc_html_e( 'Date', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th style="width: 10%;"><?php esc_html_e( 'Actions', 'wb-ads-rotator-with-split-test' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php if ( empty( $partnerships ) ) : ?>
 						<tr>
-							<td colspan="7" class="no-items"><?php esc_html_e( 'No partnership inquiries found.', 'wb-ad-manager' ); ?></td>
+							<td colspan="7" class="no-items"><?php esc_html_e( 'No partnership inquiries found.', 'wb-ads-rotator-with-split-test' ); ?></td>
 						</tr>
 					<?php else : ?>
 						<?php foreach ( $partnerships as $partnership ) : ?>
@@ -311,7 +311,7 @@ class Partnership_Admin {
 								</td>
 								<td>
 									<span title="<?php echo esc_attr( $partnership->created_at ); ?>">
-										<?php echo esc_html( $partnership->get_time_ago() ); ?> <?php esc_html_e( 'ago', 'wb-ad-manager' ); ?>
+										<?php echo esc_html( $partnership->get_time_ago() ); ?> <?php esc_html_e( 'ago', 'wb-ads-rotator-with-split-test' ); ?>
 									</span>
 								</td>
 								<td class="wbam-actions-cell">
@@ -339,7 +339,7 @@ class Partnership_Admin {
 							<?php
 							printf(
 								/* translators: %s: Number of items */
-								esc_html( _n( '%s item', '%s items', $total, 'wb-ad-manager' ) ),
+								esc_html( _n( '%s item', '%s items', $total, 'wb-ads-rotator-with-split-test' ) ),
 								esc_html( number_format_i18n( $total ) )
 							);
 							?>
@@ -354,7 +354,7 @@ class Partnership_Admin {
 							<?php endif; ?>
 
 							<span class="paging-input">
-								<?php echo esc_html( $paged ); ?> <?php esc_html_e( 'of', 'wb-ad-manager' ); ?> <span class="total-pages"><?php echo esc_html( $total_pages ); ?></span>
+								<?php echo esc_html( $paged ); ?> <?php esc_html_e( 'of', 'wb-ads-rotator-with-split-test' ); ?> <span class="total-pages"><?php echo esc_html( $total_pages ); ?></span>
 							</span>
 
 							<?php if ( $paged < $total_pages ) : ?>
@@ -384,7 +384,7 @@ class Partnership_Admin {
 		$actions['view'] = sprintf(
 			'<a href="%s" title="%s"><span class="dashicons dashicons-visibility"></span></a>',
 			esc_url( admin_url( 'admin.php?page=wbam-partnerships&view=' . $partnership->id ) ),
-			esc_attr__( 'View Details', 'wb-ad-manager' )
+			esc_attr__( 'View Details', 'wb-ads-rotator-with-split-test' )
 		);
 
 		// Accept (if pending).
@@ -392,13 +392,13 @@ class Partnership_Admin {
 			$actions['accept'] = sprintf(
 				'<a href="%s" title="%s" class="wbam-action-accept"><span class="dashicons dashicons-yes-alt"></span></a>',
 				esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=accept&partnership_id=' . $partnership->id ), 'wbam_partnership_accept_' . $partnership->id ) ),
-				esc_attr__( 'Accept', 'wb-ad-manager' )
+				esc_attr__( 'Accept', 'wb-ads-rotator-with-split-test' )
 			);
 
 			$actions['reject'] = sprintf(
 				'<a href="%s" title="%s" class="wbam-action-reject"><span class="dashicons dashicons-dismiss"></span></a>',
 				esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=reject&partnership_id=' . $partnership->id ), 'wbam_partnership_reject_' . $partnership->id ) ),
-				esc_attr__( 'Reject', 'wb-ad-manager' )
+				esc_attr__( 'Reject', 'wb-ads-rotator-with-split-test' )
 			);
 		}
 
@@ -407,7 +407,7 @@ class Partnership_Admin {
 			$actions['spam'] = sprintf(
 				'<a href="%s" title="%s" class="wbam-action-spam"><span class="dashicons dashicons-flag"></span></a>',
 				esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=spam&partnership_id=' . $partnership->id ), 'wbam_partnership_spam_' . $partnership->id ) ),
-				esc_attr__( 'Mark as Spam', 'wb-ad-manager' )
+				esc_attr__( 'Mark as Spam', 'wb-ads-rotator-with-split-test' )
 			);
 		}
 
@@ -415,8 +415,8 @@ class Partnership_Admin {
 		$actions['delete'] = sprintf(
 			'<a href="%s" title="%s" class="wbam-action-delete" onclick="return confirm(\'%s\');"><span class="dashicons dashicons-trash"></span></a>',
 			esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=delete&partnership_id=' . $partnership->id ), 'wbam_partnership_delete_' . $partnership->id ) ),
-			esc_attr__( 'Delete', 'wb-ad-manager' ),
-			esc_js( __( 'Are you sure you want to delete this inquiry?', 'wb-ad-manager' ) )
+			esc_attr__( 'Delete', 'wb-ads-rotator-with-split-test' ),
+			esc_js( __( 'Are you sure you want to delete this inquiry?', 'wb-ads-rotator-with-split-test' ) )
 		);
 
 		echo implode( ' ', $actions ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -431,22 +431,22 @@ class Partnership_Admin {
 		$partnership = $this->manager->get( $id );
 
 		if ( ! $partnership ) {
-			wp_die( esc_html__( 'Partnership not found.', 'wb-ad-manager' ) );
+			wp_die( esc_html__( 'Partnership not found.', 'wb-ads-rotator-with-split-test' ) );
 		}
 		?>
 		<div class="wrap wbam-partnership-view">
 			<h1>
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships' ) ); ?>" class="page-title-action">
 					<span class="dashicons dashicons-arrow-left-alt"></span>
-					<?php esc_html_e( 'Back to List', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'Back to List', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
-				<?php esc_html_e( 'Partnership Inquiry Details', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Partnership Inquiry Details', 'wb-ads-rotator-with-split-test' ); ?>
 			</h1>
 
 			<div class="wbam-partnership-details">
 				<div class="wbam-card">
 					<div class="wbam-card-header">
-						<h2><?php esc_html_e( 'Contact Information', 'wb-ad-manager' ); ?></h2>
+						<h2><?php esc_html_e( 'Contact Information', 'wb-ads-rotator-with-split-test' ); ?></h2>
 						<span class="wbam-status-badge wbam-status-<?php echo esc_attr( $partnership->status ); ?>">
 							<?php echo esc_html( $partnership->get_status_label() ); ?>
 						</span>
@@ -454,15 +454,15 @@ class Partnership_Admin {
 					<div class="wbam-card-body">
 						<table class="wbam-details-table">
 							<tr>
-								<th><?php esc_html_e( 'Name', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'Name', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td><?php echo esc_html( $partnership->name ); ?></td>
 							</tr>
 							<tr>
-								<th><?php esc_html_e( 'Email', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'Email', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td><a href="mailto:<?php echo esc_attr( $partnership->email ); ?>"><?php echo esc_html( $partnership->email ); ?></a></td>
 							</tr>
 							<tr>
-								<th><?php esc_html_e( 'Website', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'Website', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td>
 									<a href="<?php echo esc_url( $partnership->website_url ); ?>" target="_blank" rel="noopener">
 										<?php echo esc_html( $partnership->website_url ); ?>
@@ -471,7 +471,7 @@ class Partnership_Admin {
 								</td>
 							</tr>
 							<tr>
-								<th><?php esc_html_e( 'IP Address', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'IP Address', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td><?php echo esc_html( $partnership->ip_address ?: '-' ); ?></td>
 							</tr>
 						</table>
@@ -480,12 +480,12 @@ class Partnership_Admin {
 
 				<div class="wbam-card">
 					<div class="wbam-card-header">
-						<h2><?php esc_html_e( 'Partnership Details', 'wb-ad-manager' ); ?></h2>
+						<h2><?php esc_html_e( 'Partnership Details', 'wb-ads-rotator-with-split-test' ); ?></h2>
 					</div>
 					<div class="wbam-card-body">
 						<table class="wbam-details-table">
 							<tr>
-								<th><?php esc_html_e( 'Type', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'Type', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td>
 									<span class="wbam-type-badge wbam-type-<?php echo esc_attr( $partnership->partnership_type ); ?>">
 										<?php echo esc_html( $partnership->get_type_label() ); ?>
@@ -493,7 +493,7 @@ class Partnership_Admin {
 								</td>
 							</tr>
 							<tr>
-								<th><?php esc_html_e( 'Target Page', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'Target Page', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td>
 									<?php if ( $partnership->target_post_id ) : ?>
 										<a href="<?php echo esc_url( get_permalink( $partnership->target_post_id ) ); ?>" target="_blank">
@@ -505,20 +505,20 @@ class Partnership_Admin {
 								</td>
 							</tr>
 							<tr>
-								<th><?php esc_html_e( 'Anchor Text', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'Anchor Text', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td><?php echo esc_html( $partnership->anchor_text ?: '-' ); ?></td>
 							</tr>
 							<tr>
-								<th><?php esc_html_e( 'Budget Range', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'Budget Range', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td><?php echo esc_html( $partnership->get_budget_range() ); ?></td>
 							</tr>
 							<tr>
-								<th><?php esc_html_e( 'Submitted', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'Submitted', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $partnership->created_at ) ) ); ?></td>
 							</tr>
 							<?php if ( $partnership->responded_at ) : ?>
 							<tr>
-								<th><?php esc_html_e( 'Responded', 'wb-ad-manager' ); ?></th>
+								<th><?php esc_html_e( 'Responded', 'wb-ads-rotator-with-split-test' ); ?></th>
 								<td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $partnership->responded_at ) ) ); ?></td>
 							</tr>
 							<?php endif; ?>
@@ -529,7 +529,7 @@ class Partnership_Admin {
 				<?php if ( $partnership->message ) : ?>
 				<div class="wbam-card">
 					<div class="wbam-card-header">
-						<h2><?php esc_html_e( 'Message', 'wb-ad-manager' ); ?></h2>
+						<h2><?php esc_html_e( 'Message', 'wb-ads-rotator-with-split-test' ); ?></h2>
 					</div>
 					<div class="wbam-card-body">
 						<div class="wbam-message-content">
@@ -541,7 +541,7 @@ class Partnership_Admin {
 
 				<div class="wbam-card">
 					<div class="wbam-card-header">
-						<h2><?php esc_html_e( 'Admin Notes & Actions', 'wb-ad-manager' ); ?></h2>
+						<h2><?php esc_html_e( 'Admin Notes & Actions', 'wb-ads-rotator-with-split-test' ); ?></h2>
 					</div>
 					<div class="wbam-card-body">
 						<form method="post">
@@ -549,15 +549,15 @@ class Partnership_Admin {
 							<input type="hidden" name="partnership_id" value="<?php echo esc_attr( $partnership->id ); ?>">
 
 							<div class="wbam-form-field">
-								<label for="admin_notes"><?php esc_html_e( 'Admin Notes', 'wb-ad-manager' ); ?></label>
+								<label for="admin_notes"><?php esc_html_e( 'Admin Notes', 'wb-ads-rotator-with-split-test' ); ?></label>
 								<textarea id="admin_notes" name="admin_notes" rows="4" class="large-text"><?php echo esc_textarea( $partnership->admin_notes ); ?></textarea>
-								<p class="description"><?php esc_html_e( 'These notes are for internal use only and are not visible to the requester.', 'wb-ad-manager' ); ?></p>
+								<p class="description"><?php esc_html_e( 'These notes are for internal use only and are not visible to the requester.', 'wb-ads-rotator-with-split-test' ); ?></p>
 							</div>
 
 							<div class="wbam-form-field">
-								<label for="status"><?php esc_html_e( 'Update Status', 'wb-ad-manager' ); ?></label>
+								<label for="status"><?php esc_html_e( 'Update Status', 'wb-ads-rotator-with-split-test' ); ?></label>
 								<select id="status" name="status">
-									<option value=""><?php esc_html_e( '— No Change —', 'wb-ad-manager' ); ?></option>
+									<option value=""><?php esc_html_e( '— No Change —', 'wb-ads-rotator-with-split-test' ); ?></option>
 									<?php foreach ( Partnership::get_statuses() as $value => $label ) : ?>
 										<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $partnership->status, $value ); ?>>
 											<?php echo esc_html( $label ); ?>
@@ -568,23 +568,23 @@ class Partnership_Admin {
 
 							<div class="wbam-form-actions">
 								<button type="submit" name="wbam_update_partnership" class="button button-primary">
-									<?php esc_html_e( 'Save Notes', 'wb-ad-manager' ); ?>
+									<?php esc_html_e( 'Save Notes', 'wb-ads-rotator-with-split-test' ); ?>
 								</button>
 
 								<?php if ( $partnership->is_pending() ) : ?>
 									<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=accept&partnership_id=' . $partnership->id ), 'wbam_partnership_accept_' . $partnership->id ) ); ?>" class="button button-primary" style="background: #46b450; border-color: #46b450;">
 										<span class="dashicons dashicons-yes-alt"></span>
-										<?php esc_html_e( 'Accept', 'wb-ad-manager' ); ?>
+										<?php esc_html_e( 'Accept', 'wb-ads-rotator-with-split-test' ); ?>
 									</a>
 									<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=reject&partnership_id=' . $partnership->id ), 'wbam_partnership_reject_' . $partnership->id ) ); ?>" class="button" style="color: #a00;">
 										<span class="dashicons dashicons-dismiss"></span>
-										<?php esc_html_e( 'Reject', 'wb-ad-manager' ); ?>
+										<?php esc_html_e( 'Reject', 'wb-ads-rotator-with-split-test' ); ?>
 									</a>
 								<?php endif; ?>
 
-								<a href="mailto:<?php echo esc_attr( $partnership->email ); ?>?subject=<?php echo esc_attr( urlencode( __( 'Re: Partnership Inquiry', 'wb-ad-manager' ) ) ); ?>" class="button">
+								<a href="mailto:<?php echo esc_attr( $partnership->email ); ?>?subject=<?php echo esc_attr( urlencode( __( 'Re: Partnership Inquiry', 'wb-ads-rotator-with-split-test' ) ) ); ?>" class="button">
 									<span class="dashicons dashicons-email"></span>
-									<?php esc_html_e( 'Email Requester', 'wb-ad-manager' ); ?>
+									<?php esc_html_e( 'Email Requester', 'wb-ads-rotator-with-split-test' ); ?>
 								</a>
 							</div>
 						</form>
@@ -604,11 +604,11 @@ class Partnership_Admin {
 		}
 
 		$messages = array(
-			'accepted' => array( 'success', __( 'Partnership inquiry accepted.', 'wb-ad-manager' ) ),
-			'rejected' => array( 'success', __( 'Partnership inquiry rejected.', 'wb-ad-manager' ) ),
-			'spam'     => array( 'success', __( 'Partnership inquiry marked as spam.', 'wb-ad-manager' ) ),
-			'deleted'  => array( 'success', __( 'Partnership inquiry deleted.', 'wb-ad-manager' ) ),
-			'updated'  => array( 'success', __( 'Partnership inquiry updated.', 'wb-ad-manager' ) ),
+			'accepted' => array( 'success', __( 'Partnership inquiry accepted.', 'wb-ads-rotator-with-split-test' ) ),
+			'rejected' => array( 'success', __( 'Partnership inquiry rejected.', 'wb-ads-rotator-with-split-test' ) ),
+			'spam'     => array( 'success', __( 'Partnership inquiry marked as spam.', 'wb-ads-rotator-with-split-test' ) ),
+			'deleted'  => array( 'success', __( 'Partnership inquiry deleted.', 'wb-ads-rotator-with-split-test' ) ),
+			'updated'  => array( 'success', __( 'Partnership inquiry updated.', 'wb-ads-rotator-with-split-test' ) ),
 		);
 
 		$message_key = sanitize_text_field( wp_unslash( $_GET['message'] ) );

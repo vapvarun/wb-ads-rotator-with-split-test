@@ -18,11 +18,11 @@ class Shortcode_Placement implements Placement_Interface {
 	}
 
 	public function get_name() {
-		return __( 'Shortcode', 'wb-ad-manager' );
+		return __( 'Shortcode', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_description() {
-		return __( 'Display ads using [wbam_ad] shortcode.', 'wb-ad-manager' );
+		return __( 'Display ads using [wbam_ad] shortcode.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_group() {

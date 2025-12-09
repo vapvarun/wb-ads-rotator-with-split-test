@@ -50,7 +50,7 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Email Capture', 'wb-ad-manager' );
+		return __( 'Email Capture', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -59,7 +59,7 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Newsletter signup form to grow your email list.', 'wb-ad-manager' );
+		return __( 'Newsletter signup form to grow your email list.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -90,10 +90,10 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		 */
 		$data = apply_filters( 'wbam_email_form_data', $data, $ad_id );
 
-		$headline      = isset( $data['headline'] ) ? $data['headline'] : __( 'Subscribe to our Newsletter', 'wb-ad-manager' );
+		$headline      = isset( $data['headline'] ) ? $data['headline'] : __( 'Subscribe to our Newsletter', 'wb-ads-rotator-with-split-test' );
 		$description   = isset( $data['description'] ) ? $data['description'] : '';
-		$button_text   = isset( $data['button_text'] ) ? $data['button_text'] : __( 'Subscribe', 'wb-ad-manager' );
-		$success_msg   = isset( $data['success_message'] ) ? $data['success_message'] : __( 'Thank you for subscribing!', 'wb-ad-manager' );
+		$button_text   = isset( $data['button_text'] ) ? $data['button_text'] : __( 'Subscribe', 'wb-ads-rotator-with-split-test' );
+		$success_msg   = isset( $data['success_message'] ) ? $data['success_message'] : __( 'Thank you for subscribing!', 'wb-ads-rotator-with-split-test' );
 		$show_name     = ! empty( $data['show_name_field'] );
 		$cookie_days   = isset( $data['cookie_days'] ) ? absint( $data['cookie_days'] ) : 7;
 		$redirect_url  = isset( $data['redirect_url'] ) ? $data['redirect_url'] : '';
@@ -170,8 +170,8 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 
 		// Placeholders.
 		$placeholders = array(
-			'name'  => __( 'Your Name', 'wb-ad-manager' ),
-			'email' => __( 'Your Email', 'wb-ad-manager' ),
+			'name'  => __( 'Your Name', 'wb-ads-rotator-with-split-test' ),
+			'email' => __( 'Your Email', 'wb-ads-rotator-with-split-test' ),
 		);
 
 		/**
@@ -199,7 +199,7 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 			 data-cookie-days="<?php echo esc_attr( $cookie_days ); ?>"
 			 style="--wbam-email-bg: <?php echo esc_attr( $bg_color ); ?>; --wbam-email-text: <?php echo esc_attr( $text_color ); ?>; --wbam-email-btn: <?php echo esc_attr( $button_color ); ?>;">
 
-			<button type="button" class="wbam-email-close" aria-label="<?php esc_attr_e( 'Close', 'wb-ad-manager' ); ?>">
+			<button type="button" class="wbam-email-close" aria-label="<?php esc_attr_e( 'Close', 'wb-ads-rotator-with-split-test' ); ?>">
 				<span class="dashicons dashicons-no-alt"></span>
 			</button>
 
@@ -317,10 +317,10 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 	 * @param array $data  Data.
 	 */
 	public function render_metabox( $ad_id, $data ) {
-		$headline       = isset( $data['headline'] ) ? $data['headline'] : __( 'Subscribe to our Newsletter', 'wb-ad-manager' );
+		$headline       = isset( $data['headline'] ) ? $data['headline'] : __( 'Subscribe to our Newsletter', 'wb-ads-rotator-with-split-test' );
 		$description    = isset( $data['description'] ) ? $data['description'] : '';
-		$button_text    = isset( $data['button_text'] ) ? $data['button_text'] : __( 'Subscribe', 'wb-ad-manager' );
-		$success_message = isset( $data['success_message'] ) ? $data['success_message'] : __( 'Thank you for subscribing!', 'wb-ad-manager' );
+		$button_text    = isset( $data['button_text'] ) ? $data['button_text'] : __( 'Subscribe', 'wb-ads-rotator-with-split-test' );
+		$success_message = isset( $data['success_message'] ) ? $data['success_message'] : __( 'Thank you for subscribing!', 'wb-ads-rotator-with-split-test' );
 		$show_name      = ! empty( $data['show_name_field'] );
 		$cookie_days    = isset( $data['cookie_days'] ) ? absint( $data['cookie_days'] ) : 7;
 		$redirect_url   = isset( $data['redirect_url'] ) ? $data['redirect_url'] : '';
@@ -330,92 +330,92 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		$button_color   = isset( $data['button_color'] ) ? $data['button_color'] : '#2271b1';
 		?>
 		<div class="wbam-field">
-			<label for="wbam_email_headline"><?php esc_html_e( 'Headline', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_headline"><?php esc_html_e( 'Headline', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="text" id="wbam_email_headline" name="wbam_data[headline]" value="<?php echo esc_attr( $headline ); ?>" class="large-text">
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_email_description"><?php esc_html_e( 'Description', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_description"><?php esc_html_e( 'Description', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<textarea id="wbam_email_description" name="wbam_data[description]" rows="2" class="large-text"><?php echo esc_textarea( $description ); ?></textarea>
-				<p class="description"><?php esc_html_e( 'Optional text below the headline.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Optional text below the headline.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_email_button_text"><?php esc_html_e( 'Button Text', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_button_text"><?php esc_html_e( 'Button Text', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="text" id="wbam_email_button_text" name="wbam_data[button_text]" value="<?php echo esc_attr( $button_text ); ?>" class="regular-text">
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_email_success_message"><?php esc_html_e( 'Success Message', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_success_message"><?php esc_html_e( 'Success Message', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="text" id="wbam_email_success_message" name="wbam_data[success_message]" value="<?php echo esc_attr( $success_message ); ?>" class="large-text">
-				<p class="description"><?php esc_html_e( 'Message shown after successful subscription.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Message shown after successful subscription.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label><?php esc_html_e( 'Form Fields', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Form Fields', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<label>
 					<input type="checkbox" name="wbam_data[show_name_field]" value="1" <?php checked( $show_name ); ?>>
-					<?php esc_html_e( 'Show Name Field', 'wb-ad-manager' ); ?>
+					<?php esc_html_e( 'Show Name Field', 'wb-ads-rotator-with-split-test' ); ?>
 				</label>
-				<p class="description"><?php esc_html_e( 'Email field is always shown.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Email field is always shown.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_email_redirect_url"><?php esc_html_e( 'Redirect URL (Optional)', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_redirect_url"><?php esc_html_e( 'Redirect URL (Optional)', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="url" id="wbam_email_redirect_url" name="wbam_data[redirect_url]" value="<?php echo esc_url( $redirect_url ); ?>" class="regular-text" placeholder="https://">
-				<p class="description"><?php esc_html_e( 'Redirect to this URL after subscription. Leave empty to show success message.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Redirect to this URL after subscription. Leave empty to show success message.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_email_cookie_days"><?php esc_html_e( 'Dismiss Duration (Days)', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_cookie_days"><?php esc_html_e( 'Dismiss Duration (Days)', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="number" id="wbam_email_cookie_days" name="wbam_data[cookie_days]" value="<?php echo esc_attr( $cookie_days ); ?>" min="0" max="365" class="small-text">
-				<p class="description"><?php esc_html_e( 'Days to hide after user closes. 0 = show every visit.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Days to hide after user closes. 0 = show every visit.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_email_privacy_text"><?php esc_html_e( 'Privacy Text', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_privacy_text"><?php esc_html_e( 'Privacy Text', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
-				<input type="text" id="wbam_email_privacy_text" name="wbam_data[privacy_text]" value="<?php echo esc_attr( $privacy_text ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'We respect your privacy. Unsubscribe anytime.', 'wb-ad-manager' ); ?>">
+				<input type="text" id="wbam_email_privacy_text" name="wbam_data[privacy_text]" value="<?php echo esc_attr( $privacy_text ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'We respect your privacy. Unsubscribe anytime.', 'wb-ads-rotator-with-split-test' ); ?>">
 			</div>
 		</div>
 
-		<h4><?php esc_html_e( 'Colors', 'wb-ad-manager' ); ?></h4>
+		<h4><?php esc_html_e( 'Colors', 'wb-ads-rotator-with-split-test' ); ?></h4>
 
 		<div class="wbam-field wbam-field-inline">
-			<label for="wbam_email_bg_color"><?php esc_html_e( 'Background', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_bg_color"><?php esc_html_e( 'Background', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<input type="color" id="wbam_email_bg_color" name="wbam_data[bg_color]" value="<?php echo esc_attr( $bg_color ); ?>">
 
-			<label for="wbam_email_text_color"><?php esc_html_e( 'Text', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_text_color"><?php esc_html_e( 'Text', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<input type="color" id="wbam_email_text_color" name="wbam_data[text_color]" value="<?php echo esc_attr( $text_color ); ?>">
 
-			<label for="wbam_email_button_color"><?php esc_html_e( 'Button', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_email_button_color"><?php esc_html_e( 'Button', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<input type="color" id="wbam_email_button_color" name="wbam_data[button_color]" value="<?php echo esc_attr( $button_color ); ?>">
 		</div>
 
 		<div class="wbam-field">
-			<h4><?php esc_html_e( 'Developer Hooks', 'wb-ad-manager' ); ?></h4>
+			<h4><?php esc_html_e( 'Developer Hooks', 'wb-ads-rotator-with-split-test' ); ?></h4>
 			<p class="description">
-				<?php esc_html_e( 'Available hooks for developers:', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Available hooks for developers:', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 			<ul class="wbam-hooks-list" style="margin-left: 20px; font-size: 12px;">
-				<li><code>wbam_email_captured</code> - <?php esc_html_e( 'After email is submitted (integrate with Mailchimp, etc.)', 'wb-ad-manager' ); ?></li>
-				<li><code>wbam_email_form_before</code> / <code>after</code> - <?php esc_html_e( 'Before/after form renders', 'wb-ad-manager' ); ?></li>
-				<li><code>wbam_email_form_after_fields</code> - <?php esc_html_e( 'Add custom fields', 'wb-ad-manager' ); ?></li>
-				<li><code>wbam_email_form_validation</code> - <?php esc_html_e( 'Custom validation', 'wb-ad-manager' ); ?></li>
+				<li><code>wbam_email_captured</code> - <?php esc_html_e( 'After email is submitted (integrate with Mailchimp, etc.)', 'wb-ads-rotator-with-split-test' ); ?></li>
+				<li><code>wbam_email_form_before</code> / <code>after</code> - <?php esc_html_e( 'Before/after form renders', 'wb-ads-rotator-with-split-test' ); ?></li>
+				<li><code>wbam_email_form_after_fields</code> - <?php esc_html_e( 'Add custom fields', 'wb-ads-rotator-with-split-test' ); ?></li>
+				<li><code>wbam_email_form_validation</code> - <?php esc_html_e( 'Custom validation', 'wb-ads-rotator-with-split-test' ); ?></li>
 			</ul>
 		</div>
 		<?php
@@ -432,7 +432,7 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		return array(
 			'headline'        => isset( $data['headline'] ) ? sanitize_text_field( $data['headline'] ) : '',
 			'description'     => isset( $data['description'] ) ? sanitize_textarea_field( $data['description'] ) : '',
-			'button_text'     => isset( $data['button_text'] ) ? sanitize_text_field( $data['button_text'] ) : __( 'Subscribe', 'wb-ad-manager' ),
+			'button_text'     => isset( $data['button_text'] ) ? sanitize_text_field( $data['button_text'] ) : __( 'Subscribe', 'wb-ads-rotator-with-split-test' ),
 			'success_message' => isset( $data['success_message'] ) ? sanitize_text_field( $data['success_message'] ) : '',
 			'show_name_field' => ! empty( $data['show_name_field'] ),
 			'cookie_days'     => isset( $data['cookie_days'] ) ? absint( $data['cookie_days'] ) : 7,

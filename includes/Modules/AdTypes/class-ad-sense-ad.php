@@ -54,7 +54,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'Google AdSense', 'wb-ad-manager' );
+		return __( 'Google AdSense', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -63,7 +63,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Display Google AdSense ads with automatic script management.', 'wb-ad-manager' );
+		return __( 'Display Google AdSense ads with automatic script management.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -94,11 +94,28 @@ class AdSense_Ad implements Ad_Type_Interface {
 			return;
 		}
 
-		// Output the AdSense script once.
-		printf(
-			'<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%s" crossorigin="anonymous"></script>',
-			esc_attr( $publisher_id )
-		);
+		// Enqueue AdSense script properly.
+		$adsense_url = add_query_arg( 'client', $publisher_id, 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js' );
+		wp_enqueue_script( 'wbam-adsense-ad', $adsense_url, array(), null, false ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+
+		// Add async and crossorigin attributes via filter.
+		add_filter( 'script_loader_tag', array( $this, 'add_adsense_script_attributes' ), 10, 2 );
+	}
+
+	/**
+	 * Add async and crossorigin attributes to AdSense script tag.
+	 *
+	 * @param string $tag    Script tag HTML.
+	 * @param string $handle Script handle.
+	 * @return string Modified script tag.
+	 */
+	public function add_adsense_script_attributes( $tag, $handle ) {
+		if ( 'wbam-adsense-ad' !== $handle ) {
+			return $tag;
+		}
+
+		// Add async and crossorigin attributes.
+		return str_replace( ' src=', ' async crossorigin="anonymous" src=', $tag );
 	}
 
 	/**
@@ -209,15 +226,15 @@ class AdSense_Ad implements Ad_Type_Interface {
 		$global_publisher_id = $this->publisher_id;
 		?>
 		<div class="wbam-field">
-			<label for="wbam_adsense_slot_id"><?php esc_html_e( 'Ad Slot ID', 'wb-ad-manager' ); ?> <span class="required">*</span></label>
+			<label for="wbam_adsense_slot_id"><?php esc_html_e( 'Ad Slot ID', 'wb-ads-rotator-with-split-test' ); ?> <span class="required">*</span></label>
 			<div class="wbam-field-input">
 				<input type="text" id="wbam_adsense_slot_id" name="wbam_data[slot_id]" value="<?php echo esc_attr( $slot_id ); ?>" class="regular-text" placeholder="1234567890" />
-				<p class="description"><?php esc_html_e( 'Enter the Ad Slot ID from your AdSense account (e.g., 1234567890).', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Enter the Ad Slot ID from your AdSense account (e.g., 1234567890).', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_adsense_publisher_id"><?php esc_html_e( 'Publisher ID (Optional)', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_adsense_publisher_id"><?php esc_html_e( 'Publisher ID (Optional)', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="text" id="wbam_adsense_publisher_id" name="wbam_data[publisher_id]" value="<?php echo esc_attr( $publisher_id ); ?>" class="regular-text" placeholder="ca-pub-1234567890123456" />
 				<p class="description">
@@ -225,11 +242,11 @@ class AdSense_Ad implements Ad_Type_Interface {
 					if ( ! empty( $global_publisher_id ) ) {
 						printf(
 							/* translators: %s: Publisher ID */
-							esc_html__( 'Leave empty to use global Publisher ID: %s', 'wb-ad-manager' ),
+							esc_html__( 'Leave empty to use global Publisher ID: %s', 'wb-ads-rotator-with-split-test' ),
 							'<code>' . esc_html( $global_publisher_id ) . '</code>'
 						);
 					} else {
-						esc_html_e( 'Enter your Publisher ID (e.g., ca-pub-1234567890123456) or set it in plugin settings.', 'wb-ad-manager' );
+						esc_html_e( 'Enter your Publisher ID (e.g., ca-pub-1234567890123456) or set it in plugin settings.', 'wb-ads-rotator-with-split-test' );
 					}
 					?>
 				</p>
@@ -237,35 +254,35 @@ class AdSense_Ad implements Ad_Type_Interface {
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_adsense_format"><?php esc_html_e( 'Ad Format', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_adsense_format"><?php esc_html_e( 'Ad Format', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<select id="wbam_adsense_format" name="wbam_data[ad_format]">
-					<option value="auto" <?php selected( $ad_format, 'auto' ); ?>><?php esc_html_e( 'Auto (Responsive)', 'wb-ad-manager' ); ?></option>
-					<option value="horizontal" <?php selected( $ad_format, 'horizontal' ); ?>><?php esc_html_e( 'Horizontal Banner', 'wb-ad-manager' ); ?></option>
-					<option value="vertical" <?php selected( $ad_format, 'vertical' ); ?>><?php esc_html_e( 'Vertical Banner', 'wb-ad-manager' ); ?></option>
-					<option value="rectangle" <?php selected( $ad_format, 'rectangle' ); ?>><?php esc_html_e( 'Rectangle', 'wb-ad-manager' ); ?></option>
-					<option value="in-article" <?php selected( $ad_format, 'in-article' ); ?>><?php esc_html_e( 'In-Article', 'wb-ad-manager' ); ?></option>
-					<option value="in-feed" <?php selected( $ad_format, 'in-feed' ); ?>><?php esc_html_e( 'In-Feed', 'wb-ad-manager' ); ?></option>
-					<option value="multiplex" <?php selected( $ad_format, 'multiplex' ); ?>><?php esc_html_e( 'Multiplex', 'wb-ad-manager' ); ?></option>
-					<option value="fixed" <?php selected( $ad_format, 'fixed' ); ?>><?php esc_html_e( 'Fixed Size', 'wb-ad-manager' ); ?></option>
+					<option value="auto" <?php selected( $ad_format, 'auto' ); ?>><?php esc_html_e( 'Auto (Responsive)', 'wb-ads-rotator-with-split-test' ); ?></option>
+					<option value="horizontal" <?php selected( $ad_format, 'horizontal' ); ?>><?php esc_html_e( 'Horizontal Banner', 'wb-ads-rotator-with-split-test' ); ?></option>
+					<option value="vertical" <?php selected( $ad_format, 'vertical' ); ?>><?php esc_html_e( 'Vertical Banner', 'wb-ads-rotator-with-split-test' ); ?></option>
+					<option value="rectangle" <?php selected( $ad_format, 'rectangle' ); ?>><?php esc_html_e( 'Rectangle', 'wb-ads-rotator-with-split-test' ); ?></option>
+					<option value="in-article" <?php selected( $ad_format, 'in-article' ); ?>><?php esc_html_e( 'In-Article', 'wb-ads-rotator-with-split-test' ); ?></option>
+					<option value="in-feed" <?php selected( $ad_format, 'in-feed' ); ?>><?php esc_html_e( 'In-Feed', 'wb-ads-rotator-with-split-test' ); ?></option>
+					<option value="multiplex" <?php selected( $ad_format, 'multiplex' ); ?>><?php esc_html_e( 'Multiplex', 'wb-ads-rotator-with-split-test' ); ?></option>
+					<option value="fixed" <?php selected( $ad_format, 'fixed' ); ?>><?php esc_html_e( 'Fixed Size', 'wb-ads-rotator-with-split-test' ); ?></option>
 				</select>
 			</div>
 		</div>
 
 		<div class="wbam-field wbam-adsense-layout" <?php echo 'in-feed' !== $ad_format ? 'style="display:none;"' : ''; ?>>
-			<label for="wbam_adsense_layout"><?php esc_html_e( 'Layout Key', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_adsense_layout"><?php esc_html_e( 'Layout Key', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="text" id="wbam_adsense_layout" name="wbam_data[ad_layout]" value="<?php echo esc_attr( $ad_layout ); ?>" class="regular-text" placeholder="-fb+5w+4e-db+86" />
-				<p class="description"><?php esc_html_e( 'For in-feed ads, enter the layout key from AdSense.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'For in-feed ads, enter the layout key from AdSense.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 
 		<div class="wbam-field wbam-adsense-fixed" <?php echo 'fixed' !== $ad_format ? 'style="display:none;"' : ''; ?>>
-			<label><?php esc_html_e( 'Fixed Dimensions', 'wb-ad-manager' ); ?></label>
+			<label><?php esc_html_e( 'Fixed Dimensions', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input wbam-dimensions">
-				<input type="number" name="wbam_data[fixed_width]" value="<?php echo esc_attr( $fixed_width ); ?>" placeholder="<?php esc_attr_e( 'Width', 'wb-ad-manager' ); ?>" min="0" style="width:100px;" />
+				<input type="number" name="wbam_data[fixed_width]" value="<?php echo esc_attr( $fixed_width ); ?>" placeholder="<?php esc_attr_e( 'Width', 'wb-ads-rotator-with-split-test' ); ?>" min="0" style="width:100px;" />
 				<span>×</span>
-				<input type="number" name="wbam_data[fixed_height]" value="<?php echo esc_attr( $fixed_height ); ?>" placeholder="<?php esc_attr_e( 'Height', 'wb-ad-manager' ); ?>" min="0" style="width:100px;" />
+				<input type="number" name="wbam_data[fixed_height]" value="<?php echo esc_attr( $fixed_height ); ?>" placeholder="<?php esc_attr_e( 'Height', 'wb-ads-rotator-with-split-test' ); ?>" min="0" style="width:100px;" />
 				<span>px</span>
 			</div>
 		</div>
@@ -273,7 +290,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 		<div class="wbam-field wbam-adsense-responsive" <?php echo 'fixed' === $ad_format ? 'style="display:none;"' : ''; ?>>
 			<label>
 				<input type="checkbox" name="wbam_data[responsive]" value="1" <?php checked( $responsive ); ?> />
-				<?php esc_html_e( 'Enable full-width responsive', 'wb-ad-manager' ); ?>
+				<?php esc_html_e( 'Enable full-width responsive', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 		</div>
 
@@ -294,8 +311,8 @@ class AdSense_Ad implements Ad_Type_Interface {
 				<?php
 				printf(
 					/* translators: %s: Settings link */
-					esc_html__( 'No global Publisher ID configured. %s to set it up for all AdSense ads.', 'wb-ad-manager' ),
-					'<a href="' . esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-settings' ) ) . '">' . esc_html__( 'Go to Settings', 'wb-ad-manager' ) . '</a>'
+					esc_html__( 'No global Publisher ID configured. %s to set it up for all AdSense ads.', 'wb-ads-rotator-with-split-test' ),
+					'<a href="' . esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-settings' ) ) . '">' . esc_html__( 'Go to Settings', 'wb-ads-rotator-with-split-test' ) . '</a>'
 				);
 				?>
 			</p>

@@ -28,7 +28,7 @@ class Code_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_name() {
-		return __( 'HTML/JS Code', 'wb-ad-manager' );
+		return __( 'HTML/JS Code', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -37,7 +37,7 @@ class Code_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Paste ad network code (AdSense, etc.).', 'wb-ad-manager' );
+		return __( 'Paste ad network code (AdSense, etc.).', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -86,9 +86,9 @@ class Code_Ad implements Ad_Type_Interface {
 		$code = isset( $data['code'] ) ? $data['code'] : '';
 		?>
 		<div class="wbam-field wbam-field-full">
-			<label for="wbam_code"><?php esc_html_e( 'Ad Code', 'wb-ad-manager' ); ?></label>
+			<label for="wbam_code"><?php esc_html_e( 'Ad Code', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
-				<p class="description"><?php esc_html_e( 'Paste your ad network code (AdSense, Media.net, etc.) or custom HTML/JavaScript.', 'wb-ad-manager' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Paste your ad network code (AdSense, Media.net, etc.) or custom HTML/JavaScript.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<textarea id="wbam_code" name="wbam_data[code]" rows="12" class="large-text code"><?php echo esc_textarea( $code ); ?></textarea>
 			</div>
 		</div>

@@ -176,7 +176,7 @@ class Links_Module {
 	 * @return array
 	 */
 	public function add_settings_tab( $tabs ) {
-		$tabs['links'] = __( 'Links', 'wb-ad-manager' );
+		$tabs['links'] = __( 'Links', 'wb-ads-rotator-with-split-test' );
 		return $tabs;
 	}
 
@@ -190,62 +190,62 @@ class Links_Module {
 		$fields['links'] = array(
 			array(
 				'id'          => 'link_cloak_prefix',
-				'title'       => __( 'Cloak Prefix', 'wb-ad-manager' ),
+				'title'       => __( 'Cloak Prefix', 'wb-ads-rotator-with-split-test' ),
 				'type'        => 'text',
 				'default'     => 'go',
 				'description' => sprintf(
 					/* translators: %s: example URL */
-					__( 'The URL prefix for cloaked links. Example: %s', 'wb-ad-manager' ),
+					__( 'The URL prefix for cloaked links. Example: %s', 'wb-ads-rotator-with-split-test' ),
 					'<code>' . home_url( '/go/your-link' ) . '</code>'
 				),
 			),
 			array(
 				'id'          => 'link_default_nofollow',
-				'title'       => __( 'Default Nofollow', 'wb-ad-manager' ),
+				'title'       => __( 'Default Nofollow', 'wb-ads-rotator-with-split-test' ),
 				'type'        => 'checkbox',
 				'default'     => 1,
-				'description' => __( 'Add nofollow attribute to links by default.', 'wb-ad-manager' ),
+				'description' => __( 'Add nofollow attribute to links by default.', 'wb-ads-rotator-with-split-test' ),
 			),
 			array(
 				'id'          => 'link_default_sponsored',
-				'title'       => __( 'Default Sponsored', 'wb-ad-manager' ),
+				'title'       => __( 'Default Sponsored', 'wb-ads-rotator-with-split-test' ),
 				'type'        => 'checkbox',
 				'default'     => 0,
-				'description' => __( 'Add sponsored attribute to links by default.', 'wb-ad-manager' ),
+				'description' => __( 'Add sponsored attribute to links by default.', 'wb-ads-rotator-with-split-test' ),
 			),
 			array(
 				'id'          => 'link_default_new_tab',
-				'title'       => __( 'Open in New Tab', 'wb-ad-manager' ),
+				'title'       => __( 'Open in New Tab', 'wb-ads-rotator-with-split-test' ),
 				'type'        => 'checkbox',
 				'default'     => 1,
-				'description' => __( 'Open links in new tab by default.', 'wb-ad-manager' ),
+				'description' => __( 'Open links in new tab by default.', 'wb-ads-rotator-with-split-test' ),
 			),
 			array(
 				'id'          => 'link_default_redirect',
-				'title'       => __( 'Default Redirect Type', 'wb-ad-manager' ),
+				'title'       => __( 'Default Redirect Type', 'wb-ads-rotator-with-split-test' ),
 				'type'        => 'select',
 				'options'     => Link::get_redirect_types(),
 				'default'     => 307,
-				'description' => __( 'Default redirect type for cloaked links.', 'wb-ad-manager' ),
+				'description' => __( 'Default redirect type for cloaked links.', 'wb-ads-rotator-with-split-test' ),
 			),
 			array(
 				'id'          => 'link_inactive_action',
-				'title'       => __( 'Inactive Link Action', 'wb-ad-manager' ),
+				'title'       => __( 'Inactive Link Action', 'wb-ads-rotator-with-split-test' ),
 				'type'        => 'select',
 				'options'     => array(
-					'404'    => __( 'Show 404 page', 'wb-ad-manager' ),
-					'home'   => __( 'Redirect to homepage', 'wb-ad-manager' ),
-					'custom' => __( 'Redirect to custom URL', 'wb-ad-manager' ),
+					'404'    => __( 'Show 404 page', 'wb-ads-rotator-with-split-test' ),
+					'home'   => __( 'Redirect to homepage', 'wb-ads-rotator-with-split-test' ),
+					'custom' => __( 'Redirect to custom URL', 'wb-ads-rotator-with-split-test' ),
 				),
 				'default'     => '404',
-				'description' => __( 'What to do when an inactive or expired link is accessed.', 'wb-ad-manager' ),
+				'description' => __( 'What to do when an inactive or expired link is accessed.', 'wb-ads-rotator-with-split-test' ),
 			),
 			array(
 				'id'          => 'link_inactive_url',
-				'title'       => __( 'Inactive Link URL', 'wb-ad-manager' ),
+				'title'       => __( 'Inactive Link URL', 'wb-ads-rotator-with-split-test' ),
 				'type'        => 'url',
 				'default'     => '',
-				'description' => __( 'Custom URL to redirect to when inactive link action is set to custom.', 'wb-ad-manager' ),
+				'description' => __( 'Custom URL to redirect to when inactive link action is set to custom.', 'wb-ads-rotator-with-split-test' ),
 			),
 		);
 
