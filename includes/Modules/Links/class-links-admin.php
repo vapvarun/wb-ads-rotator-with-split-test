@@ -203,6 +203,15 @@ class Links_Admin {
 		$is_edit = (bool) $link;
 		$title   = $is_edit ? __( 'Edit Link', 'wb-ad-manager' ) : __( 'Add New Link', 'wb-ad-manager' );
 
+		/**
+		 * Fires before the link edit form.
+		 *
+		 * @since 2.3.0
+		 * @param Link|null $link    Link object or null for new link.
+		 * @param bool      $is_edit Whether this is an edit form.
+		 */
+		do_action( 'wbam_link_form_before', $link, $is_edit );
+
 		?>
 		<h1><?php echo esc_html( $title ); ?></h1>
 
@@ -211,6 +220,17 @@ class Links_Admin {
 		<form method="post" action="">
 			<?php wp_nonce_field( 'wbam_save_link' ); ?>
 			<input type="hidden" name="link_id" value="<?php echo esc_attr( $link_id ); ?>">
+
+			<?php
+			/**
+			 * Fires at the beginning of the link form fields.
+			 *
+			 * @since 2.3.0
+			 * @param Link|null $link    Link object or null for new link.
+			 * @param bool      $is_edit Whether this is an edit form.
+			 */
+			do_action( 'wbam_link_form_fields_before', $link, $is_edit );
+			?>
 
 			<table class="form-table">
 				<tr>
@@ -371,7 +391,31 @@ class Links_Admin {
 						<p class="description"><?php esc_html_e( 'Optional notes about this link.', 'wb-ad-manager' ); ?></p>
 					</td>
 				</tr>
+
+				<?php
+				/**
+				 * Fires after all link form fields.
+				 *
+				 * Use this to add custom fields to the link form.
+				 *
+				 * @since 2.3.0
+				 * @param Link|null $link    Link object or null for new link.
+				 * @param bool      $is_edit Whether this is an edit form.
+				 */
+				do_action( 'wbam_link_form_fields_after', $link, $is_edit );
+				?>
 			</table>
+
+			<?php
+			/**
+			 * Fires after the link form table, before submit button.
+			 *
+			 * @since 2.3.0
+			 * @param Link|null $link    Link object or null for new link.
+			 * @param bool      $is_edit Whether this is an edit form.
+			 */
+			do_action( 'wbam_link_form_after_fields', $link, $is_edit );
+			?>
 
 			<p class="submit">
 				<input type="submit" name="wbam_save_link" class="button button-primary"
@@ -381,6 +425,17 @@ class Links_Admin {
 				</a>
 			</p>
 		</form>
+
+		<?php
+		/**
+		 * Fires after the link form.
+		 *
+		 * @since 2.3.0
+		 * @param Link|null $link    Link object or null for new link.
+		 * @param bool      $is_edit Whether this is an edit form.
+		 */
+		do_action( 'wbam_link_form_after', $link, $is_edit );
+		?>
 
 		<?php if ( $is_edit ) : ?>
 			<div class="wbam-link-info">
@@ -424,6 +479,7 @@ class Links_Admin {
 	 */
 	private function save_link() {
 		$link_id = isset( $_POST['link_id'] ) ? (int) $_POST['link_id'] : 0;
+		$is_edit = (bool) $link_id;
 
 		$data = array(
 			'name'             => isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '',
@@ -443,6 +499,26 @@ class Links_Admin {
 			'description'      => isset( $_POST['description'] ) ? sanitize_textarea_field( $_POST['description'] ) : '',
 		);
 
+		/**
+		 * Filter link data before saving.
+		 *
+		 * @since 2.3.0
+		 * @param array $data    Link data to save.
+		 * @param int   $link_id Link ID (0 for new links).
+		 * @param array $_POST   Raw POST data.
+		 */
+		$data = apply_filters( 'wbam_link_save_data', $data, $link_id, $_POST );
+
+		/**
+		 * Fires before saving a link.
+		 *
+		 * @since 2.3.0
+		 * @param array $data    Link data to save.
+		 * @param int   $link_id Link ID (0 for new links).
+		 * @param bool  $is_edit Whether this is an update.
+		 */
+		do_action( 'wbam_link_save_before', $data, $link_id, $is_edit );
+
 		$link_manager = Link_Manager::get_instance();
 
 		if ( $link_id ) {
@@ -457,6 +533,17 @@ class Links_Admin {
 				$message = 'link_error';
 			}
 		}
+
+		/**
+		 * Fires after saving a link.
+		 *
+		 * @since 2.3.0
+		 * @param int    $link_id Link ID.
+		 * @param array  $data    Link data that was saved.
+		 * @param bool   $is_edit Whether this was an update.
+		 * @param string $message Result message key.
+		 */
+		do_action( 'wbam_link_save_after', $link_id, $data, $is_edit, $message );
 
 		wp_safe_redirect(
 			add_query_arg(
@@ -584,6 +671,15 @@ class Links_Admin {
 		$is_edit = (bool) $category;
 		$title   = $is_edit ? __( 'Edit Category', 'wb-ad-manager' ) : __( 'Add New Category', 'wb-ad-manager' );
 
+		/**
+		 * Fires before the link category form.
+		 *
+		 * @since 2.3.0
+		 * @param object|null $category Category object or null for new category.
+		 * @param bool        $is_edit  Whether this is an edit form.
+		 */
+		do_action( 'wbam_link_category_form_before', $category, $is_edit );
+
 		?>
 		<h1><?php echo esc_html( $title ); ?></h1>
 
@@ -592,6 +688,17 @@ class Links_Admin {
 		<form method="post" action="">
 			<?php wp_nonce_field( 'wbam_save_category' ); ?>
 			<input type="hidden" name="category_id" value="<?php echo esc_attr( $category_id ); ?>">
+
+			<?php
+			/**
+			 * Fires at the beginning of the category form fields.
+			 *
+			 * @since 2.3.0
+			 * @param object|null $category Category object or null for new category.
+			 * @param bool        $is_edit  Whether this is an edit form.
+			 */
+			do_action( 'wbam_link_category_form_fields_before', $category, $is_edit );
+			?>
 
 			<table class="form-table">
 				<tr>
@@ -623,6 +730,19 @@ class Links_Admin {
 						<textarea name="description" id="description" rows="3" class="large-text"><?php echo esc_textarea( $category ? $category->description : '' ); ?></textarea>
 					</td>
 				</tr>
+
+				<?php
+				/**
+				 * Fires after all category form fields.
+				 *
+				 * Use this to add custom fields to the category form.
+				 *
+				 * @since 2.3.0
+				 * @param object|null $category Category object or null for new category.
+				 * @param bool        $is_edit  Whether this is an edit form.
+				 */
+				do_action( 'wbam_link_category_form_fields_after', $category, $is_edit );
+				?>
 			</table>
 
 			<p class="submit">
@@ -633,7 +753,16 @@ class Links_Admin {
 				</a>
 			</p>
 		</form>
+
 		<?php
+		/**
+		 * Fires after the link category form.
+		 *
+		 * @since 2.3.0
+		 * @param object|null $category Category object or null for new category.
+		 * @param bool        $is_edit  Whether this is an edit form.
+		 */
+		do_action( 'wbam_link_category_form_after', $category, $is_edit );
 	}
 
 	/**
@@ -641,12 +770,33 @@ class Links_Admin {
 	 */
 	private function save_category() {
 		$category_id = isset( $_POST['category_id'] ) ? (int) $_POST['category_id'] : 0;
+		$is_edit     = (bool) $category_id;
 
 		$data = array(
 			'name'        => isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '',
 			'slug'        => isset( $_POST['slug'] ) ? sanitize_title( $_POST['slug'] ) : '',
 			'description' => isset( $_POST['description'] ) ? sanitize_textarea_field( $_POST['description'] ) : '',
 		);
+
+		/**
+		 * Filter category data before saving.
+		 *
+		 * @since 2.3.0
+		 * @param array $data        Category data to save.
+		 * @param int   $category_id Category ID (0 for new categories).
+		 * @param array $_POST       Raw POST data.
+		 */
+		$data = apply_filters( 'wbam_link_category_save_data', $data, $category_id, $_POST );
+
+		/**
+		 * Fires before saving a link category.
+		 *
+		 * @since 2.3.0
+		 * @param array $data        Category data to save.
+		 * @param int   $category_id Category ID (0 for new categories).
+		 * @param bool  $is_edit     Whether this is an update.
+		 */
+		do_action( 'wbam_link_category_save_before', $data, $category_id, $is_edit );
 
 		$link_manager = Link_Manager::get_instance();
 
@@ -662,6 +812,17 @@ class Links_Admin {
 				$message = 'category_error';
 			}
 		}
+
+		/**
+		 * Fires after saving a link category.
+		 *
+		 * @since 2.3.0
+		 * @param int    $category_id Category ID.
+		 * @param array  $data        Category data that was saved.
+		 * @param bool   $is_edit     Whether this was an update.
+		 * @param string $message     Result message key.
+		 */
+		do_action( 'wbam_link_category_save_after', $category_id, $data, $is_edit, $message );
 
 		wp_safe_redirect(
 			add_query_arg(

@@ -130,6 +130,16 @@ class Setup_Wizard {
 			),
 		);
 
+		/**
+		 * Filter the setup wizard steps.
+		 *
+		 * Allows developers to add, remove, or modify wizard steps.
+		 *
+		 * @since 2.3.0
+		 * @param array $steps Array of wizard steps.
+		 */
+		$this->steps = apply_filters( 'wbam_setup_wizard_steps', $this->steps );
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$this->step = isset( $_GET['step'] ) ? sanitize_key( $_GET['step'] ) : current( array_keys( $this->steps ) );
 
@@ -281,6 +291,39 @@ class Setup_Wizard {
 	 * Step: Sample Ads.
 	 */
 	public function step_sample() {
+		/**
+		 * Filter available sample ad options in setup wizard.
+		 *
+		 * @since 2.3.0
+		 * @param array $options Array of sample ad options.
+		 */
+		$sample_options = apply_filters(
+			'wbam_setup_wizard_sample_options',
+			array(
+				'header_banner'  => array(
+					'label'       => __( 'Header Banner', 'wb-ad-manager' ),
+					'description' => __( 'Image ad displayed in the header area', 'wb-ad-manager' ),
+					'checked'     => true,
+				),
+				'sidebar_widget' => array(
+					'label'       => __( 'Sidebar Widget Ad', 'wb-ad-manager' ),
+					'description' => __( 'Code ad for sidebar widget placement', 'wb-ad-manager' ),
+					'checked'     => true,
+				),
+				'content_promo'  => array(
+					'label'       => __( 'In-Content Promotion', 'wb-ad-manager' ),
+					'description' => __( 'Rich content ad after paragraph 2', 'wb-ad-manager' ),
+					'checked'     => true,
+				),
+			)
+		);
+
+		/**
+		 * Fires before the sample ads step content.
+		 *
+		 * @since 2.3.0
+		 */
+		do_action( 'wbam_setup_wizard_sample_before' );
 		?>
 		<div class="wbam-setup-step-content">
 			<h2><?php esc_html_e( 'Create Sample Ads', 'wb-ad-manager' ); ?></h2>
@@ -289,31 +332,35 @@ class Setup_Wizard {
 			<form method="post">
 				<?php wp_nonce_field( 'wbam_setup_sample', 'wbam_setup_nonce' ); ?>
 
+				<?php
+				/**
+				 * Fires before the sample ads form fields.
+				 *
+				 * @since 2.3.0
+				 */
+				do_action( 'wbam_setup_wizard_sample_form_before' );
+				?>
+
 				<div class="wbam-sample-ads">
-					<label class="wbam-sample-ad-option">
-						<input type="checkbox" name="sample_ads[]" value="header_banner" checked />
-						<span class="wbam-sample-ad-info">
-							<strong><?php esc_html_e( 'Header Banner', 'wb-ad-manager' ); ?></strong>
-							<span><?php esc_html_e( 'Image ad displayed in the header area', 'wb-ad-manager' ); ?></span>
-						</span>
-					</label>
-
-					<label class="wbam-sample-ad-option">
-						<input type="checkbox" name="sample_ads[]" value="sidebar_widget" checked />
-						<span class="wbam-sample-ad-info">
-							<strong><?php esc_html_e( 'Sidebar Widget Ad', 'wb-ad-manager' ); ?></strong>
-							<span><?php esc_html_e( 'Code ad for sidebar widget placement', 'wb-ad-manager' ); ?></span>
-						</span>
-					</label>
-
-					<label class="wbam-sample-ad-option">
-						<input type="checkbox" name="sample_ads[]" value="content_promo" checked />
-						<span class="wbam-sample-ad-info">
-							<strong><?php esc_html_e( 'In-Content Promotion', 'wb-ad-manager' ); ?></strong>
-							<span><?php esc_html_e( 'Rich content ad after paragraph 2', 'wb-ad-manager' ); ?></span>
-						</span>
-					</label>
+					<?php foreach ( $sample_options as $key => $option ) : ?>
+						<label class="wbam-sample-ad-option">
+							<input type="checkbox" name="sample_ads[]" value="<?php echo esc_attr( $key ); ?>" <?php checked( $option['checked'] ); ?> />
+							<span class="wbam-sample-ad-info">
+								<strong><?php echo esc_html( $option['label'] ); ?></strong>
+								<span><?php echo esc_html( $option['description'] ); ?></span>
+							</span>
+						</label>
+					<?php endforeach; ?>
 				</div>
+
+				<?php
+				/**
+				 * Fires after the sample ads form fields.
+				 *
+				 * @since 2.3.0
+				 */
+				do_action( 'wbam_setup_wizard_sample_form_after' );
+				?>
 
 				<p class="wbam-setup-actions">
 					<button type="submit" name="save_step" value="1" class="button button-primary button-large">
@@ -326,6 +373,13 @@ class Setup_Wizard {
 			</form>
 		</div>
 		<?php
+
+		/**
+		 * Fires after the sample ads step content.
+		 *
+		 * @since 2.3.0
+		 */
+		do_action( 'wbam_setup_wizard_sample_after' );
 	}
 
 	/**
@@ -339,9 +393,25 @@ class Setup_Wizard {
 
 		$sample_ads = isset( $_POST['sample_ads'] ) ? array_map( 'sanitize_key', wp_unslash( $_POST['sample_ads'] ) ) : array();
 
+		/**
+		 * Fires before creating sample ads.
+		 *
+		 * @since 2.3.0
+		 * @param array $sample_ads Selected sample ad keys.
+		 */
+		do_action( 'wbam_setup_wizard_sample_save_before', $sample_ads );
+
 		if ( ! empty( $sample_ads ) ) {
 			$this->create_sample_ads( $sample_ads );
 		}
+
+		/**
+		 * Fires after creating sample ads.
+		 *
+		 * @since 2.3.0
+		 * @param array $sample_ads Selected sample ad keys.
+		 */
+		do_action( 'wbam_setup_wizard_sample_save_after', $sample_ads );
 
 		// Clean output buffer before redirect.
 		if ( ob_get_level() ) {
@@ -399,6 +469,17 @@ class Setup_Wizard {
 			),
 		);
 
+		/**
+		 * Filter the sample ads definitions.
+		 *
+		 * Allows developers to modify, add, or remove sample ad configurations.
+		 *
+		 * @since 2.3.0
+		 * @param array $sample_ads     Array of sample ad definitions.
+		 * @param array $ads_to_create  Keys of ads to be created.
+		 */
+		$sample_ads = apply_filters( 'wbam_setup_wizard_sample_ads', $sample_ads, $ads_to_create );
+
 		foreach ( $ads_to_create as $ad_key ) {
 			if ( ! isset( $sample_ads[ $ad_key ] ) ) {
 				continue;
@@ -422,6 +503,16 @@ class Setup_Wizard {
 				update_post_meta( $post_id, '_wbam_enabled', '1' );
 				update_post_meta( $post_id, '_wbam_priority', 5 );
 				update_post_meta( $post_id, '_wbam_sample_ad', true );
+
+				/**
+				 * Fires after a sample ad is created.
+				 *
+				 * @since 2.3.0
+				 * @param int    $post_id Post ID of the created ad.
+				 * @param string $ad_key  Sample ad key.
+				 * @param array  $ad      Sample ad configuration.
+				 */
+				do_action( 'wbam_setup_wizard_sample_ad_created', $post_id, $ad_key, $ad );
 			}
 		}
 	}
@@ -431,6 +522,50 @@ class Setup_Wizard {
 	 */
 	public function step_ready() {
 		update_option( 'wbam_setup_complete', true );
+
+		/**
+		 * Fires when setup wizard is completed.
+		 *
+		 * @since 2.3.0
+		 */
+		do_action( 'wbam_setup_wizard_complete' );
+
+		/**
+		 * Filter the next steps shown on the ready screen.
+		 *
+		 * @since 2.3.0
+		 * @param array $next_steps Array of next step configurations.
+		 */
+		$next_steps = apply_filters(
+			'wbam_setup_wizard_next_steps',
+			array(
+				'view_ads' => array(
+					'url'         => admin_url( 'edit.php?post_type=wbam-ad' ),
+					'icon'        => 'dashicons-admin-post',
+					'title'       => __( 'View Your Ads', 'wb-ad-manager' ),
+					'description' => __( 'See and manage all your ads', 'wb-ad-manager' ),
+				),
+				'create'   => array(
+					'url'         => admin_url( 'post-new.php?post_type=wbam-ad' ),
+					'icon'        => 'dashicons-plus-alt',
+					'title'       => __( 'Create New Ad', 'wb-ad-manager' ),
+					'description' => __( 'Add your own custom ads', 'wb-ad-manager' ),
+				),
+				'settings' => array(
+					'url'         => admin_url( 'edit.php?post_type=wbam-ad&page=wbam-settings' ),
+					'icon'        => 'dashicons-admin-settings',
+					'title'       => __( 'Settings', 'wb-ad-manager' ),
+					'description' => __( 'Configure plugin options', 'wb-ad-manager' ),
+				),
+			)
+		);
+
+		/**
+		 * Fires before the ready step content.
+		 *
+		 * @since 2.3.0
+		 */
+		do_action( 'wbam_setup_wizard_ready_before' );
 		?>
 		<div class="wbam-setup-step-content wbam-setup-ready">
 			<span class="dashicons dashicons-yes-alt"></span>
@@ -438,24 +573,23 @@ class Setup_Wizard {
 			<p><?php esc_html_e( 'WB Ad Manager is ready to use. Here are some next steps:', 'wb-ad-manager' ); ?></p>
 
 			<div class="wbam-setup-next-steps">
-				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad' ) ); ?>" class="wbam-next-step">
-					<span class="dashicons dashicons-admin-post"></span>
-					<strong><?php esc_html_e( 'View Your Ads', 'wb-ad-manager' ); ?></strong>
-					<span><?php esc_html_e( 'See and manage all your ads', 'wb-ad-manager' ); ?></span>
-				</a>
-
-				<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=wbam-ad' ) ); ?>" class="wbam-next-step">
-					<span class="dashicons dashicons-plus-alt"></span>
-					<strong><?php esc_html_e( 'Create New Ad', 'wb-ad-manager' ); ?></strong>
-					<span><?php esc_html_e( 'Add your own custom ads', 'wb-ad-manager' ); ?></span>
-				</a>
-
-				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-settings' ) ); ?>" class="wbam-next-step">
-					<span class="dashicons dashicons-admin-settings"></span>
-					<strong><?php esc_html_e( 'Settings', 'wb-ad-manager' ); ?></strong>
-					<span><?php esc_html_e( 'Configure plugin options', 'wb-ad-manager' ); ?></span>
-				</a>
+				<?php foreach ( $next_steps as $step ) : ?>
+					<a href="<?php echo esc_url( $step['url'] ); ?>" class="wbam-next-step">
+						<span class="dashicons <?php echo esc_attr( $step['icon'] ); ?>"></span>
+						<strong><?php echo esc_html( $step['title'] ); ?></strong>
+						<span><?php echo esc_html( $step['description'] ); ?></span>
+					</a>
+				<?php endforeach; ?>
 			</div>
+
+			<?php
+			/**
+			 * Fires after the next steps links, before the dashboard button.
+			 *
+			 * @since 2.3.0
+			 */
+			do_action( 'wbam_setup_wizard_ready_after_steps' );
+			?>
 
 			<p class="wbam-setup-actions">
 				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad' ) ); ?>" class="button button-primary button-large">
@@ -464,5 +598,12 @@ class Setup_Wizard {
 			</p>
 		</div>
 		<?php
+
+		/**
+		 * Fires after the ready step content.
+		 *
+		 * @since 2.3.0
+		 */
+		do_action( 'wbam_setup_wizard_ready_after' );
 	}
 }

@@ -198,9 +198,38 @@ class Frontend {
 		$email = isset( $_POST['subscriber_email'] ) ? sanitize_email( wp_unslash( $_POST['subscriber_email'] ) ) : '';
 		$name  = isset( $_POST['subscriber_name'] ) ? sanitize_text_field( wp_unslash( $_POST['subscriber_name'] ) ) : '';
 
+		/**
+		 * Fires before processing email capture submission.
+		 *
+		 * @since 2.2.0
+		 * @param string $email  Subscriber email.
+		 * @param string $name   Subscriber name.
+		 * @param int    $ad_id  Ad ID.
+		 * @param array  $_POST  Raw POST data.
+		 */
+		do_action( 'wbam_email_form_submission_before', $email, $name, $ad_id, $_POST );
+
 		// Validate email.
 		if ( empty( $email ) || ! is_email( $email ) ) {
 			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'wb-ad-manager' ) ) );
+		}
+
+		/**
+		 * Custom validation filter for email capture.
+		 *
+		 * Return a WP_Error to fail validation with a custom message.
+		 *
+		 * @since 2.2.0
+		 * @param true|WP_Error $valid True if valid, WP_Error to fail.
+		 * @param string        $email Subscriber email.
+		 * @param string        $name  Subscriber name.
+		 * @param int           $ad_id Ad ID.
+		 * @param array         $_POST Raw POST data.
+		 */
+		$validation = apply_filters( 'wbam_email_form_validation', true, $email, $name, $ad_id, $_POST );
+
+		if ( is_wp_error( $validation ) ) {
+			wp_send_json_error( array( 'message' => $validation->get_error_message() ) );
 		}
 
 		/**
@@ -218,13 +247,35 @@ class Frontend {
 		// Store submission in database table.
 		$this->save_email_submission( $ad_id, $email, $name );
 
+		/**
+		 * Fires after successful email capture submission.
+		 *
+		 * @since 2.2.0
+		 * @param string $email Subscriber email.
+		 * @param string $name  Subscriber name.
+		 * @param int    $ad_id Ad ID.
+		 */
+		do_action( 'wbam_email_form_submission_after', $email, $name, $ad_id );
+
 		// Get redirect URL if set (with validation).
 		$data         = get_post_meta( $ad_id, '_wbam_ad_data', true );
 		$redirect_url = isset( $data['redirect_url'] ) ? esc_url( $data['redirect_url'] ) : '';
 
+		$success_message = __( 'Thank you for subscribing!', 'wb-ad-manager' );
+
+		/**
+		 * Filter the success message for email capture.
+		 *
+		 * @since 2.2.0
+		 * @param string $success_message Success message.
+		 * @param string $email           Subscriber email.
+		 * @param int    $ad_id           Ad ID.
+		 */
+		$success_message = apply_filters( 'wbam_email_capture_success_message', $success_message, $email, $ad_id );
+
 		wp_send_json_success(
 			array(
-				'message'  => __( 'Thank you for subscribing!', 'wb-ad-manager' ),
+				'message'  => $success_message,
 				'redirect' => $redirect_url,
 			)
 		);

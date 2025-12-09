@@ -6,6 +6,26 @@
  *
  * @package WB_Ad_Manager
  * @since   2.2.0
+ *
+ * ## Available Hooks
+ *
+ * ### Actions:
+ * - `wbam_email_form_before` - Before form renders (passes $ad_id, $data)
+ * - `wbam_email_form_after` - After form renders
+ * - `wbam_email_form_before_fields` - Before form fields
+ * - `wbam_email_form_after_fields` - After form fields (before submit button)
+ * - `wbam_email_form_after_name` - After name field (if shown)
+ * - `wbam_email_form_after_email` - After email field
+ *
+ * ### Filters:
+ * - `wbam_email_form_data` - Modify form configuration data
+ * - `wbam_email_form_classes` - Modify wrapper CSS classes
+ * - `wbam_email_form_fields` - Modify/add form fields
+ * - `wbam_email_form_button_text` - Modify button text
+ * - `wbam_email_form_success_message` - Modify success message
+ * - `wbam_email_form_privacy_text` - Modify privacy text
+ * - `wbam_email_form_placeholders` - Modify field placeholders
+ * - `wbam_email_form_show_cookie_check` - Control cookie check (return false to always show)
  */
 
 namespace WBAM\Modules\AdTypes;
@@ -61,6 +81,15 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 	public function render( $ad_id, $options = array() ) {
 		$data = get_post_meta( $ad_id, '_wbam_ad_data', true );
 
+		/**
+		 * Filter the form configuration data.
+		 *
+		 * @since 2.2.0
+		 * @param array $data  Form configuration.
+		 * @param int   $ad_id Ad ID.
+		 */
+		$data = apply_filters( 'wbam_email_form_data', $data, $ad_id );
+
 		$headline      = isset( $data['headline'] ) ? $data['headline'] : __( 'Subscribe to our Newsletter', 'wb-ad-manager' );
 		$description   = isset( $data['description'] ) ? $data['description'] : '';
 		$button_text   = isset( $data['button_text'] ) ? $data['button_text'] : __( 'Subscribe', 'wb-ad-manager' );
@@ -73,9 +102,51 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		$text_color    = isset( $data['text_color'] ) ? $data['text_color'] : '#1d2327';
 		$button_color  = isset( $data['button_color'] ) ? $data['button_color'] : '#2271b1';
 
+		/**
+		 * Filter the button text.
+		 *
+		 * @since 2.2.0
+		 * @param string $button_text Button text.
+		 * @param int    $ad_id       Ad ID.
+		 * @param array  $data        Form data.
+		 */
+		$button_text = apply_filters( 'wbam_email_form_button_text', $button_text, $ad_id, $data );
+
+		/**
+		 * Filter the success message.
+		 *
+		 * @since 2.2.0
+		 * @param string $success_msg Success message.
+		 * @param int    $ad_id       Ad ID.
+		 * @param array  $data        Form data.
+		 */
+		$success_msg = apply_filters( 'wbam_email_form_success_message', $success_msg, $ad_id, $data );
+
+		/**
+		 * Filter the privacy text.
+		 *
+		 * @since 2.2.0
+		 * @param string $privacy_text Privacy text.
+		 * @param int    $ad_id        Ad ID.
+		 * @param array  $data         Form data.
+		 */
+		$privacy_text = apply_filters( 'wbam_email_form_privacy_text', $privacy_text, $ad_id, $data );
+
 		// Check cookie for dismiss.
 		$cookie_name = 'wbam_email_dismiss_' . $ad_id;
-		if ( isset( $_COOKIE[ $cookie_name ] ) ) {
+
+		/**
+		 * Filter whether to check the dismiss cookie.
+		 *
+		 * Return false to always show the form regardless of cookie.
+		 *
+		 * @since 2.2.0
+		 * @param bool $check_cookie Whether to check cookie.
+		 * @param int  $ad_id        Ad ID.
+		 */
+		$check_cookie = apply_filters( 'wbam_email_form_show_cookie_check', true, $ad_id );
+
+		if ( $check_cookie && isset( $_COOKIE[ $cookie_name ] ) ) {
 			return '';
 		}
 
@@ -84,10 +155,44 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 			$classes[] = sanitize_html_class( $options['class'] );
 		}
 
+		/**
+		 * Filter the wrapper CSS classes.
+		 *
+		 * @since 2.2.0
+		 * @param array $classes CSS classes.
+		 * @param int   $ad_id   Ad ID.
+		 * @param array $options Render options.
+		 */
+		$classes = apply_filters( 'wbam_email_form_classes', $classes, $ad_id, $options );
+
 		$form_id = 'wbam-email-form-' . $ad_id;
 		$nonce   = wp_create_nonce( 'wbam_email_capture_' . $ad_id );
 
+		// Placeholders.
+		$placeholders = array(
+			'name'  => __( 'Your Name', 'wb-ad-manager' ),
+			'email' => __( 'Your Email', 'wb-ad-manager' ),
+		);
+
+		/**
+		 * Filter the field placeholders.
+		 *
+		 * @since 2.2.0
+		 * @param array $placeholders Placeholder texts.
+		 * @param int   $ad_id        Ad ID.
+		 */
+		$placeholders = apply_filters( 'wbam_email_form_placeholders', $placeholders, $ad_id );
+
 		ob_start();
+
+		/**
+		 * Fires before the email capture form.
+		 *
+		 * @since 2.2.0
+		 * @param int   $ad_id Ad ID.
+		 * @param array $data  Form data.
+		 */
+		do_action( 'wbam_email_form_before', $ad_id, $data );
 		?>
 		<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"
 			 data-ad-id="<?php echo esc_attr( $ad_id ); ?>"
@@ -113,16 +218,61 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 					<input type="hidden" name="nonce" value="<?php echo esc_attr( $nonce ); ?>">
 					<input type="hidden" name="redirect_url" value="<?php echo esc_url( $redirect_url ); ?>">
 
+					<?php
+					/**
+					 * Fires before the form fields.
+					 *
+					 * @since 2.2.0
+					 * @param int   $ad_id Ad ID.
+					 * @param array $data  Form data.
+					 */
+					do_action( 'wbam_email_form_before_fields', $ad_id, $data );
+					?>
+
 					<div class="wbam-email-fields">
 						<?php if ( $show_name ) : ?>
-							<div class="wbam-email-field">
-								<input type="text" name="subscriber_name" placeholder="<?php esc_attr_e( 'Your Name', 'wb-ad-manager' ); ?>" class="wbam-email-input">
+							<div class="wbam-email-field wbam-email-field-name">
+								<input type="text" name="subscriber_name" placeholder="<?php echo esc_attr( $placeholders['name'] ); ?>" class="wbam-email-input">
 							</div>
+							<?php
+							/**
+							 * Fires after the name field.
+							 *
+							 * @since 2.2.0
+							 * @param int   $ad_id Ad ID.
+							 * @param array $data  Form data.
+							 */
+							do_action( 'wbam_email_form_after_name', $ad_id, $data );
+							?>
 						<?php endif; ?>
 
-						<div class="wbam-email-field">
-							<input type="email" name="subscriber_email" placeholder="<?php esc_attr_e( 'Your Email', 'wb-ad-manager' ); ?>" class="wbam-email-input" required>
+						<div class="wbam-email-field wbam-email-field-email">
+							<input type="email" name="subscriber_email" placeholder="<?php echo esc_attr( $placeholders['email'] ); ?>" class="wbam-email-input" required>
 						</div>
+
+						<?php
+						/**
+						 * Fires after the email field.
+						 *
+						 * @since 2.2.0
+						 * @param int   $ad_id Ad ID.
+						 * @param array $data  Form data.
+						 */
+						do_action( 'wbam_email_form_after_email', $ad_id, $data );
+						?>
+
+						<?php
+						/**
+						 * Fires after all fields, before the submit button.
+						 *
+						 * Use this to add custom fields like phone, company, etc.
+						 *
+						 * @since 2.2.0
+						 * @param int   $ad_id Ad ID.
+						 * @param array $data  Form data.
+						 */
+						do_action( 'wbam_email_form_after_fields', $ad_id, $data );
+						?>
 
 						<div class="wbam-email-submit">
 							<button type="submit" class="wbam-email-button"><?php echo esc_html( $button_text ); ?></button>
@@ -146,7 +296,16 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 				</div>
 			</div>
 		</div>
+
 		<?php
+		/**
+		 * Fires after the email capture form.
+		 *
+		 * @since 2.2.0
+		 * @param int   $ad_id Ad ID.
+		 * @param array $data  Form data.
+		 */
+		do_action( 'wbam_email_form_after', $ad_id, $data );
 
 		return ob_get_clean();
 	}
@@ -248,16 +407,16 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		</div>
 
 		<div class="wbam-field">
-			<h4><?php esc_html_e( 'Integration', 'wb-ad-manager' ); ?></h4>
+			<h4><?php esc_html_e( 'Developer Hooks', 'wb-ad-manager' ); ?></h4>
 			<p class="description">
-				<?php
-				printf(
-					/* translators: %s: hook name */
-					esc_html__( 'Developers can integrate email services using the %s action hook.', 'wb-ad-manager' ),
-					'<code>wbam_email_captured</code>'
-				);
-				?>
+				<?php esc_html_e( 'Available hooks for developers:', 'wb-ad-manager' ); ?>
 			</p>
+			<ul class="wbam-hooks-list" style="margin-left: 20px; font-size: 12px;">
+				<li><code>wbam_email_captured</code> - <?php esc_html_e( 'After email is submitted (integrate with Mailchimp, etc.)', 'wb-ad-manager' ); ?></li>
+				<li><code>wbam_email_form_before</code> / <code>after</code> - <?php esc_html_e( 'Before/after form renders', 'wb-ad-manager' ); ?></li>
+				<li><code>wbam_email_form_after_fields</code> - <?php esc_html_e( 'Add custom fields', 'wb-ad-manager' ); ?></li>
+				<li><code>wbam_email_form_validation</code> - <?php esc_html_e( 'Custom validation', 'wb-ad-manager' ); ?></li>
+			</ul>
 		</div>
 		<?php
 	}

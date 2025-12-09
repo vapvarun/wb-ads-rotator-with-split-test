@@ -39,19 +39,26 @@ class Link_Shortcodes {
 	 * @return string
 	 */
 	public function render_link( $atts, $content = '' ) {
-		$atts = shortcode_atts(
+		/**
+		 * Filter default attributes for the wbam_link shortcode.
+		 *
+		 * @since 2.3.0
+		 * @param array $defaults Default shortcode attributes.
+		 */
+		$defaults = apply_filters(
+			'wbam_link_shortcode_defaults',
 			array(
-				'id'      => 0,
-				'slug'    => '',
-				'text'    => '',
-				'class'   => '',
-				'nofollow' => '',
+				'id'        => 0,
+				'slug'      => '',
+				'text'      => '',
+				'class'     => '',
+				'nofollow'  => '',
 				'sponsored' => '',
-				'new_tab' => '',
-			),
-			$atts,
-			'wbam_link'
+				'new_tab'   => '',
+			)
 		);
+
+		$atts = shortcode_atts( $defaults, $atts, 'wbam_link' );
 
 		$link_manager = Link_Manager::get_instance();
 
@@ -102,6 +109,16 @@ class Link_Shortcodes {
 			$link_attrs['target'] = $new_tab ? '_blank' : '_self';
 		}
 
+		/**
+		 * Filter link HTML attributes before rendering.
+		 *
+		 * @since 2.3.0
+		 * @param array $link_attrs HTML attributes for the link.
+		 * @param Link  $link       Link object.
+		 * @param array $atts       Shortcode attributes.
+		 */
+		$link_attrs = apply_filters( 'wbam_link_shortcode_attributes', $link_attrs, $link, $atts );
+
 		// Build HTML.
 		$html_attrs = array();
 		foreach ( $link_attrs as $name => $value ) {
@@ -110,7 +127,18 @@ class Link_Shortcodes {
 			}
 		}
 
-		return sprintf( '<a %s>%s</a>', implode( ' ', $html_attrs ), esc_html( $text ) );
+		$output = sprintf( '<a %s>%s</a>', implode( ' ', $html_attrs ), esc_html( $text ) );
+
+		/**
+		 * Filter the final link shortcode output.
+		 *
+		 * @since 2.3.0
+		 * @param string $output Link HTML output.
+		 * @param Link   $link   Link object.
+		 * @param array  $atts   Shortcode attributes.
+		 * @param string $text   Link text.
+		 */
+		return apply_filters( 'wbam_link_shortcode_output', $output, $link, $atts, $text );
 	}
 
 	/**
@@ -147,7 +175,17 @@ class Link_Shortcodes {
 			return '';
 		}
 
-		return esc_url( $link->get_url() );
+		$url = esc_url( $link->get_url() );
+
+		/**
+		 * Filter the link URL shortcode output.
+		 *
+		 * @since 2.3.0
+		 * @param string $url  The link URL.
+		 * @param Link   $link Link object.
+		 * @param array  $atts Shortcode attributes.
+		 */
+		return apply_filters( 'wbam_link_url_shortcode_output', $url, $link, $atts );
 	}
 
 	/**
@@ -159,7 +197,14 @@ class Link_Shortcodes {
 	 * @return string
 	 */
 	public function render_links_list( $atts ) {
-		$atts = shortcode_atts(
+		/**
+		 * Filter default attributes for the wbam_links shortcode.
+		 *
+		 * @since 2.3.0
+		 * @param array $defaults Default shortcode attributes.
+		 */
+		$defaults = apply_filters(
+			'wbam_links_shortcode_defaults',
 			array(
 				'category'   => 0,
 				'type'       => '',
@@ -169,10 +214,10 @@ class Link_Shortcodes {
 				'class'      => '',
 				'item_class' => '',
 				'format'     => 'list',
-			),
-			$atts,
-			'wbam_links'
+			)
 		);
+
+		$atts = shortcode_atts( $defaults, $atts, 'wbam_links' );
 
 		$link_manager = Link_Manager::get_instance();
 
@@ -184,6 +229,15 @@ class Link_Shortcodes {
 			'orderby'     => sanitize_text_field( $atts['orderby'] ),
 			'order'       => sanitize_text_field( $atts['order'] ),
 		);
+
+		/**
+		 * Filter query arguments for the wbam_links shortcode.
+		 *
+		 * @since 2.3.0
+		 * @param array $args Query arguments.
+		 * @param array $atts Shortcode attributes.
+		 */
+		$args = apply_filters( 'wbam_links_shortcode_query_args', $args, $atts );
 
 		$links = $link_manager->get_links( $args );
 
@@ -237,6 +291,14 @@ class Link_Shortcodes {
 				break;
 		}
 
-		return $output;
+		/**
+		 * Filter the links list shortcode output.
+		 *
+		 * @since 2.3.0
+		 * @param string $output Links list HTML output.
+		 * @param array  $links  Array of Link objects.
+		 * @param array  $atts   Shortcode attributes.
+		 */
+		return apply_filters( 'wbam_links_shortcode_output', $output, $links, $atts );
 	}
 }
