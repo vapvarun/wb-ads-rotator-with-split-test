@@ -27,6 +27,54 @@ class Admin {
 		add_action( 'save_post', array( $this, 'save_meta' ), 10, 2 );
 		add_filter( 'manage_wbam-ad_posts_columns', array( $this, 'add_columns' ) );
 		add_action( 'manage_wbam-ad_posts_custom_column', array( $this, 'render_column' ), 10, 2 );
+		add_action( 'admin_init', array( $this, 'handle_disable_ad' ) );
+	}
+
+	/**
+	 * Handle disable ad from comparison view.
+	 */
+	public function handle_disable_ad() {
+		if ( ! isset( $_GET['wbam_disable'] ) || '1' !== $_GET['wbam_disable'] ) {
+			return;
+		}
+
+		if ( ! isset( $_GET['post'] ) ) {
+			return;
+		}
+
+		$post_id = absint( $_GET['post'] );
+
+		// Verify nonce.
+		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wbam_disable_ad_' . $post_id ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'wb-ad-manager' ) );
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post || 'wbam-ad' !== $post->post_type ) {
+			return;
+		}
+
+		// Disable the ad.
+		update_post_meta( $post_id, '_wbam_enabled', '0' );
+
+		// Add admin notice.
+		add_action(
+			'admin_notices',
+			function () use ( $post ) {
+				printf(
+					'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
+					sprintf(
+						/* translators: %s: Ad title */
+						esc_html__( 'Ad "%s" has been disabled.', 'wb-ad-manager' ),
+						esc_html( $post->post_title )
+					)
+				);
+			}
+		);
 	}
 
 	/**
@@ -111,6 +159,22 @@ class Admin {
 			'side',
 			'high'
 		);
+
+		// Only show comparison metabox for existing ads with placements.
+		global $post;
+		if ( $post && $post->ID ) {
+			$placements = get_post_meta( $post->ID, '_wbam_placements', true );
+			if ( ! empty( $placements ) ) {
+				add_meta_box(
+					'wbam-ad-comparison',
+					__( 'Ad Performance Comparison', 'wb-ad-manager' ),
+					array( $this, 'render_comparison_metabox' ),
+					'wbam-ad',
+					'normal',
+					'default'
+				);
+			}
+		}
 	}
 
 	/**
@@ -311,6 +375,197 @@ class Admin {
 	}
 
 	/**
+	 * Render comparison metabox.
+	 *
+	 * Shows performance comparison of all ads sharing the same placements.
+	 *
+	 * @param \WP_Post $post Post.
+	 */
+	public function render_comparison_metabox( $post ) {
+		global $wpdb;
+
+		$current_placements = get_post_meta( $post->ID, '_wbam_placements', true );
+		if ( empty( $current_placements ) || ! is_array( $current_placements ) ) {
+			echo '<p>' . esc_html__( 'No placements assigned to this ad.', 'wb-ad-manager' ) . '</p>';
+			return;
+		}
+
+		// Find all ads that share at least one placement with current ad.
+		$all_ads = get_posts(
+			array(
+				'post_type'      => 'wbam-ad',
+				'posts_per_page' => 50,
+				'post_status'    => 'publish',
+				'post__not_in'   => array( $post->ID ),
+				'meta_query'     => array(
+					array(
+						'key'     => '_wbam_enabled',
+						'value'   => '1',
+						'compare' => '=',
+					),
+				),
+			)
+		);
+
+		// Filter to only ads sharing placements.
+		$competing_ads = array();
+		foreach ( $all_ads as $ad ) {
+			$ad_placements = get_post_meta( $ad->ID, '_wbam_placements', true );
+			if ( ! empty( $ad_placements ) && is_array( $ad_placements ) ) {
+				$shared = array_intersect( $current_placements, $ad_placements );
+				if ( ! empty( $shared ) ) {
+					$competing_ads[] = $ad;
+				}
+			}
+		}
+
+		if ( empty( $competing_ads ) ) {
+			echo '<p>' . esc_html__( 'No other enabled ads are using the same placements. Enable more ads to compare performance.', 'wb-ad-manager' ) . '</p>';
+			return;
+		}
+
+		// Add current ad to comparison.
+		array_unshift( $competing_ads, $post );
+
+		// Get stats for all ads.
+		$table_name   = $wpdb->prefix . 'wbam_analytics';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+
+		$stats = array();
+		foreach ( $competing_ads as $ad ) {
+			$impressions = 0;
+			$clicks      = 0;
+
+			if ( $table_exists ) {
+				// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$impressions = (int) $wpdb->get_var(
+					$wpdb->prepare(
+						'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
+						$ad->ID,
+						'impression'
+					)
+				);
+				$clicks = (int) $wpdb->get_var(
+					$wpdb->prepare(
+						'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
+						$ad->ID,
+						'click'
+					)
+				);
+				// phpcs:enable
+			}
+
+			$ctr = $impressions > 0 ? ( $clicks / $impressions ) * 100 : 0;
+
+			$stats[ $ad->ID ] = array(
+				'id'          => $ad->ID,
+				'title'       => $ad->post_title,
+				'impressions' => $impressions,
+				'clicks'      => $clicks,
+				'ctr'         => $ctr,
+				'is_current'  => $ad->ID === $post->ID,
+			);
+		}
+
+		// Sort by CTR descending.
+		usort(
+			$stats,
+			function ( $a, $b ) {
+				return $b['ctr'] <=> $a['ctr'];
+			}
+		);
+
+		// Find winner (highest CTR with at least 100 impressions).
+		$winner_id = 0;
+		foreach ( $stats as $stat ) {
+			if ( $stat['impressions'] >= 100 ) {
+				$winner_id = $stat['id'];
+				break;
+			}
+		}
+
+		// Find max CTR for bar scaling.
+		$max_ctr = max( array_column( $stats, 'ctr' ) );
+		$max_ctr = $max_ctr > 0 ? $max_ctr : 1;
+		?>
+		<style>
+			.wbam-comparison-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+			.wbam-comparison-table th { text-align: left; padding: 10px; border-bottom: 2px solid #ddd; }
+			.wbam-comparison-table td { padding: 10px; border-bottom: 1px solid #eee; }
+			.wbam-comparison-table tr.wbam-current-ad { background: #f0f7ff; }
+			.wbam-ctr-bar { background: #ddd; height: 20px; border-radius: 3px; overflow: hidden; min-width: 100px; }
+			.wbam-ctr-fill { background: #2271b1; height: 100%; transition: width 0.3s; }
+			.wbam-ctr-fill.winner { background: #00a32a; }
+			.wbam-winner-badge { background: #00a32a; color: #fff; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 5px; }
+			.wbam-current-badge { background: #2271b1; color: #fff; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 5px; }
+			.wbam-disable-btn { color: #b32d2e !important; }
+			.wbam-comparison-note { color: #666; font-style: italic; margin-top: 10px; }
+		</style>
+
+		<table class="wbam-comparison-table">
+			<thead>
+				<tr>
+					<th><?php esc_html_e( 'Ad', 'wb-ad-manager' ); ?></th>
+					<th><?php esc_html_e( 'Impressions', 'wb-ad-manager' ); ?></th>
+					<th><?php esc_html_e( 'Clicks', 'wb-ad-manager' ); ?></th>
+					<th><?php esc_html_e( 'CTR', 'wb-ad-manager' ); ?></th>
+					<th><?php esc_html_e( 'Performance', 'wb-ad-manager' ); ?></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ( $stats as $stat ) : ?>
+					<tr class="<?php echo $stat['is_current'] ? 'wbam-current-ad' : ''; ?>">
+						<td>
+							<?php if ( $stat['is_current'] ) : ?>
+								<strong><?php echo esc_html( $stat['title'] ); ?></strong>
+								<span class="wbam-current-badge"><?php esc_html_e( 'This Ad', 'wb-ad-manager' ); ?></span>
+							<?php else : ?>
+								<a href="<?php echo esc_url( get_edit_post_link( $stat['id'] ) ); ?>">
+									<?php echo esc_html( $stat['title'] ); ?>
+								</a>
+							<?php endif; ?>
+							<?php if ( $winner_id === $stat['id'] ) : ?>
+								<span class="wbam-winner-badge"><?php esc_html_e( 'Winner', 'wb-ad-manager' ); ?></span>
+							<?php endif; ?>
+						</td>
+						<td><?php echo esc_html( number_format_i18n( $stat['impressions'] ) ); ?></td>
+						<td><?php echo esc_html( number_format_i18n( $stat['clicks'] ) ); ?></td>
+						<td><?php echo esc_html( number_format( $stat['ctr'], 2 ) ); ?>%</td>
+						<td>
+							<div class="wbam-ctr-bar">
+								<div class="wbam-ctr-fill <?php echo $winner_id === $stat['id'] ? 'winner' : ''; ?>"
+								     style="width: <?php echo esc_attr( ( $stat['ctr'] / $max_ctr ) * 100 ); ?>%"></div>
+							</div>
+						</td>
+						<td>
+							<?php if ( ! $stat['is_current'] && $winner_id !== $stat['id'] ) : ?>
+								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'post.php?post=' . $stat['id'] . '&action=edit&wbam_disable=1' ), 'wbam_disable_ad_' . $stat['id'] ) ); ?>"
+								   class="wbam-disable-btn"
+								   onclick="return confirm('<?php esc_attr_e( 'Disable this underperforming ad?', 'wb-ad-manager' ); ?>');">
+									<?php esc_html_e( 'Disable', 'wb-ad-manager' ); ?>
+								</a>
+							<?php endif; ?>
+						</td>
+					</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+
+		<p class="wbam-comparison-note">
+			<?php
+			if ( 0 === $winner_id ) {
+				esc_html_e( 'No winner yet — ads need at least 100 impressions each for a meaningful comparison.', 'wb-ad-manager' );
+			} else {
+				esc_html_e( 'Winner is the ad with highest CTR among those with 100+ impressions.', 'wb-ad-manager' );
+			}
+			?>
+		</p>
+		<?php
+	}
+
+	/**
 	 * Save meta.
 	 *
 	 * @param int      $post_id Post ID.
@@ -378,6 +633,16 @@ class Admin {
 			// Archive settings.
 			$data['after_posts']  = isset( $raw_data['after_posts'] ) ? absint( $raw_data['after_posts'] ) : 3;
 			$data['posts_repeat'] = isset( $raw_data['posts_repeat'] ) ? true : false;
+
+			/**
+			 * Filter ad data before saving.
+			 *
+			 * @since 2.3.0
+			 * @param array $data     Ad data to save.
+			 * @param int   $post_id  Ad post ID.
+			 * @param array $raw_data Raw POST data.
+			 */
+			$data = apply_filters( 'wbam_ad_data_before_save', $data, $post_id, $raw_data );
 
 			update_post_meta( $post_id, '_wbam_ad_data', $data );
 		}

@@ -165,6 +165,15 @@ class Targeting_Engine {
 	private function check_display_rules( $ad_id ) {
 		$rules = get_post_meta( $ad_id, '_wbam_display_rules', true );
 
+		/**
+		 * Filter display rules for an ad.
+		 *
+		 * @since 2.3.0
+		 * @param array $rules Display rules.
+		 * @param int   $ad_id Ad ID.
+		 */
+		$rules = apply_filters( 'wbam_ad_display_rules', $rules, $ad_id );
+
 		if ( empty( $rules ) || ! is_array( $rules ) ) {
 			return true; // No rules = show everywhere.
 		}

@@ -176,6 +176,15 @@ class Frontend {
 	 */
 	public function record_impression( $ad_id, $placement = '' ) {
 		$this->record_analytics( $ad_id, 'impression', $placement );
+
+		/**
+		 * Action fired when an ad impression is recorded.
+		 *
+		 * @since 2.3.0
+		 * @param int    $ad_id     Ad ID.
+		 * @param string $placement Placement ID.
+		 */
+		do_action( 'wbam_ad_impression', $ad_id, $placement );
 	}
 
 	/**

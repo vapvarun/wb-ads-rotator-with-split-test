@@ -203,7 +203,15 @@ class Placement_Engine {
 			}
 		}
 
-		return $filtered;
+		/**
+		 * Filter the ads returned for a placement.
+		 *
+		 * @since 2.3.0
+		 * @param array  $filtered     Array of ad IDs that passed targeting.
+		 * @param string $placement_id Placement ID.
+		 * @param array  $ad_ids       Original array of ad IDs before targeting.
+		 */
+		return apply_filters( 'wbam_ads_for_placement', $filtered, $placement_id, $ad_ids );
 	}
 
 	/**
