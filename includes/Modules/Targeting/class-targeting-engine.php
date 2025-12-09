@@ -208,18 +208,38 @@ class Targeting_Engine {
 		}
 
 		// Check categories.
-		if ( ! empty( $rules['categories'] ) && is_singular( 'post' ) ) {
-			$post_categories = wp_get_post_categories( get_the_ID() );
-			if ( array_intersect( $rules['categories'], $post_categories ) ) {
-				$matched = true;
+		if ( ! empty( $rules['categories'] ) ) {
+			// Check on single posts.
+			if ( is_singular( 'post' ) ) {
+				$post_categories = wp_get_post_categories( get_the_ID() );
+				if ( array_intersect( $rules['categories'], $post_categories ) ) {
+					$matched = true;
+				}
+			}
+			// Check on category archives.
+			if ( is_category() ) {
+				$current_cat = get_queried_object_id();
+				if ( in_array( $current_cat, array_map( 'intval', $rules['categories'] ), true ) ) {
+					$matched = true;
+				}
 			}
 		}
 
 		// Check tags.
-		if ( ! empty( $rules['tags'] ) && is_singular( 'post' ) ) {
-			$post_tags = wp_get_post_tags( get_the_ID(), array( 'fields' => 'ids' ) );
-			if ( array_intersect( $rules['tags'], $post_tags ) ) {
-				$matched = true;
+		if ( ! empty( $rules['tags'] ) ) {
+			// Check on single posts.
+			if ( is_singular( 'post' ) ) {
+				$post_tags = wp_get_post_tags( get_the_ID(), array( 'fields' => 'ids' ) );
+				if ( array_intersect( $rules['tags'], $post_tags ) ) {
+					$matched = true;
+				}
+			}
+			// Check on tag archives.
+			if ( is_tag() ) {
+				$current_tag = get_queried_object_id();
+				if ( in_array( $current_tag, array_map( 'intval', $rules['tags'] ), true ) ) {
+					$matched = true;
+				}
 			}
 		}
 
@@ -251,18 +271,38 @@ class Targeting_Engine {
 		}
 
 		// Exclude categories.
-		if ( ! empty( $rules['exclude_categories'] ) && is_singular( 'post' ) ) {
-			$post_categories = wp_get_post_categories( get_the_ID() );
-			if ( array_intersect( $rules['exclude_categories'], $post_categories ) ) {
-				return false;
+		if ( ! empty( $rules['exclude_categories'] ) ) {
+			// Check on single posts.
+			if ( is_singular( 'post' ) ) {
+				$post_categories = wp_get_post_categories( get_the_ID() );
+				if ( array_intersect( $rules['exclude_categories'], $post_categories ) ) {
+					return false;
+				}
+			}
+			// Check on category archives.
+			if ( is_category() ) {
+				$current_cat = get_queried_object_id();
+				if ( in_array( $current_cat, array_map( 'intval', $rules['exclude_categories'] ), true ) ) {
+					return false;
+				}
 			}
 		}
 
 		// Exclude tags.
-		if ( ! empty( $rules['exclude_tags'] ) && is_singular( 'post' ) ) {
-			$post_tags = wp_get_post_tags( get_the_ID(), array( 'fields' => 'ids' ) );
-			if ( array_intersect( $rules['exclude_tags'], $post_tags ) ) {
-				return false;
+		if ( ! empty( $rules['exclude_tags'] ) ) {
+			// Check on single posts.
+			if ( is_singular( 'post' ) ) {
+				$post_tags = wp_get_post_tags( get_the_ID(), array( 'fields' => 'ids' ) );
+				if ( array_intersect( $rules['exclude_tags'], $post_tags ) ) {
+					return false;
+				}
+			}
+			// Check on tag archives.
+			if ( is_tag() ) {
+				$current_tag = get_queried_object_id();
+				if ( in_array( $current_tag, array_map( 'intval', $rules['exclude_tags'] ), true ) ) {
+					return false;
+				}
 			}
 		}
 

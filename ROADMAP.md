@@ -29,6 +29,9 @@ WB Ad Manager is a modular WordPress ad management plugin with BuddyPress integr
 | BuddyPress Widgets (3) | ✅ Complete |
 | bbPress Module | ✅ Complete |
 | bbPress Widgets (2) | ✅ Complete |
+| Links Module | ✅ Complete |
+| A/B Testing (Basic) | ✅ Complete |
+| A/B Testing (Advanced) | 🔄 In Progress |
 | Targeting Engine | ✅ Complete |
 | Content Analyzer | ✅ Complete |
 | Display Rules (Include/Exclude) | ✅ Complete |
@@ -257,7 +260,83 @@ assets/js/frontend.js
 
 ---
 
+### Phase 4: Links Module ✅ COMPLETE
+
+**Links Management:**
+- [x] Create `wbam_links` database table
+- [x] Link Manager class for CRUD operations
+- [x] Link entity class with all properties
+- [x] Admin UI for managing links
+
+**Link Features:**
+- [x] Link cloaking with customizable prefix (default: /go/)
+- [x] Nofollow attribute support
+- [x] Sponsored attribute support
+- [x] Click tracking via AJAX endpoint
+- [x] Link shortcodes for easy insertion
+
+**Shortcodes:**
+- [x] `[wbam_link id="X"]` - Single link output
+- [x] `[wbam_link id="X" text="Custom Text"]` - Custom anchor text
+- [x] `[wbam_link id="X" class="custom-class"]` - Custom CSS class
+
+**Admin Interface:**
+- [x] Links list table with all columns
+- [x] Add/Edit link forms
+- [x] Click count display
+- [x] Quick actions (edit, delete, copy URL)
+
+**Files Created:**
+```
+includes/Modules/Links/
+├── class-links-module.php
+├── class-link-manager.php
+├── class-link.php
+├── class-link-cloaker.php
+├── class-link-shortcodes.php
+├── class-links-admin.php
+└── class-links-list-table.php
+```
+
+---
+
+### Phase 5: A/B Testing Foundation ✅ COMPLETE
+
+**Basic A/B Testing:**
+- [x] Ad rotation with weighted random selection
+- [x] Priority/weight system (1-10 scale)
+- [x] Impression tracking capability
+- [x] Click tracking capability
+- [x] Basic statistics display in admin
+
+**Files:**
+```
+includes/Modules/Targeting/class-frequency-manager.php (rotation logic)
+```
+
+---
+
 ## FREE VERSION v1.1+ - Future Enhancements
+
+### A/B Testing Completion 🔄 IN PROGRESS
+**Priority:** High | **Complexity:** High
+
+**What exists:**
+- [x] Ad rotation with split test capability
+- [x] Impression and click tracking
+- [x] Basic statistics display
+
+**What needs to be added:**
+- [ ] Statistical significance calculation (Chi-squared/Z-test)
+- [ ] Confidence level indicators (90%, 95%, 99%)
+- [ ] Automatic winner declaration
+- [ ] Test scheduling (start/end dates, minimum sample size)
+- [ ] Simple test comparison reports
+- [ ] One-click winner selection
+
+**Note:** Advanced features (multi-variate testing, auto-optimization, Thompson Sampling) will be in PRO version.
+
+---
 
 ### Ad Groups & Rotation 🔲
 **Priority:** High | **Complexity:** High
@@ -336,4 +415,4 @@ assets/js/frontend.js
 
 ---
 
-*Last updated: December 1, 2024*
+*Last updated: December 9, 2024*
