@@ -1,0 +1,144 @@
+<?php
+/**
+ * Before Archive Placement
+ *
+ * @package WB_Ad_Manager
+ * @since   2.4.0
+ */
+
+namespace WBAM\Modules\Placements;
+
+/**
+ * Before Archive Placement class.
+ *
+ * Displays ads before the posts loop on archive pages.
+ * Uses multiple hooks for maximum theme compatibility:
+ * - loop_start (standard WordPress hook)
+ * - Theme-specific hooks (buddyx_before_content, genesis_before_loop, etc.)
+ */
+class Before_Archive_Placement implements Placement_Interface {
+
+	/**
+	 * Track if ads were displayed.
+	 *
+	 * @var bool
+	 */
+	private $displayed = false;
+
+	/**
+	 * Get placement ID.
+	 *
+	 * @return string
+	 */
+	public function get_id() {
+		return 'before_archive';
+	}
+
+	/**
+	 * Get placement name.
+	 *
+	 * @return string
+	 */
+	public function get_name() {
+		return __( 'Before Posts Archive', 'wb-ads-rotator-with-split-test' );
+	}
+
+	/**
+	 * Get placement description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return __( 'Display ads before the posts loop on archive/blog pages.', 'wb-ads-rotator-with-split-test' );
+	}
+
+	/**
+	 * Get placement group.
+	 *
+	 * @return string
+	 */
+	public function get_group() {
+		return 'wordpress';
+	}
+
+	/**
+	 * Check if placement is available.
+	 *
+	 * @return bool
+	 */
+	public function is_available() {
+		return true;
+	}
+
+	/**
+	 * Register placement hooks.
+	 *
+	 * Multiple hooks for theme compatibility.
+	 */
+	public function register() {
+		// Standard WordPress hook.
+		add_action( 'loop_start', array( $this, 'display_ads_loop' ), 5 );
+
+		// Theme-specific hooks for wider compatibility.
+		// BuddyX / Flavor theme.
+		add_action( 'buddyx_before_content', array( $this, 'display_ads' ), 20 );
+		// Genesis theme framework.
+		add_action( 'genesis_before_loop', array( $this, 'display_ads' ) );
+		// GeneratePress theme.
+		add_action( 'generate_before_main_content', array( $this, 'display_ads' ) );
+		// Astra theme.
+		add_action( 'astra_primary_content_top', array( $this, 'display_ads' ) );
+		// OceanWP theme.
+		add_action( 'ocean_before_content', array( $this, 'display_ads' ) );
+		// Theme My Login / General themes.
+		add_action( 'theme_before_content', array( $this, 'display_ads' ) );
+	}
+
+	/**
+	 * Display ads before archive loop (for loop_start hook).
+	 *
+	 * @param \WP_Query $query Query.
+	 */
+	public function display_ads_loop( $query ) {
+		if ( ! $query->is_main_query() ) {
+			return;
+		}
+
+		$this->display_ads();
+	}
+
+	/**
+	 * Display ads before archive content.
+	 */
+	public function display_ads() {
+		// Only on archive pages (category, tag, date, author, etc.), home/blog, and search.
+		if ( ! is_archive() && ! is_home() && ! is_search() ) {
+			return;
+		}
+
+		// Don't show on singular pages.
+		if ( is_singular() ) {
+			return;
+		}
+
+		// Prevent duplicate output.
+		if ( $this->displayed ) {
+			return;
+		}
+
+		$engine = Placement_Engine::get_instance();
+		$ads    = $engine->get_ads_for_placement( $this->get_id() );
+
+		if ( empty( $ads ) ) {
+			return;
+		}
+
+		$this->displayed = true;
+
+		echo '<div class="wbam-placement wbam-placement-before-archive">';
+		foreach ( $ads as $ad_id ) {
+			echo $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+		echo '</div>';
+	}
+}

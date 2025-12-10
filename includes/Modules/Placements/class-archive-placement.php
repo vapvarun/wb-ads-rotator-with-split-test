@@ -10,6 +10,8 @@ namespace WBAM\Modules\Placements;
 
 /**
  * Archive Placement class.
+ *
+ * Displays ads between posts on archive pages.
  */
 class Archive_Placement implements Placement_Interface {
 
@@ -32,7 +34,7 @@ class Archive_Placement implements Placement_Interface {
 	}
 
 	public function get_name() {
-		return __( 'Between Posts', 'wb-ads-rotator-with-split-test' );
+		return __( 'Between Posts (Archive)', 'wb-ads-rotator-with-split-test' );
 	}
 
 	public function get_description() {
