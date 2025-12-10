@@ -69,7 +69,9 @@ class Code_Ad implements Ad_Type_Interface {
 			$classes[] = sanitize_html_class( $options['class'] );
 		}
 
-		$html  = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-ad-id="' . esc_attr( $ad_id ) . '">';
+		$placement = isset( $options['placement'] ) ? $options['placement'] : '';
+
+		$html  = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-ad-id="' . esc_attr( $ad_id ) . '" data-placement="' . esc_attr( $placement ) . '">';
 		$html .= $code; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		$html .= '</div>';
 

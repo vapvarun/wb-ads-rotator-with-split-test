@@ -155,6 +155,8 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 			$classes[] = sanitize_html_class( $options['class'] );
 		}
 
+		$placement = isset( $options['placement'] ) ? $options['placement'] : '';
+
 		/**
 		 * Filter the wrapper CSS classes.
 		 *
@@ -196,6 +198,7 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		?>
 		<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"
 			 data-ad-id="<?php echo esc_attr( $ad_id ); ?>"
+			 data-placement="<?php echo esc_attr( $placement ); ?>"
 			 data-cookie-days="<?php echo esc_attr( $cookie_days ); ?>"
 			 style="--wbam-email-bg: <?php echo esc_attr( $bg_color ); ?>; --wbam-email-text: <?php echo esc_attr( $text_color ); ?>; --wbam-email-btn: <?php echo esc_attr( $button_color ); ?>;">
 

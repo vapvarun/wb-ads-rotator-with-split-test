@@ -163,6 +163,8 @@ class AdSense_Ad implements Ad_Type_Interface {
 			$classes[] = sanitize_html_class( $options['class'] );
 		}
 
+		$placement = isset( $options['placement'] ) ? $options['placement'] : '';
+
 		// Build style attribute.
 		$style = 'display:block;';
 		if ( ! $responsive && $fixed_width && $fixed_height ) {
@@ -194,7 +196,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 		}
 
 		// Build HTML.
-		$html = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-ad-id="' . esc_attr( $ad_id ) . '">';
+		$html = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-ad-id="' . esc_attr( $ad_id ) . '" data-placement="' . esc_attr( $placement ) . '">';
 		$html .= '<ins';
 		foreach ( $ins_attrs as $attr => $value ) {
 			if ( ! empty( $value ) ) {

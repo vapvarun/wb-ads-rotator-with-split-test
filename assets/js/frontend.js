@@ -471,7 +471,7 @@
 			 * Initialize click tracking.
 			 */
 			init: function() {
-				var ads = document.querySelectorAll( '.wbam-ad-container[data-ad-id]' );
+				var ads = document.querySelectorAll( '.wbam-ad[data-ad-id]' );
 
 				ads.forEach( function( ad ) {
 					var links = ad.querySelectorAll( 'a' );
