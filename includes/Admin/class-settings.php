@@ -28,20 +28,21 @@ class Settings {
 	 * @var array
 	 */
 	private $defaults = array(
-		'disable_ads_logged_in'  => false,
-		'disable_ads_admin'      => true,
-		'ad_label'               => '',
-		'ad_label_position'      => 'above',
-		'container_class'        => '',
-		'disable_on_post_types'  => array(),
-		'min_content_length'     => 0,
-		'max_ads_per_page'       => 0,
-		'cache_ads'              => false,
-		'lazy_load'              => false,
-		'geo_primary_provider'   => 'ip-api',
-		'geo_ipinfo_key'         => '',
-		'adsense_publisher_id'   => '',
-		'adsense_auto_ads'       => false,
+		'disable_ads_logged_in'    => false,
+		'disable_ads_admin'        => true,
+		'ad_label'                 => '',
+		'ad_label_position'        => 'above',
+		'container_class'          => '',
+		'disable_on_post_types'    => array(),
+		'min_content_length'       => 0,
+		'max_ads_per_page'         => 0,
+		'cache_ads'                => false,
+		'lazy_load'                => false,
+		'geo_primary_provider'     => 'ip-api',
+		'geo_ipinfo_key'           => '',
+		'adsense_publisher_id'     => '',
+		'adsense_auto_ads'         => false,
+		'delete_data_on_uninstall' => false,
 	);
 
 	/**
@@ -294,6 +295,26 @@ class Settings {
 				'description' => __( 'Enable AdSense Auto Ads on your site. Google will automatically place ads.', 'wb-ads-rotator-with-split-test' ),
 			)
 		);
+
+		// Advanced Section.
+		add_settings_section(
+			'wbam_advanced',
+			__( 'Advanced', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_advanced_section' ),
+			'wbam-settings'
+		);
+
+		add_settings_field(
+			'delete_data_on_uninstall',
+			__( 'Delete Data on Uninstall', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_checkbox_field' ),
+			'wbam-settings',
+			'wbam_advanced',
+			array(
+				'id'          => 'delete_data_on_uninstall',
+				'description' => __( 'Delete all plugin data (ads, analytics, settings) when the plugin is uninstalled.', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
 	}
 
 	/**
@@ -355,6 +376,9 @@ class Settings {
 		// AdSense settings.
 		$sanitized['adsense_publisher_id']   = sanitize_text_field( $input['adsense_publisher_id'] ?? '' );
 		$sanitized['adsense_auto_ads']       = ! empty( $input['adsense_auto_ads'] );
+
+		// Advanced settings.
+		$sanitized['delete_data_on_uninstall'] = ! empty( $input['delete_data_on_uninstall'] );
 
 		return $sanitized;
 	}
@@ -441,6 +465,13 @@ class Settings {
 	 */
 	public function render_adsense_section() {
 		echo '<p>' . esc_html__( 'Configure Google AdSense integration. The AdSense script will only be loaded once, even with multiple ad units on a page.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+	}
+
+	/**
+	 * Render advanced section.
+	 */
+	public function render_advanced_section() {
+		echo '<p>' . esc_html__( 'Advanced plugin settings.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 	}
 
 	/**
