@@ -25,19 +25,24 @@ class Settings {
 	/**
 	 * Default settings.
 	 *
+	 * These defaults are optimized for first-time users:
+	 * - Ads visible to admins so they can test immediately
+	 * - Performance features enabled for better page load
+	 * - Ad label set for transparency/compliance
+	 *
 	 * @var array
 	 */
 	private $defaults = array(
 		'disable_ads_logged_in'    => false,
-		'disable_ads_admin'        => true,
-		'ad_label'                 => '',
+		'disable_ads_admin'        => false,  // Show ads to admins so they can test.
+		'ad_label'                 => 'Advertisement',
 		'ad_label_position'        => 'above',
 		'container_class'          => '',
 		'disable_on_post_types'    => array(),
-		'min_content_length'       => 0,
-		'max_ads_per_page'         => 0,
-		'cache_ads'                => false,
-		'lazy_load'                => false,
+		'min_content_length'       => 300,    // Minimum content length for paragraph ads.
+		'max_ads_per_page'         => 10,     // Sensible limit to prevent ad overload.
+		'cache_ads'                => true,   // Better performance.
+		'lazy_load'                => true,   // Better page load times.
 		'geo_primary_provider'     => 'ip-api',
 		'geo_ipinfo_key'           => '',
 		'adsense_publisher_id'     => '',
