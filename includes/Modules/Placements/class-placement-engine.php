@@ -79,7 +79,6 @@ class Placement_Engine {
 		$this->register_placement( new Widget_Placement() );
 		$this->register_placement( new Before_Archive_Placement() );
 		$this->register_placement( new After_Archive_Placement() );
-		$this->register_placement( new Archive_Placement() );
 		$this->register_placement( new Sticky_Placement() );
 		$this->register_placement( new Popup_Placement() );
 		$this->register_placement( new Comment_Placement() );
