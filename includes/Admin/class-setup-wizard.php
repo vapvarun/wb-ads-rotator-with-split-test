@@ -451,7 +451,7 @@ class Setup_Wizard {
 				'data'       => array(
 					'type' => 'code',
 					'code' => '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; text-align: center; color: #fff;">
-	<h4 style="margin: 0 0 10px; font-size: 18px;">' . esc_html__( 'Advertise Here!', 'wb-ads-rotator-with-split-test' ) . '</h4>
+	<h4 style="margin: 0 0 10px; color: inherit; font-size: 18px;">' . esc_html__( 'Advertise Here!', 'wb-ads-rotator-with-split-test' ) . '</h4>
 	<p style="margin: 0 0 15px; font-size: 14px;">' . esc_html__( 'This is a sample sidebar ad using custom HTML code.', 'wb-ads-rotator-with-split-test' ) . '</p>
 	<a href="#" style="display: inline-block; background: #fff; color: #667eea; padding: 8px 20px; border-radius: 4px; text-decoration: none; font-weight: bold;">' . esc_html__( 'Learn More', 'wb-ads-rotator-with-split-test' ) . '</a>
 </div>',

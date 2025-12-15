@@ -176,13 +176,13 @@
 }
 
 /* BuddyPress specific adjustments */
-#activity-stream .wbam-activity-ad {
+/* #activity-stream .wbam-activity-ad {
 	border-left: none;
 }
 
 #activity-stream .wbam-activity-ad .activity-avatar {
 	display: none;
-}
+} */
 
 /* ==========================================================================
    Alignment Variations
@@ -374,6 +374,7 @@
 	right: -10px;
 	width: 28px;
 	height: 28px;
+	padding: 0;
 	background: #333;
 	color: #fff;
 	border: none;
@@ -388,7 +389,8 @@
 }
 
 .wbam-sticky-close:hover {
-	background: #000;
+	background: #fce8e6;
+    color: #c5221f;
 }
 
 .wbam-sticky-bottom-bar .wbam-sticky-close,
@@ -453,8 +455,9 @@
 	right: 10px;
 	width: 32px;
 	height: 32px;
-	background: rgba(0, 0, 0, 0.1);
-	color: #333;
+	padding: 0;
+	background: #333;
+	color: #fff;
 	border: none;
 	border-radius: 50%;
 	font-size: 22px;
@@ -468,7 +471,8 @@
 }
 
 .wbam-popup-close:hover {
-	background: rgba(0, 0, 0, 0.2);
+	background: #fce8e6;
+    color: #c5221f;
 }
 
 @keyframes wbam-fade-in {
