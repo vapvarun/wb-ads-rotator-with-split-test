@@ -204,6 +204,22 @@ class Placement_Engine {
 			}
 		}
 
+		// Sort filtered ads by priority (higher priority first).
+		usort(
+			$filtered,
+			function ( $a, $b ) {
+				$priority_a = (int) get_post_meta( $a, '_wbam_priority', true );
+				$priority_b = (int) get_post_meta( $b, '_wbam_priority', true );
+
+				// Default priority is 5 if not set.
+				$priority_a = $priority_a ?: 5;
+				$priority_b = $priority_b ?: 5;
+
+				// Higher priority first (descending).
+				return $priority_b - $priority_a;
+			}
+		);
+
 		/**
 		 * Filter the ads returned for a placement.
 		 *
