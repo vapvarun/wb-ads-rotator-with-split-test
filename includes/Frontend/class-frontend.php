@@ -39,7 +39,7 @@ class Frontend {
 		wp_enqueue_style(
 			'wbam-frontend',
 			WBAM_URL . 'assets/css/frontend' . $suffix . '.css',
-			array(),
+			array( 'dashicons' ),
 			WBAM_VERSION
 		);
 
