@@ -199,6 +199,7 @@ class Geo_Engine {
 		// Get provider order from settings.
 		$primary        = Settings_Helper::get( 'geo_primary_provider', 'ip-api' );
 		$provider_order = $this->get_provider_order( $primary );
+		$settings       = Settings_Helper::get();
 
 		$location = null;
 
