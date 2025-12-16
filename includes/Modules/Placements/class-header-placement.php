@@ -40,6 +40,10 @@ class Header_Placement implements Placement_Interface {
 		return true;
 	}
 
+	public function show_in_selector() {
+		return true;
+	}
+
 	public function register() {
 		// Primary: Use wp_body_open for visible header ads (after <body> tag).
 		add_action( 'wp_body_open', array( $this, 'display' ), 10 );

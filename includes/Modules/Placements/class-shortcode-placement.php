@@ -33,6 +33,16 @@ class Shortcode_Placement implements Placement_Interface {
 		return true;
 	}
 
+	/**
+	 * Shortcode placement should not appear in the placement selector.
+	 * It's used manually via [wbam_ad] shortcode.
+	 *
+	 * @return bool
+	 */
+	public function show_in_selector() {
+		return false;
+	}
+
 	public function register() {
 		add_shortcode( 'wbam_ad', array( $this, 'shortcode_single' ) );
 		add_shortcode( 'wbam_ads', array( $this, 'shortcode_multiple' ) );

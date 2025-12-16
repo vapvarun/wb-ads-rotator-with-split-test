@@ -49,6 +49,16 @@ interface Placement_Interface {
 	public function is_available();
 
 	/**
+	 * Check if placement should appear in the admin selector.
+	 *
+	 * Placements like shortcode are used manually and shouldn't
+	 * appear as selectable options in the placement metabox.
+	 *
+	 * @return bool
+	 */
+	public function show_in_selector();
+
+	/**
 	 * Register placement hooks.
 	 */
 	public function register();

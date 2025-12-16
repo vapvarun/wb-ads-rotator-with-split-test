@@ -71,6 +71,15 @@ class Before_Archive_Placement implements Placement_Interface {
 	}
 
 	/**
+	 * Check if placement should appear in the admin selector.
+	 *
+	 * @return bool
+	 */
+	public function show_in_selector() {
+		return true;
+	}
+
+	/**
 	 * Register placement hooks.
 	 *
 	 * Multiple hooks for theme compatibility.

@@ -33,6 +33,10 @@ class Paragraph_Placement implements Placement_Interface {
 		return true;
 	}
 
+	public function show_in_selector() {
+		return true;
+	}
+
 	public function register() {
 		add_filter( 'the_content', array( $this, 'inject_ads' ), 25 );
 	}

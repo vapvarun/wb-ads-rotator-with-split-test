@@ -33,6 +33,10 @@ class Footer_Placement implements Placement_Interface {
 		return true;
 	}
 
+	public function show_in_selector() {
+		return true;
+	}
+
 	public function register() {
 		add_action( 'wp_footer', array( $this, 'display' ), 10 );
 	}
