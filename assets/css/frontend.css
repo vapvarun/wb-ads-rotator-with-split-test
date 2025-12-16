@@ -69,12 +69,19 @@
 
 .wbam-ad-image {
 	line-height: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	max-width: 100%;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .wbam-ad-image a {
 	display: inline-block;
 	text-decoration: none;
 	transition: opacity var(--wbam-transition);
+	max-width: 100%;
 }
 
 .wbam-ad-image a:hover {
@@ -85,6 +92,30 @@
 	max-width: 100%;
 	height: auto;
 	border-radius: var(--wbam-border-radius);
+	display: block;
+}
+
+/* Constrain image ads in specific placements to prevent oversized images */
+.wbam-placement-footer .wbam-ad-image,
+.wbam-placement-header .wbam-ad-image,
+.wbam-placement-sidebar .wbam-ad-image {
+	max-width: 728px;
+}
+
+.wbam-placement-before-content .wbam-ad-image,
+.wbam-placement-after-content .wbam-ad-image,
+.wbam-placement-paragraph .wbam-ad-image {
+	max-width: 970px;
+}
+
+/* Widget sidebar constraint */
+.widget .wbam-ad-image {
+	max-width: 100%;
+}
+
+.widget .wbam-ad-image img {
+	width: 100%;
+	object-fit: contain;
 }
 
 /* ==========================================================================
