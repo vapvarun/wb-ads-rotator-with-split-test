@@ -57,6 +57,12 @@ class Targeting_Engine {
 			return false;
 		}
 
+		// Check session/frequency limits.
+		$frequency_manager = Frequency_Manager::get_instance();
+		if ( ! $frequency_manager->can_show_ad( $ad_id ) ) {
+			return false;
+		}
+
 		return apply_filters( 'wbam_should_display_ad', true, $ad_id );
 	}
 
