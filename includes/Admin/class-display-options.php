@@ -225,6 +225,19 @@ class Display_Options {
 		$schedule   = is_array( $schedule ) ? $schedule : array();
 		$start_date = isset( $schedule['start_date'] ) ? $schedule['start_date'] : '';
 		$end_date   = isset( $schedule['end_date'] ) ? $schedule['end_date'] : '';
+
+		// Also check standalone date meta (used by PRO advertiser dashboard).
+		$standalone_start = get_post_meta( $post->ID, '_wbam_start_date', true );
+		$standalone_end   = get_post_meta( $post->ID, '_wbam_end_date', true );
+
+		// Use standalone dates if schedule dates are empty.
+		if ( empty( $start_date ) && ! empty( $standalone_start ) ) {
+			$start_date = $standalone_start;
+		}
+		if ( empty( $end_date ) && ! empty( $standalone_end ) ) {
+			$end_date = $standalone_end;
+		}
+
 		$days       = isset( $schedule['days'] ) ? (array) $schedule['days'] : array();
 		$time_start = isset( $schedule['time_start'] ) ? $schedule['time_start'] : '';
 		$time_end   = isset( $schedule['time_end'] ) ? $schedule['time_end'] : '';
@@ -440,6 +453,18 @@ class Display_Options {
 		if ( isset( $_POST['wbam_schedule'] ) ) {
 			$schedule = $this->sanitize_schedule( wp_unslash( $_POST['wbam_schedule'] ) ); // phpcs:ignore
 			update_post_meta( $post_id, '_wbam_schedule', $schedule );
+
+			// Also sync to standalone date meta keys (used by PRO advertiser dashboard).
+			if ( ! empty( $schedule['start_date'] ) ) {
+				update_post_meta( $post_id, '_wbam_start_date', $schedule['start_date'] );
+			} else {
+				delete_post_meta( $post_id, '_wbam_start_date' );
+			}
+			if ( ! empty( $schedule['end_date'] ) ) {
+				update_post_meta( $post_id, '_wbam_end_date', $schedule['end_date'] );
+			} else {
+				delete_post_meta( $post_id, '_wbam_end_date' );
+			}
 		}
 
 		// Save visitor conditions.

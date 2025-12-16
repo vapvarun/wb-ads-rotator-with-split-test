@@ -116,8 +116,26 @@ class Targeting_Engine {
 	private function check_schedule( $ad_id ) {
 		$schedule = get_post_meta( $ad_id, '_wbam_schedule', true );
 
-		if ( empty( $schedule ) || ! is_array( $schedule ) ) {
+		// Also check standalone date meta (used by PRO advertiser dashboard).
+		$standalone_start = get_post_meta( $ad_id, '_wbam_start_date', true );
+		$standalone_end   = get_post_meta( $ad_id, '_wbam_end_date', true );
+
+		// If no schedule array and no standalone dates, show the ad.
+		if ( ( empty( $schedule ) || ! is_array( $schedule ) ) && empty( $standalone_start ) && empty( $standalone_end ) ) {
 			return true;
+		}
+
+		// Initialize schedule array if empty.
+		if ( empty( $schedule ) || ! is_array( $schedule ) ) {
+			$schedule = array();
+		}
+
+		// Merge standalone dates into schedule (standalone takes precedence if set).
+		if ( ! empty( $standalone_start ) ) {
+			$schedule['start_date'] = $standalone_start;
+		}
+		if ( ! empty( $standalone_end ) ) {
+			$schedule['end_date'] = $standalone_end;
 		}
 
 		$now = current_time( 'timestamp' );
