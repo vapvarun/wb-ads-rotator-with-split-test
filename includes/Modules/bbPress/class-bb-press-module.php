@@ -109,6 +109,15 @@ class bbPress_Placement implements \WBAM\Modules\Placements\Placement_Interface 
 	}
 
 	/**
+	 * Show in placement selector.
+	 *
+	 * @return bool
+	 */
+	public function show_in_selector() {
+		return true;
+	}
+
+	/**
 	 * Register placement hooks.
 	 */
 	public function register() {
