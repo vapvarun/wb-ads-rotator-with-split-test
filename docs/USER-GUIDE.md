@@ -586,4 +586,4 @@ Navigate to **WB Ads > Upgrade to PRO**
 
 ---
 
-*Last updated: December 9, 2024*
+*Last updated: December 17, 2024*

@@ -148,8 +148,8 @@ class Partnership {
 		$this->target_post_id = $this->target_post_id ? (int) $this->target_post_id : null;
 
 		// Cast float fields.
-		$this->budget_min = $this->budget_min !== null ? (float) $this->budget_min : null;
-		$this->budget_max = $this->budget_max !== null ? (float) $this->budget_max : null;
+		$this->budget_min = null !== $this->budget_min ? (float) $this->budget_min : null;
+		$this->budget_max = null !== $this->budget_max ? (float) $this->budget_max : null;
 	}
 
 	/**
@@ -293,7 +293,7 @@ class Partnership {
 	 * @return string
 	 */
 	public function get_time_ago() {
-		return human_time_diff( strtotime( $this->created_at ), current_time( 'timestamp' ) );
+		return human_time_diff( strtotime( $this->created_at ), current_datetime()->getTimestamp() );
 	}
 
 	/**

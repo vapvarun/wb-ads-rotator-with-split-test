@@ -343,6 +343,141 @@ $html = apply_filters( 'wbam_link_output', $html, $link, $options );
  * @param int    $link_id Link post ID.
  */
 $url = apply_filters( 'wbam_link_redirect_url', $url, $link_id );
+
+/**
+ * Filter link redirect type (301, 302, etc).
+ *
+ * @since 2.3.0
+ * @param string $type Redirect type.
+ * @param object $link Link object.
+ */
+$type = apply_filters( 'wbam_link_redirect_type', $type, $link );
+
+/**
+ * Filter link data before saving.
+ *
+ * @since 2.3.0
+ * @param array $data    Link data.
+ * @param int   $link_id Link ID.
+ * @param array $_POST   Raw POST data.
+ */
+$data = apply_filters( 'wbam_link_save_data', $data, $link_id, $_POST );
+
+/**
+ * Fires when a link is clicked.
+ *
+ * @since 2.0.0
+ * @param int $link_id Link ID.
+ */
+do_action( 'wbam_link_clicked', $link_id );
+
+/**
+ * Fires before link redirect.
+ *
+ * @since 2.3.0
+ * @param object $link        Link object.
+ * @param string $destination Destination URL.
+ */
+do_action( 'wbam_before_link_redirect', $link, $destination );
+
+/**
+ * Fires when a link is created.
+ *
+ * @since 2.3.0
+ * @param int   $link_id Link ID.
+ * @param array $data    Link data.
+ */
+do_action( 'wbam_link_created', $link_id, $data );
+
+/**
+ * Fires when a link is updated.
+ *
+ * @since 2.3.0
+ * @param int   $link_id Link ID.
+ * @param array $data    Link data.
+ */
+do_action( 'wbam_link_updated', $link_id, $data );
+
+/**
+ * Fires when a link is deleted.
+ *
+ * @since 2.3.0
+ * @param int $link_id Link ID.
+ */
+do_action( 'wbam_link_deleted', $link_id );
+```
+
+#### Link Partnerships
+
+```php
+/**
+ * Fires when a partnership inquiry is submitted.
+ *
+ * @since 2.3.0
+ * @param object $partnership Partnership object.
+ * @param array  $data        Submitted data.
+ */
+do_action( 'wbam_partnership_form_submission_after', $partnership, $data );
+
+/**
+ * Fires when partnership is created.
+ *
+ * @since 2.3.0
+ * @param object $partnership Partnership object.
+ */
+do_action( 'wbam_partnership_created', $partnership );
+
+/**
+ * Fires when partnership is accepted.
+ *
+ * @since 2.3.0
+ * @param object $partnership Partnership object.
+ */
+do_action( 'wbam_partnership_accepted', $partnership );
+
+/**
+ * Fires when partnership is rejected.
+ *
+ * @since 2.3.0
+ * @param object $partnership Partnership object.
+ */
+do_action( 'wbam_partnership_rejected', $partnership );
+
+/**
+ * Filter partnership form data before saving.
+ *
+ * @since 2.3.0
+ * @param array $data  Partnership data.
+ * @param array $_POST Raw POST data.
+ */
+$data = apply_filters( 'wbam_partnership_form_data', $data, $_POST );
+
+/**
+ * Filter partnership form validation.
+ *
+ * @since 2.3.0
+ * @param bool  $valid Validation result.
+ * @param array $data  Partnership data.
+ * @param array $_POST Raw POST data.
+ */
+$valid = apply_filters( 'wbam_partnership_form_validation', true, $data, $_POST );
+
+/**
+ * Filter partnership types available in form.
+ *
+ * @since 2.3.0
+ * @param array $types Array of partnership types.
+ */
+$types = apply_filters( 'wbam_partnership_form_types', $types );
+
+/**
+ * Filter whether to send admin notification.
+ *
+ * @since 2.3.0
+ * @param bool   $send        Whether to send.
+ * @param object $partnership Partnership object.
+ */
+$send = apply_filters( 'wbam_send_partnership_admin_notification', true, $partnership );
 ```
 
 ---
@@ -803,4 +938,4 @@ For questions about extending the plugin, check our knowledge base or contact su
 
 ---
 
-*Last updated: December 9, 2024*
+*Last updated: December 17, 2024*
