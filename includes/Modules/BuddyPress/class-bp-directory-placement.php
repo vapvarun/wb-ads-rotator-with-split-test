@@ -62,6 +62,15 @@ class BP_Directory_Placement implements Placement_Interface {
 	}
 
 	/**
+	 * Show in placement selector.
+	 *
+	 * @return bool
+	 */
+	public function show_in_selector() {
+		return true;
+	}
+
+	/**
 	 * Register placement hooks.
 	 */
 	public function register() {

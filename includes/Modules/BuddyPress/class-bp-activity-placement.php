@@ -43,6 +43,15 @@ class BP_Activity_Placement implements Placement_Interface {
 		return class_exists( 'BuddyPress' );
 	}
 
+	/**
+	 * Show in placement selector.
+	 *
+	 * @return bool
+	 */
+	public function show_in_selector() {
+		return true;
+	}
+
 	public function register() {
 		add_action( 'bp_after_activity_entry', array( $this, 'after_activity' ) );
 
