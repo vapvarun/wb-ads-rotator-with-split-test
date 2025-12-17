@@ -173,6 +173,10 @@ class Placement_Engine {
 	 * @return array
 	 */
 	public function get_ads_for_placement( $placement_id ) {
+		// Use a more precise LIKE pattern for serialized data.
+		// Format: s:X:"placement_id"; where X is the string length.
+		$serialized_pattern = sprintf( 's:%d:"%s"', strlen( $placement_id ), $placement_id );
+
 		$args = array(
 			'post_type'      => 'wbam-ad',
 			'posts_per_page' => -1,
@@ -186,7 +190,7 @@ class Placement_Engine {
 				),
 				array(
 					'key'     => '_wbam_placements',
-					'value'   => $placement_id,
+					'value'   => $serialized_pattern,
 					'compare' => 'LIKE',
 				),
 			),
@@ -194,11 +198,17 @@ class Placement_Engine {
 
 		$ad_ids = get_posts( $args );
 
-		// Filter through targeting engine.
+		// Filter through targeting engine and verify exact placement match.
 		$targeting = Targeting_Engine::get_instance();
 		$filtered  = array();
 
 		foreach ( $ad_ids as $ad_id ) {
+			// Double-check that the placement is actually in the array (prevents false LIKE matches).
+			$placements = get_post_meta( $ad_id, '_wbam_placements', true );
+			if ( ! is_array( $placements ) || ! in_array( $placement_id, $placements, true ) ) {
+				continue;
+			}
+
 			if ( $targeting->should_display( $ad_id ) ) {
 				$filtered[] = $ad_id;
 			}

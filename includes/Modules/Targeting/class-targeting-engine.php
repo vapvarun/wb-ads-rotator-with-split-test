@@ -138,11 +138,13 @@ class Targeting_Engine {
 			$schedule['end_date'] = $standalone_end;
 		}
 
-		$now = current_time( 'timestamp' );
+		// Use current_datetime() for WP 5.3+ compatibility (avoids deprecated current_time('timestamp')).
+		$now_datetime = current_datetime();
+		$now          = $now_datetime->getTimestamp();
 
 		// Check start date.
 		if ( ! empty( $schedule['start_date'] ) ) {
-			$start = strtotime( $schedule['start_date'] );
+			$start = strtotime( $schedule['start_date'], $now );
 			if ( $start && $now < $start ) {
 				return false;
 			}
@@ -150,7 +152,7 @@ class Targeting_Engine {
 
 		// Check end date.
 		if ( ! empty( $schedule['end_date'] ) ) {
-			$end = strtotime( $schedule['end_date'] . ' 23:59:59' );
+			$end = strtotime( $schedule['end_date'] . ' 23:59:59', $now );
 			if ( $end && $now > $end ) {
 				return false;
 			}
@@ -167,13 +169,20 @@ class Targeting_Engine {
 		// Check time of day.
 		if ( ! empty( $schedule['time_start'] ) || ! empty( $schedule['time_end'] ) ) {
 			$current_time = current_time( 'H:i' );
+			$time_start   = ! empty( $schedule['time_start'] ) ? $schedule['time_start'] : '00:00';
+			$time_end     = ! empty( $schedule['time_end'] ) ? $schedule['time_end'] : '23:59';
 
-			if ( ! empty( $schedule['time_start'] ) && $current_time < $schedule['time_start'] ) {
-				return false;
-			}
-
-			if ( ! empty( $schedule['time_end'] ) && $current_time > $schedule['time_end'] ) {
-				return false;
+			// Handle overnight schedules (e.g., 22:00 to 06:00).
+			if ( $time_start > $time_end ) {
+				// Overnight: valid if current time >= start OR current time <= end.
+				if ( $current_time < $time_start && $current_time > $time_end ) {
+					return false;
+				}
+			} else {
+				// Normal schedule: valid if current time is between start and end.
+				if ( $current_time < $time_start || $current_time > $time_end ) {
+					return false;
+				}
 			}
 		}
 
