@@ -152,18 +152,18 @@ class Links_Module {
 		// Rate limiting: 60 requests per minute.
 		$frontend = \WBAM\Frontend\Frontend::get_instance();
 		if ( ! $frontend->check_rate_limit( 'link_click', 60, 60 ) ) {
-			wp_send_json_error( 'Too many requests', 429 );
+			wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'wb-ads-rotator-with-split-test' ) ), 429 );
 		}
 
 		// Verify nonce.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wbam_track_click' ) ) {
-			wp_send_json_error( 'Invalid nonce' );
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'wb-ads-rotator-with-split-test' ) ), 403 );
 		}
 
 		$link_id = isset( $_POST['link_id'] ) ? absint( $_POST['link_id'] ) : 0;
 
 		if ( ! $link_id ) {
-			wp_send_json_error( 'Invalid link ID' );
+			wp_send_json_error( array( 'message' => __( 'Invalid link ID.', 'wb-ads-rotator-with-split-test' ) ), 400 );
 		}
 
 		// Track the click.

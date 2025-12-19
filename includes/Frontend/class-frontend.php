@@ -250,7 +250,7 @@ class Frontend {
 	public function handle_email_capture() {
 		// Rate limiting: 10 email submissions per minute per IP.
 		if ( ! $this->check_rate_limit( 'email_capture', 10, 60 ) ) {
-			wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'wb-ads-rotator-with-split-test' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Too many requests. Please try again later.', 'wb-ads-rotator-with-split-test' ) ), 429 );
 		}
 
 		$ad_id = isset( $_POST['ad_id'] ) ? absint( wp_unslash( $_POST['ad_id'] ) ) : 0;
@@ -258,7 +258,7 @@ class Frontend {
 
 		// Verify nonce.
 		if ( ! wp_verify_nonce( $nonce, 'wbam_email_capture_' . $ad_id ) ) {
-			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'wb-ads-rotator-with-split-test' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'wb-ads-rotator-with-split-test' ) ), 403 );
 		}
 
 		$email = isset( $_POST['subscriber_email'] ) ? sanitize_email( wp_unslash( $_POST['subscriber_email'] ) ) : '';
