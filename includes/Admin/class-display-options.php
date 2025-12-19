@@ -77,14 +77,15 @@ class Display_Options {
 		$rules      = is_array( $rules ) ? $rules : array();
 		$display_on = isset( $rules['display_on'] ) ? $rules['display_on'] : 'all';
 
-		$post_types       = isset( $rules['post_types'] ) ? $rules['post_types'] : array();
-		$categories       = isset( $rules['categories'] ) ? $rules['categories'] : array();
-		$tags             = isset( $rules['tags'] ) ? $rules['tags'] : array();
-		$page_types       = isset( $rules['page_types'] ) ? $rules['page_types'] : array();
-		$exclude_posts    = isset( $rules['exclude_posts'] ) ? $rules['exclude_posts'] : array();
-		$exclude_cats     = isset( $rules['exclude_categories'] ) ? $rules['exclude_categories'] : array();
-		$exclude_tags     = isset( $rules['exclude_tags'] ) ? $rules['exclude_tags'] : array();
-		$exclude_pages    = isset( $rules['exclude_page_types'] ) ? $rules['exclude_page_types'] : array();
+		$post_types     = isset( $rules['post_types'] ) ? $rules['post_types'] : array();
+		$categories     = isset( $rules['categories'] ) ? $rules['categories'] : array();
+		$tags           = isset( $rules['tags'] ) ? $rules['tags'] : array();
+		$page_types     = isset( $rules['page_types'] ) ? $rules['page_types'] : array();
+		$specific_posts = isset( $rules['posts'] ) ? array_map( 'intval', $rules['posts'] ) : array();
+		$exclude_posts  = isset( $rules['exclude_posts'] ) ? $rules['exclude_posts'] : array();
+		$exclude_cats   = isset( $rules['exclude_categories'] ) ? $rules['exclude_categories'] : array();
+		$exclude_tags   = isset( $rules['exclude_tags'] ) ? $rules['exclude_tags'] : array();
+		$exclude_pages  = isset( $rules['exclude_page_types'] ) ? $rules['exclude_page_types'] : array();
 		?>
 		<div class="wbam-display-rules">
 			<div class="wbam-rule-section">
@@ -171,6 +172,29 @@ class Display_Options {
 							</option>
 						<?php endforeach; ?>
 					</select>
+				</div>
+
+				<div class="wbam-rule-row">
+					<label><?php esc_html_e( 'Specific Pages/Posts', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<select name="wbam_display_rules[posts][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select specific pages or posts...', 'wb-ads-rotator-with-split-test' ); ?>">
+						<?php
+						$all_pages = get_posts(
+							array(
+								'post_type'      => array( 'page', 'post' ),
+								'posts_per_page' => -1,
+								'orderby'        => 'title',
+								'order'          => 'ASC',
+								'post_status'    => 'publish',
+							)
+						);
+						foreach ( $all_pages as $page_item ) :
+							?>
+							<option value="<?php echo esc_attr( $page_item->ID ); ?>" <?php selected( in_array( $page_item->ID, $specific_posts, true ) ); ?>>
+								<?php echo esc_html( $page_item->post_title ); ?> (<?php echo esc_html( ucfirst( $page_item->post_type ) ); ?>)
+							</option>
+						<?php endforeach; ?>
+					</select>
+					<p class="description"><?php esc_html_e( 'Select specific pages or posts to show this ad on.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				</div>
 			</div>
 
