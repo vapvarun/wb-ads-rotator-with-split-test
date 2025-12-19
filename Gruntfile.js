@@ -96,7 +96,9 @@ module.exports = function( grunt ) {
 						'!dist/**',
 						'!tests/**',
 						'!docs/**',
+						'!marketing/**',
 						'!.git/**',
+						'!.github/**',
 						'!.gitignore',
 						'!.distignore',
 						'!Gruntfile.js',
@@ -106,8 +108,12 @@ module.exports = function( grunt ) {
 						'!composer.lock',
 						'!phpcs.xml',
 						'!phpunit.xml',
+						'!phpstan.neon',
+						'!*.md',
 						'!**/*.md',
-						'!*.log'
+						'!*.log',
+						'!*.zip',
+						'!CLAUDE.md'
 					],
 					dest: 'dist/<%= pkg.name %>'
 				} ]
