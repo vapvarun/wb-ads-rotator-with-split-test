@@ -178,11 +178,9 @@ class Targeting_Engine {
 				if ( $current_time < $time_start && $current_time > $time_end ) {
 					return false;
 				}
-			} else {
+			} elseif ( $current_time < $time_start || $current_time > $time_end ) {
 				// Normal schedule: valid if current time is between start and end.
-				if ( $current_time < $time_start || $current_time > $time_end ) {
-					return false;
-				}
+				return false;
 			}
 		}
 
@@ -434,31 +432,202 @@ class Targeting_Engine {
 	}
 
 	/**
+	 * Cached device type for current request.
+	 *
+	 * @var string|null
+	 */
+	private $cached_device = null;
+
+	/**
 	 * Detect current device type.
+	 *
+	 * Uses multiple detection methods for reliability:
+	 * 1. Client Hints API (modern browsers)
+	 * 2. User-Agent pattern matching (comprehensive patterns)
+	 * 3. wp_is_mobile() fallback
+	 *
+	 * @since 1.0.0
+	 * @since 1.2.0 Added Client Hints support, caching, and filter.
+	 *
+	 * @return string Device type: 'mobile', 'tablet', or 'desktop'.
+	 */
+	private function detect_device() {
+		// Return cached result if already detected in this request.
+		if ( null !== $this->cached_device ) {
+			return $this->cached_device;
+		}
+
+		$device = 'desktop';
+
+		// Method 1: Check Client Hints (modern browsers).
+		$device = $this->detect_device_from_client_hints();
+
+		if ( 'desktop' === $device ) {
+			// Method 2: User-Agent detection.
+			$device = $this->detect_device_from_user_agent();
+		}
+
+		// Method 3: WordPress fallback - if we detected desktop but wp_is_mobile() returns true.
+		if ( 'desktop' === $device && function_exists( 'wp_is_mobile' ) && wp_is_mobile() ) {
+			$device = 'mobile';
+		}
+
+		/**
+		 * Filter the detected device type.
+		 *
+		 * Allows themes/plugins to override device detection for custom logic.
+		 *
+		 * @since 1.2.0
+		 *
+		 * @param string $device     Detected device type: 'mobile', 'tablet', or 'desktop'.
+		 * @param string $user_agent The User-Agent string (if available).
+		 */
+		$device = apply_filters( 'wbam_detected_device', $device, $this->get_user_agent() );
+
+		// Cache for this request.
+		$this->cached_device = $device;
+
+		return $device;
+	}
+
+	/**
+	 * Get sanitized User-Agent string.
+	 *
+	 * @since 1.2.0
 	 *
 	 * @return string
 	 */
-	private function detect_device() {
+	private function get_user_agent() {
 		if ( ! isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
+			return '';
+		}
+		return sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) );
+	}
+
+	/**
+	 * Detect device from Client Hints headers.
+	 *
+	 * Client Hints provide more reliable device info from modern browsers.
+	 * Requires `Sec-CH-UA-Mobile` header to be sent by browser.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Device type or 'desktop' if not available.
+	 */
+	private function detect_device_from_client_hints() {
+		// Check Sec-CH-UA-Mobile header (most reliable modern method).
+		if ( isset( $_SERVER['HTTP_SEC_CH_UA_MOBILE'] ) ) {
+			$mobile_hint = sanitize_text_field( wp_unslash( $_SERVER['HTTP_SEC_CH_UA_MOBILE'] ) );
+			$mobile_hint = trim( $mobile_hint, '"? ' );
+			if ( '1' === $mobile_hint || 'true' === strtolower( $mobile_hint ) ) {
+				// Mobile detected, but could be tablet - check platform.
+				return $this->detect_tablet_from_hints() ? 'tablet' : 'mobile';
+			}
+			// Explicitly not mobile.
 			return 'desktop';
 		}
 
-		$ua = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) );
+		return 'desktop';
+	}
 
-		// Check for tablets first (iPad, Android tablets, etc.).
-		// Note: Android tablets don't have "Mobile" in UA, Android phones do.
-		if ( preg_match( '/tablet|ipad|playbook|silk|kindle/i', $ua ) ) {
-			return 'tablet';
+	/**
+	 * Check if Client Hints indicate a tablet device.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return bool
+	 */
+	private function detect_tablet_from_hints() {
+		// Check Sec-CH-UA-Platform for tablet indicators.
+		if ( isset( $_SERVER['HTTP_SEC_CH_UA_PLATFORM'] ) ) {
+			$platform = sanitize_text_field( wp_unslash( $_SERVER['HTTP_SEC_CH_UA_PLATFORM'] ) );
+			$platform = strtolower( trim( $platform, '"' ) );
+			// iPadOS identifies as "iOS" but typically has larger viewport.
+			// We'll rely on UA fallback for tablet distinction.
+			if ( 'android' === $platform ) {
+				// Check if Android tablet by looking at screen hints if available.
+				return $this->is_android_tablet_from_ua();
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Check if Android device is a tablet from User-Agent.
+	 *
+	 * Android tablets typically don't have "Mobile" in their UA.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return bool
+	 */
+	private function is_android_tablet_from_ua() {
+		$ua = $this->get_user_agent();
+		return preg_match( '/android/i', $ua ) && ! preg_match( '/mobile/i', $ua );
+	}
+
+	/**
+	 * Detect device from User-Agent string.
+	 *
+	 * Uses comprehensive regex patterns to detect various devices.
+	 * Patterns are regularly updated to handle modern browsers.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Device type: 'mobile', 'tablet', or 'desktop'.
+	 */
+	private function detect_device_from_user_agent() {
+		$ua = $this->get_user_agent();
+
+		if ( empty( $ua ) ) {
+			return 'desktop';
 		}
 
-		// Android without "Mobile" is typically a tablet.
-		if ( preg_match( '/android/i', $ua ) && ! preg_match( '/mobile/i', $ua ) ) {
-			return 'tablet';
+		// Tablet patterns (check first as some tablets match mobile patterns).
+		$tablet_patterns = array(
+			// Apple tablets.
+			'/ipad/i',
+			'/macintosh.*mobile/i', // iPadOS 13+ requesting desktop site.
+			// Android tablets (no "Mobile" in UA).
+			'/android(?!.*mobile)/i',
+			// Amazon tablets.
+			'/kindle|silk|kftt|kfot|kfjwa|kfjwi|kfsowi|kfthwa|kfthwi|kfapwa|kfapwi|kfdowi|kfgiwi|kffowi|kfmewi|kftbwi|kfarwi|kfaswi|kfsawa|kfsawi|kfauwi/i',
+			// Other tablets.
+			'/tablet|playbook|nexus\s*(?:7|9|10)/i',
+			'/samsung.*tablet|gt-p|sm-t|sm-p/i',
+			'/surface|tab\s/i',
+		);
+
+		foreach ( $tablet_patterns as $pattern ) {
+			if ( preg_match( $pattern, $ua ) ) {
+				return 'tablet';
+			}
 		}
 
-		// Check for mobile devices.
-		if ( preg_match( '/mobile|iphone|ipod|android|blackberry|opera mini|opera mobi|iemobile|windows phone|webos|palm|symbian|nokia|samsung|lg-|htc|mot-|sonyericsson/i', $ua ) ) {
-			return 'mobile';
+		// Mobile patterns (comprehensive list).
+		$mobile_patterns = array(
+			// Apple mobile.
+			'/iphone|ipod/i',
+			// Android mobile (with "Mobile" in UA).
+			'/android.*mobile/i',
+			// Windows mobile.
+			'/windows\s*phone|iemobile|wpdesktop/i',
+			// BlackBerry.
+			'/blackberry|bb10|rim\s*tablet/i',
+			// Opera mobile.
+			'/opera\s*(mini|mobi)/i',
+			// Other mobile browsers and devices.
+			'/mobile|webos|palm|symbian|nokia|samsung.*mobile|lg[-;\/\s]|htc[-;\/\s]|mot[-;\/\s]|sonyericsson|sie-|portalmmm|blazer|avantgo|danger|elaine|hiptop|fennec|maemo|iris|3g_t|g1\su|mobile\ssafari/i',
+			// Feature phones.
+			'/vodafone|o2|pocket|wap|midp|cldc|j2me|docomo|au-mic|softbank|kddi|obigo|netfront/i',
+			// Smart TV browsers (treat as mobile for limited capabilities).
+			'/smart-tv|googletv|appletv|hbbtv|pov_tv|netcast\.tv/i',
+		);
+
+		foreach ( $mobile_patterns as $pattern ) {
+			if ( preg_match( $pattern, $ua ) ) {
+				return 'mobile';
+			}
 		}
 
 		return 'desktop';
