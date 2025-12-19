@@ -28,6 +28,9 @@ class Frontend {
 		add_action( 'wp_ajax_wbam_email_capture', array( $this, 'handle_email_capture' ) );
 		add_action( 'wp_ajax_nopriv_wbam_email_capture', array( $this, 'handle_email_capture' ) );
 		add_action( 'wp_head', array( $this, 'maybe_add_adsense_auto_ads' ) );
+
+		// Track impressions when ads are rendered.
+		add_filter( 'wbam_ad_output', array( $this, 'maybe_track_impression' ), 10, 3 );
 	}
 
 	/**
@@ -206,6 +209,34 @@ class Frontend {
 		 * @param string $placement Placement ID.
 		 */
 		do_action( 'wbam_ad_impression', $ad_id, $placement );
+	}
+
+	/**
+	 * Track impression via wbam_ad_output filter.
+	 *
+	 * Only tracks if PRO plugin is not active (PRO handles its own tracking).
+	 *
+	 * @since 2.3.1
+	 *
+	 * @param string $output    Ad output HTML.
+	 * @param int    $ad_id     Ad ID.
+	 * @param string $placement Placement ID.
+	 * @return string Unmodified output.
+	 */
+	public function maybe_track_impression( $output, $ad_id, $placement ) {
+		// Skip if PRO plugin is handling analytics.
+		if ( defined( 'WBAM_PRO_VERSION' ) ) {
+			return $output;
+		}
+
+		// Skip if output is empty (no ad rendered).
+		if ( empty( $output ) ) {
+			return $output;
+		}
+
+		$this->record_impression( $ad_id, $placement );
+
+		return $output;
 	}
 
 	/**
