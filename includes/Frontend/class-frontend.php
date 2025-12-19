@@ -167,19 +167,20 @@ class Frontend {
 			return false;
 		}
 
-		// Generate visitor hash for anonymized tracking.
+		// Generate visitor hash for GDPR-compliant anonymized tracking.
+		// Uses daily rotating salt to prevent long-term tracking while still detecting unique visitors.
 		$visitor_hash = '';
-		$ip_address   = '';
-
 		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
 			$ip_address     = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
 			$user_agent_raw = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-			$visitor_hash   = hash( 'sha256', $ip_address . $user_agent_raw );
+			$daily_salt     = wp_hash( gmdate( 'Y-m-d' ) );
+			$visitor_hash   = hash( 'sha256', $ip_address . $user_agent_raw . $daily_salt );
 		}
 
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 		$referer    = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 
+		// GDPR: Store empty string for IP address - use visitor_hash for unique visitor detection.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		return $wpdb->insert(
 			$table_name,
@@ -188,7 +189,7 @@ class Frontend {
 				'event_type'   => $event_type,
 				'placement'    => $placement,
 				'visitor_hash' => $visitor_hash,
-				'ip_address'   => $ip_address,
+				'ip_address'   => '', // GDPR: Never store raw IP addresses.
 				'user_agent'   => $user_agent,
 				'referer'      => $referer,
 				'created_at'   => current_time( 'mysql' ),
