@@ -172,9 +172,9 @@ class Frontend {
 		$ip_address   = '';
 
 		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-			$ip_address   = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+			$ip_address     = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
 			$user_agent_raw = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-			$visitor_hash = hash( 'sha256', $ip_address . $user_agent_raw );
+			$visitor_hash   = hash( 'sha256', $ip_address . $user_agent_raw );
 		}
 
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
@@ -365,11 +365,11 @@ class Frontend {
 			// Fallback to options for backward compatibility.
 			$submissions   = get_option( 'wbam_email_submissions', array() );
 			$submissions[] = array(
-				'email'  => $email,
-				'name'   => $name,
-				'ad_id'  => $ad_id,
-				'date'   => current_time( 'mysql' ),
-				'ip'     => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '',
+				'email' => $email,
+				'name'  => $name,
+				'ad_id' => $ad_id,
+				'date'  => current_time( 'mysql' ),
+				'ip'    => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '',
 			);
 
 			// Keep only last 1000 submissions.
@@ -400,33 +400,46 @@ class Frontend {
 	/**
 	 * Check rate limit for an action.
 	 *
-	 * Uses transients for simple IP-based rate limiting.
+	 * Uses transients for IP-based and user-based rate limiting.
 	 *
 	 * @param string $action    Action identifier.
 	 * @param int    $limit     Maximum requests allowed.
 	 * @param int    $window    Time window in seconds.
 	 * @return bool True if within limit, false if exceeded.
 	 */
-	private function check_rate_limit( $action, $limit, $window ) {
+	public function check_rate_limit( $action, $limit, $window ) {
+		// Check user-based rate limit for logged-in users.
+		if ( is_user_logged_in() ) {
+			$user_key   = 'wbam_rl_' . $action . '_u' . get_current_user_id();
+			$user_count = get_transient( $user_key );
+
+			if ( false === $user_count ) {
+				set_transient( $user_key, 1, $window );
+			} elseif ( $user_count >= $limit ) {
+				return false;
+			} else {
+				set_transient( $user_key, $user_count + 1, $window );
+			}
+		}
+
+		// Check IP-based rate limit.
 		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
 		if ( empty( $ip ) ) {
-			return true; // Can't rate limit without IP.
+			return true; // Can't rate limit by IP without IP.
 		}
 
 		$key   = 'wbam_rl_' . $action . '_' . md5( $ip );
 		$count = get_transient( $key );
 
 		if ( false === $count ) {
-			// First request in this window.
 			set_transient( $key, 1, $window );
 			return true;
 		}
 
 		if ( $count >= $limit ) {
-			return false; // Rate limit exceeded.
+			return false;
 		}
 
-		// Increment counter.
 		set_transient( $key, $count + 1, $window );
 		return true;
 	}

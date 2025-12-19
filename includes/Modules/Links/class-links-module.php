@@ -149,8 +149,14 @@ class Links_Module {
 	 * AJAX handler for click tracking.
 	 */
 	public function ajax_track_click() {
+		// Rate limiting: 60 requests per minute.
+		$frontend = \WBAM\Frontend\Frontend::get_instance();
+		if ( ! $frontend->check_rate_limit( 'link_click', 60, 60 ) ) {
+			wp_send_json_error( 'Too many requests', 429 );
+		}
+
 		// Verify nonce.
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'wbam_track_click' ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wbam_track_click' ) ) {
 			wp_send_json_error( 'Invalid nonce' );
 		}
 
