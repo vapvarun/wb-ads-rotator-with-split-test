@@ -401,6 +401,26 @@ class Display_Options {
 		$exclude_countries = isset( $geo_rules['exclude_countries'] ) ? $geo_rules['exclude_countries'] : array();
 		$show_unknown      = isset( $geo_rules['show_unknown'] ) ? $geo_rules['show_unknown'] : true;
 
+		// Determine the mode based on existing data.
+		// If include_countries has values, mode is 'include'.
+		// If exclude_countries has values, mode is 'exclude'.
+		// Default to 'include' (show only in selected).
+		$mode               = 'include';
+		$selected_countries = array();
+
+		if ( ! empty( $include_countries ) ) {
+			$mode               = 'include';
+			$selected_countries = $include_countries;
+		} elseif ( ! empty( $exclude_countries ) ) {
+			$mode               = 'exclude';
+			$selected_countries = $exclude_countries;
+		}
+
+		// Get mode from saved data if available.
+		if ( isset( $geo_rules['mode'] ) ) {
+			$mode = $geo_rules['mode'];
+		}
+
 		$geo_engine = Geo_Engine::get_instance();
 		$countries  = $geo_engine->get_countries_list();
 		?>
@@ -414,36 +434,75 @@ class Display_Options {
 
 			<div class="wbam-geo-options" <?php echo ! $enabled ? 'style="display:none;"' : ''; ?>>
 				<div class="wbam-geo-row">
-					<label class="wbam-section-label"><?php esc_html_e( 'Show only in these countries', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<p class="description"><?php esc_html_e( 'Leave empty to show in all countries.', 'wb-ads-rotator-with-split-test' ); ?></p>
-					<select name="wbam_geo_targeting[include_countries][]" multiple class="wbam-select2 wbam-country-select" data-placeholder="<?php esc_attr_e( 'Select countries...', 'wb-ads-rotator-with-split-test' ); ?>">
+					<label class="wbam-section-label"><?php esc_html_e( 'Targeting Mode', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<div class="wbam-geo-mode-selector" style="margin-bottom: 12px;">
+						<label style="display: inline-block; margin-right: 20px; cursor: pointer;">
+							<input type="radio" name="wbam_geo_targeting[mode]" value="include" <?php checked( $mode, 'include' ); ?> class="wbam-geo-mode-radio" />
+							<?php esc_html_e( 'Show only in selected countries', 'wb-ads-rotator-with-split-test' ); ?>
+						</label>
+						<label style="display: inline-block; cursor: pointer;">
+							<input type="radio" name="wbam_geo_targeting[mode]" value="exclude" <?php checked( $mode, 'exclude' ); ?> class="wbam-geo-mode-radio" />
+							<?php esc_html_e( 'Show everywhere except selected countries', 'wb-ads-rotator-with-split-test' ); ?>
+						</label>
+					</div>
+				</div>
+
+				<div class="wbam-geo-row">
+					<label class="wbam-section-label wbam-geo-countries-label">
+						<?php
+						if ( 'exclude' === $mode ) {
+							esc_html_e( 'Countries to exclude', 'wb-ads-rotator-with-split-test' );
+						} else {
+							esc_html_e( 'Countries to show in', 'wb-ads-rotator-with-split-test' );
+						}
+						?>
+					</label>
+					<p class="description wbam-geo-countries-desc">
+						<?php
+						if ( 'exclude' === $mode ) {
+							esc_html_e( 'The ad will be hidden from visitors in these countries.', 'wb-ads-rotator-with-split-test' );
+						} else {
+							esc_html_e( 'The ad will only be shown to visitors in these countries. Leave empty to show in all countries.', 'wb-ads-rotator-with-split-test' );
+						}
+						?>
+					</p>
+					<select name="wbam_geo_targeting[countries][]" multiple class="wbam-select2 wbam-country-select wbam-geo-countries-select" data-placeholder="<?php esc_attr_e( 'Search and select countries...', 'wb-ads-rotator-with-split-test' ); ?>" style="width: 100%;">
 						<?php foreach ( $countries as $code => $name ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( in_array( $code, $include_countries, true ) ); ?>>
+							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( in_array( $code, $selected_countries, true ) ); ?>>
 								<?php echo esc_html( $name ); ?>
 							</option>
 						<?php endforeach; ?>
 					</select>
 				</div>
 
-				<div class="wbam-geo-row">
-					<label class="wbam-section-label"><?php esc_html_e( 'Exclude these countries', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<select name="wbam_geo_targeting[exclude_countries][]" multiple class="wbam-select2 wbam-country-select" data-placeholder="<?php esc_attr_e( 'Select countries to exclude...', 'wb-ads-rotator-with-split-test' ); ?>">
-						<?php foreach ( $countries as $code => $name ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( in_array( $code, $exclude_countries, true ) ); ?>>
-								<?php echo esc_html( $name ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-				</div>
-
-				<div class="wbam-geo-row">
+				<div class="wbam-geo-row" style="margin-top: 15px;">
 					<label>
 						<input type="checkbox" name="wbam_geo_targeting[show_unknown]" value="1" <?php checked( $show_unknown ); ?> />
 						<?php esc_html_e( 'Show ad to visitors with unknown location', 'wb-ads-rotator-with-split-test' ); ?>
 					</label>
+					<p class="description"><?php esc_html_e( 'When location cannot be determined (e.g., VPN, local IP).', 'wb-ads-rotator-with-split-test' ); ?></p>
 				</div>
 			</div>
 		</div>
+
+		<script>
+		jQuery(document).ready(function($) {
+			// Update label and description when mode changes.
+			$('.wbam-geo-mode-radio').on('change', function() {
+				var mode = $(this).val();
+				var $label = $('.wbam-geo-countries-label');
+				var $desc = $('.wbam-geo-countries-desc');
+
+				if (mode === 'exclude') {
+					$label.text('<?php echo esc_js( __( 'Countries to exclude', 'wb-ads-rotator-with-split-test' ) ); ?>');
+					$desc.text('<?php echo esc_js( __( 'The ad will be hidden from visitors in these countries.', 'wb-ads-rotator-with-split-test' ) ); ?>');
+				} else {
+					$label.text('<?php echo esc_js( __( 'Countries to show in', 'wb-ads-rotator-with-split-test' ) ); ?>');
+					$desc.text('<?php echo esc_js( __( 'The ad will only be shown to visitors in these countries. Leave empty to show in all countries.', 'wb-ads-rotator-with-split-test' ) ); ?>');
+				}
+			});
+		});
+		</script>
 		<?php
 	}
 
@@ -613,16 +672,37 @@ class Display_Options {
 		$sanitized['enabled']      = ! empty( $input['enabled'] );
 		$sanitized['show_unknown'] = ! empty( $input['show_unknown'] );
 
-		if ( ! empty( $input['include_countries'] ) && is_array( $input['include_countries'] ) ) {
-			$sanitized['include_countries'] = array_map( 'sanitize_text_field', $input['include_countries'] );
-		} else {
-			$sanitized['include_countries'] = array();
+		// Handle new unified mode + countries structure.
+		$mode      = isset( $input['mode'] ) ? sanitize_text_field( $input['mode'] ) : 'include';
+		$countries = array();
+
+		if ( ! empty( $input['countries'] ) && is_array( $input['countries'] ) ) {
+			$countries = array_map( 'sanitize_text_field', $input['countries'] );
 		}
 
+		// Validate mode.
+		if ( ! in_array( $mode, array( 'include', 'exclude' ), true ) ) {
+			$mode = 'include';
+		}
+
+		$sanitized['mode'] = $mode;
+
+		// Map countries to the appropriate field based on mode.
+		// This maintains backward compatibility with the geo engine logic.
+		if ( 'include' === $mode ) {
+			$sanitized['include_countries'] = $countries;
+			$sanitized['exclude_countries'] = array();
+		} else {
+			$sanitized['include_countries'] = array();
+			$sanitized['exclude_countries'] = $countries;
+		}
+
+		// Legacy support: if old separate fields are submitted, merge them.
+		if ( ! empty( $input['include_countries'] ) && is_array( $input['include_countries'] ) ) {
+			$sanitized['include_countries'] = array_map( 'sanitize_text_field', $input['include_countries'] );
+		}
 		if ( ! empty( $input['exclude_countries'] ) && is_array( $input['exclude_countries'] ) ) {
 			$sanitized['exclude_countries'] = array_map( 'sanitize_text_field', $input['exclude_countries'] );
-		} else {
-			$sanitized['exclude_countries'] = array();
 		}
 
 		return $sanitized;
