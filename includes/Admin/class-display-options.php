@@ -105,28 +105,33 @@ class Display_Options {
 			</div>
 
 			<div class="wbam-rule-section wbam-conditional-section" data-show-when="specific">
-				<label class="wbam-section-label"><?php esc_html_e( 'Include on:', 'wb-ads-rotator-with-split-test' ); ?></label>
+				<label class="wbam-section-label"><?php esc_html_e( 'Target by:', 'wb-ads-rotator-with-split-test' ); ?></label>
 
+				<?php // Specific Pages - Most specific targeting first. ?>
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Post Types', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<div class="wbam-checkbox-list">
+					<label><?php esc_html_e( 'Selected Pages', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<select name="wbam_display_rules[posts][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Choose individual pages...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php
-						$available_types = get_post_types( array( 'public' => true ), 'objects' );
-						foreach ( $available_types as $type ) :
-							if ( 'wbam-ad' === $type->name || 'attachment' === $type->name ) {
-								continue;
-							}
+						$all_pages = get_pages(
+							array(
+								'sort_column' => 'post_title',
+								'sort_order'  => 'ASC',
+								'post_status' => 'publish',
+							)
+						);
+						foreach ( $all_pages as $page_item ) :
 							?>
-							<label>
-								<input type="checkbox" name="wbam_display_rules[post_types][]" value="<?php echo esc_attr( $type->name ); ?>" <?php checked( in_array( $type->name, $post_types, true ) ); ?> />
-								<?php echo esc_html( $type->labels->singular_name ); ?>
-							</label>
+							<option value="<?php echo esc_attr( $page_item->ID ); ?>" <?php selected( in_array( $page_item->ID, $specific_posts, true ) ); ?>>
+								<?php echo esc_html( $page_item->post_title ); ?>
+							</option>
 						<?php endforeach; ?>
-					</div>
+					</select>
+					<p class="description"><?php esc_html_e( 'Pick individual pages where this ad should appear.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				</div>
 
+				<?php // Special Page Types - Front page, blog, archives, etc. ?>
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Page Types', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<label><?php esc_html_e( 'Special Templates', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<div class="wbam-checkbox-list">
 						<?php
 						$available_page_types = array(
@@ -146,6 +151,27 @@ class Display_Options {
 					</div>
 				</div>
 
+				<?php // Content Types. ?>
+				<div class="wbam-rule-row">
+					<label><?php esc_html_e( 'Content Types', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<div class="wbam-checkbox-list">
+						<?php
+						$available_types = get_post_types( array( 'public' => true ), 'objects' );
+						foreach ( $available_types as $type ) :
+							if ( 'wbam-ad' === $type->name || 'attachment' === $type->name ) {
+								continue;
+							}
+							?>
+							<label>
+								<input type="checkbox" name="wbam_display_rules[post_types][]" value="<?php echo esc_attr( $type->name ); ?>" <?php checked( in_array( $type->name, $post_types, true ) ); ?> />
+								<?php echo esc_html( $type->labels->singular_name ); ?>
+							</label>
+						<?php endforeach; ?>
+					</div>
+					<p class="description"><?php esc_html_e( 'Show on all content of these types.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				</div>
+
+				<?php // Categories. ?>
 				<div class="wbam-rule-row">
 					<label><?php esc_html_e( 'Categories', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<select name="wbam_display_rules[categories][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select categories...', 'wb-ads-rotator-with-split-test' ); ?>">
@@ -160,6 +186,7 @@ class Display_Options {
 					</select>
 				</div>
 
+				<?php // Tags. ?>
 				<div class="wbam-rule-row">
 					<label><?php esc_html_e( 'Tags', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<select name="wbam_display_rules[tags][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select tags...', 'wb-ads-rotator-with-split-test' ); ?>">
@@ -173,34 +200,13 @@ class Display_Options {
 						<?php endforeach; ?>
 					</select>
 				</div>
-
-				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Specific Pages', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<select name="wbam_display_rules[posts][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select specific pages...', 'wb-ads-rotator-with-split-test' ); ?>">
-						<?php
-						$all_pages = get_pages(
-							array(
-								'sort_column' => 'post_title',
-								'sort_order'  => 'ASC',
-								'post_status' => 'publish',
-							)
-						);
-						foreach ( $all_pages as $page_item ) :
-							?>
-							<option value="<?php echo esc_attr( $page_item->ID ); ?>" <?php selected( in_array( $page_item->ID, $specific_posts, true ) ); ?>>
-								<?php echo esc_html( $page_item->post_title ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<p class="description"><?php esc_html_e( 'Select specific pages to show this ad on.', 'wb-ads-rotator-with-split-test' ); ?></p>
-				</div>
 			</div>
 
 			<div class="wbam-rule-section wbam-conditional-section" data-show-when="all">
 				<label class="wbam-section-label"><?php esc_html_e( 'Exclude from:', 'wb-ads-rotator-with-split-test' ); ?></label>
 
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Page Types', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<label><?php esc_html_e( 'Special Templates', 'wb-ads-rotator-with-split-test' ); ?></label>
 					<div class="wbam-checkbox-list">
 						<?php foreach ( $available_page_types as $key => $label ) : ?>
 							<label>
