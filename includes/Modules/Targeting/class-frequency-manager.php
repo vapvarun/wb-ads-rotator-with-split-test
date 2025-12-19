@@ -100,14 +100,30 @@ class Frequency_Manager {
 	}
 
 	/**
-	 * Get ad views from cookie.
+	 * Get ad views from cookie with server-side fallback.
+	 *
+	 * Uses cookie-based tracking as primary method, with IP-based
+	 * transient fallback for when cookies are disabled or cleared.
 	 *
 	 * @param int $ad_id Ad ID.
 	 * @return int
 	 */
 	public function get_ad_views( $ad_id ) {
 		$cookie_data = $this->get_cookie_data();
-		return isset( $cookie_data[ $ad_id ] ) ? (int) $cookie_data[ $ad_id ] : 0;
+		$cookie_views = isset( $cookie_data[ $ad_id ] ) ? (int) $cookie_data[ $ad_id ] : 0;
+
+		// Server-side fallback: Check IP-based transient.
+		$visitor_hash = $this->get_visitor_hash();
+		if ( ! empty( $visitor_hash ) ) {
+			$transient_key = 'wbam_freq_' . $visitor_hash . '_' . $ad_id;
+			$server_views = get_transient( $transient_key );
+			$server_views = false !== $server_views ? (int) $server_views : 0;
+
+			// Return the higher count to prevent bypassing limits.
+			return max( $cookie_views, $server_views );
+		}
+
+		return $cookie_views;
 	}
 
 	/**
@@ -125,7 +141,28 @@ class Frequency_Manager {
 	}
 
 	/**
-	 * Set view cookie in footer.
+	 * Generate visitor hash for server-side tracking.
+	 *
+	 * Uses IP address and User-Agent with daily rotating salt for
+	 * GDPR-compliant anonymized tracking.
+	 *
+	 * @since 2.3.2
+	 * @return string Visitor hash or empty string if IP not available.
+	 */
+	private function get_visitor_hash() {
+		if ( ! isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			return '';
+		}
+
+		$ip_address     = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+		$user_agent_raw = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+		$daily_salt     = wp_hash( gmdate( 'Y-m-d' ) );
+
+		return hash( 'sha256', $ip_address . $user_agent_raw . $daily_salt );
+	}
+
+	/**
+	 * Set view cookie in footer with server-side fallback.
 	 */
 	public function set_view_cookie() {
 		if ( empty( $this->page_ads ) ) {
@@ -133,12 +170,21 @@ class Frequency_Manager {
 		}
 
 		$cookie_data = $this->get_cookie_data();
+		$visitor_hash = $this->get_visitor_hash();
 
 		foreach ( $this->page_ads as $ad_id ) {
 			if ( isset( $cookie_data[ $ad_id ] ) ) {
 				$cookie_data[ $ad_id ]++;
 			} else {
 				$cookie_data[ $ad_id ] = 1;
+			}
+
+			// Server-side fallback: Update transient for IP-based tracking.
+			if ( ! empty( $visitor_hash ) ) {
+				$transient_key = 'wbam_freq_' . $visitor_hash . '_' . $ad_id;
+				$current_count = get_transient( $transient_key );
+				$current_count = false !== $current_count ? (int) $current_count : 0;
+				set_transient( $transient_key, $current_count + 1, self::COOKIE_EXPIRATION );
 			}
 		}
 

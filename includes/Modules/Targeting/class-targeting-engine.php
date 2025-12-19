@@ -142,19 +142,31 @@ class Targeting_Engine {
 		$now_datetime = current_datetime();
 		$now          = $now_datetime->getTimestamp();
 
-		// Check start date.
+		// Check start date (use WordPress timezone for consistent scheduling).
 		if ( ! empty( $schedule['start_date'] ) ) {
-			$start = strtotime( $schedule['start_date'], $now );
-			if ( $start && $now < $start ) {
-				return false;
+			try {
+				$start_datetime = new \DateTime( $schedule['start_date'], wp_timezone() );
+				$start = $start_datetime->getTimestamp();
+				if ( $now < $start ) {
+					return false;
+				}
+			} catch ( \Exception $e ) {
+				// Invalid date format, skip this check.
+				error_log( 'WB Ad Manager: Invalid start_date format: ' . $schedule['start_date'] );
 			}
 		}
 
-		// Check end date.
+		// Check end date (use WordPress timezone for consistent scheduling).
 		if ( ! empty( $schedule['end_date'] ) ) {
-			$end = strtotime( $schedule['end_date'] . ' 23:59:59', $now );
-			if ( $end && $now > $end ) {
-				return false;
+			try {
+				$end_datetime = new \DateTime( $schedule['end_date'] . ' 23:59:59', wp_timezone() );
+				$end = $end_datetime->getTimestamp();
+				if ( $now > $end ) {
+					return false;
+				}
+			} catch ( \Exception $e ) {
+				// Invalid date format, skip this check.
+				error_log( 'WB Ad Manager: Invalid end_date format: ' . $schedule['end_date'] );
 			}
 		}
 

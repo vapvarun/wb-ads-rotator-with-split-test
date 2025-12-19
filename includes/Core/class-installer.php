@@ -22,7 +22,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.4.0';
+	const DB_VERSION = '1.5.0';
 
 	/**
 	 * Option name for database version.
@@ -102,6 +102,13 @@ class Installer {
 				}
 			}
 			// phpcs:enable
+		}
+
+		// Migration to 1.5.0: Create rate limits table if it doesn't exist.
+		if ( version_compare( $current_version, '1.5.0', '<' ) ) {
+			// Re-run create_tables to ensure rate limits table exists.
+			// dbDelta is safe to run multiple times - it will only create missing tables.
+			$this->create_tables();
 		}
 	}
 
@@ -266,6 +273,20 @@ class Installer {
 		) {$charset_collate};";
 
 		dbDelta( $sql_partnerships );
+
+		// Rate limits table (for atomic rate limiting).
+		$table_rate_limits = $wpdb->prefix . 'wbam_rate_limits';
+		$sql_rate_limits   = "CREATE TABLE {$table_rate_limits} (
+			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			`key` varchar(255) NOT NULL,
+			`count` int(11) NOT NULL DEFAULT 0,
+			expires bigint(20) UNSIGNED NOT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY `key` (`key`),
+			KEY expires (expires)
+		) {$charset_collate};";
+
+		dbDelta( $sql_rate_limits );
 	}
 
 	/**
@@ -288,6 +309,7 @@ class Installer {
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_analytics" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_email_submissions" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_partnerships" );
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_rate_limits" );
 		// phpcs:enable
 
 		delete_option( self::DB_VERSION_OPTION );

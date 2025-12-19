@@ -408,7 +408,8 @@ class Frontend {
 	/**
 	 * Check rate limit for an action.
 	 *
-	 * Uses transients for IP-based and user-based rate limiting.
+	 * Uses database-level locking to prevent TOCTOU race conditions.
+	 * Falls back to transients if database locking is not available.
 	 *
 	 * @param string $action    Action identifier.
 	 * @param int    $limit     Maximum requests allowed.
@@ -418,15 +419,9 @@ class Frontend {
 	public function check_rate_limit( $action, $limit, $window ) {
 		// Check user-based rate limit for logged-in users.
 		if ( is_user_logged_in() ) {
-			$user_key   = 'wbam_rl_' . $action . '_u' . get_current_user_id();
-			$user_count = get_transient( $user_key );
-
-			if ( false === $user_count ) {
-				set_transient( $user_key, 1, $window );
-			} elseif ( $user_count >= $limit ) {
+			$user_key = 'wbam_rl_' . $action . '_u' . get_current_user_id();
+			if ( ! $this->increment_rate_limit_atomic( $user_key, $limit, $window ) ) {
 				return false;
-			} else {
-				set_transient( $user_key, $user_count + 1, $window );
 			}
 		}
 
@@ -436,7 +431,78 @@ class Frontend {
 			return true; // Can't rate limit by IP without IP.
 		}
 
-		$key   = 'wbam_rl_' . $action . '_' . md5( $ip );
+		$key = 'wbam_rl_' . $action . '_' . md5( $ip );
+		return $this->increment_rate_limit_atomic( $key, $limit, $window );
+	}
+
+	/**
+	 * Atomically increment rate limit counter using database locking.
+	 *
+	 * Prevents TOCTOU race conditions by using MySQL INSERT ... ON DUPLICATE KEY UPDATE
+	 * for atomic increment operation.
+	 *
+	 * @since 2.3.2
+	 *
+	 * @param string $key    Rate limit key.
+	 * @param int    $limit  Maximum requests allowed.
+	 * @param int    $window Time window in seconds.
+	 * @return bool True if within limit, false if exceeded.
+	 */
+	private function increment_rate_limit_atomic( $key, $limit, $window ) {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'wbam_rate_limits';
+
+		// Check if rate limits table exists.
+		if ( ! $this->table_exists( $table_name ) ) {
+			// Fallback to transient-based rate limiting (non-atomic).
+			return $this->increment_rate_limit_transient( $key, $limit, $window );
+		}
+
+		$expiration = time() + $window;
+
+		// Atomic increment using INSERT ... ON DUPLICATE KEY UPDATE.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				"INSERT INTO {$table_name} (`key`, `count`, `expires`)
+				VALUES (%s, 1, %d)
+				ON DUPLICATE KEY UPDATE
+					`count` = IF(expires < %d, 1, `count` + 1),
+					`expires` = IF(expires < %d, %d, `expires`)",
+				$key,
+				$expiration,
+				time(),
+				time(),
+				$expiration
+			)
+		);
+
+		// Get updated count.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT `count` FROM {$table_name} WHERE `key` = %s",
+				$key
+			)
+		);
+
+		return ( (int) $count ) <= $limit;
+	}
+
+	/**
+	 * Fallback non-atomic rate limit increment using transients.
+	 *
+	 * Used when rate limits table doesn't exist.
+	 *
+	 * @since 2.3.2
+	 *
+	 * @param string $key    Rate limit key.
+	 * @param int    $limit  Maximum requests allowed.
+	 * @param int    $window Time window in seconds.
+	 * @return bool True if within limit, false if exceeded.
+	 */
+	private function increment_rate_limit_transient( $key, $limit, $window ) {
 		$count = get_transient( $key );
 
 		if ( false === $count ) {
