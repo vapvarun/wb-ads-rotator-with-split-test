@@ -51,6 +51,11 @@ class Placement_Engine {
 			}
 		}
 
+		// Clear placement cache when ads are saved/updated/deleted.
+		add_action( 'wbam_save_ad_meta', array( $this, 'clear_placement_cache' ) );
+		add_action( 'delete_post', array( $this, 'maybe_clear_cache_on_delete' ) );
+		add_action( 'trashed_post', array( $this, 'maybe_clear_cache_on_delete' ) );
+
 		do_action( 'wbam_placements_init', $this );
 	}
 
@@ -169,34 +174,46 @@ class Placement_Engine {
 	/**
 	 * Get ads for a placement.
 	 *
+	 * Uses object caching to avoid repeated LIKE queries on serialized meta.
+	 * Cache is invalidated when ads are saved (via wbam_save_ad_meta action).
+	 *
 	 * @param string $placement_id Placement ID.
 	 * @return array
 	 */
 	public function get_ads_for_placement( $placement_id ) {
-		// Use a more precise LIKE pattern for serialized data.
-		// Format: s:X:"placement_id"; where X is the string length.
-		$serialized_pattern = sprintf( 's:%d:"%s"', strlen( $placement_id ), $placement_id );
+		// Try to get cached ad IDs for this placement.
+		$cache_key = 'wbam_placement_ads_' . sanitize_key( $placement_id );
+		$ad_ids    = wp_cache_get( $cache_key, 'wbam' );
 
-		$args = array(
-			'post_type'      => 'wbam-ad',
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'meta_query'     => array(
-				'relation' => 'AND',
-				array(
-					'key'     => '_wbam_enabled',
-					'value'   => '1',
-					'compare' => '=',
-				),
-				array(
-					'key'     => '_wbam_placements',
-					'value'   => $serialized_pattern,
-					'compare' => 'LIKE',
-				),
-			),
-		);
+		if ( false === $ad_ids ) {
+			// Use a more precise LIKE pattern for serialized data.
+			// Format: s:X:"placement_id"; where X is the string length.
+			$serialized_pattern = sprintf( 's:%d:"%s"', strlen( $placement_id ), $placement_id );
 
-		$ad_ids = get_posts( $args );
+			$args = array(
+				'post_type'      => 'wbam-ad',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Cached to mitigate performance impact.
+					'relation' => 'AND',
+					array(
+						'key'     => '_wbam_enabled',
+						'value'   => '1',
+						'compare' => '=',
+					),
+					array(
+						'key'     => '_wbam_placements',
+						'value'   => $serialized_pattern,
+						'compare' => 'LIKE',
+					),
+				),
+			);
+
+			$ad_ids = get_posts( $args );
+
+			// Cache for 5 minutes. Invalidated on ad save via clear_placement_cache().
+			wp_cache_set( $cache_key, $ad_ids, 'wbam', 5 * MINUTE_IN_SECONDS );
+		}
 
 		// Filter through targeting engine and verify exact placement match.
 		$targeting = Targeting_Engine::get_instance();
@@ -222,8 +239,8 @@ class Placement_Engine {
 				$priority_b = (int) get_post_meta( $b, '_wbam_priority', true );
 
 				// Default priority is 5 if not set.
-				$priority_a = $priority_a ?: 5;
-				$priority_b = $priority_b ?: 5;
+				$priority_a = $priority_a ? $priority_a : 5;
+				$priority_b = $priority_b ? $priority_b : 5;
 
 				// Higher priority first (descending).
 				return $priority_b - $priority_a;
@@ -274,5 +291,45 @@ class Placement_Engine {
 		 * @param string $placement Placement ID.
 		 */
 		return apply_filters( 'wbam_ad_output', $output, $ad_id, $placement );
+	}
+
+	/**
+	 * Clear placement cache when an ad is saved.
+	 *
+	 * Clears cache for all placements the ad uses, ensuring fresh
+	 * query results after ad configuration changes.
+	 *
+	 * @since 2.3.1
+	 *
+	 * @param int $ad_id Ad post ID.
+	 */
+	public function clear_placement_cache( $ad_id ) {
+		$placements = get_post_meta( $ad_id, '_wbam_placements', true );
+
+		if ( ! empty( $placements ) && is_array( $placements ) ) {
+			foreach ( $placements as $placement_id ) {
+				$cache_key = 'wbam_placement_ads_' . sanitize_key( $placement_id );
+				wp_cache_delete( $cache_key, 'wbam' );
+			}
+		}
+
+		// Also clear cache for all registered placements in case ad was removed from some.
+		foreach ( array_keys( $this->placements ) as $placement_id ) {
+			$cache_key = 'wbam_placement_ads_' . sanitize_key( $placement_id );
+			wp_cache_delete( $cache_key, 'wbam' );
+		}
+	}
+
+	/**
+	 * Clear placement cache when an ad is deleted or trashed.
+	 *
+	 * @since 2.3.1
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	public function maybe_clear_cache_on_delete( $post_id ) {
+		if ( 'wbam-ad' === get_post_type( $post_id ) ) {
+			$this->clear_placement_cache( $post_id );
+		}
 	}
 }
