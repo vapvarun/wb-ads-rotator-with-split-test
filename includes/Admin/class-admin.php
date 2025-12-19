@@ -19,6 +19,13 @@ class Admin {
 	use Singleton;
 
 	/**
+	 * Cache for table existence checks.
+	 *
+	 * @var array
+	 */
+	private static $table_cache = array();
+
+	/**
 	 * Initialize.
 	 */
 	public function init() {
@@ -431,9 +438,8 @@ class Admin {
 		array_unshift( $competing_ads, $post );
 
 		// Get stats for all ads.
-		$table_name = $wpdb->prefix . 'wbam_analytics';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+		$table_name   = $wpdb->prefix . 'wbam_analytics';
+		$table_exists = $this->table_exists( $table_name );
 
 		$stats = array();
 		foreach ( $competing_ads as $ad ) {
@@ -709,10 +715,8 @@ class Admin {
 				if ( false === $count ) {
 					global $wpdb;
 					$table_name = $wpdb->prefix . 'wbam_analytics';
-					// Check if table exists before querying.
-					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-					$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
-					if ( $table_exists ) {
+					// Check if table exists (cached to avoid repeated queries).
+					if ( $this->table_exists( $table_name ) ) {
 						// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 						$count = $wpdb->get_var(
 							$wpdb->prepare(
@@ -736,10 +740,8 @@ class Admin {
 				if ( false === $count ) {
 					global $wpdb;
 					$table_name = $wpdb->prefix . 'wbam_analytics';
-					// Check if table exists before querying.
-					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-					$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
-					if ( $table_exists ) {
+					// Check if table exists (cached to avoid repeated queries).
+					if ( $this->table_exists( $table_name ) ) {
 						// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 						$count = $wpdb->get_var(
 							$wpdb->prepare(
@@ -764,5 +766,34 @@ class Admin {
 				echo '<span class="wbam-status-badge ' . esc_attr( $class ) . '">' . esc_html( $text ) . '</span>';
 				break;
 		}
+	}
+
+	/**
+	 * Check if a database table exists (with static caching).
+	 *
+	 * Caches the result to avoid repeated SHOW TABLES queries during
+	 * the same request. Tables are created during plugin activation,
+	 * so they should always exist at runtime.
+	 *
+	 * @since 2.3.1
+	 *
+	 * @param string $table_name Full table name including prefix.
+	 * @return bool True if table exists, false otherwise.
+	 */
+	private function table_exists( $table_name ) {
+		// Return cached result if available.
+		if ( isset( self::$table_cache[ $table_name ] ) ) {
+			return self::$table_cache[ $table_name ];
+		}
+
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+
+		// Cache the result for subsequent calls.
+		self::$table_cache[ $table_name ] = ! empty( $exists );
+
+		return self::$table_cache[ $table_name ];
 	}
 }
