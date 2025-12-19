@@ -96,6 +96,11 @@ class Setup_Wizard {
 	 */
 	public function dismiss_setup() {
 		check_ajax_referer( 'wbam_dismiss_setup', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'wb-ad-manager' ) ) );
+		}
+
 		update_option( 'wbam_setup_dismissed', true );
 		wp_send_json_success();
 	}
