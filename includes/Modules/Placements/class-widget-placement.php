@@ -26,7 +26,7 @@ class Widget_Placement implements Placement_Interface {
 	}
 
 	public function get_group() {
-		return 'wordpress';
+		return 'WordPress';
 	}
 
 	public function is_available() {
@@ -88,17 +88,21 @@ class WBAM_Ad_Widget extends \WP_Widget {
 			return;
 		}
 
-		echo $args['before_widget']; // phpcs:ignore
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML from theme is trusted.
+		echo $args['before_widget'];
 
 		if ( ! empty( $instance['title'] ) ) {
-			echo $args['before_title'] . esc_html( $instance['title'] ) . $args['after_title']; // phpcs:ignore
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML from theme is trusted.
+			echo $args['before_title'] . esc_html( $instance['title'] ) . $args['after_title'];
 		}
 
 		echo '<div class="wbam-placement wbam-placement-widget">';
-		echo $output; // phpcs:ignore
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Ad types escape their own output. Code ads require unfiltered_html capability.
+		echo $output;
 		echo '</div>';
 
-		echo $args['after_widget']; // phpcs:ignore
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML from theme is trusted.
+		echo $args['after_widget'];
 	}
 
 	/**

@@ -122,7 +122,7 @@ class Comment_Placement implements Placement_Interface {
 			return $comment_text;
 		}
 
-		$this->comment_count++;
+		++$this->comment_count;
 
 		$ad_output = $this->get_between_ads( $this->comment_count );
 
@@ -147,8 +147,8 @@ class Comment_Placement implements Placement_Interface {
 		}
 
 		foreach ( $ads as $ad_id ) {
-			$data         = get_post_meta( $ad_id, '_wbam_ad_data', true );
-			$ad_position  = isset( $data['comment_position'] ) ? $data['comment_position'] : 'before_form';
+			$data        = get_post_meta( $ad_id, '_wbam_ad_data', true );
+			$ad_position = isset( $data['comment_position'] ) ? $data['comment_position'] : 'before_form';
 
 			if ( $ad_position !== $position ) {
 				continue;
@@ -157,7 +157,8 @@ class Comment_Placement implements Placement_Interface {
 			$output = $engine->render_ad( $ad_id );
 
 			if ( ! empty( $output ) ) {
-				echo '<div class="wbam-comment-ad wbam-comment-' . esc_attr( $position ) . '">' . $output . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Ad types escape their own output. Code ads require unfiltered_html capability.
+				echo '<div class="wbam-comment-ad wbam-comment-' . esc_attr( $position ) . '">' . $output . '</div>';
 			}
 		}
 	}

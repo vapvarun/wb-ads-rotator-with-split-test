@@ -33,7 +33,7 @@ class Header_Placement implements Placement_Interface {
 	}
 
 	public function get_group() {
-		return 'wordpress';
+		return 'WordPress';
 	}
 
 	public function is_available() {
@@ -77,7 +77,8 @@ class Header_Placement implements Placement_Interface {
 
 		echo '<div class="wbam-placement wbam-placement-header">';
 		foreach ( $ads as $ad_id ) {
-			echo $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) ); // phpcs:ignore
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Ad types escape their own output. Code ads require unfiltered_html capability.
+			echo $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 		}
 		echo '</div>';
 	}
