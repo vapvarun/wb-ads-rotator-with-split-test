@@ -102,7 +102,7 @@ class Admin {
 		wp_enqueue_script(
 			'wbam-admin',
 			WBAM_URL . 'assets/js/admin' . $suffix . '.js',
-			array( 'jquery' ),
+			array( 'jquery', 'media-editor' ),
 			WBAM_VERSION,
 			true
 		);
@@ -195,11 +195,11 @@ class Admin {
 		<div class="wbam-metabox wbam-adtype-tabs">
 			<?php foreach ( $ad_types as $type ) : ?>
 				<input type="radio"
-				       name="wbam_data[type]"
-				       value="<?php echo esc_attr( $type->get_id() ); ?>"
-				       id="wbam-adtype-<?php echo esc_attr( $type->get_id() ); ?>"
-				       class="wbam-adtype-radio"
-				       <?php checked( $ad_type, $type->get_id() ); ?> />
+						name="wbam_data[type]"
+						value="<?php echo esc_attr( $type->get_id() ); ?>"
+						id="wbam-adtype-<?php echo esc_attr( $type->get_id() ); ?>"
+						class="wbam-adtype-radio"
+						<?php checked( $ad_type, $type->get_id() ); ?> />
 			<?php endforeach; ?>
 
 			<div class="wbam-adtype-nav">
@@ -260,7 +260,10 @@ class Admin {
 					<h4><?php echo esc_html( ucfirst( $group ) ); ?> <?php esc_html_e( 'Placements', 'wb-ads-rotator-with-split-test' ); ?></h4>
 					<div class="wbam-placement-options">
 						<?php foreach ( $group_placements as $placement ) : ?>
-							<?php if ( ! $placement->is_available() || ! $placement->show_in_selector() ) continue; ?>
+							<?php
+							if ( ! $placement->is_available() || ! $placement->show_in_selector() ) {
+								continue;}
+							?>
 							<label class="wbam-placement-option">
 								<input type="checkbox" name="wbam_placements[]" value="<?php echo esc_attr( $placement->get_id() ); ?>" <?php checked( in_array( $placement->get_id(), $placements, true ) ); ?> />
 								<span class="wbam-option-title"><?php echo esc_html( $placement->get_name() ); ?></span>
@@ -428,7 +431,7 @@ class Admin {
 		array_unshift( $competing_ads, $post );
 
 		// Get stats for all ads.
-		$table_name   = $wpdb->prefix . 'wbam_analytics';
+		$table_name = $wpdb->prefix . 'wbam_analytics';
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
 
@@ -446,7 +449,7 @@ class Admin {
 						'impression'
 					)
 				);
-				$clicks = (int) $wpdb->get_var(
+				$clicks      = (int) $wpdb->get_var(
 					$wpdb->prepare(
 						'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
 						$ad->ID,
@@ -536,14 +539,14 @@ class Admin {
 						<td>
 							<div class="wbam-ctr-bar">
 								<div class="wbam-ctr-fill <?php echo $winner_id === $stat['id'] ? 'winner' : ''; ?>"
-								     style="width: <?php echo esc_attr( ( $stat['ctr'] / $max_ctr ) * 100 ); ?>%"></div>
+									style="width: <?php echo esc_attr( ( $stat['ctr'] / $max_ctr ) * 100 ); ?>%"></div>
 							</div>
 						</td>
 						<td>
 							<?php if ( ! $stat['is_current'] && $winner_id !== $stat['id'] ) : ?>
 								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'post.php?post=' . $stat['id'] . '&action=edit&wbam_disable=1' ), 'wbam_disable_ad_' . $stat['id'] ) ); ?>"
-								   class="wbam-disable-btn"
-								   onclick="return confirm('<?php esc_attr_e( 'Disable this underperforming ad?', 'wb-ads-rotator-with-split-test' ); ?>');">
+									class="wbam-disable-btn"
+									onclick="return confirm('<?php esc_attr_e( 'Disable this underperforming ad?', 'wb-ads-rotator-with-split-test' ); ?>');">
 									<?php esc_html_e( 'Disable', 'wb-ads-rotator-with-split-test' ); ?>
 								</a>
 							<?php endif; ?>

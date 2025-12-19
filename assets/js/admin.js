@@ -18,35 +18,68 @@
 		});
 
 		// Image Upload
+		var wbamMediaFrame = null;
 		$(document).on('click', '.wbam-upload-image', function(e) {
 			e.preventDefault();
-			var $field = $(this).closest('.wbam-field');
-			var $input = $field.find('input[type="url"]');
-			var $preview = $field.find('.wbam-image-preview');
 
-			var frame = wp.media({
-				title: wbamAdmin.i18n.selectImage,
-				button: { text: wbamAdmin.i18n.useImage },
+			// Check if wp.media is available.
+			if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
+				alert('Media library not loaded. Please refresh the page.');
+				return;
+			}
+
+			var $button = $(this);
+			var $field = $button.closest('.wbam-field');
+			var $input = $field.find('input[type="url"]').first();
+			var $preview = $field.find('.wbam-image-preview');
+			var $removeBtn = $field.find('.wbam-remove-image');
+
+			// Create frame if not exists or reuse.
+			if (wbamMediaFrame) {
+				wbamMediaFrame.off('select');
+			}
+
+			wbamMediaFrame = wp.media({
+				title: typeof wbamAdmin !== 'undefined' ? wbamAdmin.i18n.selectImage : 'Select Image',
+				button: { text: typeof wbamAdmin !== 'undefined' ? wbamAdmin.i18n.useImage : 'Use This Image' },
+				library: { type: 'image' },
 				multiple: false
 			});
 
-			frame.on('select', function() {
-				var url = frame.state().get('selection').first().toJSON().url;
-				$input.val(url);
+			wbamMediaFrame.on('select', function() {
+				var attachment = wbamMediaFrame.state().get('selection').first().toJSON();
+				var url = attachment.url;
+				$input.val(url).trigger('change');
 				$preview.html('<img src="' + url + '" alt="" />');
-				$field.find('.wbam-remove-image').show();
+				$removeBtn.show();
 			});
 
-			frame.open();
+			wbamMediaFrame.open();
 		});
 
 		// Image Remove
 		$(document).on('click', '.wbam-remove-image', function(e) {
 			e.preventDefault();
 			var $field = $(this).closest('.wbam-field');
-			$field.find('input[type="url"]').val('');
+			$field.find('input[type="url"]').first().val('').trigger('change');
 			$field.find('.wbam-image-preview').empty();
 			$(this).hide();
+		});
+
+		// Image URL manual input - update preview.
+		$(document).on('input change', '#wbam_image_url', function() {
+			var url = $(this).val().trim();
+			var $field = $(this).closest('.wbam-field');
+			var $preview = $field.find('.wbam-image-preview');
+			var $removeBtn = $field.find('.wbam-remove-image');
+
+			if (url && url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+				$preview.html('<img src="' + url + '" alt="" />');
+				$removeBtn.show();
+			} else if (!url) {
+				$preview.empty();
+				$removeBtn.hide();
+			}
 		});
 
 		// Placement Settings Toggle
