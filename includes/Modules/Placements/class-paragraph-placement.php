@@ -26,7 +26,7 @@ class Paragraph_Placement implements Placement_Interface {
 	}
 
 	public function get_group() {
-		return 'wordpress';
+		return 'WordPress';
 	}
 
 	public function is_available() {
@@ -44,6 +44,9 @@ class Paragraph_Placement implements Placement_Interface {
 	/**
 	 * Inject ads into content.
 	 *
+	 * Uses preg_replace_callback to properly insert ads after </p> tags
+	 * without corrupting HTML structure.
+	 *
 	 * @param string $content Content.
 	 * @return string
 	 */
@@ -59,9 +62,16 @@ class Paragraph_Placement implements Placement_Interface {
 			return $content;
 		}
 
-		// Split by paragraphs.
-		$paragraphs = explode( '</p>', $content );
-		$count      = count( $paragraphs );
+		// Count paragraphs first.
+		preg_match_all( '/<\/p>/i', $content, $matches );
+		$total_paragraphs = count( $matches[0] );
+
+		if ( 0 === $total_paragraphs ) {
+			return $content;
+		}
+
+		// Collect insertion points and ads to insert.
+		$insertions = array();
 
 		foreach ( $ads as $ad_id ) {
 			$data            = get_post_meta( $ad_id, '_wbam_ad_data', true );
@@ -70,25 +80,39 @@ class Paragraph_Placement implements Placement_Interface {
 
 			if ( $repeat ) {
 				// Insert after every X paragraphs.
-				$new_paragraphs = array();
-				foreach ( $paragraphs as $i => $p ) {
-					$new_paragraphs[] = $p;
-					$pos              = $i + 1;
-					if ( $pos < $count && $pos >= $after_paragraph && ( $pos % $after_paragraph ) === 0 ) {
-						$new_paragraphs[] = $this->wrap_ad( $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) ) );
+				for ( $pos = $after_paragraph; $pos <= $total_paragraphs; $pos += $after_paragraph ) {
+					if ( ! isset( $insertions[ $pos ] ) ) {
+						$insertions[ $pos ] = '';
 					}
+					$insertions[ $pos ] .= $this->wrap_ad( $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) ) );
 				}
-				$paragraphs = $new_paragraphs;
-			} else {
+			} elseif ( $after_paragraph <= $total_paragraphs ) {
 				// Insert only once.
-				if ( $after_paragraph <= $count ) {
-					$ad_html                         = $this->wrap_ad( $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) ) );
-					$paragraphs[ $after_paragraph - 1 ] .= $ad_html;
+				if ( ! isset( $insertions[ $after_paragraph ] ) ) {
+					$insertions[ $after_paragraph ] = '';
 				}
+				$insertions[ $after_paragraph ] .= $this->wrap_ad( $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) ) );
 			}
 		}
 
-		return implode( '</p>', $paragraphs );
+		if ( empty( $insertions ) ) {
+			return $content;
+		}
+
+		// Use preg_replace_callback to insert ads at the right positions.
+		$paragraph_count = 0;
+
+		$content = preg_replace_callback(
+			'/<\/p>/i',
+			function ( $matched ) use ( &$paragraph_count, $insertions ) {
+				++$paragraph_count;
+				$suffix = isset( $insertions[ $paragraph_count ] ) ? $insertions[ $paragraph_count ] : '';
+				return $matched[0] . $suffix;
+			},
+			$content
+		);
+
+		return $content;
 	}
 
 	/**
