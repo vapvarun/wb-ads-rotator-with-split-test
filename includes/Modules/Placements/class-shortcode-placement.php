@@ -26,7 +26,7 @@ class Shortcode_Placement implements Placement_Interface {
 	}
 
 	public function get_group() {
-		return 'wordpress';
+		return 'WordPress';
 	}
 
 	public function is_available() {
@@ -101,13 +101,13 @@ class Shortcode_Placement implements Placement_Interface {
 			return '';
 		}
 
-		$ids    = array_map( 'absint', explode( ',', $atts['ids'] ) );
-		$engine = Placement_Engine::get_instance();
-		$output = '<div class="wbam-placement wbam-placement-shortcode">';
+		$ids        = array_map( 'absint', explode( ',', $atts['ids'] ) );
+		$engine     = Placement_Engine::get_instance();
+		$ads_output = '';
 
 		foreach ( $ids as $ad_id ) {
 			if ( $ad_id > 0 ) {
-				$output .= $engine->render_ad(
+				$ads_output .= $engine->render_ad(
 					$ad_id,
 					array(
 						'placement' => 'shortcode',
@@ -117,7 +117,11 @@ class Shortcode_Placement implements Placement_Interface {
 			}
 		}
 
-		$output .= '</div>';
-		return $output;
+		// Only output wrapper if we have actual ads to show.
+		if ( empty( $ads_output ) ) {
+			return '';
+		}
+
+		return '<div class="wbam-placement wbam-placement-shortcode">' . $ads_output . '</div>';
 	}
 }

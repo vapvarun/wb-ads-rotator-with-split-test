@@ -13,6 +13,13 @@ namespace WBAM\Modules\Placements;
  */
 class Footer_Placement implements Placement_Interface {
 
+	/**
+	 * Flag to track if footer ads have been displayed.
+	 *
+	 * @var bool
+	 */
+	private $displayed = false;
+
 	public function get_id() {
 		return 'footer';
 	}
@@ -42,12 +49,19 @@ class Footer_Placement implements Placement_Interface {
 	}
 
 	public function display() {
+		// Prevent duplicate display if wp_footer fires multiple times.
+		if ( $this->displayed ) {
+			return;
+		}
+
 		$engine = Placement_Engine::get_instance();
 		$ads    = $engine->get_ads_for_placement( $this->get_id() );
 
 		if ( empty( $ads ) ) {
 			return;
 		}
+
+		$this->displayed = true;
 
 		echo '<div class="wbam-placement wbam-placement-footer">';
 		foreach ( $ads as $ad_id ) {

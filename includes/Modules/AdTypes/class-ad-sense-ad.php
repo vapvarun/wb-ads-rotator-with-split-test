@@ -33,7 +33,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->publisher_id   = Settings_Helper::get( 'adsense_publisher_id', '' );
+		$this->publisher_id = Settings_Helper::get( 'adsense_publisher_id', '' );
 
 		// Enqueue AdSense script in footer if we have ads.
 		add_action( 'wp_footer', array( $this, 'maybe_enqueue_adsense_script' ), 5 );
@@ -80,7 +80,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 	 * Only loads if AdSense ads are being displayed on the page.
 	 */
 	public function maybe_enqueue_adsense_script() {
-		if ( ! self::$script_enqueued ) {
+		if ( self::$script_enqueued ) {
 			return;
 		}
 
@@ -152,10 +152,10 @@ class AdSense_Ad implements Ad_Type_Interface {
 		// Mark that we need the AdSense script.
 		self::$script_enqueued = true;
 
-		$ad_format   = isset( $data['ad_format'] ) ? $data['ad_format'] : 'auto';
-		$ad_layout   = isset( $data['ad_layout'] ) ? $data['ad_layout'] : '';
-		$responsive  = isset( $data['responsive'] ) ? $data['responsive'] : true;
-		$fixed_width = isset( $data['fixed_width'] ) ? absint( $data['fixed_width'] ) : 0;
+		$ad_format    = isset( $data['ad_format'] ) ? $data['ad_format'] : 'auto';
+		$ad_layout    = isset( $data['ad_layout'] ) ? $data['ad_layout'] : '';
+		$responsive   = isset( $data['responsive'] ) ? $data['responsive'] : true;
+		$fixed_width  = isset( $data['fixed_width'] ) ? absint( $data['fixed_width'] ) : 0;
 		$fixed_height = isset( $data['fixed_height'] ) ? absint( $data['fixed_height'] ) : 0;
 
 		$classes = array( 'wbam-ad', 'wbam-ad-adsense' );
@@ -173,30 +173,30 @@ class AdSense_Ad implements Ad_Type_Interface {
 
 		// Build ins attributes.
 		$ins_attrs = array(
-			'class'                  => 'adsbygoogle',
-			'style'                  => $style,
-			'data-ad-client'         => $publisher_id,
-			'data-ad-slot'           => $slot_id,
+			'class'          => 'adsbygoogle',
+			'style'          => $style,
+			'data-ad-client' => $publisher_id,
+			'data-ad-slot'   => $slot_id,
 		);
 
 		// Add format-specific attributes.
 		if ( 'auto' === $ad_format && $responsive ) {
-			$ins_attrs['data-ad-format']      = 'auto';
+			$ins_attrs['data-ad-format']             = 'auto';
 			$ins_attrs['data-full-width-responsive'] = 'true';
 		} elseif ( 'in-article' === $ad_format ) {
-			$ins_attrs['data-ad-format']  = 'fluid';
-			$ins_attrs['data-ad-layout']  = 'in-article';
+			$ins_attrs['data-ad-format'] = 'fluid';
+			$ins_attrs['data-ad-layout'] = 'in-article';
 		} elseif ( 'in-feed' === $ad_format ) {
-			$ins_attrs['data-ad-format']       = 'fluid';
-			$ins_attrs['data-ad-layout-key']   = ! empty( $ad_layout ) ? $ad_layout : '';
+			$ins_attrs['data-ad-format']     = 'fluid';
+			$ins_attrs['data-ad-layout-key'] = ! empty( $ad_layout ) ? $ad_layout : '';
 		} elseif ( 'multiplex' === $ad_format ) {
-			$ins_attrs['data-ad-format']  = 'autorelaxed';
+			$ins_attrs['data-ad-format'] = 'autorelaxed';
 		} elseif ( ! empty( $ad_format ) && 'auto' !== $ad_format ) {
 			$ins_attrs['data-ad-format'] = $ad_format;
 		}
 
 		// Build HTML.
-		$html = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-ad-id="' . esc_attr( $ad_id ) . '" data-placement="' . esc_attr( $placement ) . '">';
+		$html  = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-ad-id="' . esc_attr( $ad_id ) . '" data-placement="' . esc_attr( $placement ) . '">';
 		$html .= '<ins';
 		foreach ( $ins_attrs as $attr => $value ) {
 			if ( ! empty( $value ) ) {

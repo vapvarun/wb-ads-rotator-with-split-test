@@ -58,7 +58,7 @@ class Before_Archive_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_group() {
-		return 'wordpress';
+		return 'WordPress';
 	}
 
 	/**

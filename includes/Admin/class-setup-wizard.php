@@ -98,7 +98,7 @@ class Setup_Wizard {
 		check_ajax_referer( 'wbam_dismiss_setup', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'wb-ad-manager' ) ) );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
 		update_option( 'wbam_setup_dismissed', true );

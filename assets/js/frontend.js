@@ -108,11 +108,13 @@
 					// Close button handler.
 					var closeBtn = ad.querySelector( '.wbam-sticky-close' );
 					if ( closeBtn ) {
-						closeBtn.addEventListener( 'click', function( e ) {
+						var closeHandler = function( e ) {
 							e.preventDefault();
 							ad.style.display = 'none';
 							WBAM.cookies.markClosed( adId );
-						} );
+						};
+						closeBtn.addEventListener( 'click', closeHandler );
+						closeBtn.addEventListener( 'touchend', closeHandler );
 					}
 				} );
 			}

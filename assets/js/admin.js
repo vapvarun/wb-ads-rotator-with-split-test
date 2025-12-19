@@ -88,6 +88,8 @@
 			$('.wbam-activity-settings').toggle($('input[value="bp_activity"]').is(':checked'));
 			$('.wbam-archive-settings').toggle($('input[value="archive"]').is(':checked'));
 		});
+		// Trigger on page load to show/hide settings based on initial state
+		$('input[name="wbam_placements[]"]').first().trigger('change');
 
 		// Display Rules
 		$(document).on('change', 'input[name="wbam_display_rules[display_on]"]', function() {

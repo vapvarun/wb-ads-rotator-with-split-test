@@ -134,7 +134,13 @@ class Frontend {
 
 		if ( $ad_id > 0 ) {
 			// Record click in analytics table.
-			$this->record_analytics( $ad_id, 'click', $placement );
+			$result = $this->record_analytics( $ad_id, 'click', $placement );
+
+			// Log if analytics recording failed (table missing or insert error).
+			if ( false === $result && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( sprintf( '[WBAM] Click tracking failed for ad %d on placement %s', $ad_id, $placement ) );
+			}
 
 			/**
 			 * Action fired when an ad is clicked.
@@ -146,6 +152,7 @@ class Frontend {
 			do_action( 'wbam_ad_clicked', $ad_id, $placement );
 		}
 
+		// Always return success to not block user experience, even if analytics failed.
 		wp_send_json_success();
 	}
 
@@ -164,6 +171,13 @@ class Frontend {
 
 		// Check if table exists (cached to avoid repeated queries).
 		if ( ! $this->table_exists( $table_name ) ) {
+			// Log once per request when table is missing to help debugging.
+			static $table_missing_logged = false;
+			if ( ! $table_missing_logged && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( sprintf( '[WBAM] Analytics table "%s" does not exist. Re-activate the plugin to create it.', $table_name ) );
+				$table_missing_logged = true;
+			}
 			return false;
 		}
 
@@ -439,7 +453,12 @@ class Frontend {
 	 * Atomically increment rate limit counter using database locking.
 	 *
 	 * Prevents TOCTOU race conditions by using MySQL INSERT ... ON DUPLICATE KEY UPDATE
-	 * for atomic increment operation.
+	 * with LAST_INSERT_ID() to get the new count atomically in a single operation.
+	 *
+	 * MySQL rows_affected behavior for ON DUPLICATE KEY UPDATE:
+	 * - INSERT (new row): 1 row affected
+	 * - UPDATE (value changed): 2 rows affected
+	 * - UPDATE (no change): 0 rows affected
 	 *
 	 * @since 2.3.2
 	 *
@@ -461,14 +480,15 @@ class Frontend {
 
 		$expiration = time() + $window;
 
-		// Atomic increment using INSERT ... ON DUPLICATE KEY UPDATE.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$result = $wpdb->query(
+		// Atomic increment using INSERT ... ON DUPLICATE KEY UPDATE with LAST_INSERT_ID.
+		// LAST_INSERT_ID(expr) sets the return value to expr, allowing us to retrieve the new count atomically.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name validated by table_exists().
+		$wpdb->query(
 			$wpdb->prepare(
 				"INSERT INTO {$table_name} (`key`, `count`, `expires`)
 				VALUES (%s, 1, %d)
 				ON DUPLICATE KEY UPDATE
-					`count` = IF(expires < %d, 1, `count` + 1),
+					`count` = LAST_INSERT_ID(IF(expires < %d, 1, `count` + 1)),
 					`expires` = IF(expires < %d, %d, `expires`)",
 				$key,
 				$expiration,
@@ -477,17 +497,34 @@ class Frontend {
 				$expiration
 			)
 		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		// Get updated count.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$count = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT `count` FROM {$table_name} WHERE `key` = %s",
-				$key
-			)
-		);
+		// Determine count based on operation type.
+		// rows_affected: 1 = INSERT (new row), 2 = UPDATE, 0 = UPDATE (no change).
+		$rows_affected = (int) $wpdb->rows_affected;
 
-		return ( (int) $count ) <= $limit;
+		if ( 1 === $rows_affected ) {
+			// INSERT case: this is the first request, count is 1.
+			$count = 1;
+		} else {
+			// UPDATE case: get the new count from LAST_INSERT_ID().
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$count = (int) $wpdb->get_var( 'SELECT LAST_INSERT_ID()' );
+
+			// Safeguard: if LAST_INSERT_ID returns 0, fall back to SELECT (shouldn't happen).
+			if ( 0 === $count ) {
+				// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name validated by table_exists().
+				$count = (int) $wpdb->get_var(
+					$wpdb->prepare(
+						"SELECT `count` FROM {$table_name} WHERE `key` = %s",
+						$key
+					)
+				);
+				// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			}
+		}
+
+		return $count <= $limit;
 	}
 
 	/**

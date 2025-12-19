@@ -146,7 +146,7 @@ class Targeting_Engine {
 		if ( ! empty( $schedule['start_date'] ) ) {
 			try {
 				$start_datetime = new \DateTime( $schedule['start_date'], wp_timezone() );
-				$start = $start_datetime->getTimestamp();
+				$start          = $start_datetime->getTimestamp();
 				if ( $now < $start ) {
 					return false;
 				}
@@ -160,7 +160,7 @@ class Targeting_Engine {
 		if ( ! empty( $schedule['end_date'] ) ) {
 			try {
 				$end_datetime = new \DateTime( $schedule['end_date'] . ' 23:59:59', wp_timezone() );
-				$end = $end_datetime->getTimestamp();
+				$end          = $end_datetime->getTimestamp();
 				if ( $now > $end ) {
 					return false;
 				}
@@ -172,7 +172,7 @@ class Targeting_Engine {
 
 		// Check day of week.
 		if ( ! empty( $schedule['days'] ) && is_array( $schedule['days'] ) ) {
-			$current_day = strtolower( current_time( 'D' ) );
+			$current_day = strtolower( $now_datetime->format( 'D' ) );
 			if ( ! in_array( $current_day, $schedule['days'], true ) ) {
 				return false;
 			}
@@ -180,7 +180,7 @@ class Targeting_Engine {
 
 		// Check time of day.
 		if ( ! empty( $schedule['time_start'] ) || ! empty( $schedule['time_end'] ) ) {
-			$current_time = current_time( 'H:i' );
+			$current_time = $now_datetime->format( 'H:i' );
 			$time_start   = ! empty( $schedule['time_start'] ) ? $schedule['time_start'] : '00:00';
 			$time_end     = ! empty( $schedule['time_end'] ) ? $schedule['time_end'] : '23:59';
 
@@ -188,8 +188,10 @@ class Targeting_Engine {
 			if ( $time_start > $time_end ) {
 				// Overnight: valid if current time >= start OR current time <= end.
 				if ( $current_time < $time_start && $current_time > $time_end ) {
+					// Current time is in the "gap" (between end and start), so hide ad.
 					return false;
 				}
+				// Current time >= start OR <= end, so show ad - continue checking.
 			} elseif ( $current_time < $time_start || $current_time > $time_end ) {
 				// Normal schedule: valid if current time is between start and end.
 				return false;
