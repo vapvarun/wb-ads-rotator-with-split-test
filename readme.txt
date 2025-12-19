@@ -5,7 +5,7 @@ Tags: ads, ad manager, ad rotation, split test, adsense
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,6 +110,27 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 
 == Changelog ==
 
+= 2.4.0 =
+* Security: GDPR compliance - stop storing raw IP addresses in analytics
+* Security: Add user-based rate limiting to AJAX handlers
+* Security: Add capability check to setup wizard dismiss handler
+* Security: Document security model for unescaped ad output in placements
+* Security: Add security measures for code ad type
+* Performance: Add object caching for placement ad queries
+* Performance: Cache table existence checks to avoid repeated queries
+* Fix: Impressions not being recorded properly
+* Fix: Image upload/remove button functionality
+* Fix: Paragraph placement HTML corruption with preg_replace_callback
+* Fix: wp_send_json_error signature and add missing HTTP status codes
+* Fix: Raw $_POST passed to hooks before sanitization
+* Fix: Geo targeting UI simplified with single mode selector
+* Fix: Device detection reliability improvements
+* Fix: Image ad UI with proper container width constraints
+* Fix: Display Rules UI clarity and organization
+* Fix: Specific Pages dropdown now only shows pages
+* Fix: 16 additional bugs from comprehensive audit
+* New: Comprehensive marketing materials included
+
 = 2.0.0 =
 * Complete rewrite with modern architecture
 * Ad rotation and split testing with weighted priority system
@@ -129,6 +150,9 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 * Legacy version
 
 == Upgrade Notice ==
+
+= 2.4.0 =
+Security and stability update with GDPR compliance, performance caching, and 20+ bug fixes. Recommended update for all users.
 
 = 2.0.0 =
 Major update! Complete rewrite with modern architecture, 14+ placements, Google AdSense Auto Ads, BuddyPress & bbPress integration. Backup recommended before updating.
