@@ -175,26 +175,24 @@ class Display_Options {
 				</div>
 
 				<div class="wbam-rule-row">
-					<label><?php esc_html_e( 'Specific Pages/Posts', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<select name="wbam_display_rules[posts][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select specific pages or posts...', 'wb-ads-rotator-with-split-test' ); ?>">
+					<label><?php esc_html_e( 'Specific Pages', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<select name="wbam_display_rules[posts][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select specific pages...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php
-						$all_pages = get_posts(
+						$all_pages = get_pages(
 							array(
-								'post_type'      => array( 'page', 'post' ),
-								'posts_per_page' => -1,
-								'orderby'        => 'title',
-								'order'          => 'ASC',
-								'post_status'    => 'publish',
+								'sort_column' => 'post_title',
+								'sort_order'  => 'ASC',
+								'post_status' => 'publish',
 							)
 						);
 						foreach ( $all_pages as $page_item ) :
 							?>
 							<option value="<?php echo esc_attr( $page_item->ID ); ?>" <?php selected( in_array( $page_item->ID, $specific_posts, true ) ); ?>>
-								<?php echo esc_html( $page_item->post_title ); ?> (<?php echo esc_html( ucfirst( $page_item->post_type ) ); ?>)
+								<?php echo esc_html( $page_item->post_title ); ?>
 							</option>
 						<?php endforeach; ?>
 					</select>
-					<p class="description"><?php esc_html_e( 'Select specific pages or posts to show this ad on.', 'wb-ads-rotator-with-split-test' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Select specific pages to show this ad on.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				</div>
 			</div>
 
