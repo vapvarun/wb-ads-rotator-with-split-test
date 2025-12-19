@@ -22,7 +22,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.3.0';
+	const DB_VERSION = '1.4.0';
 
 	/**
 	 * Option name for database version.
@@ -36,7 +36,73 @@ class Installer {
 	 */
 	public function install() {
 		$this->create_tables();
+		$this->run_migrations();
 		$this->update_db_version();
+	}
+
+	/**
+	 * Run database migrations for existing installs.
+	 */
+	private function run_migrations() {
+		global $wpdb;
+
+		$current_version = get_option( self::DB_VERSION_OPTION, '0' );
+
+		// Migration to 1.4.0: Add PRO-compatible columns to analytics table.
+		if ( version_compare( $current_version, '1.4.0', '<' ) ) {
+			$table_analytics = $wpdb->prefix . 'wbam_analytics';
+
+			// Check if table exists.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_analytics ) );
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			if ( $table_exists ) {
+				// Add campaign_id column if it doesn't exist.
+				$column_exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM `{$table_analytics}` LIKE %s", 'campaign_id' ) );
+				if ( empty( $column_exists ) ) {
+					$wpdb->query( "ALTER TABLE `{$table_analytics}` ADD COLUMN `campaign_id` bigint(20) UNSIGNED DEFAULT NULL AFTER `ad_id`" );
+					$wpdb->query( "ALTER TABLE `{$table_analytics}` ADD INDEX `campaign_id` (`campaign_id`)" );
+				}
+
+				// Add user_id column if it doesn't exist.
+				$column_exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM `{$table_analytics}` LIKE %s", 'user_id' ) );
+				if ( empty( $column_exists ) ) {
+					$wpdb->query( "ALTER TABLE `{$table_analytics}` ADD COLUMN `user_id` bigint(20) UNSIGNED DEFAULT NULL AFTER `event_type`" );
+				}
+
+				// Add ip_hash column if it doesn't exist.
+				$column_exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM `{$table_analytics}` LIKE %s", 'ip_hash' ) );
+				if ( empty( $column_exists ) ) {
+					$wpdb->query( "ALTER TABLE `{$table_analytics}` ADD COLUMN `ip_hash` varchar(64) DEFAULT NULL AFTER `user_id`" );
+				}
+
+				// Add country column if it doesn't exist.
+				$column_exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM `{$table_analytics}` LIKE %s", 'country' ) );
+				if ( empty( $column_exists ) ) {
+					$wpdb->query( "ALTER TABLE `{$table_analytics}` ADD COLUMN `country` varchar(2) DEFAULT NULL AFTER `ip_hash`" );
+				}
+
+				// Add device_type column if it doesn't exist.
+				$column_exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM `{$table_analytics}` LIKE %s", 'device_type' ) );
+				if ( empty( $column_exists ) ) {
+					$wpdb->query( "ALTER TABLE `{$table_analytics}` ADD COLUMN `device_type` varchar(20) DEFAULT NULL AFTER `country`" );
+				}
+
+				// Add browser column if it doesn't exist.
+				$column_exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM `{$table_analytics}` LIKE %s", 'browser' ) );
+				if ( empty( $column_exists ) ) {
+					$wpdb->query( "ALTER TABLE `{$table_analytics}` ADD COLUMN `browser` varchar(50) DEFAULT NULL AFTER `device_type`" );
+				}
+
+				// Add page_url column if it doesn't exist.
+				$column_exists = $wpdb->get_results( $wpdb->prepare( "SHOW COLUMNS FROM `{$table_analytics}` LIKE %s", 'page_url' ) );
+				if ( empty( $column_exists ) ) {
+					$wpdb->query( "ALTER TABLE `{$table_analytics}` ADD COLUMN `page_url` varchar(2000) DEFAULT NULL AFTER `placement`" );
+				}
+			}
+			// phpcs:enable
+		}
 	}
 
 	/**
@@ -132,8 +198,16 @@ class Installer {
 		$sql_analytics   = "CREATE TABLE {$table_analytics} (
 			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			ad_id bigint(20) UNSIGNED NOT NULL,
+			campaign_id bigint(20) UNSIGNED DEFAULT NULL,
 			event_type varchar(20) NOT NULL,
+			user_id bigint(20) UNSIGNED DEFAULT NULL,
+			ip_hash varchar(64) DEFAULT NULL,
+			country varchar(2) DEFAULT NULL,
+			device_type varchar(20) DEFAULT NULL,
+			browser varchar(50) DEFAULT NULL,
+			referrer varchar(2000) DEFAULT NULL,
 			placement varchar(100) DEFAULT NULL,
+			page_url varchar(2000) DEFAULT NULL,
 			visitor_hash varchar(64) DEFAULT NULL,
 			ip_address varchar(45) DEFAULT NULL,
 			user_agent text,
@@ -141,6 +215,7 @@ class Installer {
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
 			PRIMARY KEY  (id),
 			KEY ad_id (ad_id),
+			KEY campaign_id (campaign_id),
 			KEY event_type (event_type),
 			KEY created_at (created_at),
 			KEY ad_event (ad_id, event_type)
