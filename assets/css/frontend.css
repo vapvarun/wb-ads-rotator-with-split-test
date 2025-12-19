@@ -75,6 +75,7 @@
 	max-width: 100%;
 	margin-left: auto;
 	margin-right: auto;
+	box-sizing: border-box;
 }
 
 .wbam-ad-image a {
@@ -93,29 +94,77 @@
 	height: auto;
 	border-radius: var(--wbam-border-radius);
 	display: block;
+	object-fit: contain;
 }
 
-/* Constrain image ads in specific placements to prevent oversized images */
-.wbam-placement-footer .wbam-ad-image,
-.wbam-placement-header .wbam-ad-image,
-.wbam-placement-sidebar .wbam-ad-image {
+/* ==========================================================================
+   Image Ad Container Constraints
+   Prevent oversized images from taking up unwanted space
+   ========================================================================== */
+
+/* Default container for all image ads - reasonable max-width */
+.wbam-placement .wbam-ad-image {
 	max-width: 728px;
+	width: 100%;
 }
 
+/* Full-width content area placements can be larger */
 .wbam-placement-before-content .wbam-ad-image,
 .wbam-placement-after-content .wbam-ad-image,
-.wbam-placement-paragraph .wbam-ad-image {
+.wbam-placement-paragraph .wbam-ad-image,
+.wbam-placement-shortcode .wbam-ad-image {
 	max-width: 970px;
 }
 
-/* Widget sidebar constraint */
+/* Header/Footer - standard leaderboard size */
+.wbam-placement-footer .wbam-ad-image,
+.wbam-placement-header .wbam-ad-image {
+	max-width: 728px;
+}
+
+/* Sidebar placements - medium rectangle size */
+.wbam-placement-sidebar .wbam-ad-image {
+	max-width: 300px;
+}
+
+/* Widget sidebar constraint - fill available width */
 .widget .wbam-ad-image {
 	max-width: 100%;
+	width: 100%;
 }
 
 .widget .wbam-ad-image img {
 	width: 100%;
 	object-fit: contain;
+}
+
+/* BuddyPress/bbPress placements */
+.wbam-activity-ad .wbam-ad-image,
+.wbam-bp-directory-ad .wbam-ad-image,
+.wbam-bp-between-item .wbam-ad-image,
+.wbam-comment-ad .wbam-ad-image,
+.wbam-bbpress-ad .wbam-ad-image {
+	max-width: 600px;
+}
+
+/* Sticky ads - constrained to container */
+.wbam-sticky-ad .wbam-ad-image {
+	max-width: 100%;
+}
+
+.wbam-sticky-ad .wbam-ad-image img {
+	max-height: 250px;
+	width: auto;
+}
+
+/* Popup ads - fit within modal */
+.wbam-popup-content .wbam-ad-image {
+	max-width: 100%;
+}
+
+.wbam-popup-content .wbam-ad-image img {
+	max-height: 400px;
+	width: auto;
 }
 
 /* ==========================================================================
