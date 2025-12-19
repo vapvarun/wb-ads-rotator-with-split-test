@@ -264,16 +264,23 @@ class Frontend {
 		$email = isset( $_POST['subscriber_email'] ) ? sanitize_email( wp_unslash( $_POST['subscriber_email'] ) ) : '';
 		$name  = isset( $_POST['subscriber_name'] ) ? sanitize_text_field( wp_unslash( $_POST['subscriber_name'] ) ) : '';
 
+		// Build sanitized form data array for hooks (instead of raw $_POST).
+		$form_data = array(
+			'subscriber_email' => $email,
+			'subscriber_name'  => $name,
+			'ad_id'            => $ad_id,
+		);
+
 		/**
 		 * Fires before processing email capture submission.
 		 *
 		 * @since 2.2.0
-		 * @param string $email  Subscriber email.
-		 * @param string $name   Subscriber name.
-		 * @param int    $ad_id  Ad ID.
-		 * @param array  $_POST  Raw POST data.
+		 * @param string $email     Subscriber email.
+		 * @param string $name      Subscriber name.
+		 * @param int    $ad_id     Ad ID.
+		 * @param array  $form_data Sanitized form data.
 		 */
-		do_action( 'wbam_email_form_submission_before', $email, $name, $ad_id, $_POST );
+		do_action( 'wbam_email_form_submission_before', $email, $name, $ad_id, $form_data );
 
 		// Validate email.
 		if ( empty( $email ) || ! is_email( $email ) ) {
@@ -286,13 +293,13 @@ class Frontend {
 		 * Return a WP_Error to fail validation with a custom message.
 		 *
 		 * @since 2.2.0
-		 * @param true|WP_Error $valid True if valid, WP_Error to fail.
-		 * @param string        $email Subscriber email.
-		 * @param string        $name  Subscriber name.
-		 * @param int           $ad_id Ad ID.
-		 * @param array         $_POST Raw POST data.
+		 * @param true|WP_Error $valid     True if valid, WP_Error to fail.
+		 * @param string        $email     Subscriber email.
+		 * @param string        $name      Subscriber name.
+		 * @param int           $ad_id     Ad ID.
+		 * @param array         $form_data Sanitized form data.
 		 */
-		$validation = apply_filters( 'wbam_email_form_validation', true, $email, $name, $ad_id, $_POST );
+		$validation = apply_filters( 'wbam_email_form_validation', true, $email, $name, $ad_id, $form_data );
 
 		if ( is_wp_error( $validation ) ) {
 			wp_send_json_error( array( 'message' => $validation->get_error_message() ) );
