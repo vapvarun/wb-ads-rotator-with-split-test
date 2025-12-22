@@ -1,12 +1,17 @@
 {
   "name": "wb-ad-manager",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "A comprehensive ad management solution for WordPress",
   "author": "Wbcom Designs",
   "license": "GPL-2.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/wbcomdesigns/wb-ad-manager"
+  },
+  "scripts": {
+    "build": "grunt build",
+    "dist": "grunt dist",
+    "watch": "grunt watch"
   },
   "devDependencies": {
     "grunt": "^1.6.1",

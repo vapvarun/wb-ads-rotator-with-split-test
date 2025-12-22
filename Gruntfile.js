@@ -69,8 +69,8 @@ module.exports = function( grunt ) {
 						'dist/.*',
 						'tests/.*'
 					],
-					mainFile: 'wb-ad-manager.php',
-					potFilename: 'wb-ad-manager.pot',
+					mainFile: 'wb-ads-rotator-with-split-test.php',
+					potFilename: 'wb-ads-rotator-with-split-test.pot',
 					potHeaders: {
 						poedit: true,
 						'x-poedit-keywordslist': true,
