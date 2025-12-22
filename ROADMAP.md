@@ -1,472 +1,57 @@
-# WB Ad Manager - Development Roadmap
+# WB Ad Manager FREE - Future Roadmap
 
-**Plugin Name:** WB Ad Manager
-**Premium Name:** WB Ad Manager Pro
-**Current Version:** 2.0.0
-**Last Updated:** December 1, 2024
+> Practical feature scope based on real site owner requirements. Not everything needs to be built—only what matters.
 
 ---
 
-## Overview
+## Future Versions
 
-WB Ad Manager is a modular WordPress ad management plugin with BuddyPress integration. The free version provides core ad management features, while the Pro version adds advanced targeting, analytics, advertiser portal, and payment integration.
+### v2.4.0 - Link Management Improvements
+- **Link Expiration**: Auto-disable links after a date
+- **Duplicate Detection**: Warn when creating duplicate destination URLs
+- **Bulk Operations**: Select multiple links to enable/disable/delete
+- **Search & Filter**: Find links by title, URL, or status
 
----
+### v2.5.0 - Better Analytics
+- **Click Graphs**: Visual 7-day/30-day click charts
+- **Top Links Widget**: Dashboard widget showing top 5 performing links
+- **Browser/Device Breakdown**: Basic breakdown of click sources
+- **CSV Export**: Export click data for reporting
 
-## Current Status Summary
+### v2.6.0 - Editor Integration
+- **Gutenberg Block**: Insert tracked links directly in block editor
+- **Link Picker Modal**: Quick search and insert existing links
+- **Copy Short URL Button**: One-click copy for sharing
 
-| Component | Status |
-|-----------|--------|
-| Core Plugin Structure | ✅ Complete |
-| Ad Types (4) | ✅ Complete |
-| Setup Wizard | ✅ Complete |
-| All Placements (14) | ✅ Complete |
-| Admin UI & Metaboxes | ✅ Complete |
-| Settings Page | ✅ Complete |
-| Admin CSS/JS | ✅ Complete |
-| Frontend CSS/JS | ✅ Complete |
-| BuddyPress Module | ✅ Complete |
-| BuddyPress Widgets (3) | ✅ Complete |
-| bbPress Module | ✅ Complete |
-| bbPress Widgets (2) | ✅ Complete |
-| Links Module | ✅ Complete |
-| A/B Testing (Basic) | ✅ Complete |
-| A/B Testing (Advanced) | 🔄 In Progress |
-| Targeting Engine | ✅ Complete |
-| Content Analyzer | ✅ Complete |
-| Display Rules (Include/Exclude) | ✅ Complete |
-| Visitor Conditions | ✅ Complete |
-| Basic Scheduling | ✅ Complete |
-| Geo-Targeting (3 providers) | ✅ Complete |
-| Advanced Scheduling | ✅ Complete |
-| Frequency Control | ✅ Complete |
-| Sticky/Floating Ads | ✅ Complete |
-| Popup/Modal Ads | ✅ Complete |
-| Comment Ads | ✅ Complete |
-| Pro Features | 🔲 Pro Plugin |
+### v2.7.0 - Ad Rotation Enhancements
+- **Ad Scheduling**: Show ads only during specific hours/days
+- **Category Targeting**: Assign ads to content categories
+- **Improved Split Test Reports**: Better visualization of A/B results
 
 ---
 
-## FREE VERSION PHASES
+## PRO Features (Available in wb-ad-manager-pro)
 
-### Phase 1: Core Foundation ✅ COMPLETE
+These features require the PRO plugin:
 
-- [x] Plugin bootstrap with PSR-4 style namespaces (`WBAM\`)
-- [x] Singleton trait for instance management
-- [x] Custom Post Type `wbam-ad`
-- [x] Module-based architecture
-- [x] Placement Engine with interface-based placements
-- [x] Admin metaboxes with card-based UI
-- [x] Settings page with global options
-- [x] Frontend asset loading
-
-**Ad Types Implemented:**
-- [x] Image ads (with link, alt text, target)
-- [x] Rich Content (HTML textarea)
-- [x] Code ads (custom HTML/JS)
-- [x] Google AdSense (auto script management, multiple formats, Auto Ads support)
-
-**Placements Implemented:**
-- [x] Header (`wp_head`)
-- [x] Footer (`wp_footer`)
-- [x] Before Content
-- [x] After Content
-- [x] After Paragraph X (with repeat option)
-- [x] Archive (between posts)
-- [x] Widget
-- [x] Shortcode `[wbam_ad id="X"]` and `[wbam_ads ids="X,Y,Z"]`
-- [x] BuddyPress Activity Stream
-
-**Settings Implemented:**
-- [x] Disable ads for logged-in users
-- [x] Disable ads for admins
-- [x] Minimum content length for paragraph ads
-- [x] Disable on specific post types
-- [x] Ad label text & position
-- [x] Custom container CSS class
-- [x] Lazy load option
-- [x] Cache ad queries option
-- [x] Google AdSense Publisher ID (global)
-- [x] Google AdSense Auto Ads toggle
-
-**Setup Wizard:**
-- [x] First-time activation wizard
-- [x] 3 sample ads creation (image, rich content, code)
-- [x] Auto-placement setup
-- [x] Skip/dismiss option
-
-**Targeting Implemented:**
-- [x] Targeting Engine with rule processing
-- [x] Display Rules metabox
-  - [x] Show on all pages / specific pages
-  - [x] Include by post types
-  - [x] Include by page types (front, blog, archive, search, 404)
-  - [x] Include by categories
-  - [x] Include by tags
-  - [x] Exclude by page types
-  - [x] Exclude by categories
-  - [x] Exclude by tags
-- [x] Schedule metabox
-  - [x] Start date
-  - [x] End date
-- [x] Visitor Conditions metabox
-  - [x] Device targeting (desktop, tablet, mobile)
-  - [x] User status (all, logged in, logged out)
-  - [x] User roles
-- [x] Geo Targeting metabox
-  - [x] Country include/exclude
-  - [x] IP-based geolocation (ip-api.com)
-  - [x] BuddyPress profile location fallback
-  - [x] Unknown location handling
-  - [x] Geo cache with transients
-
-**Files Created:**
-```
-wb-ad-manager/
-├── wb-ad-manager.php
-├── readme.txt
-├── ROADMAP.md
-├── Gruntfile.js
-├── package.json
-├── assets/
-│   ├── css/admin.css
-│   ├── css/admin.min.css
-│   ├── css/frontend.css
-│   ├── css/frontend.min.css
-│   ├── js/admin.js
-│   ├── js/admin.min.js
-│   ├── js/frontend.js
-│   └── js/frontend.min.js
-├── languages/
-│   └── wb-ad-manager.pot
-└── includes/
-    ├── Core/
-    │   ├── trait-singleton.php
-    │   └── class-plugin.php
-    ├── Admin/
-    │   ├── class-admin.php
-    │   ├── class-settings.php
-    │   ├── class-display-options.php
-    │   └── class-setup-wizard.php
-    ├── Frontend/
-    │   └── class-frontend.php
-    └── Modules/
-        ├── AdTypes/
-        │   ├── interface-ad-type.php
-        │   ├── class-image-ad.php
-        │   ├── class-rich-content-ad.php
-        │   ├── class-code-ad.php
-        │   └── class-ad-sense-ad.php
-        ├── Placements/
-        │   ├── interface-placement.php
-        │   ├── class-placement-engine.php
-        │   ├── class-header-placement.php
-        │   ├── class-footer-placement.php
-        │   ├── class-content-placement.php
-        │   ├── class-paragraph-placement.php
-        │   ├── class-archive-placement.php
-        │   ├── class-widget-placement.php
-        │   └── class-shortcode-placement.php
-        ├── Targeting/
-        │   ├── interface-targeting-rule.php
-        │   └── class-targeting-engine.php
-        ├── GeoTargeting/
-        │   └── class-geo-engine.php
-        └── BuddyPress/
-            ├── class-bp-module.php
-            └── class-bp-activity-placement.php
-```
+- Geographic/Device/Time-based Redirects
+- A/B Split Testing for Links
+- GA4 & Facebook Pixel Integration
+- Password Protected Links
+- Click Limits & Scheduled Publishing
+- Affiliate Disclosure & OpenGraph Meta
+- Email Reports & Click Alerts
+- Advertiser Portal & Campaign Management
+- CPM/CPC Billing
 
 ---
 
-### Phase 2: Advanced Scheduling & Frequency ✅ COMPLETE
+## Priority Order
 
-**Advanced Scheduling:**
-- [x] Add day-of-week targeting (Mon, Tue, Wed, etc.)
-- [x] Add time-of-day targeting (time range)
-- [x] Uses site timezone
-
-**Frequency Control:**
-- [x] Create `class-frequency-manager.php`
-- [x] Maximum ads per page setting (in Settings)
-- [x] Maximum ads per session (cookie-based, per-ad setting)
-- [x] Ad rotation/randomization (weighted random)
-- [x] Priority/weight system for ads (1-10 scale)
-- [x] Add priority field to ad metabox
-- [x] Add session limit field to ad metabox
-
-**Content Analysis:**
-- [x] Create `class-content-analyzer.php`
-- [x] Detect post length (character, word count)
-- [x] Count paragraphs, headings, images, links
-- [x] Reading time estimation
-- [x] Smart ad position suggestions based on content
+1. **HIGH**: Link expiration, click graphs, Gutenberg block
+2. **MEDIUM**: Bulk operations, CSV export, search/filter
+3. **LOW**: Dashboard widget, ad scheduling
 
 ---
 
-### Phase 3: Additional Placements ✅ COMPLETE
-
-**New WordPress Placements:**
-- [x] Floating/sticky ads (corner, bottom bar) - `class-sticky-placement.php`
-  - Bottom Right
-  - Bottom Left
-  - Bottom Bar (Full Width)
-  - Top Bar (Full Width)
-- [x] Popup/modal ads (with frequency limit) - `class-popup-placement.php`
-  - Time Delay trigger
-  - Scroll Percentage trigger
-  - Exit Intent trigger
-- [x] Frontend JS for sticky/popup functionality
-- [x] Comment placements - `class-comment-placement.php`
-  - Before Comment Form
-  - After Comment Form
-  - Between Comments (with repeat option)
-
-**Additional BuddyPress Placements:**
-- [x] In member directory - `class-bp-directory-placement.php`
-  - Before Members List
-  - After Members List
-  - Between Members (with repeat option)
-- [x] In group directory - `class-bp-directory-placement.php`
-  - Before Groups List
-  - After Groups List
-  - Between Groups (with repeat option)
-- [x] BuddyPress Widgets - `class-bp-widgets.php`
-  - Profile Ad Widget (shows on member profiles)
-  - Group Ad Widget (shows on group pages)
-  - Activity Ad Widget (shows on activity pages)
-
-**bbPress Placements (if bbPress active):**
-- [x] bbPress Module - `class-bbpress-module.php`
-  - Before/After Forum List
-  - Before/After Topic List
-  - Before/After Single Topic
-  - Between Replies (with repeat option)
-- [x] bbPress Widgets
-  - Forum Ad Widget (all bbPress pages, forum only, or topic only)
-  - Topic Sidebar Ad Widget (single topic pages)
-
-**Files Created:**
-```
-includes/Modules/Placements/class-sticky-placement.php
-includes/Modules/Placements/class-popup-placement.php
-includes/Modules/Placements/class-comment-placement.php
-includes/Modules/BuddyPress/class-bp-directory-placement.php
-includes/Modules/BuddyPress/class-bp-widgets.php
-includes/Modules/bbPress/class-bbpress-module.php
-includes/Modules/Targeting/class-content-analyzer.php
-assets/js/frontend.js
-```
-
----
-
-### Phase 4: Links Module ✅ COMPLETE
-
-**Links Management:**
-- [x] Create `wbam_links` database table
-- [x] Link Manager class for CRUD operations
-- [x] Link entity class with all properties
-- [x] Admin UI for managing links
-
-**Link Features:**
-- [x] Link cloaking with customizable prefix (default: /go/)
-- [x] Nofollow attribute support
-- [x] Sponsored attribute support
-- [x] Click tracking via AJAX endpoint
-- [x] Link shortcodes for easy insertion
-
-**Shortcodes:**
-- [x] `[wbam_link id="X"]` - Single link output
-- [x] `[wbam_link id="X" text="Custom Text"]` - Custom anchor text
-- [x] `[wbam_link id="X" class="custom-class"]` - Custom CSS class
-
-**Admin Interface:**
-- [x] Links list table with all columns
-- [x] Add/Edit link forms
-- [x] Click count display
-- [x] Quick actions (edit, delete, copy URL)
-
-**Files Created:**
-```
-includes/Modules/Links/
-├── class-links-module.php
-├── class-link-manager.php
-├── class-link.php
-├── class-link-cloaker.php
-├── class-link-shortcodes.php
-├── class-links-admin.php
-└── class-links-list-table.php
-```
-
----
-
-### Phase 5: A/B Testing Foundation ✅ COMPLETE
-
-**Basic A/B Testing:**
-- [x] Ad rotation with weighted random selection
-- [x] Priority/weight system (1-10 scale)
-- [x] Impression tracking capability
-- [x] Click tracking capability
-- [x] Basic statistics display in admin
-
-**Files:**
-```
-includes/Modules/Targeting/class-frequency-manager.php (rotation logic)
-```
-
----
-
-## FREE VERSION v1.1+ - Future Enhancements
-
-### A/B Testing Completion 🔄 IN PROGRESS
-**Priority:** High | **Complexity:** High
-
-**What exists:**
-- [x] Ad rotation with split test capability
-- [x] Impression and click tracking
-- [x] Basic statistics display
-
-**What needs to be added:**
-- [ ] Statistical significance calculation (Chi-squared/Z-test)
-- [ ] Confidence level indicators (90%, 95%, 99%)
-- [ ] Automatic winner declaration
-- [ ] Test scheduling (start/end dates, minimum sample size)
-- [ ] Simple test comparison reports
-- [ ] One-click winner selection
-
-**Note:** Advanced features (multi-variate testing, auto-optimization, Thompson Sampling) will be in PRO version.
-
----
-
-### Link Partnership Manager (Basic) 🔲
-**Priority:** High | **Complexity:** High
-
-Allow site owners to receive and manage link partnership inquiries from other sites/advertisers. This is an inquiry-based system where the site owner is in full control.
-
-**Core Features:**
-- [ ] New link types: `paid_link`, `exchange`, `sponsored_post`
-- [ ] Create `wbam_link_partnerships` database table
-- [ ] Partnership entity class with all properties
-- [ ] Inquiry form shortcode `[wbam_partnership_inquiry]`
-- [ ] Admin inbox page to view incoming inquiries
-- [ ] Accept/Reject actions with optional reason
-- [ ] Basic email notifications (new inquiry, accepted, rejected)
-
-**Partnership Types:**
-- `paid_link` - Paid link placement on site
-- `exchange` - Reciprocal link exchange
-- `sponsored_post` - Guest post with link
-
-**Inquiry Form Fields:**
-- Name & Email (required)
-- Website URL (required)
-- Partnership type selection
-- Target page/post (if applicable)
-- Proposed anchor text
-- Message/notes
-- Budget range (for paid links)
-
-**Admin Inbox:**
-- List of pending/accepted/rejected inquiries
-- Quick view of inquiry details
-- Accept/Reject/Mark as spam actions
-- Filter by status, date, type
-
-**Database Table: `wbam_link_partnerships`**
-```sql
-id, name, email, website_url, partnership_type, target_post_id,
-anchor_text, message, budget_min, budget_max, status (pending/accepted/rejected/spam),
-admin_notes, created_at, responded_at
-```
-
-**Files:**
-```
-includes/Modules/Links/
-├── class-partnership.php
-├── class-partnership-manager.php
-├── class-partnership-form.php
-└── class-partnership-admin.php
-```
-
-**Note:** Advanced features (pricing presets, negotiation, revenue tracking, exchange monitoring) are in PRO version.
-
----
-
-### Ad Groups & Rotation 🔲
-**Priority:** High | **Complexity:** High
-
-- [ ] Create `wbam-ad-group` custom taxonomy or CPT
-- [ ] Group multiple ads together
-- [ ] Rotation types: Random, Weighted, Sequential
-- [ ] Fallback ad if group is empty
-- [ ] `[wbam_group id="X"]` shortcode
-
-### Impression Tracking 🔲
-**Priority:** Medium | **Complexity:** Medium
-
-- [ ] Create `wbam_impressions` database table
-- [ ] AJAX/beacon tracking endpoint
-- [ ] Daily aggregation (no PII storage)
-- [ ] Simple stats column in ads list table
-
-### ads.txt Editor 🔲
-**Priority:** Low | **Complexity:** Low
-
-- [ ] Settings page textarea for ads.txt
-- [ ] Auto-add AdSense entry option
-- [ ] Format validation
-
-### Ad Blocker Detection 🔲
-**Priority:** Low | **Complexity:** Medium
-
-- [ ] JavaScript bait element detection
-- [ ] Customizable fallback message
-- [ ] CSS class for blocked state styling
-
----
-
-## Technical Considerations
-
-### Performance
-- Use transients for caching ad queries
-- Lazy load ads below the fold
-- Async tracking beacons
-- Database query optimization
-- Object caching support
-
-### Security
-- Sanitize all ad content (especially HTML/JS)
-- Nonce verification on all forms
-- Capability checks
-- SQL injection prevention
-- XSS prevention
-- Rate limiting on tracking endpoints
-
-### Privacy (GDPR)
-- Consent options for tracking
-- IP anonymization option
-- Data export/deletion tools
-- Cookie notice integration
-- Privacy policy template
-
-### Compatibility
-- Test with popular themes
-- Test with page builders (Elementor, Divi, Gutenberg)
-- Test with caching plugins
-- Test with security plugins
-- PHP 7.4+ and 8.x support
-- WordPress 5.8+ support
-
----
-
-## Resources
-
-- [Advanced Ads](https://wpadvancedads.com/) - Placement system reference
-- [Ad Inserter](https://adinserter.pro/) - Content insertion reference
-- [ip-api.com](http://ip-api.com/) - Free geo IP service
-- [ipinfo.io](https://ipinfo.io/) - Geo IP service with API
-- [Google AdSense](https://www.google.com/adsense/) - Ad network integration
-
----
-
-*Last updated: December 9, 2024*
+*Last updated: December 2024*
