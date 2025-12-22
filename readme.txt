@@ -5,7 +5,7 @@ Tags: ads, ad manager, ad rotation, split test, adsense
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.4.0
+Stable tag: 2.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,6 +110,12 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 
 == Changelog ==
 
+= 2.5.0 =
+* Improvement: Add npm scripts for build/dist/watch commands
+* Improvement: Fix Gruntfile makepot config for correct plugin name
+* Improvement: Add future roadmap for planned features
+* Dev: Update POT file for translations
+
 = 2.4.0 =
 * Security: GDPR compliance - stop storing raw IP addresses in analytics
 * Security: Add user-based rate limiting to AJAX handlers
@@ -150,6 +156,9 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 * Legacy version
 
 == Upgrade Notice ==
+
+= 2.5.0 =
+Build system improvements and translation updates.
 
 = 2.4.0 =
 Security and stability update with GDPR compliance, performance caching, and 20+ bug fixes. Recommended update for all users.
