@@ -111,6 +111,8 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 == Changelog ==
 
 = 2.5.0 =
+* Fix: Add GDPR privacy helper for IP anonymization in frequency tracking
+* Fix: Frequency tracking now properly calls track_impression via wbam_ad_output filter
 * Improvement: Add npm scripts for build/dist/watch commands
 * Improvement: Fix Gruntfile makepot config for correct plugin name
 * Improvement: Add future roadmap for planned features
