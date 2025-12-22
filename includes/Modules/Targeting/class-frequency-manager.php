@@ -39,7 +39,28 @@ class Frequency_Manager {
 	 * Initialize.
 	 */
 	public function init() {
+		// Hook to track impressions when ads are rendered.
+		add_filter( 'wbam_ad_output', array( $this, 'on_ad_output' ), 5, 2 );
+
+		// Set cookie in footer with all tracked impressions.
 		add_action( 'wp_footer', array( $this, 'set_view_cookie' ), 999 );
+	}
+
+	/**
+	 * Callback for wbam_ad_output filter to track frequency.
+	 *
+	 * @since 2.3.3
+	 *
+	 * @param string $output Ad HTML output.
+	 * @param int    $ad_id  Ad ID.
+	 * @return string Unchanged output.
+	 */
+	public function on_ad_output( $output, $ad_id ) {
+		// Only track if ad actually has output (was rendered).
+		if ( ! empty( $output ) && ! empty( $ad_id ) ) {
+			$this->track_impression( $ad_id );
+		}
+		return $output;
 	}
 
 	/**

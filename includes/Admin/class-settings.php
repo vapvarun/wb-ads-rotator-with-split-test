@@ -47,6 +47,8 @@ class Settings {
 		'geo_ipinfo_key'           => '',
 		'adsense_publisher_id'     => '',
 		'adsense_auto_ads'         => false,
+		'require_consent_adsense'  => false,  // Require consent before loading AdSense.
+		'anonymize_ip'             => true,   // Anonymize IP addresses in stored data.
 		'delete_data_on_uninstall' => false,
 	);
 
@@ -301,6 +303,38 @@ class Settings {
 			)
 		);
 
+		// Privacy Section.
+		add_settings_section(
+			'wbam_privacy',
+			__( 'Privacy & GDPR', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_privacy_section' ),
+			'wbam-settings'
+		);
+
+		add_settings_field(
+			'require_consent_adsense',
+			__( 'Require Consent for AdSense', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_checkbox_field' ),
+			'wbam-settings',
+			'wbam_privacy',
+			array(
+				'id'          => 'require_consent_adsense',
+				'description' => __( 'Only load AdSense scripts after user consent. Works with Cookie Notice, CookieYes, Complianz, and other consent plugins.', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+
+		add_settings_field(
+			'anonymize_ip',
+			__( 'Anonymize IP Addresses', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_checkbox_field' ),
+			'wbam-settings',
+			'wbam_privacy',
+			array(
+				'id'          => 'anonymize_ip',
+				'description' => __( 'Store anonymized IP hashes instead of raw IP addresses. Recommended for GDPR compliance.', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+
 		// Advanced Section.
 		add_settings_section(
 			'wbam_advanced',
@@ -381,6 +415,10 @@ class Settings {
 		// AdSense settings.
 		$sanitized['adsense_publisher_id']   = sanitize_text_field( $input['adsense_publisher_id'] ?? '' );
 		$sanitized['adsense_auto_ads']       = ! empty( $input['adsense_auto_ads'] );
+
+		// Privacy settings.
+		$sanitized['require_consent_adsense'] = ! empty( $input['require_consent_adsense'] );
+		$sanitized['anonymize_ip']            = ! empty( $input['anonymize_ip'] );
 
 		// Advanced settings.
 		$sanitized['delete_data_on_uninstall'] = ! empty( $input['delete_data_on_uninstall'] );
@@ -470,6 +508,13 @@ class Settings {
 	 */
 	public function render_adsense_section() {
 		echo '<p>' . esc_html__( 'Configure Google AdSense integration. The AdSense script will only be loaded once, even with multiple ad units on a page.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+	}
+
+	/**
+	 * Render privacy section.
+	 */
+	public function render_privacy_section() {
+		echo '<p>' . esc_html__( 'Configure privacy and GDPR compliance settings. These options help ensure your site respects user privacy.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 	}
 
 	/**

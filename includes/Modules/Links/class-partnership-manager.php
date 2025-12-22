@@ -11,6 +11,7 @@
 namespace WBAM\Modules\Links;
 
 use WBAM\Core\Singleton;
+use WBAM\Core\Privacy_Helper;
 
 /**
  * Partnership Manager class.
@@ -497,22 +498,8 @@ class Partnership_Manager {
 	 * @return string
 	 */
 	private function get_client_ip() {
-		$ip = '';
-
-		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-			$ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
-		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-			$ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
-			// X-Forwarded-For can contain multiple IPs, take the first one.
-			if ( strpos( $ip, ',' ) !== false ) {
-				$ips = explode( ',', $ip );
-				$ip  = trim( $ips[0] );
-			}
-		} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
-			$ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
-		}
-
-		return $ip;
+		// GDPR: Use Privacy_Helper for anonymized IP based on settings.
+		return Privacy_Helper::get_storage_ip();
 	}
 
 	/**

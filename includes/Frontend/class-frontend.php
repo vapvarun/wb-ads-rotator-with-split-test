@@ -9,6 +9,7 @@
 namespace WBAM\Frontend;
 
 use WBAM\Core\Settings_Helper;
+use WBAM\Core\Privacy_Helper;
 use WBAM\Core\Singleton;
 
 /**
@@ -86,6 +87,11 @@ class Frontend {
 		// Get Publisher ID.
 		$publisher_id = Settings_Helper::get( 'adsense_publisher_id', '' );
 		if ( empty( $publisher_id ) ) {
+			return;
+		}
+
+		// GDPR: Check consent before loading third-party scripts.
+		if ( ! Privacy_Helper::has_consent( 'marketing' ) ) {
 			return;
 		}
 
@@ -382,6 +388,9 @@ class Frontend {
 
 		$table_name = $wpdb->prefix . 'wbam_email_submissions';
 
+		// GDPR: Use anonymized IP based on privacy settings.
+		$ip_address = Privacy_Helper::get_storage_ip();
+
 		// Check if table exists (cached to avoid repeated queries).
 		if ( ! $this->table_exists( $table_name ) ) {
 			// Fallback to options for backward compatibility.
@@ -391,7 +400,7 @@ class Frontend {
 				'name'  => $name,
 				'ad_id' => $ad_id,
 				'date'  => current_time( 'mysql' ),
-				'ip'    => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '',
+				'ip'    => $ip_address, // GDPR: Store anonymized IP hash.
 			);
 
 			// Keep only last 1000 submissions.
@@ -403,8 +412,6 @@ class Frontend {
 			return true;
 		}
 
-		$ip_address = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
-
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		return $wpdb->insert(
 			$table_name,
@@ -412,7 +419,7 @@ class Frontend {
 				'ad_id'      => $ad_id,
 				'email'      => $email,
 				'name'       => $name,
-				'ip_address' => $ip_address,
+				'ip_address' => $ip_address, // GDPR: Anonymized based on settings.
 				'created_at' => current_time( 'mysql' ),
 			),
 			array( '%d', '%s', '%s', '%s', '%s' )
