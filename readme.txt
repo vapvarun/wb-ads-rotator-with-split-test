@@ -62,6 +62,50 @@ WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. 
 * Geographic location (country)
 * Custom scheduling
 
+= WB Ad Manager Pro =
+
+Take your ad management to the next level with [WB Ad Manager Pro](https://wbcomdesigns.com/downloads/wb-ad-manager-pro/). The Pro version includes everything in the free plugin plus:
+
+**Advertiser Portal & Self-Service:**
+
+* Complete advertiser dashboard with analytics
+* Self-service ad submission and management
+* Wallet system with Stripe payments
+* Campaign management with budgets and goals
+* Advertiser performance tracking
+
+**Classifieds Marketplace:**
+
+* Full classified listings system
+* Category and location taxonomies
+* Featured listings and upgrades
+* Seller profiles and following system
+* Inquiry management
+
+**Advanced Link Management:**
+
+* Affiliate link cloaking and tracking
+* Link scanner to find monetization opportunities
+* Partnership management system
+* Click tracking and analytics
+
+**Revenue & Analytics:**
+
+* Revenue dashboard with earnings reports
+* CPM, CPC, and flat-rate billing
+* A/B testing with statistical analysis
+* Share of Voice reporting
+* Detailed impression and click analytics
+
+**Community Integrations:**
+
+* Enhanced BuddyPress integration
+* Seller profiles in member directories
+* Activity stream for listings
+* Following/favorites system
+
+[Learn more about WB Ad Manager Pro](https://wbcomdesigns.com/downloads/wb-ad-manager-pro/)
+
 == Installation ==
 
 1. Upload the plugin files to `/wp-content/plugins/wb-ad-manager/` directory, or install through WordPress plugins screen.
