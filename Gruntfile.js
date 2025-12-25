@@ -113,7 +113,8 @@ module.exports = function( grunt ) {
 						'!**/*.md',
 						'!*.log',
 						'!*.zip',
-						'!CLAUDE.md'
+						'!CLAUDE.md',
+						'!sales-page.html'
 					],
 					dest: 'dist/<%= pkg.name %>'
 				} ]
