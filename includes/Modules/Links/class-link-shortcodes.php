@@ -20,12 +20,46 @@ class Link_Shortcodes {
 	use Singleton;
 
 	/**
+	 * Whether assets have been enqueued.
+	 *
+	 * @var bool
+	 */
+	private static $assets_enqueued = false;
+
+	/**
 	 * Initialize shortcodes.
 	 */
 	public function init() {
 		add_shortcode( 'wbam_link', array( $this, 'render_link' ) );
 		add_shortcode( 'wbam_links', array( $this, 'render_links_list' ) );
 		add_shortcode( 'wbam_link_url', array( $this, 'render_link_url' ) );
+
+		// Register frontend assets.
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
+	}
+
+	/**
+	 * Register frontend assets.
+	 */
+	public function register_assets() {
+		wp_register_style(
+			'wbam-links-frontend',
+			WBAM_URL . 'assets/css/links-frontend.css',
+			array(),
+			WBAM_VERSION
+		);
+	}
+
+	/**
+	 * Enqueue assets if not already enqueued.
+	 */
+	private function maybe_enqueue_assets() {
+		if ( self::$assets_enqueued ) {
+			return;
+		}
+
+		wp_enqueue_style( 'wbam-links-frontend' );
+		self::$assets_enqueued = true;
 	}
 
 	/**
@@ -39,6 +73,8 @@ class Link_Shortcodes {
 	 * @return string
 	 */
 	public function render_link( $atts, $content = '' ) {
+		$this->maybe_enqueue_assets();
+
 		/**
 		 * Filter default attributes for the wbam_link shortcode.
 		 *
@@ -90,7 +126,7 @@ class Link_Shortcodes {
 		if ( '' !== $atts['nofollow'] || '' !== $atts['sponsored'] ) {
 			$rel = array();
 
-			$nofollow = '' !== $atts['nofollow'] ? filter_var( $atts['nofollow'], FILTER_VALIDATE_BOOLEAN ) : $link->nofollow;
+			$nofollow  = '' !== $atts['nofollow'] ? filter_var( $atts['nofollow'], FILTER_VALIDATE_BOOLEAN ) : $link->nofollow;
 			$sponsored = '' !== $atts['sponsored'] ? filter_var( $atts['sponsored'], FILTER_VALIDATE_BOOLEAN ) : $link->sponsored;
 
 			if ( $nofollow ) {
@@ -105,7 +141,7 @@ class Link_Shortcodes {
 
 		// Override target if specified.
 		if ( '' !== $atts['new_tab'] ) {
-			$new_tab = filter_var( $atts['new_tab'], FILTER_VALIDATE_BOOLEAN );
+			$new_tab              = filter_var( $atts['new_tab'], FILTER_VALIDATE_BOOLEAN );
 			$link_attrs['target'] = $new_tab ? '_blank' : '_self';
 		}
 
@@ -197,6 +233,8 @@ class Link_Shortcodes {
 	 * @return string
 	 */
 	public function render_links_list( $atts ) {
+		$this->maybe_enqueue_assets();
+
 		/**
 		 * Filter default attributes for the wbam_links shortcode.
 		 *
@@ -260,7 +298,7 @@ class Link_Shortcodes {
 		switch ( $atts['format'] ) {
 			case 'inline':
 				$output .= '<span class="' . esc_attr( $container_class ) . '">';
-				$items = array();
+				$items   = array();
 				foreach ( $links as $link ) {
 					$items[] = '<span class="' . esc_attr( $item_class ) . '">' . $link->get_html() . '</span>';
 				}

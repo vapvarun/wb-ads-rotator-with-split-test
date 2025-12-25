@@ -1,0 +1,112 @@
+/**
+ * WB Ad Manager - Links Frontend Styles
+ *
+ * Styles for [wbam_link], [wbam_links] shortcodes.
+ *
+ * @package WB_Ad_Manager
+ * @since   2.5.0
+ */
+
+/* ==========================================================================
+   Base Link Styles
+   ========================================================================== */
+
+.wbam-link {
+	text-decoration: none;
+	transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.wbam-link:hover {
+	opacity: 0.8;
+}
+
+/* Link Types */
+.wbam-link-affiliate {
+	/* Affiliate links - no special styling by default */
+}
+
+.wbam-link-redirect {
+	/* Redirect links - no special styling by default */
+}
+
+.wbam-link-internal {
+	/* Internal links - no special styling by default */
+}
+
+/* ==========================================================================
+   Links List Styles
+   ========================================================================== */
+
+/* List Format (default) */
+.wbam-links-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.wbam-links-list .wbam-links-item {
+	margin-bottom: 0.75em;
+	padding: 0;
+}
+
+.wbam-links-list .wbam-links-item:last-child {
+	margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Grid Format
+   ========================================================================== */
+
+.wbam-links-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 1.5rem;
+}
+
+.wbam-links-grid .wbam-links-item {
+	background: #f9f9f9;
+	border: 1px solid #eee;
+	border-radius: 6px;
+	padding: 1rem;
+	transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.wbam-links-grid .wbam-links-item:hover {
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	border-color: #ddd;
+}
+
+.wbam-links-grid .wbam-link {
+	display: block;
+	font-weight: 500;
+	margin-bottom: 0.5rem;
+}
+
+.wbam-link-description {
+	color: #666;
+	font-size: 0.9em;
+	line-height: 1.5;
+	margin: 0;
+}
+
+/* ==========================================================================
+   Inline Format
+   ========================================================================== */
+
+span.wbam-links-list {
+	display: inline;
+}
+
+span.wbam-links-list .wbam-links-item {
+	display: inline;
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 600px) {
+	.wbam-links-grid {
+		grid-template-columns: 1fr;
+	}
+}
