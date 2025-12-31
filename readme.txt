@@ -18,8 +18,9 @@ WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. 
 **Key Features:**
 
 * **Ad Rotation & Split Testing** - Multiple ads rotate in same placement with weighted priority
-* **4 Ad Types** - Image, Rich Content, HTML/JS Code, and Google AdSense
+* **5 Ad Types** - Image, Rich Content, HTML/JS Code, Google AdSense, and Email Capture
 * **14+ Placements** - Header, Footer, Content, Paragraph, Sticky, Popup, Comments, Archive, Shortcode, Widget, BuddyPress, bbPress
+* **GDPR & Privacy** - Consent integration with popular cookie plugins and IP anonymization
 * **Google AdSense** - Native AdSense support with automatic script management and Auto Ads
 * **BuddyPress Integration** - Activity stream, member/group directories, profile widgets
 * **bbPress Integration** - Forum, topic, and reply ad placements
@@ -35,6 +36,7 @@ WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. 
 2. **Rich Content** - WYSIWYG editor for HTML content
 3. **HTML/JS Code** - Paste ad network code (custom scripts)
 4. **Google AdSense** - Native integration with auto script management
+5. **Email Capture** - Newsletter signup forms with third-party integration
 
 **Placements:**
 
@@ -61,6 +63,14 @@ WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. 
 * User roles
 * Geographic location (country)
 * Custom scheduling
+
+**GDPR & Privacy:**
+
+* Consent requirement for AdSense - wait for user permission before loading
+* Integration with popular consent plugins (CookieYes, Complianz, Borlabs Cookie)
+* IP anonymization for analytics and geo-targeting
+* Configurable data retention periods
+* Delete all data on uninstall option
 
 = WB Ad Manager Pro =
 
