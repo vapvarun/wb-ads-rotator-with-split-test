@@ -61,7 +61,7 @@ Every row below lists: the doc, the capture, an exact filename, the admin URL (s
 
 | # | Doc | Shot | Filename | Where / state |
 |---|---|---|---|---|
-| 1 | getting-started/installation.md | "Install from WordPress.org" search result hit | `free/install-search.png` | `/wp-admin/plugin-install.php?s=wb+ad+manager&tab=search&type=term` |
+| 1 | getting-started/installation.md | Upload Plugin screen with the downloaded ZIP selected | `free/install-search.png` | `/wp-admin/plugin-install.php?tab=upload` |
 | 2 | getting-started/installation.md | "Plugins list with WB Ad Manager active" | `free/install-active.png` | `/wp-admin/plugins.php`, row highlighted |
 | 3 | getting-started/pro-installation-requirements.md | "WB Ads → Pro Settings → Modules" grid | `pro/modules-toggle.png` | `/wp-admin/admin.php?page=wbam-pro-settings&tab=modules` |
 | 4 | getting-started/pro-installation-requirements.md | "WB Ads → Pro Settings → Credits with adapter rows" | `pro/credits-adapters.png` | same page, tab=credits |
