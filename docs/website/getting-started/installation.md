@@ -3,7 +3,7 @@ title: Installation Guide
 persona: Evaluator — Free
 tier: free
 one_job: Get someone trying the free plugin from zero to a working install, verified.
-outcome: Reader can install the free plugin via WordPress.org or ZIP upload, meet the prerequisites, and confirm the install succeeded.
+outcome: Reader can download the free plugin from wbcomdesigns.com, install it by ZIP upload, meet the prerequisites, and confirm the install succeeded.
 assumes: WordPress 5.8+, PHP 7.4+, admin access to the target site.
 ---
 
@@ -30,19 +30,15 @@ Before installing, make sure you have:
 
 ## Installation Methods
 
-### Method A: Install from WordPress.org (Recommended)
+WB Ad Manager is distributed from wbcomdesigns.com. Both the free plugin and Pro
+come from the same downloads page, so start by downloading the ZIP: searching the
+WordPress plugin directory will not find it.
 
-![Plugin install search — 'wb ad manager' keyword result](../images/free/install-search.png)
+**[Download WB Ad Manager](https://wbcomdesigns.com/downloads/wb-ad-manager/)**
 
-1. Log in to your WordPress dashboard
-2. Go to **Plugins → Add New**
-3. Search for "WB Ad Manager"
-4. Click **Install Now**
-5. Click **Activate**
+### Method A: Upload ZIP File (Recommended)
 
-### Method B: Upload ZIP File
-
-1. Download the plugin ZIP from WordPress.org
+1. Download the plugin ZIP from the [downloads page](https://wbcomdesigns.com/downloads/wb-ad-manager/)
 2. Go to **Plugins → Add New → Upload Plugin**
 3. Choose the ZIP file
 4. Click **Install Now**
