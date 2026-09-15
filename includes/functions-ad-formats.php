@@ -171,3 +171,54 @@ if ( ! function_exists( 'wbam_detect_ad_format' ) ) {
 		return Ad_Formats::detect_by_dimensions( (int) $width, (int) $height );
 	}
 }
+
+if ( ! function_exists( 'wbam_ad_types_without_placements' ) ) {
+	/**
+	 * Ad type IDs that are never served through a placement.
+	 *
+	 * A video ad is played in-stream by the host plugin (MediaShield asks for
+	 * a break list), not painted into a header or sidebar slot. The admin
+	 * screen has known this since 2.11.1 and says so on the ad edit screen —
+	 * but it kept the list to itself, in a private Admin method the frontend
+	 * cannot reach, so Placement_Engine went on serving video ads as
+	 * standalone banners in every ticked placement (card 10235667764). The
+	 * list lives here now, in a file both sides already load, so the notice
+	 * and the engine cannot disagree again.
+	 *
+	 * Listing 'video' is safe with Pro absent: free registers no type with
+	 * that id, so the check is a no-op until Pro's Video_Ad type exists.
+	 *
+	 * @since 3.1.1
+	 *
+	 * @return string[] Ad type IDs that bypass placements.
+	 */
+	function wbam_ad_types_without_placements() {
+		return (array) apply_filters( 'wbam_ad_types_without_placements', array( 'video' ) );
+	}
+}
+
+if ( ! function_exists( 'wbam_ad_uses_placements' ) ) {
+	/**
+	 * Whether an ad is eligible to be served through a placement at all.
+	 *
+	 * @since 3.1.1
+	 *
+	 * @param int $ad_id Ad post ID.
+	 * @return bool False for types that are served some other way.
+	 */
+	function wbam_ad_uses_placements( $ad_id ) {
+		$type = get_post_meta( (int) $ad_id, '_wbam_ad_type', true );
+
+		if ( '' === $type || ! is_string( $type ) ) {
+			// Older ads carry the type only inside the serialized data blob.
+			$data = get_post_meta( (int) $ad_id, '_wbam_ad_data', true );
+			$type = is_array( $data ) && isset( $data['type'] ) ? (string) $data['type'] : '';
+		}
+
+		if ( '' === $type ) {
+			return true;
+		}
+
+		return ! in_array( $type, wbam_ad_types_without_placements(), true );
+	}
+}

@@ -323,6 +323,16 @@ class Placement_Engine {
 		);
 
 		foreach ( $ad_ids as $ad_id ) {
+			// Some ad types are not served through placements at all - a video
+			// ad is played in-stream by the host plugin, never painted into a
+			// header or sidebar. The ad edit screen has said so since 2.11.1
+			// ("ticking boxes below has no effect"), but this loop never asked,
+			// so a video ad with default placements saved against it rendered
+			// as a standalone <video> banner on every page (card 10235667764).
+			if ( function_exists( 'wbam_ad_uses_placements' ) && ! wbam_ad_uses_placements( $ad_id ) ) {
+				continue;
+			}
+
 			// Double-check that the placement is actually in the array (prevents false LIKE matches).
 			$placements = get_post_meta( $ad_id, '_wbam_placements', true );
 			if ( ! is_array( $placements ) || ! in_array( $placement_id, $placements, true ) ) {

@@ -1,22 +1,55 @@
 {
   "mode": "combo",
-  "release_version": "3.1.0",
-  "pro_version": "3.1.0",
-  "ran_at": "2026-08-21T11:13:21Z",
+  "release_version": "3.1.1",
+  "pro_version": "3.1.1",
+  "ran_at": "2026-09-15T10:10:00+00:00",
   "sections": {
-    "A_fresh_install":     { "pass": 2, "fail": 0, "skipped": 2 },
-    "B_upgrade":           { "pass": 1, "fail": 0, "skipped": 0 },
-    "C_core_flows":        { "pass": 9, "fail": 0, "skipped": 2 },
-    "D_regression_guards": { "pass": 12, "fail": 0, "skipped": 0 },
-    "E_pro_smoke":         { "pass": 1, "fail": 0, "skipped": 4 },
-    "F_cross_browser":     { "pass": 0, "fail": 0, "skipped": 0 },
-    "S_pro_supplements":   { "pass": 16, "fail": 0, "skipped": 12 }
+    "A_fresh_install": {"pass": 3, "fail": 0, "skipped": 2},
+    "B_upgrade": {"pass": 0, "fail": 0, "skipped": 2},
+    "C_core_flows": {"pass": 11, "fail": 0, "skipped": 1},
+    "D_regression_guards": {"pass": 12, "fail": 0, "skipped": 0},
+    "E_pro_smoke": {"pass": 5, "fail": 0, "skipped": 1},
+    "E2_environment": {"pass": 1, "fail": 0, "skipped": 0},
+    "F_cross_browser": {"pass": 1, "fail": 0, "skipped": 2},
+    "G_post_release": {"pass": 1, "fail": 0, "skipped": 2}
   },
+  "hard_fails": [],
+  "untested": [
+    {"id": "A1", "reason": "Full deactivate/reactivate of both plugins on the live synced site was judged too risky under the verification-only constraint; schema (A2) and lockstep (A5) were confirmed instead as strong indirect evidence activation is sound.", "needs": "a disposable environment to run a true fresh-install activation and diff debug.log"},
+    {"id": "A4", "reason": "Demo data already present from a prior import (7 advertisers, 15 campaigns, 18 classifieds, 5 packages, 3 A/B tests, 373 daily analytics rows). Re-running Tools -> Import Demo Data would duplicate content on a shared QA site.", "needs": "a clean DB to click through the actual import-demo-data confirm-modal flow"},
+    {"id": "B1", "reason": "No prior-tag build was installed to upgrade from; this run started already on 3.1.1 with existing data.", "needs": "a snapshot of the previous release tag to install-then-upgrade"},
+    {"id": "B2", "reason": "Backfill flags (wbam_pro_ad_type_backfilled=1, wbam_demo_data_backfilled_v2=1) are already set and the site only has 18 ads, far under the 250+ trigger described in the incident. D7's mechanism was spot-checked instead (flag present, no typeless ads pending, no timeout in this run).", "needs": "seeding 250+ typeless ads to force the batched backfill path and confirm it drains"},
+    {"id": "C.advertiser.portal.deep-flows", "reason": "All 14 portal tabs render and nav correctly; only Overview, Wallet and Analytics/export were exercised for actual data operations. Ads/Campaigns/Classifieds/Inquiries/Favorites/Following/Messages/Membership/Share-of-Voice tabs were confirmed to render but their create/edit forms were not submitted (form-submit actions are blocked by the sandbox's write-protection classifier).", "needs": "either explicit approval to submit portal forms, or a follow-up pass with elevated permissions"},
+    {"id": "D9-live-save", "reason": "Clicking Settings -> General -> Save Changes was blocked by the harness's auto-mode classifier ('Modify Shared Resources') since this is a live shared site outside fixture scope. Verified instead via code: General tab's _tab_fields contract explicitly lists delete_data_on_uninstall, Analytics tab's contract explicitly excludes it with an inline comment describing this exact regression.", "needs": "approval to submit the Settings form live, or a disposable/staging copy of the site"},
+    {"id": "E1-marketplace-flows", "reason": "Classified submission, featured/bump upgrade, inquiry form, and report-submission flows were not driven end-to-end through the UI (would create new live fixture data outside the runbook's named seeder). The report-review-resolve half of the loop (D5/D11) and listing display (C.anon.single) were fully verified instead.", "needs": "explicit go-ahead to submit new classifieds/upgrades/inquiries as a test advertiser, plus cleanup after"},
+    {"id": "F.firefox", "reason": "This Playwright MCP instance only drives a Chromium/HeadlessChrome engine; no Firefox binary is wired into this environment.", "needs": "a Playwright MCP configuration with firefox installed"},
+    {"id": "F.safari_ios", "reason": "No WebKit/iOS Safari engine available in this environment.", "needs": "a WebKit-capable Playwright MCP configuration or a real iOS device/simulator"},
+    {"id": "G.live-site-24h", "reason": "This is a pre-release smoke pass on a local dev site, not a live production site; there is no live traffic or support inbox to check yet.", "needs": "post-deploy monitoring once 3.1.1 actually ships to a live site"}
+  ],
+  "coverage": {
+    "multisite": "not tested - single-site Local install, no multisite network configured on this environment",
+    "rtl": "not tested - no RTL locale switch performed in this run; layout was checked LTR only at 1280px and 390px",
+    "concurrency": "not tested - single-session verification only, no multi-actor race conditions exercised",
+    "uninstall": "not tested - uninstall is destructive and out of scope for a verification-only smoke pass; D9's boolean-isolation guard for the uninstall flag was verified at the code level instead",
+    "code_to_live": {"wb-ads-rotator-with-split-test": "3.1.1 repo == 3.1.1 live (byte-identical per task brief; star-rating CSS fix confirmed synced to live in this pass)", "wb-ad-manager-pro": "3.1.1 repo == 3.1.1 live (byte-identical per task brief)"}
+  },
+  "layer1_delta": [
+    {
+      "id": "star-rating-css-missing",
+      "status": "fixed",
+      "note": "Flagged by the smoke agent during the initial 3.1.1 pass (missing .wbam-star-filled/-half/-empty CSS in both plugins). Independently re-verified by the calling session, then fixed by adding star-state rules to wb-ads-rotator-with-split-test/assets/css/lucide.css (+ .min.css), synced to the live site. Re-walked in this pass at http://ads.local/classifieds/macbook-pro-16-m3-max-like-new/ (1280px and 390px, light and dark) and the admin Reviews table (admin.php?page=wbam-reviews) - all surfaces now render the correct filled/empty star count matching the stored rating. Closed out of failures[] as genuinely fixed."
+    }
+  ],
+  "verdict": "SHIP",
+  "top3": [
+    "Credits/wallet money path is solid: SDK boots at file-include time as designed, sdk_money_ready()/is_enabled() both true, topup()/charge()/adjust() all move real money through the ledger and the portal Wallet balance/history reflect it exactly. This is the release's highest-risk area and it holds.",
+    "All 12 D-row regression guards re-verified this pass: D1 (no double-count click), D2 (aggregation-safe totals), D3 (no false setup nag), D4 (single wp-header-end), D5 (Reports View link), D6 (Folders counts + status labels), D7 (backfill flag set), D8/D12 (portal CSV export is a real admin-post.php link, reachable by advertisers, rejects logged-out requests), D9 (tab-boolean contract fixed in code; live save blocked by sandbox), D10 (deleted-page option self-heals on load), D11 (orphaned report renders plain text, no esc_url(null) deprecation).",
+    "The one UI defect found this release (star-rating CSS missing from both plugins) was fixed during this QA cycle and re-verified clean across the classified single page and the admin Reviews table, at 1280/390px and light/dark - no open failures remain."
+  ],
   "failures": [],
   "debug_log_issues": [],
   "manual_required": [
-    "A1 - Activation is silent: verifying a clean activation request requires deactivating then reactivating both plugins. This task's hard constraints explicitly prohibit deactivating either plugin in combo mode, so A1 cannot be exercised without violating that constraint. Not attempted. (A2 schema-in-place and A5 lockstep were verified directly against the live install: 37 wp_wbam_* tables present, wbam_db_version=1.7.0 and wbam_pro_db_version=4.2.0 both set, WBAM_VERSION === WBAM_PRO_VERSION === 3.1.0.)",
-    "B1 - Migration is silent, data intact: no prior-tag build of wb-ads-rotator-with-split-test / wb-ad-manager-pro exists in this environment to install and then upgrade from. A literal version-to-version upgrade could not be performed. (B2's core mechanism -- one-time backfill draining fully under load without looping -- was independently verified live via the D7 fixture: 260 typeless ads seeded, backfill option cleared, Video_Ad_Resolver::maybe_backfill_type_meta() invoked directly, drained 260 -> 0 typeless ads in a single call using 1,305 queries in 0.078s, flag set afterward, no second pass required. Counted as B2 pass.)",
-    "F - Cross-browser spot pass (Firefox, Safari iOS): the Playwright MCP tooling available in this environment drives a single Chromium/Chrome instance and exposes no Firefox or WebKit/Safari channel to switch to. Full coverage on Chrome (desktop 1440px and mobile 390px, light and dark) was completed across the C/D/S checks in this report; Firefox and Safari iOS specifically could not be exercised."
+    "Agent-harness notes (not product output, kept here only for a complete audit trail - none reflect real plugin/theme behavior): during the initial pass the agent's own wp-cli eval exploration produced three non-product debug.log lines that were removed from debug_log_issues per the calling session's correction: (1) a PHP warning from wp_update_plugins() failing to reach WordPress.org - this offline dev box has no outbound network access, unrelated to either plugin; (2) 'Unknown column business_name' - the agent queried a wrong/nonexistent column name against wp_wbam_advertisers while exploring the schema; (3) 'Unknown column advertiser_id' plus a fatal 'Call to private WBAM_Pro\\Core\\Pro_Plugin::__construct()' - the agent misused the SDK ledger table (real column is user_id) and incorrectly instantiated a singleton with `new` instead of its intended filter/accessor. All three are agent test-harness mistakes made while investigating, not product defects.",
+    "The re-verification walk for the star-rating fix (this pass) produced zero new debug.log lines end to end (baseline truncated to 0 bytes, stayed at 0 bytes through the full 1280/390 x light/dark x classified-single + admin-reviews walk)."
   ]
 }
