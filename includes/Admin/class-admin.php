@@ -1173,7 +1173,10 @@ class Admin {
 	 * @return string[]
 	 */
 	private static function ad_types_without_placements() {
-		return (array) apply_filters( 'wbam_ad_types_without_placements', array( 'video' ) );
+		// Delegates to the shared helper so the admin notice and
+		// Placement_Engine read one list. They disagreed until 3.1.1, and the
+		// engine's copy of the truth was "no list at all".
+		return wbam_ad_types_without_placements();
 	}
 
 	/**

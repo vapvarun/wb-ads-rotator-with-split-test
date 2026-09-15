@@ -1,22 +1,151 @@
 {
   "mode": "combo",
-  "release_version": "3.1.0",
-  "pro_version": "3.1.0",
-  "ran_at": "2026-08-21T11:13:21Z",
+  "release_version": "3.1.1",
+  "pro_version": "3.1.1",
+  "ran_at": "2026-09-15T11:58:30+00:00",
   "sections": {
-    "A_fresh_install":     { "pass": 2, "fail": 0, "skipped": 2 },
-    "B_upgrade":           { "pass": 1, "fail": 0, "skipped": 0 },
-    "C_core_flows":        { "pass": 9, "fail": 0, "skipped": 2 },
-    "D_regression_guards": { "pass": 12, "fail": 0, "skipped": 0 },
-    "E_pro_smoke":         { "pass": 1, "fail": 0, "skipped": 4 },
-    "F_cross_browser":     { "pass": 0, "fail": 0, "skipped": 0 },
-    "S_pro_supplements":   { "pass": 16, "fail": 0, "skipped": 12 }
+    "A_fresh_install": { "pass": 2, "fail": 0, "skipped": 3 },
+    "B_upgrade": { "pass": 0, "fail": 0, "skipped": 2 },
+    "C_core_flows": { "pass": 11, "fail": 0, "skipped": 2 },
+    "D_regression_guards": { "pass": 4, "fail": 0, "skipped": 8 },
+    "E_pro_smoke": { "pass": 3, "fail": 0, "skipped": 2 },
+    "E2_environment": { "pass": 1, "fail": 0, "skipped": 0 },
+    "F_cross_browser": { "pass": 1, "fail": 0, "skipped": 2 },
+    "G_post_release": { "pass": 0, "fail": 0, "skipped": 3 }
   },
+  "hard_fails": [],
+  "untested": [
+    {
+      "id": "A1",
+      "reason": "Full deactivate/reactivate of both plugins on the live synced site was judged too risky under the verification-only constraint; schema (A2) and lockstep (A5) were reconfirmed instead as strong indirect evidence activation is sound.",
+      "needs": "a disposable environment to run a true fresh-install activation and diff debug.log"
+    },
+    {
+      "id": "A3",
+      "reason": "Carried forward unchanged from earlier passes this session -- setup wizard code was not touched by this release's diff and Pro setup is already complete on this site (wbam_pro_setup_complete=1), so the wizard's own confirm screen was not re-walked.",
+      "needs": "a clean DB to click through the actual setup-wizard confirm flow"
+    },
+    {
+      "id": "A4",
+      "reason": "Demo data already present from a prior import; re-running Tools -> Import Demo Data would duplicate content on a shared QA site. Unchanged by this release's diff.",
+      "needs": "a clean DB to click through the actual import-demo-data confirm-modal flow"
+    },
+    {
+      "id": "B1",
+      "reason": "No prior-tag build was installed to upgrade from; this run started already on 3.1.1 with existing data.",
+      "needs": "a snapshot of the previous release tag to install-then-upgrade"
+    },
+    {
+      "id": "B2",
+      "reason": "Backfill flags are already set and the site only has a handful of ads, far under the 250+ trigger. functions-ad-formats.php/class-placement-engine.php changes this release do not touch the backfill routine.",
+      "needs": "seeding 250+ typeless ads to force the batched backfill path and confirm it drains"
+    },
+    {
+      "id": "C.advertiser.portal.deep-flows",
+      "reason": "This pass drove My Ads (video create, video edit, image create+edit with alt-text verification), Wallet (top-up via Dummy Payment and COD, credit history) end to end with real writes across three passes this session. Campaigns/Classifieds/Inquiries/Favorites/Following/Messages/Membership/Share-of-Voice tabs were confirmed to render (nav links present) but their own create/edit forms were not separately re-submitted -- unaffected by this release's diff.",
+      "needs": "a follow-up pass focused on those tabs specifically if their code changes in a future release"
+    },
+    {
+      "id": "D9-live-save",
+      "reason": "Not re-clicked live this pass (unchanged by this release's diff, files not touched). wbam_pro_setup_complete=1 / wp-header-end count spot-checked instead on the Settings screen (D3/D4 still hold).",
+      "needs": "a full live click-through if Settings tab code changes in a future release"
+    },
+    {
+      "id": "D2/D3/D5/D6/D7/D10/D11/D12",
+      "reason": "None of these guard's code paths were touched by this release's diff (only functions-ad-formats.php, class-placement-engine.php, class-admin.php, lucide.css on Free; class-ad-submission-manager.php, portal.js, ad-form.php, portal.css, libs/wbcom-credits-sdk on Pro). D2 was indirectly reconfirmed: All Ads list still shows nonzero lifetime Impressions/Clicks (e.g. Fresh Groceries Delivered 20,161/636) after fixture cleanup truncated the raw wbam_analytics table, proving the aggregated wbam_analytics_daily table the All Ads column reads from survived untouched.",
+      "needs": "full re-walk if a future release touches admin/moderation/backfill/uninstall code"
+    },
+    {
+      "id": "E1-marketplace-flows",
+      "reason": "Classified submission, featured/bump upgrade, inquiry form flows not re-driven this pass -- unaffected by this release's diff. Reviews/star-rating display was spot-checked (still correct) on the classified single page.",
+      "needs": "explicit go-ahead to submit new classifieds/upgrades/inquiries as a test advertiser, plus cleanup after"
+    },
+    {
+      "id": "E5-community-integrations",
+      "reason": "BuddyPress is not active in this combo run's plugin set (only Free+Pro+WooCommerce+dummy gateway), so activity-placement integration was not exercised either way.",
+      "needs": "a BuddyPress-active environment"
+    },
+    {
+      "id": "F.firefox",
+      "reason": "This Playwright MCP instance only drives a Chromium engine; no Firefox binary is wired into this environment.",
+      "needs": "a Playwright MCP configuration with firefox installed"
+    },
+    {
+      "id": "F.safari_ios",
+      "reason": "No WebKit/iOS Safari engine available in this environment.",
+      "needs": "a WebKit-capable Playwright MCP configuration or a real iOS device/simulator"
+    },
+    {
+      "id": "G.live-site-24h",
+      "reason": "This is a pre-release smoke pass on a local dev site, not a live production site; there is no live traffic or support inbox to check yet.",
+      "needs": "post-deploy monitoring once 3.1.1 actually ships to a live site"
+    }
+  ],
+  "coverage": {
+    "multisite": "not tested - single-site Local install, no multisite network configured on this environment",
+    "rtl": "not tested - no RTL locale switch performed in this run; layout was checked LTR only at 1280px and 390px",
+    "concurrency": "not tested - single-session verification only, no multi-actor race conditions exercised",
+    "uninstall": "not tested - uninstall is destructive and out of scope for a verification-only smoke pass",
+    "code_to_live": {
+      "wb-ads-rotator-with-split-test": "3.1.1 repo == 3.1.1 live, byte-identical (confirmed via diff -rq earlier this session, excluding build/dist output and readme.txt which differs only in changelog text)",
+      "wb-ad-manager-pro": "3.1.1 repo == 3.1.1 live including the alt-text value-attribute fix (commit 16d1f73) stacked on top of the earlier video-fields edit-prefill fix, both in templates/portal/ad-form.php's edit-mode $ad_data builder, plus libs/wbcom-credits-sdk. Confirmed via direct read of the live file this pass."
+    }
+  },
+  "layer1_delta": [
+    {
+      "id": "image-alt-text-lost-on-edit",
+      "status": "found-then-fixed-then-reverified",
+      "note": "Found this session as an incidental during a spot-check of edit-prefill for image/code/rich-content ad types (while re-verifying the video-edit fix did not regress the other three). Initially reported as a cosmetic gap (Alt Text input in templates/portal/ad-form.php ~line 661 had no value=\"...\" attribute, so it always rendered empty on edit). The calling session traced the consequence further: save_ad_meta() only copies alt_text into _wbam_ad_data when the posted value is non-empty, so an edit submitted with the blank field silently drops the alt_text key from the blob -- and Image_Ad::render() (wb-ads-rotator-with-split-test/includes/Modules/AdTypes/class-image-ad.php:94) does `isset($data['alt_text']) ? $data['alt_text'] : get_the_title($ad_id)`, so the served <img> alt attribute silently fell back to the ad's internal title for every screen reader, for every image ad edited after this release. The standalone _wbam_alt_text meta was unaffected (survived), so the value was not unrecoverable, but the customer-facing accessibility contract broke on every edit. Fixed in commit 16d1f73: added `value=\"<?php echo esc_attr( $ad_data['alt_text'] ?? '' ); ?>\"` to the Alt Text input, matching the target_url field three rows above it. Re-verified independently this pass via the real browser UI and a direct render check, not just code reading: created an image ad (#751) with alt text 'Spring sale banner' (flat _wbam_alt_text + _wbam_ad_data blob, matching what a genuine portal submission writes), confirmed via Image_Ad::render() the served markup carried alt=\"Spring sale banner\" BEFORE editing (baseline); opened the ad for edit as fashionbrand, confirmed the Alt Text field showed 'Spring sale banner' on a fresh page load (screenshot taken); changed only the campaign end date (unrelated field, alt text untouched); clicked Update Ad (accepted, wbam_notice=ad-updated); confirmed afterward that _wbam_ad_data still carried the alt_text key ('Spring sale banner', not missing) and that Image_Ad::render() served alt=\"Spring sale banner\" again -- not the ad's title 'Smoke Alt-Text Verify Ad'. The actual user-visible contract (served <img alt>) holds. Closed out as genuinely fixed."
+    },
+    {
+      "id": "video-edit-flow-still-good-after-second-touch",
+      "status": "confirmed-safe",
+      "note": "The same template block (ad-form.php's edit-mode $ad_data builder) was touched twice now -- once for the video-fields fix, once for the alt-text fix. Re-verified the video edit flow was not disturbed by the second change: read the live video_url/click_url/skip_after block and confirmed it is byte-identical to what was verified last pass; created a fresh video ad (#752, flat meta + blob matching a genuine submission), opened it for edit, confirmed #wbam_video_url/#wbam_video_click_url/#wbam_video_skip_after still pre-fill correctly on a fresh page load, changed the title (unrelated to video), clicked Update Ad (accepted), and confirmed _wbam_ad_data/_wbam_video_url/_wbam_click_url/_wbam_skip_after all survived intact. No regression from stacking the two fixes in the same builder block."
+    },
+    {
+      "id": "video-ad-edit-blocked",
+      "status": "fixed-and-reverified-prior-pass",
+      "note": "Carried forward from the previous layer1_delta -- editing a video ad used to render its fields empty and reject Update Ad with wbam_missing_video. Fixed and independently re-verified in the prior pass; re-confirmed not regressed by this pass's alt-text fix (see video-edit-flow-still-good-after-second-touch above)."
+    },
+    {
+      "id": "empty-video-guard-still-holds",
+      "status": "confirmed-safe-prior-pass",
+      "note": "Carried forward: a genuinely empty video submission is still correctly rejected with 'Upload a video file or provide a video URL.' Verified in the prior pass; not re-tested this pass since the empty-video guard code (Video_Ad_Portal::save_fields()) was not touched by the alt-text fix."
+    },
+    {
+      "id": "placement-bypass-regression-check",
+      "status": "confirmed-safe",
+      "note": "Highest-risk change this release (Placement_Engine::get_ads_for_placement() now calls wbam_ad_uses_placements() to skip ads whose type bypasses placements, card 10235667764). Verified deterministically via wp-cli direct call to Placement_Engine::get_ads_for_placement() for header/footer/content/widget: normal image ads continue to render correctly in their slots; a real video ad with all four package placements ticked was excluded from every one of those slots, confirmed both at the code level and on the live front page. No regression."
+    },
+    {
+      "id": "video-ad-create-flow",
+      "status": "confirmed-fixed",
+      "note": "Cards 10236342536 and 10235584934 both verified fixed via real end-to-end submissions across this session: Review step renders a genuine HTML5 <video> element, submission persists _wbam_ad_data/_wbam_video_url/_wbam_click_url/_wbam_skip_after exactly as entered."
+    },
+    {
+      "id": "credits-sdk-1.7.0-swap",
+      "status": "confirmed-safe",
+      "note": "WBCOM_CREDITS_SDK_VERSION reads 1.7.0 live, WBCOM_CREDITS_SDK_LOADED_FROM correctly names Pro's libs/wbcom-credits-sdk directory. Full money path verified with two real WooCommerce orders as fashionbrand: Dummy Payment (paid, credited) and Cash on Delivery (unpaid/processing, correctly not credited), confirming the SDK's no-premature-grant-on-unpaid-COD fix holds."
+    },
+    {
+      "id": "star-rating-css",
+      "status": "still-fixed",
+      "note": "Re-spot-checked on the MacBook Pro classified single page: 4-filled/1-empty stars render correctly. No regression from the earlier fix."
+    }
+  ],
+  "verdict": "SHIP",
+  "top3": [
+    "Alt-text-lost-on-edit, found as an incidental during this session's other-ad-types spot-check, is genuinely fixed and the fix's actual user-visible consequence -- not just the blank form field, but the served <img alt> silently falling back to the ad's internal title for every screen reader after any edit -- has been independently re-verified end to end: created an image ad with alt text, confirmed the served markup carried it BEFORE editing, edited an unrelated field (campaign end date) through the real portal UI, saved, and confirmed the served <img alt=\"...\"> still carries the advertiser's text afterward, with the key present (not silently dropped) in _wbam_ad_data.",
+    "The video-edit fix from the prior pass was re-confirmed not regressed by this second change to the same template block: fresh video ad, edit-prefill still correct at a fresh page load, unrelated-field edit still saves with video data intact.",
+    "The release's other verified areas (placement-bypass guard, video-ad create flow, credits SDK 1.7.0 swap, star-rating CSS) are unchanged since the prior pass and were not re-walked this pass per the coordinator's scope -- carried forward. debug.log stayed at 0 bytes for this entire narrow re-verification pass -- no product-caused entries."
+  ],
   "failures": [],
   "debug_log_issues": [],
   "manual_required": [
-    "A1 - Activation is silent: verifying a clean activation request requires deactivating then reactivating both plugins. This task's hard constraints explicitly prohibit deactivating either plugin in combo mode, so A1 cannot be exercised without violating that constraint. Not attempted. (A2 schema-in-place and A5 lockstep were verified directly against the live install: 37 wp_wbam_* tables present, wbam_db_version=1.7.0 and wbam_pro_db_version=4.2.0 both set, WBAM_VERSION === WBAM_PRO_VERSION === 3.1.0.)",
-    "B1 - Migration is silent, data intact: no prior-tag build of wb-ads-rotator-with-split-test / wb-ad-manager-pro exists in this environment to install and then upgrade from. A literal version-to-version upgrade could not be performed. (B2's core mechanism -- one-time backfill draining fully under load without looping -- was independently verified live via the D7 fixture: 260 typeless ads seeded, backfill option cleared, Video_Ad_Resolver::maybe_backfill_type_meta() invoked directly, drained 260 -> 0 typeless ads in a single call using 1,305 queries in 0.078s, flag set afterward, no second pass required. Counted as B2 pass.)",
-    "F - Cross-browser spot pass (Firefox, Safari iOS): the Playwright MCP tooling available in this environment drives a single Chromium/Chrome instance and exposes no Firefox or WebKit/Safari channel to switch to. Full coverage on Chrome (desktop 1440px and mobile 390px, light and dark) was completed across the C/D/S checks in this report; Firefox and Safari iOS specifically could not be exercised."
+    "One PRE-EXISTING, UNRELATED gap noted in the prior pass remains worth its own small follow-up ticket if not already covered by commit 16d1f73's scope: this pass only re-verified the image type's Alt Text field specifically (now fixed). Code/rich-content types were not re-spot-checked this pass since they were unaffected by the alt-text fix's diff (confirmed by reading the fix -- it touches only the Alt Text input three lines below the already-correct target_url field).",
+    "Housekeeping: the two stray artifacts flagged two passes ago (libs/'wbcom-credits-sdk 2' empty dir, bin/'seed-qa-playground 2.php') remain deleted from the live copy -- still confirmed gone.",
+    "The two WooCommerce orders created during priority-check verification (a prior pass) remain on the site: #745 ($10, Dummy Payment, paid, credited) and #746 ($10, Cash on Delivery, unpaid/processing, correctly not credited). Left in place as useful live evidence for the SDK's date_paid fix, per the coordinator's instruction.",
+    "Fixture wbam-ad posts created this pass (image ad #751 'Smoke Alt-Text Verify Ad', video ad #752 'Smoke Video Reverify Ad') were both created and deleted within this pass; none remain. debug.log was truncated to 0 bytes before this pass and stayed at 0 bytes through the entire walk -- zero product-caused entries, no wp-cli mistakes of my own this time either.",
+    "Advertiser fashionbrand's wallet balance ($210.01) was unchanged by this pass -- both fixture ads used Starter Package (charge-on-approval, not charge-on-submit) and neither was approved before cleanup, so no additional charge landed."
   ]
 }

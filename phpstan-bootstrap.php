@@ -7,7 +7,7 @@
  */
 
 // Free plugin constants.
-defined( 'WBAM_VERSION' ) || define( 'WBAM_VERSION', '3.1.0' );
+defined( 'WBAM_VERSION' ) || define( 'WBAM_VERSION', '3.1.1' );
 defined( 'WBAM_FILE' ) || define( 'WBAM_FILE', __DIR__ . '/wb-ads-rotator-with-split-test.php' );
 defined( 'WBAM_PATH' ) || define( 'WBAM_PATH', __DIR__ . '/' );
 defined( 'WBAM_URL' ) || define( 'WBAM_URL', 'https://example.test/wp-content/plugins/wb-ads-rotator-with-split-test/' );
