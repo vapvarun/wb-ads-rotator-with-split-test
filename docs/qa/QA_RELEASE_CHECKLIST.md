@@ -45,7 +45,8 @@ The gate between "fixes are merged" and "customers get an update". Work top to b
 - [ ] Version bumped in: main file header, version constant, `readme.txt` stable tag, `package.json`
 - [ ] Free and Pro agree (lockstep)
 - [ ] `readme.txt` changelog follows the action-prefix format — `New`/`Improve`/`Fix`/`Security`/`Dev`/`Compat`, no emoji, no em-dashes
-- [ ] Built artifacts exist for **every** distribution channel: free zip, **standalone Pro zip**, combo zip
+- [ ] Built artifacts exist for **every** distribution channel: free zip, **standalone Pro zip**
+- [ ] Combo zip built for testing the matched pair - **QA only, never attached to a release**; no customer channel serves it
 - [ ] Zips exclude `node_modules`, `tests`, `.md` docs; bundled SDK sources are **present**
 - [ ] Pristine Docker install of the built zip activates cleanly — dev-tree CI does not catch packaging bugs
 

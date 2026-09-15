@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 #
-# Build three distribution zips:
-#   1. wb-ads-rotator-with-split-test-<version>.zip   (free only)
-#   2. wb-ad-manager-pro-<version>.zip                (pro only)
-#   3. wb-ad-manager-combo-<version>.zip              (both plugin folders; "<free>+<pro>" only if the two versions differ)
+# Build three zips - two shipped, one internal:
+#   1. wb-ads-rotator-with-split-test-<version>.zip   RELEASE ASSET (free only)
+#   2. wb-ad-manager-pro-<version>.zip                RELEASE ASSET (pro only)
+#   3. wb-ad-manager-combo-<version>.zip              QA ONLY - never attached
+#                                                     to a GitHub release
+#
+# The combo is a convenience for testing the matched pair in one install. No
+# customer channel serves it: free ships from the store and wp.org, Pro from
+# EDD. It rode along on the 3.1.0 release by accident, which is also how it
+# ended up advertising its version twice ("3.1.0+3.1.0"). Build it, test with
+# it, do not upload it.
 #
 # All respect the free plugin's .distignore. The pro folder adds its own
 # exclusions on top, defined once in PRO_EXCLUDES and shared by the
@@ -267,7 +274,7 @@ if [ -n "$PRO_VERSION" ]; then
 fi
 
 # ------------------------------------------------------------------
-# 3. Combo zip (only if pro is present)
+# 3. Combo zip - QA only, not a release asset (only if pro is present)
 # ------------------------------------------------------------------
 if [ -n "$PRO_VERSION" ]; then
 	COMBO_FREE_TARGET="$BUILD_DIR/combo/wb-ads-rotator-with-split-test"
@@ -295,11 +302,17 @@ fi
 # Report
 # ------------------------------------------------------------------
 echo
-echo "== Dist zips =="
-for z in "$FREE_ZIP" "${COMBO_ZIP:-}"; do
+echo "== Release assets =="
+for z in "$FREE_ZIP" "${PRO_ZIP:-}"; do
 	[ -z "$z" ] && continue
 	[ ! -f "$z" ] && continue
 	size=$(wc -c < "$z")
 	sha=$(shasum -a 256 "$z" | awk '{print $1}')
 	printf "  %s\n    size: %s bytes\n    sha256: %s\n" "$z" "$size" "$sha"
 done
+
+if [ -n "${COMBO_ZIP:-}" ] && [ -f "$COMBO_ZIP" ]; then
+	echo
+	echo "== QA only - do NOT attach to a release =="
+	printf "  %s\n    size: %s bytes\n" "$COMBO_ZIP" "$(wc -c < "$COMBO_ZIP")"
+fi
