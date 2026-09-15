@@ -3,7 +3,7 @@
 # Build three distribution zips:
 #   1. wb-ads-rotator-with-split-test-<version>.zip   (free only)
 #   2. wb-ad-manager-pro-<version>.zip                (pro only)
-#   3. wb-ad-manager-combo-<free>+<pro>.zip           (both plugin folders)
+#   3. wb-ad-manager-combo-<version>.zip              (both plugin folders; "<free>+<pro>" only if the two versions differ)
 #
 # All respect the free plugin's .distignore. The pro folder adds its own
 # exclusions on top, defined once in PRO_EXCLUDES and shared by the
@@ -280,7 +280,13 @@ if [ -n "$PRO_VERSION" ]; then
 	verify_no_internal_artifacts "$COMBO_FREE_TARGET" "combo/free"
 	verify_no_internal_artifacts "$COMBO_PRO_TARGET" "combo/pro"
 
-	COMBO_ZIP="$DIST_DIR/wb-ad-manager-combo-${FREE_VERSION}+${PRO_VERSION}.zip"
+	# One version in the name when free and pro are in lockstep (the normal
+	# case); only a skewed pair gets the "<free>+<pro>" form.
+	if [ "$FREE_VERSION" = "$PRO_VERSION" ]; then
+		COMBO_ZIP="$DIST_DIR/wb-ad-manager-combo-${FREE_VERSION}.zip"
+	else
+		COMBO_ZIP="$DIST_DIR/wb-ad-manager-combo-${FREE_VERSION}+${PRO_VERSION}.zip"
+	fi
 	rm -f "$COMBO_ZIP"
 	( cd "$BUILD_DIR/combo" && zip -rq "$COMBO_ZIP" "wb-ads-rotator-with-split-test" "wb-ad-manager-pro" )
 fi

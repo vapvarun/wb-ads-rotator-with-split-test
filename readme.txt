@@ -5,7 +5,7 @@ Tags: ads, ad manager, ad rotation, split test, adsense
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.1.0
+Stable tag: 3.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -186,6 +186,11 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 7. Free vs PRO comparison. Row-by-row feature table so you know exactly what you're getting at each tier.
 
 == Changelog ==
+
+= 3.1.1 - September 2026 =
+
+* Dev      - The combined download is named for a single version when free and Pro ship together, instead of carrying both version numbers in the file name.
+* Compat   - Aligned with WB Ad Manager Pro 3.1.1, which fixes a critical error on credit charges when another Wbcom plugin bundles an older credits library. Install both updates together.
 
 = 3.1.0 - August 2026 =
 
