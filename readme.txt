@@ -189,6 +189,7 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 
 = 3.1.1 - September 2026 =
 
+* Fix      - Seller ratings show as filled stars again. A four-star rating rendered as five identical outlines, which read as no rating at all, on classified listings, the advertiser portal and the admin reviews table.
 * Dev      - The combined download is named for a single version when free and Pro ship together, instead of carrying both version numbers in the file name.
 * Compat   - Aligned with WB Ad Manager Pro 3.1.1, which fixes a critical error on credit charges when another Wbcom plugin bundles an older credits library. Install both updates together.
 

@@ -38,3 +38,34 @@
 .wbam-icon:empty {
 	display: inline-block;
 }
+
+/* Rating stars.
+ *
+ * Review_Manager::render_stars() marks each star wbam-star-filled,
+ * wbam-star-half or wbam-star-empty, but a Lucide star is stroke-only
+ * (fill="none"), so all three states rendered identically: a 4-of-5 seller
+ * rating looked exactly like no rating at all. These rules are what make the
+ * distinction visible, and they live here - beside the icon base rules, in the
+ * free plugin's shared lucide stylesheet - so every surface that renders stars
+ * gets them: classifieds, advertiser portal and the admin reviews table, free
+ * and pro alike.
+ */
+.wbam-stars {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.wbam-star-filled,
+.wbam-star-filled svg,
+.wbam-star-half,
+.wbam-star-half svg {
+	color: var(--wbam-warning, #dba617);
+	fill: currentColor;
+}
+
+.wbam-star-empty,
+.wbam-star-empty svg {
+	color: var(--wbam-border-strong, #c3c4c7);
+	fill: none;
+}
