@@ -285,7 +285,7 @@ A: Most ad plugins do one thing. WB Ad Manager combines ad management, affiliate
 A: Pro ships the Wbcom Credits SDK with adapters for WooCommerce Products, WooCommerce Subscriptions, WooCommerce Memberships, Paid Memberships Pro, and MemberPress. Advertisers top up their wallet through whichever payment gateway you already have configured inside those plugins — Stripe, PayPal, bank transfer, or anything else WooCommerce supports. Manual / bank-transfer top-ups are also available for offline payments.
 
 ### Q: Can I try Pro before buying?
-A: Yes, we offer a 14-day money-back guarantee. If Pro doesn't meet your needs, get a full refund, no questions asked.
+A: Yes, we offer a 30-day money-back guarantee. If Pro doesn't meet your needs, get a full refund.
 
 ---
 
