@@ -308,7 +308,7 @@ Of course. Here's what might help:
 
 **For your team:**
 - Free version has no commitment - just test it
-- Pro has 14-day money-back guarantee
+- Pro has 30-day money-back guarantee
 - One-pager summary: [link to one-pager]
 - Comparison with alternatives: [link to comparison]
 
@@ -359,17 +359,15 @@ In the meantime, is there something in the current version that would help you? 
 ### "What if Pro doesn't work for me?"
 
 **Response:**
-We offer a 14-day money-back guarantee.
+We offer a 30-day money-back guarantee.
 
 Here's how it works:
 1. Purchase Pro
 2. Install and test
-3. If it doesn't meet your needs within 14 days, email support
-4. Full refund, no questions asked
+3. If it doesn't meet your needs within 30 days, email support
+4. Full refund
 
 We'd rather have you try risk-free than wonder "what if."
-
-The only reason we don't do 30 days is because most people know within a week whether it's working.
 
 ---
 
@@ -380,7 +378,7 @@ Not a traditional trial, but here's what you can do:
 
 1. **Install Free first** - Get familiar with the interface and core features
 2. **Review Pro features** - Check our documentation and demo videos
-3. **Purchase with guarantee** - 14-day money-back if it's not right
+3. **Purchase with guarantee** - 30-day money-back guarantee if it's not right
 
 The free version gives you a real sense of the plugin quality. Pro adds specific modules (classifieds, portal, A/B testing) on top of that same foundation.
 

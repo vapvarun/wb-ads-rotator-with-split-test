@@ -375,7 +375,7 @@ The free version alone replaces 3-4 other plugins. Pro is for site owners who wa
 **Body:**
 - Download FREE from WordPress.org
 - Upgrade to PRO at wbcomdesigns.com
-- 14-day money-back guarantee
+- 30-day money-back guarantee
 
 **CTA Button:** Download Free Now
 
