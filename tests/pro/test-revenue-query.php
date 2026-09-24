@@ -37,7 +37,7 @@ class Test_Revenue_Query extends Pro_Test_Case {
 		$charge = Credits_Bridge::charge( $this->advertiser->id, 10.00, 1, 'x', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
 		$this->assertNotWPError( $charge );
 
-		$series = Revenue_Query::series( $start, $end, 'day' );
+		$series = Revenue_Query::series( $start, $end );
 
 		$this->assertCount( 5, $series, 'series() must zero-fill every day in the range, not just days with rows.' );
 
