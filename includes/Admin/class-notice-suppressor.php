@@ -140,16 +140,40 @@ class Notice_Suppressor {
 	 * @param mixed $cb_callable A WP hook callable: string, array, or Closure.
 	 * @return bool
 	 */
+	/**
+	 * Whether a class / static callback name belongs to this plugin family.
+	 *
+	 * @param string $name Class or "Class::method" name.
+	 * @return bool
+	 */
+	private function is_own_namespace( $name ) {
+		/**
+		 * Filter the namespaces whose admin notices are kept on WB Ads screens.
+		 * Companion plugins add their own so their notices are not stripped as
+		 * third-party.
+		 *
+		 * @since 3.2.0
+		 *
+		 * @param string[] $namespaces Namespace prefixes, with trailing backslash.
+		 */
+		foreach ( (array) apply_filters( 'wbam_notice_suppressor_namespaces', array( 'WBAM\\' ) ) as $prefix ) {
+			if ( '' !== $prefix && 0 === strpos( $name, $prefix ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private function is_our_callback( $cb_callable ) {
 		// [ $object, 'method' ] or [ 'ClassName', 'method' ].
 		if ( is_array( $cb_callable ) && isset( $cb_callable[0] ) ) {
 			$class = is_object( $cb_callable[0] ) ? get_class( $cb_callable[0] ) : (string) $cb_callable[0];
-			return 0 === strpos( $class, 'WBAM\\' );
+			return $this->is_own_namespace( $class );
 		}
 
 		// Plain function name or static "Class::method".
 		if ( is_string( $cb_callable ) ) {
-			if ( 0 === strpos( $cb_callable, 'WBAM\\' ) ) {
+			if ( $this->is_own_namespace( $cb_callable ) ) {
 				return true;
 			}
 			if ( 0 === strpos( $cb_callable, 'wbam_' ) ) {

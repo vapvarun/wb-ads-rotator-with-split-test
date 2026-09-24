@@ -85,7 +85,6 @@ class List_Empty_States {
 		}
 
 		echo '<style>'
-			. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .page-title-action,'
 			. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .subsubsub,'
 			. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .search-box,'
 			. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .tablenav,'
@@ -218,7 +217,9 @@ class List_Empty_States {
 			return;
 		}
 
+		// .notice: core common.js moves notices below the page heading; without
+		// it the card printed above the title and the admin notices.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- All fields escaped above.
-		echo '<div class="wbam-empty-state-wrap">' . $card . '</div>';
+		echo '<div class="notice wbam-empty-state-wrap">' . $card . '</div>';
 	}
 }

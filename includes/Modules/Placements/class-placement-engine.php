@@ -516,7 +516,9 @@ class Placement_Engine {
 			// emitted the markup — so the disclosure a site owner configured
 			// never appeared. Render it here (the single wrapping point) when a
 			// non-empty label is set.
-			$label_text = trim( (string) \WBAM\Core\Settings_Helper::get( 'ad_label', '' ) );
+			// Default to a disclosure until the owner saves one; a label they
+			// clear on purpose is stored as '' and still wins.
+			$label_text = trim( (string) \WBAM\Core\Settings_Helper::get( 'ad_label', __( 'Advertisement', 'wb-ads-rotator-with-split-test' ) ) );
 			$label_pos  = 'below' === \WBAM\Core\Settings_Helper::get( 'ad_label_position', 'above' ) ? 'below' : 'above';
 			$label_html = '';
 			if ( '' !== $label_text ) {

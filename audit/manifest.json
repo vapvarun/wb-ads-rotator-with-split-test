@@ -1306,6 +1306,13 @@
       "purpose": "Filter the registered ad-format catalog"
     },
     {
+      "name": "wbam_notice_suppressor_namespaces",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-notice-suppressor.php",
+      "purpose": "Namespace prefixes whose admin notices are kept on WB Ads screens; PRO adds WBAM_Pro\\ so its banner and notices are not stripped"
+    },
+    {
       "name": "wbam_skip_content_injection",
       "type": "filter",
       "args": 2,

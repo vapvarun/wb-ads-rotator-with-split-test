@@ -376,7 +376,9 @@ class Setup_Wizard {
 				),
 				'sidebar_widget' => array(
 					'label'       => __( 'Sidebar Widget Ad', 'wb-ads-rotator-with-split-test' ),
-					'description' => __( 'Code ad for sidebar widget placement', 'wb-ads-rotator-with-split-test' ),
+					'description' => wp_is_block_theme()
+						? __( 'Code ad for a sidebar. Your theme has no widget areas: show it with the [wbam_ad] shortcode.', 'wb-ads-rotator-with-split-test' )
+						: __( 'Code ad, added to your first sidebar as a widget', 'wb-ads-rotator-with-split-test' ),
 					'checked'     => true,
 				),
 				'content_promo'  => array(
@@ -499,6 +501,39 @@ class Setup_Wizard {
 	}
 
 	/**
+	 * Add a WB Ad widget showing the given ad to the first registered
+	 * sidebar. No-op on themes without classic sidebars (block themes).
+	 *
+	 * @param int $ad_id Ad post ID.
+	 */
+	private function place_sample_widget( $ad_id ) {
+		global $wp_registered_sidebars;
+
+		$sidebar_ids = array_diff( array_keys( (array) $wp_registered_sidebars ), array( 'wp_inactive_widgets' ) );
+		if ( empty( $sidebar_ids ) ) {
+			return;
+		}
+		$sidebar_id = reset( $sidebar_ids );
+
+		$instances = get_option( 'widget_wbam_ad_widget', array() );
+		$instances = is_array( $instances ) ? $instances : array();
+		$numbers   = array_filter( array_keys( $instances ), 'is_int' );
+		$number    = $numbers ? max( $numbers ) + 1 : 2;
+
+		$instances[ $number ]      = array(
+			'title' => '',
+			'ad_id' => $ad_id,
+		);
+		$instances['_multiwidget'] = 1;
+		update_option( 'widget_wbam_ad_widget', $instances );
+
+		$sidebars                = wp_get_sidebars_widgets();
+		$sidebars[ $sidebar_id ] = isset( $sidebars[ $sidebar_id ] ) ? (array) $sidebars[ $sidebar_id ] : array();
+		array_unshift( $sidebars[ $sidebar_id ], 'wbam_ad_widget-' . $number );
+		wp_set_sidebars_widgets( $sidebars );
+	}
+
+	/**
 	 * Create sample ads.
 	 *
 	 * @param array $ads_to_create List of sample ads to create.
@@ -588,6 +623,12 @@ class Setup_Wizard {
 				// Phase K: track the created ID on the option so the
 				// cleanup action knows exactly which rows it owns.
 				self::track_demo_id( 'ads', (int) $post_id );
+
+				// A widget-placement ad only shows through a widget in a
+				// sidebar, so the sample was invisible. Put it in one.
+				if ( in_array( 'widget', (array) $ad['placements'], true ) ) {
+					$this->place_sample_widget( (int) $post_id );
+				}
 
 				/**
 				 * Fires after a sample ad is created.
