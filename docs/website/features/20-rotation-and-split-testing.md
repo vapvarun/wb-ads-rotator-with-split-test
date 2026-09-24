@@ -30,7 +30,7 @@ To run a test:
 ## What the free plugin does and does not do
 
 - Free: priority-weighted rotation, impression/click/CTR tracking, and the side-by-side comparison metabox.
-- Pro (**WB Ad Manager Pro**): automatic A/B winner selection, multivariate testing, campaigns with budgets and pacing, and share-of-voice caps.
+- Pro (**WB Ad Manager Pro**): A/B tests that split traffic between an original ad and its variants with a significance readout, campaigns with budgets and pacing, and share-of-voice caps.
 
 ## Next steps
 

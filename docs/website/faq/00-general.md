@@ -18,7 +18,7 @@ When several ads share a placement, the plugin picks one at weighted random base
 
 ## Can I A/B test ads?
 
-Yes. Run two or more ads on the same placement at equal priority, then read the **Ad Performance Comparison** metabox on any of them to see impressions, clicks, and CTR side by side. Automatic winner selection and multivariate testing are in WB Ad Manager Pro.
+Yes. Run two or more ads on the same placement at equal priority, then read the **Ad Performance Comparison** metabox on any of them to see impressions, clicks, and CTR side by side. WB Ad Manager Pro adds true A/B tests with a traffic split between an original ad and its variants, plus a statistical significance readout to help you pick the winner.
 
 ## Does this support Google AdSense?
 
@@ -42,4 +42,4 @@ No, unless you opt in. Enable **Delete data on uninstall** under **Settings -> A
 
 ## What is in the Pro version?
 
-WB Ad Manager Pro adds an advertiser portal, a wallet and payments layer, campaigns with budgets, a classifieds marketplace, advanced analytics, and automatic A/B winner selection. The free plugin's features keep working alongside it.
+WB Ad Manager Pro adds an advertiser portal, a wallet and payments layer, campaigns with budgets, a classifieds marketplace, advanced analytics, and A/B testing with traffic splitting. The free plugin's features keep working alongside it.
