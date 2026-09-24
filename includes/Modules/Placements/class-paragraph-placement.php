@@ -59,6 +59,11 @@ class Paragraph_Placement implements Placement_Interface {
 			return $content;
 		}
 
+		/** This filter is documented in includes/Modules/Placements/class-content-placement.php */
+		if ( apply_filters( 'wbam_skip_content_injection', false, $content ) ) {
+			return $content;
+		}
+
 		$engine = Placement_Engine::get_instance();
 		$ads    = $engine->get_ads_for_placement( $this->get_id() );
 

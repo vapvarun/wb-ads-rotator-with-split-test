@@ -50,6 +50,21 @@ class Content_Placement implements Placement_Interface {
 			return $content;
 		}
 
+		/**
+		 * Filter whether to skip in-content ad injection (before/after content
+		 * and after-paragraph) on the current page. Application pages - an
+		 * account dashboard, a posting form, a message thread - render their
+		 * UI through the_content, and ads injected there land inside forms.
+		 *
+		 * @since 3.2.0
+		 *
+		 * @param bool   $skip    Whether to skip. Default false.
+		 * @param string $content The content being filtered.
+		 */
+		if ( apply_filters( 'wbam_skip_content_injection', false, $content ) ) {
+			return $content;
+		}
+
 		$engine = Placement_Engine::get_instance();
 
 		// Get ads with 'content' placement (shows both before and after).

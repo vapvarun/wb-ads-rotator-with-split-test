@@ -1306,6 +1306,13 @@
       "purpose": "Filter the registered ad-format catalog"
     },
     {
+      "name": "wbam_skip_content_injection",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-content-placement.php, class-paragraph-placement.php",
+      "purpose": "Skip before/after-content and after-paragraph ads on the current page; PRO returns true on its application pages (dashboard, posting forms, listings browser)"
+    },
+    {
       "name": "wbam_ad_output",
       "type": "filter",
       "args": 3,
