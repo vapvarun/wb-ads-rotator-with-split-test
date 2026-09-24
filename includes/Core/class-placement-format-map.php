@@ -117,16 +117,18 @@ class Placement_Format_Map {
 			// Core placements (free).
 			'header'                       => array( 'leaderboard', 'large-leaderboard', 'banner', $r ),
 			'footer'                       => array( 'leaderboard', $r ),
-			'before_content'               => array( 'leaderboard', 'medium-rectangle', 'large-rectangle', $r ),
-			'after_content'                => array( 'leaderboard', 'medium-rectangle', 'large-rectangle', $r ),
-			'paragraph'                    => array( 'medium-rectangle', 'large-rectangle', $r ),
+			// Keys must be real placement ids: 'content' (before/after the post)
+			// and 'after_paragraph'. The old before_content / after_content /
+			// paragraph / comment keys matched nothing, so those slots accepted
+			// any size.
+			'content'                      => array( 'leaderboard', 'medium-rectangle', 'large-rectangle', $r ),
+			'after_paragraph'              => array( 'medium-rectangle', 'large-rectangle', $r ),
 			'widget'                       => array( 'medium-rectangle', 'skyscraper', 'wide-skyscraper', 'square', $r ),
 			'before_archive'               => array( 'leaderboard', $r ),
 			'after_archive'                => array( 'leaderboard', $r ),
 			'sticky'                       => array( 'mobile-banner', 'mobile-large-banner', $r ),
 			'popup'                        => array( 'medium-rectangle', 'large-rectangle', $r ),
-			'comment'                      => array( 'medium-rectangle', $r ),
-			'comments'                     => array( 'medium-rectangle', $r ), // alternate slug used by admin card.
+			'comments'                     => array( 'medium-rectangle', $r ),
 			'shortcode'                    => array( $r ), // inline, author controls the container.
 
 			// BuddyPress.

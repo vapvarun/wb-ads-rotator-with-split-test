@@ -214,6 +214,52 @@ class Test_Lifecycle_3_2 extends Pro_Test_Case {
 		$this->assertSame( 'active', $manager->get( $listing->id )->status );
 	}
 
+	public function test_ab_significance_follows_the_tests_confidence_level(): void {
+		$manager  = \WBAM_Pro\Modules\ABTesting\AB_Test_Manager::get_instance();
+		$original = array(
+			'impressions' => 1000,
+			'clicks'      => 50,
+		);
+		$variant  = array(
+			'impressions' => 1000,
+			'clicks'      => 68,
+		); // p ~= 0.08: significant at 90%, not at 95% or 99%.
+
+		$this->assertTrue( $manager->calculate_significance( $original, $variant, 90 )['significant'] );
+		$this->assertFalse( $manager->calculate_significance( $original, $variant, 99 )['significant'] );
+	}
+
+	public function test_completing_an_ab_test_switches_off_losing_variants(): void {
+		$ids = array();
+		foreach ( array( 'Original', 'Winner', 'Loser' ) as $title ) {
+			$id = self::factory()->post->create(
+				array(
+					'post_type'   => 'wbam-ad',
+					'post_title'  => $title,
+					'post_status' => 'publish',
+				)
+			);
+			update_post_meta( $id, '_wbam_enabled', '1' );
+			$ids[ $title ] = $id;
+		}
+
+		$test = new \WBAM_Pro\Modules\ABTesting\AB_Test(
+			array(
+				'name'           => 'Lifecycle AB',
+				'original_ad_id' => $ids['Original'],
+				'variant_ad_ids' => array( $ids['Winner'], $ids['Loser'] ),
+				'status'         => 'running',
+			)
+		);
+		$test->save();
+
+		\WBAM_Pro\Modules\ABTesting\AB_Test_Manager::get_instance()->complete_test( $test->id, $ids['Winner'] );
+
+		$this->assertSame( '0', get_post_meta( $ids['Loser'], '_wbam_enabled', true ) );
+		$this->assertSame( '1', get_post_meta( $ids['Winner'], '_wbam_enabled', true ) );
+		$this->assertSame( '1', get_post_meta( $ids['Original'], '_wbam_enabled', true ), 'The original slot serves the winner.' );
+	}
+
 	public function test_plan_featured_credits_are_spent_once_per_period(): void {
 		$members = Membership_Manager::get_instance();
 		$members->save_plan(

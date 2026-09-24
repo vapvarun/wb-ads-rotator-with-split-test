@@ -168,6 +168,12 @@ verify_no_internal_artifacts() {
 		   -o -name '.gitignore' \
 		   -o -name '.gitattributes' \
 		   -o -name '.DS_Store' \
+		   -o -name '.eslint*' \
+		   -o -name '.stylelintrc*' \
+		   -o -name '.pa11yci' \
+		   -o -name '.gitkeep' \
+		   -o -name '.bundled-from' \
+		   -o -path "$target/scripts" \
 		\) -print | sort)
 
 	if [ "$found" -ne 0 ]; then
@@ -235,6 +241,11 @@ PRO_EXCLUDES=(
 	--exclude=.phpcs.xml.dist --exclude=.phpstan.neon --exclude=.phpunit.result.cache
 	--exclude=phpstan.neon --exclude=phpstan-baseline.neon --exclude=phpstan-bootstrap.php
 	--exclude='*.md' --exclude=CLAUDE.md --exclude=sales-page.html
+	# Front-end tooling configs and the release script: dev only. The 3.1.1
+	# zip shipped all of these.
+	--exclude=/scripts --exclude=.eslintrc.json --exclude=.eslintignore
+	--exclude=.stylelintrc.json --exclude=.pa11yci --exclude=.gitkeep
+	--exclude=.bundled-from
 )
 
 # ------------------------------------------------------------------
