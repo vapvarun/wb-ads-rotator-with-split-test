@@ -240,4 +240,4 @@ If you want to build a revenue-generating advertising platform - classifieds, se
 
 The WBcom Designs Team
 
-P.S. All Pro licenses include a 14-day money-back guarantee. Try it risk-free.
+P.S. All Pro licenses include a 30-day money-back guarantee. Try it risk-free.

@@ -249,7 +249,7 @@ For the next 48 hours, get **[X]% off** any Pro license.
 ✓ Link Partnerships
 ✓ Priority Support
 
-Plus a **14-day money-back guarantee**. If Pro doesn't work for you, get a full refund.
+Plus a **30-day money-back guarantee**. If Pro doesn't work for you, get a full refund.
 
 ---
 

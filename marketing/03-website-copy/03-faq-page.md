@@ -346,7 +346,7 @@ Visit our pricing page for current pricing. We offer single-site and unlimited-s
 
 ### Is there a trial or refund policy?
 
-Yes. We offer a 14-day money-back guarantee. If WB Ad Manager Pro doesn't meet your needs, contact support within 14 days for a full refund.
+Yes. We offer a 30-day money-back guarantee. If WB Ad Manager Pro doesn't meet your needs, contact support within 30 days for a full refund.
 
 ---
 

@@ -184,7 +184,7 @@
 ## Slide 8: FAQs
 
 **Q: Can I try PRO features before buying?**
-A: Yes, we offer a 14-day money-back guarantee.
+A: Yes, we offer a 30-day money-back guarantee.
 
 **Q: Do I need PRO for AdSense?**
 A: No, full AdSense support is in the FREE version.

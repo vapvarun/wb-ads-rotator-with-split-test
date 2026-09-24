@@ -157,10 +157,10 @@
 ## Money-Back Guarantee
 
 ### Headline
-"14-Day Money-Back Guarantee"
+"30-Day Money-Back Guarantee"
 
 ### Copy
-Not sure if Pro is right for you? No risk. Try WB Ad Manager Pro for 14 days. If it doesn't meet your needs, contact us for a full refund - no questions asked.
+Not sure if Pro is right for you? No risk. Try WB Ad Manager Pro for 30 days. If it doesn't meet your needs, contact us for a full refund.
 
 ### Badge
 [Guarantee badge/shield icon]
@@ -182,7 +182,7 @@ Yes. The free version is GPL licensed and can be used on any site, including cli
 The plugin continues working with all features intact. You simply stop receiving updates and priority support. You can renew anytime to resume updates.
 
 ### Do you offer refunds?
-Yes. We offer a 14-day money-back guarantee on all Pro purchases. If you're not satisfied, contact support within 14 days of purchase for a full refund.
+Yes. We offer a 30-day money-back guarantee on all Pro purchases. If you're not satisfied, contact support within 30 days of purchase for a full refund.
 
 ### Is there a lifetime license option?
 Contact us for lifetime license pricing and availability.
@@ -225,7 +225,7 @@ Whether you're just getting started with the free version or ready to build an a
 ## Trust Elements (Footer)
 
 - Secure checkout
-- 14-day money-back guarantee
+- 30-day money-back guarantee
 - One year of updates included
 - Priority support for Pro users
 - SSL encrypted transactions

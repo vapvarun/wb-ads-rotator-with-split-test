@@ -106,7 +106,7 @@ Everything in Free, plus:
 | Pro Single | $[XX]/year | 1 |
 | Pro Unlimited | $[XX]/year | Unlimited |
 
-14-day money-back guarantee on all Pro purchases.
+30-day money-back guarantee on all Pro purchases.
 
 ---
 
