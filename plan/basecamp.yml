@@ -1,0 +1,39 @@
+# Basecamp IDs for the WB Ad Manager card table.
+# Consumed by `wppqa_learn_from_basecamp` to fetch the full bug lifecycle
+# and write a committed ledger to plan/basecamp/ledger.md + ledger.json.
+# When this project's column set changes, update this file — do not hand-
+# edit the ledger.
+
+project_id: 44982066
+card_table_id: 9334950387
+project_url: https://3.basecamp.com/5798509/buckets/44982066
+
+columns:
+  triage: 9334950390
+  bugs: 9334953095
+  ready_for_development: 9334953466
+  in_development: 9334953922
+  ready_for_testing: 9334954442
+  in_testing: 9334954687
+  done: 9334950396
+  scope: 9334950393
+  suggestions: 9334950395
+  ui: 9758079954
+  not_now: 9334950392
+
+# Module hints — keys are labels used in the ledger's
+# "top modules by bug count" aggregation. Values are case-insensitive
+# regexes matched against card titles. Order matters only for reporting.
+module_hints:
+  Analytics:   '(analytic|impression|click|report|stat)'
+  Memberships: '(membership|subscri|plan|renewal|proration)'
+  Classifieds: '(classified|listing|category|location)'
+  Campaigns:   '(campaign|pause|resume|budget)'
+  Ads:         '(\bad\b|banner|image ad|rich ad|submit ad)'
+  Wallet:      '(wallet|credit|top.?up|ledger|payment|topup)'
+  Portal:      '(portal|dashboard|tab|navigation|sidebar)'
+  Admin:       '(admin page|settings|menu|meta box|wp-admin)'
+  Notifications: '(email|notification|inbox|notify)'
+  Demo:        '(demo data|seed|fixture)'
+  Setup:       '(setup wizard|activation|install|onboarding)'
+  Toast:       '(toast|confirm|dialog|notice)'
