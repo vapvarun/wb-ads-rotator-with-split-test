@@ -17,6 +17,7 @@
 namespace WBAM\Tests\Pro;
 
 use WBAM_Pro\Core\Credits_Bridge;
+use WBAM_Pro\Core\Revenue_Ledger;
 use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
 use WBAM_Pro\Modules\AdSubmissions\Ad_Submission_Manager;
 
@@ -91,7 +92,7 @@ class Test_Ad_Submission_Rejection_Refund extends Pro_Test_Case {
 
 	public function test_charged_submission_refunds_the_actual_charge(): void {
 		$submission = $this->submit();
-		Credits_Bridge::charge( $this->advertiser->id, 49.00, (int) $submission->ad_id, 'Package purchase: Rejection Refund Flat' );
+		Credits_Bridge::charge( $this->advertiser->id, 49.00, (int) $submission->ad_id, 'Package purchase: Rejection Refund Flat', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
 		$charged = \Wbcom\Credits\Credits::get_balance( 'wbam-pro', $this->user );
 
 		Ad_Submission_Manager::get_instance()->reject( (int) $submission->id, 'guard paid' );

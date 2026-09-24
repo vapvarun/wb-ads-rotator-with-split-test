@@ -16,6 +16,7 @@
 namespace WBAM\Tests\Pro;
 
 use WBAM_Pro\Core\Credits_Bridge;
+use WBAM_Pro\Core\Revenue_Ledger;
 use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
 
 class Test_Credits_Money_Adoption extends Pro_Test_Case {
@@ -27,7 +28,7 @@ class Test_Credits_Money_Adoption extends Pro_Test_Case {
 		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );
 		\Wbcom\Credits\Credits::topup( 'wbam-pro', $user, 100000, 'seed' );
 
-		$result = Credits_Bridge::charge( $advertiser->id, 147.35, 424242, 'cents-exactness' );
+		$result = Credits_Bridge::charge( $advertiser->id, 147.35, 424242, 'cents-exactness', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
 		$this->assertNotWPError( $result );
 
 		$row = $wpdb->get_row(
@@ -45,8 +46,8 @@ class Test_Credits_Money_Adoption extends Pro_Test_Case {
 		\Wbcom\Credits\Credits::topup( 'wbam-pro', $user, 100000, 'seed' );
 		$before = \Wbcom\Credits\Credits::get_balance( 'wbam-pro', $user );
 
-		Credits_Bridge::charge( $advertiser->id, 147.35, 424243, 'round-trip charge' );
-		Credits_Bridge::credit( $advertiser->id, 147.35, 424243, 'round-trip refund' );
+		Credits_Bridge::charge( $advertiser->id, 147.35, 424243, 'round-trip charge', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		Credits_Bridge::credit( $advertiser->id, 147.35, 424243, 'round-trip refund', Revenue_Ledger::SOURCE_AD_PACKAGE );
 
 		$this->assertSame( $before, \Wbcom\Credits\Credits::get_balance( 'wbam-pro', $user ) );
 	}

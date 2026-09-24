@@ -19,6 +19,7 @@ namespace WBAM\Tests\Pro;
 use WBAM\Tests\Helpers\Factory;
 use WBAM_Pro\Core\Settings_Helper;
 use WBAM_Pro\Core\Credits_Bridge;
+use WBAM_Pro\Core\Revenue_Ledger;
 use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
 use WBAM_Pro\Modules\Classifieds\Classified_Manager;
 
@@ -51,7 +52,7 @@ class Test_Classified_Rejection_Refund extends Pro_Test_Case {
 		$this->assertNotWPError( $classified );
 
 		if ( $charge_amount > 0 ) {
-			$charge = Credits_Bridge::charge( $advertiser->id, $charge_amount, (int) $classified->id, 'Classified listing: Standard package' );
+			$charge = Credits_Bridge::charge( $advertiser->id, $charge_amount, (int) $classified->id, 'Classified listing: Standard package', false, Revenue_Ledger::SOURCE_CLASSIFIED_LISTING );
 			$this->assertNotWPError( $charge );
 		}
 
@@ -78,7 +79,7 @@ class Test_Classified_Rejection_Refund extends Pro_Test_Case {
 
 	public function test_refund_covers_upgrades_charged_to_the_same_listing(): void {
 		$ctx = $this->make_charged_pending_classified( 5 );
-		Credits_Bridge::charge( $ctx['advertiser']->id, 3, (int) $ctx['classified']->id, 'Classified listing upgrade: featured' );
+		Credits_Bridge::charge( $ctx['advertiser']->id, 3, (int) $ctx['classified']->id, 'Classified listing upgrade: featured', false, Revenue_Ledger::SOURCE_CLASSIFIED_UPGRADE );
 		$before = \Wbcom\Credits\Credits::get_balance( 'wbam-pro', $ctx['user'] );
 
 		Classified_Manager::get_instance()->reject( (int) $ctx['classified']->id, 'regression' );
