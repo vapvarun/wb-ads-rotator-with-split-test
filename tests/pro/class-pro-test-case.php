@@ -30,6 +30,7 @@ abstract class Pro_Test_Case extends WP_UnitTestCase {
 		self::flush_credits_balance_cache();
 		self::truncate_credits_ledger();
 		self::truncate_membership_tables();
+		self::clear_advertisers();
 	}
 
 	public function tear_down(): void {
@@ -90,6 +91,26 @@ abstract class Pro_Test_Case extends WP_UnitTestCase {
 				// commit the surrounding transaction.
 				$wpdb->query( "DELETE FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			}
+		}
+	}
+
+	/**
+	 * Empty the advertisers table before each test (campaigns follow via the
+	 * ON DELETE CASCADE foreign key).
+	 *
+	 * Campaign::record_impression() and other money paths run their own
+	 * START TRANSACTION/COMMIT, which commits the test's transaction, so
+	 * advertiser rows survive the rollback. WordPress then reuses user IDs in
+	 * later tests and get_or_create() hits the UNIQUE user_id key or picks up
+	 * a stranger's row ("Campaign not found", wrong status).
+	 */
+	protected static function clear_advertisers(): void {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'wbam_advertisers';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- test teardown on a known table name.
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table ) {
+			$wpdb->query( "DELETE FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 	}
 
