@@ -677,4 +677,64 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 
 		$this->assertNotEmpty( Classified_Manager::get_instance()->get( (int) $classified->id )->expires_at );
 	}
+
+	// ---------------------------------------------------------------------
+	// Campaigns.
+	// ---------------------------------------------------------------------
+
+	/**
+	 * Step "Expired campaigns email 'Campaign completed' and 'ad paused'
+	 * although the status is Expired".
+	 */
+	public function test_expiry_sends_one_campaign_ended_email_and_no_ad_paused_email(): void {
+		global $wpdb;
+		$ad_id = (int) self::factory()->post->create(
+			array(
+				'post_type'   => 'wbam-ad',
+				'post_status' => 'publish',
+				'post_author' => $this->user,
+			)
+		);
+		$campaign = Campaign_Manager::get_instance()->create(
+			array(
+				'advertiser_id' => $this->advertiser->id,
+				'ad_id'         => $ad_id,
+				'name'          => 'Runs out',
+				'pricing_model' => 'flat',
+				'status'        => 'draft',
+			)
+		);
+		$this->assertTrue( Campaign_Manager::get_instance()->activate( (int) $campaign->id ) );
+		$wpdb->update( $wpdb->prefix . 'wbam_campaigns', array( 'end_date' => gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ) ), array( 'id' => (int) $campaign->id ) );
+
+		$subjects = $this->mail_subjects();
+		Campaign_Manager::get_instance()->check_expired_campaigns();
+
+		$this->assertSame( 'expired', Campaign_Manager::get_instance()->get( (int) $campaign->id )->status );
+		$this->assertNotEmpty( preg_grep( '/Campaign ended/', (array) $subjects ), 'Emails: ' . implode( ' | ', (array) $subjects ) );
+		$this->assertEmpty( preg_grep( '/completed|paused/i', (array) $subjects ), 'Emails: ' . implode( ' | ', (array) $subjects ) );
+	}
+
+	/**
+	 * Same step: an admin cannot put a campaign live with its end date
+	 * already behind it.
+	 */
+	public function test_a_campaign_past_its_end_date_cannot_be_activated(): void {
+		$campaign = Campaign_Manager::get_instance()->create(
+			array(
+				'advertiser_id' => $this->advertiser->id,
+				'name'          => 'Already over',
+				'pricing_model' => 'flat',
+				'start_date'    => gmdate( 'Y-m-d H:i:s', time() - 10 * DAY_IN_SECONDS ),
+				'end_date'      => gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ),
+				'status'        => 'draft',
+			)
+		);
+
+		$result = Campaign_Manager::get_instance()->activate( (int) $campaign->id );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'campaign_end_date_passed', $result->get_error_code() );
+		$this->assertSame( 'draft', Campaign_Manager::get_instance()->get( (int) $campaign->id )->status );
+	}
 }
