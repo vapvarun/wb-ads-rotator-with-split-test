@@ -1736,8 +1736,11 @@ class Admin {
 
 	/**
 	 * Code ad preview rendered in a sandboxed iframe so pasted scripts
-	 * cannot read admin cookies, modify the edit screen, or phone home
-	 * on behalf of the logged-in admin.
+	 * cannot read admin cookies or modify the edit screen. Scripts run, but
+	 * without allow-same-origin: a srcdoc frame would otherwise share the
+	 * wp-admin origin and could remove its own sandbox. Code that needs the
+	 * page's origin (ad network tags) may not fill in here; the preview is
+	 * approximate.
 	 *
 	 * @param array<string,mixed> $data Ad data.
 	 * @return void
@@ -1754,7 +1757,7 @@ class Admin {
 		$doc .= '<style>body{margin:0;padding:12px;font:14px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#1d2327;background:#fff;}</style>';
 		$doc .= '</head><body>' . $code . '</body></html>';
 		printf(
-			'<iframe sandbox="allow-scripts allow-same-origin" style="width:100%%;min-height:200px;border:0;background:#fff;" srcdoc="%s"></iframe>',
+			'<iframe sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width:100%%;min-height:200px;border:0;background:#fff;" srcdoc="%s"></iframe>',
 			esc_attr( $doc )
 		);
 	}

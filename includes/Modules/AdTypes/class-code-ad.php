@@ -124,6 +124,23 @@ class Code_Ad implements Ad_Type_Interface {
 	/**
 	 * Render code in a sandboxed iframe for security isolation.
 	 *
+	 * The code runs with scripts but WITHOUT allow-same-origin: a srcdoc
+	 * frame inherits the page's origin, so the two flags together let the
+	 * framed script reach into the page and remove its own sandbox. It gets
+	 * an opaque origin instead, and may open its click-through in a new tab
+	 * or, on a click, in the top window.
+	 *
+	 * Sandbox mode is the place for code the site owner does not fully
+	 * trust. Code that needs the page's origin (AdSense and most network
+	 * tags) runs with sandbox mode off, as direct output - and code with
+	 * scripts only reaches direct output when the user who saved it had
+	 * unfiltered_html: save() here and PRO's advertiser portal both run
+	 * wp_kses_post() on code from anyone else.
+	 *
+	 * Click tracking binds to the links in the ad container and never saw
+	 * links inside the frame, so a sandboxed ad's clicks are not counted -
+	 * unchanged by this.
+	 *
 	 * @since 1.2.0
 	 *
 	 * @param string $code  The ad code.
@@ -134,24 +151,26 @@ class Code_Ad implements Ad_Type_Interface {
 		// Generate unique ID for this iframe.
 		$iframe_id = 'wbam-sandbox-' . $ad_id . '-' . wp_rand( 1000, 9999 );
 
-		// Encode the code for safe embedding.
-		$encoded_code = rawurlencode( $code );
+		// The frame's origin is opaque, so the page cannot read its height;
+		// the frame reports it instead.
+		$resize = '<script>(function(){function r(){parent.postMessage({wbamSandboxHeight:document.body.scrollHeight},"*");}addEventListener("load",r);if(window.ResizeObserver){new ResizeObserver(r).observe(document.body);}})();</script>';
 
 		// Build srcdoc content with proper HTML structure.
-		$srcdoc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:0;overflow:hidden;}</style></head><body>' . $code . '</body></html>';
+		$srcdoc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:0;overflow:hidden;}</style></head><body>' . $code . $resize . '</body></html>';
 
-		// Sandbox attributes allow scripts and same-origin for ad functionality.
-		$sandbox_attrs = 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox';
+		$sandbox_attrs = 'allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation';
 
 		/**
 		 * Filter the sandbox attributes for code ad iframes.
+		 *
+		 * allow-same-origin is dropped whenever allow-scripts is present.
 		 *
 		 * @since 1.2.0
 		 *
 		 * @param string $sandbox_attrs The sandbox attribute values.
 		 * @param int    $ad_id         The ad post ID.
 		 */
-		$sandbox_attrs = apply_filters( 'wbam_code_ad_sandbox_attrs', $sandbox_attrs, $ad_id );
+		$sandbox_attrs = self::without_sandbox_escape( apply_filters( 'wbam_code_ad_sandbox_attrs', $sandbox_attrs, $ad_id ) );
 
 		$html  = '<iframe id="' . esc_attr( $iframe_id ) . '" ';
 		$html .= 'class="wbam-code-sandbox" ';
@@ -162,15 +181,34 @@ class Code_Ad implements Ad_Type_Interface {
 		$html .= 'loading="lazy">';
 		$html .= '</iframe>';
 
-		// Add auto-resize script.
+		// Size the frame from the height it reports - only its own messages.
 		$html .= '<script>';
 		$html .= '(function(){';
 		$html .= 'var f=document.getElementById("' . esc_js( $iframe_id ) . '");';
-		$html .= 'if(f){f.onload=function(){try{f.style.height=f.contentWindow.document.body.scrollHeight+"px";}catch(e){f.style.height="250px";}};}';
+		$html .= 'if(f){addEventListener("message",function(e){if(e.source===f.contentWindow&&e.data&&e.data.wbamSandboxHeight>0){f.style.height=Math.ceil(e.data.wbamSandboxHeight)+"px";}});}';
 		$html .= '})();';
 		$html .= '</script>';
 
 		return $html;
+	}
+
+	/**
+	 * Remove allow-same-origin from a sandbox token list that has
+	 * allow-scripts: with both, the framed script can remove its own sandbox.
+	 *
+	 * @since 3.2.0
+	 *
+	 * @param string $sandbox_attrs Space-separated sandbox tokens.
+	 * @return string
+	 */
+	public static function without_sandbox_escape( $sandbox_attrs ) {
+		$tokens = preg_split( '/\s+/', strtolower( trim( (string) $sandbox_attrs ) ), -1, PREG_SPLIT_NO_EMPTY );
+
+		if ( in_array( 'allow-scripts', $tokens, true ) ) {
+			$tokens = array_diff( $tokens, array( 'allow-same-origin' ) );
+		}
+
+		return implode( ' ', array_unique( $tokens ) );
 	}
 
 	/**
