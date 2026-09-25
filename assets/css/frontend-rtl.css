@@ -262,6 +262,12 @@
 	color: inherit;
 }
 
+/* Whole-creative click-through link (set when the ad has a click URL). */
+.wbam-ad-rich-content__link {
+	display: block;
+	text-decoration: none;
+}
+
 /* ==========================================================================
    Code Ads (AdSense, etc.)
    ========================================================================== */
