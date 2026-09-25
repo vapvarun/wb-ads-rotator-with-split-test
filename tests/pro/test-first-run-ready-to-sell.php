@@ -34,11 +34,11 @@ class Test_First_Run_Ready_To_Sell extends Pro_Test_Case {
 
 	private function render_wizard_done_step(): string {
 		ob_start();
-		if ( function_exists( 'wbam_setup_wizard_render_step_2' ) ) {
-			wbam_setup_wizard_render_step_2();
+		if ( function_exists( 'wbam_setup_wizard_render_step_3_done' ) ) {
+			wbam_setup_wizard_render_step_3_done();
 		} else {
 			// The template declares its step renderers, so it can load once.
-			$current_step = 2;
+			$current_step = 3;
 			$settings     = array();
 			include WBAM_PRO_PATH . 'templates/admin/setup-wizard.php';
 		}
