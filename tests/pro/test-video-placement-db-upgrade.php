@@ -58,6 +58,6 @@ class Test_Video_Placement_Db_Upgrade extends Pro_Test_Case {
 	}
 
 	public function test_db_version_constant_was_bumped(): void {
-		$this->assertSame( '4.3.3', Installer::DB_VERSION );
+		$this->assertTrue( version_compare( Installer::DB_VERSION, '4.3.3', '>=' ), 'The 4.3.3 upgrade must be reachable.' );
 	}
 }

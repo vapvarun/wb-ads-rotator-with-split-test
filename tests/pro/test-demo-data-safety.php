@@ -384,4 +384,22 @@ class Test_Demo_Data_Safety extends Pro_Test_Case {
 		$this->assertStringStartsWith( 'demo-data-', $first );
 		$this->assertNotSame( $first, $second, 'A dismissed demo banner returns after a re-import.' );
 	}
+
+	/** 4.3.4: existing installs get their own pages un-flagged and dropped from the demo registry. */
+	public function test_upgrade_4_3_4_unflags_essential_pages(): void {
+		$page = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$demo = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		update_option( 'wbam_page_advertiser_dashboard', $page );
+		update_post_meta( $page, '_wbam_is_demo', '1' );
+		update_post_meta( $demo, '_wbam_is_demo', '1' );
+		update_option( 'wbam_pro_demo_data_ids', array( 'pages' => array( $page, $demo ) ) );
+
+		$method = new \ReflectionMethod( \WBAM_Pro\Core\Installer::class, 'upgrade_to_4_3_4' );
+		$method->setAccessible( true );
+		$method->invoke( null );
+
+		$this->assertSame( '', get_post_meta( $page, '_wbam_is_demo', true ), 'The plugin page is no longer flagged as demo.' );
+		$this->assertSame( '1', get_post_meta( $demo, '_wbam_is_demo', true ), 'A real demo page keeps its flag.' );
+		$this->assertSame( array( $demo ), get_option( 'wbam_pro_demo_data_ids' )['pages'] );
+	}
 }
