@@ -29,7 +29,9 @@
 	--wbam-form-button-text-hover: var(--button-text-hover-color, var(--reign-site-button-text-hover-color, var(--wbam-accent-fg, #fff)));
 	--wbam-form-button-border: var(--button-border-color, var(--reign-site-button-bg-color, transparent));
 	--wbam-form-button-border-hover: var(--button-border-hover-color, var(--reign-site-button-bg-hover-color, transparent));
-	--wbam-form-required: var(--color-danger, var(--wbam-danger, #c00));
+	/* Mixed toward the text colour like the error text: plain danger red is
+	   under 3:1 on the dark field fill. */
+	--wbam-form-required: var(--color-danger, color-mix(in srgb, var(--wbam-danger) 60%, var(--wbam-text)));
 	--wbam-form-radius: var(--wbam-r-md, 8px);
 	--wbam-form-success-bg: var(--color-success-bg, color-mix(in srgb, var(--wbam-success) 14%, var(--wbam-card-bg)));
 	--wbam-form-success-border: var(--color-success-border, color-mix(in srgb, var(--wbam-success) 35%, var(--wbam-card-bg)));

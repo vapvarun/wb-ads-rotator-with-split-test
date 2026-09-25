@@ -24,12 +24,15 @@
 	--wbam-text-subtle:   #8c8f94;
 	--wbam-text-inverse:  #ffffff;
 	--wbam-accent:        var(--bx-color-accent, var(--reign-colors-theme, var(--brand, var(--wp--preset--color--primary, #2271b1))));
-	--wbam-accent-hover:  var(--bx-color-link-hover, var(--reign-site-link-hover-color, var(--brand-hover, #135e96)));
+	/* Last resort derives from the accent, so a block theme's green primary
+	   does not hover blue. */
+	--wbam-accent-hover:  var(--bx-color-link-hover, var(--reign-site-link-hover-color, var(--brand-hover, color-mix(in srgb, var(--wbam-accent) 85%, #000))));
 	/* Text on an accent fill: white on a dark accent, black on a light one.
 	   Themes lighten their brand colour in dark mode (Reign: #97c0ee), where
 	   fixed white text falls to 1.9:1. 0.585 is the OKLCH lightness where the
-	   higher-contrast of the two flips. */
-	--wbam-accent-fg:     oklch(from var(--wbam-accent) clamp(0, (0.585 - l) * 1000, 1) 0 0);
+	   higher-contrast of the two flips. White here; the @supports block
+	   after the dark palette upgrades it where relative colour works. */
+	--wbam-accent-fg:     #ffffff;
 	--wbam-link:          var(--bx-color-link, var(--reign-site-link-color, var(--brand, #2271b1)));
 	--wbam-success:       #00a32a;
 	--wbam-danger:        #d63638;
@@ -37,6 +40,8 @@
 	--wbam-warning:       #dba617;
 	--wbam-border:        var(--bx-color-border, var(--reign-site-border-color, #e5e5e5));
 	--wbam-border-strong: #c3c4c7;
+	/* Form field edge: 3:1 against the surface (WCAG 1.4.11). Follows --wbam-text, so dark mode adapts. */
+	--wbam-input-border:  color-mix(in srgb, var(--wbam-text) 60%, transparent);
 	--wbam-border-subtle: #dcdcde;
 	--wbam-shadow-sm:     0 1px 2px rgba(0, 0, 0, 0.04);
 	--wbam-shadow-md:     0 2px 6px rgba(0, 0, 0, 0.08);
@@ -510,12 +515,29 @@ html.dark,
 	--wbam-border-color-darker: #3a4253;
 	--wbam-error-bg:      rgba(214, 54, 56, 0.18);
 	--wbam-danger-bg:     rgba(214, 54, 56, 0.18);
-	/* Re-resolve against this element's accent (dark triggers can sit on body). */
-	--wbam-accent-fg:     oklch(from var(--wbam-accent) clamp(0, (0.585 - l) * 1000, 1) 0 0);
 	--wbam-shadow-color:  rgba(0, 0, 0, 0.4);
 	--wbam-shadow-medium: rgba(0, 0, 0, 0.3);
 	--wbam-shadow-strong: rgba(0, 0, 0, 0.6);
 	--wbam-overlay-bg:    rgba(0, 0, 0, 0.85);
+}
+
+/* Contrast-aware text on the accent. Relative colour syntax is Safari 18+;
+   without this gate older Safari drops the value at use time and the text
+   inherits (dark on a dark accent). Declared on every dark trigger too so it
+   re-resolves against that element's accent. */
+@supports (color: oklch(from red l c h)) {
+	:root,
+	html[data-bx-mode="dark"],
+	body.buddyx-dark-theme,
+	html.dark-mode,
+	body.dark-mode,
+	body.dark-scheme,
+	html.dark,
+	[data-theme="dark"],
+	.buddyx-dark-mode,
+	.bb-dark-mode {
+		--wbam-accent-fg: oklch(from var(--wbam-accent) clamp(0, (0.585 - l) * 1000, 1) 0 0);
+	}
 }
 
 /* ==========================================================================

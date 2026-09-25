@@ -94,8 +94,11 @@ class Partnership_Manager {
 				'status'           => $data['status'],
 				'admin_notes'      => $data['admin_notes'],
 				'ip_address'       => $data['ip_address'],
+				// Site time, like responded_at. The column default is the DB
+				// server's clock, which is hours off on most hosts.
+				'created_at'       => current_time( 'mysql' ),
 			),
-			array( '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%f', '%f', '%s', '%s', '%s' )
+			array( '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%f', '%f', '%s', '%s', '%s', '%s' )
 		);
 
 		if ( false === $result ) {
@@ -527,10 +530,10 @@ class Partnership_Manager {
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$this->table}
 				WHERE (email = %s OR website_url = %s)
-				AND created_at > DATE_SUB(NOW(), INTERVAL %d HOUR)",
+				AND created_at > %s",
 				$email,
 				$website,
-				$hours_back
+				wp_date( 'Y-m-d H:i:s', time() - ( (int) $hours_back * HOUR_IN_SECONDS ) )
 			)
 		);
 		// phpcs:enable

@@ -297,11 +297,12 @@ class Partnership {
 	 * @return string
 	 */
 	public function get_time_ago() {
-		$created_ts = strtotime( (string) $this->created_at );
-		if ( false === $created_ts ) {
+		// created_at is site-local time; read it in the site timezone.
+		$created = '' !== (string) $this->created_at ? date_create_immutable( (string) $this->created_at, wp_timezone() ) : false;
+		if ( false === $created ) {
 			return '';
 		}
-		return human_time_diff( $created_ts, current_datetime()->getTimestamp() );
+		return human_time_diff( $created->getTimestamp(), time() );
 	}
 
 	/**

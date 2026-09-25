@@ -14,6 +14,7 @@
 		var $message = $form.find('.wbam-form-message');
 		var $budgetFields = $('#wbam-budget-fields');
 		var originalBtnText = $submitBtn.text();
+		var submitted = false;
 
 		// Show/hide budget fields based on partnership type
 		$('#wbam_partnership_type').on('change', function() {
@@ -28,6 +29,10 @@
 		// Form submission
 		$form.on('submit', function(e) {
 			e.preventDefault();
+
+			if (submitted) {
+				return;
+			}
 
 			// Clear previous messages
 			$message.removeClass('wbam-success wbam-error').hide();
@@ -62,10 +67,12 @@
 				data: formData,
 				success: function(response) {
 					if (response.success) {
+						submitted = true;
 						showMessage(response.data.message, 'success');
 						$form[0].reset();
-						// Hide the form fields
-						$form.find('.wbam-form-row').not('.wbam-form-actions').slideUp();
+						// Hide the fields and the Submit button: a second click on an
+						// emptied form would replace the thank-you with an error.
+						$form.find('.wbam-form-row').slideUp();
 					} else {
 						showMessage(response.data.message || wbamPartnership.i18n.error, 'error');
 					}
@@ -74,7 +81,9 @@
 					showMessage(wbamPartnership.i18n.error, 'error');
 				},
 				complete: function() {
-					$submitBtn.prop('disabled', false).text(originalBtnText);
+					if (!submitted) {
+						$submitBtn.prop('disabled', false).text(originalBtnText);
+					}
 				}
 			});
 		});
