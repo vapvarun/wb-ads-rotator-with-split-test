@@ -227,7 +227,7 @@
 
 .wbam-confirm-dialog__btn {
 	padding: 10px 24px;
-	border-radius: 6px;
+	border-radius: var(--wbam-r-md, 8px);
 	font-size: 14px;
 	font-weight: 500;
 	cursor: pointer;

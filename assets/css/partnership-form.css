@@ -17,7 +17,7 @@
 	--wbam-form-text: var(--wbam-text, var(--global-font-color, var(--reign-form-text-color, var(--reign-site-body-text-color, #333))));
 	--wbam-form-text-light: var(--wbam-text-muted, var(--color-meta, var(--reign-form-placeholder-color, var(--reign-site-alternate-text-color, #666))));
 	--wbam-form-border: var(--wbam-border, var(--global-border-color, var(--reign-form-border-color, var(--reign-site-border-color, #ddd))));
-	--wbam-form-input-bg: var(--wbam-surface-alt, var(--global-body-lightcolor, var(--reign-form-background-color, var(--reign-site-secondary-bg-color, #fff))));
+	--wbam-form-input-bg: var(--wbam-card-bg, #fff);
 	--wbam-form-input-text: var(--wbam-text, var(--reign-form-text-color, #333));
 	--wbam-form-placeholder: var(--wbam-text-muted, var(--reign-form-placeholder-color, #767676));
 	--wbam-form-focus: var(--wbam-accent, var(--color-theme-primary, var(--reign-form-focus-border-color, var(--reign-accent-color, #0073aa))));
@@ -78,13 +78,13 @@
 :where(.wbam-partnership-form-wrap) .wbam-form-field .required {
 	color: var(--wbam-form-required);
 }
-:where(.wbam-partnership-form-wrap) .wbam-form-field input,
-:where(.wbam-partnership-form-wrap) .wbam-form-field textarea {
+.wbam-partnership-form-wrap .wbam-form-field input,
+.wbam-partnership-form-wrap .wbam-form-field textarea {
 	width: 100%;
 	padding: 10px 12px;
 	border: 1px solid var(--wbam-input-border, rgba(0, 0, 0, 0.42));
 	border-radius: var(--wbam-form-radius);
-	font-size: 14px;
+	font-size: var(--wbam-font-size-md, 1rem);
 	min-height: 44px;
 	background-color: var(--wbam-form-input-bg);
 	color: var(--wbam-form-input-text);
@@ -98,7 +98,7 @@
 	padding: 10px 40px 10px 12px;
 	border: 1px solid var(--wbam-input-border, rgba(0, 0, 0, 0.42));
 	border-radius: var(--wbam-form-radius);
-	font-size: 14px;
+	font-size: var(--wbam-font-size-md, 1rem);
 	background-color: var(--wbam-form-input-bg);
 	color: var(--wbam-form-input-text);
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");

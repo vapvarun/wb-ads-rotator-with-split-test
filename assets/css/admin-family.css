@@ -118,8 +118,13 @@
 	color:       var(--wbam-text-muted);
 }
 
+.wbam-action-summary__title + .wbam-action-summary__list {
+	margin-top: var(--wbam-space-2);
+}
+
 .wbam-action-summary__list {
 	margin:  0;
+	list-style: disc;
 	padding-inline-start: var(--wbam-space-5);
 	color:   var(--wbam-text);
 }

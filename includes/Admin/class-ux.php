@@ -332,6 +332,7 @@ class UX {
 			$args,
 			array(
 				'items'  => array(),
+				'label'  => '',
 				'title'  => '',
 				'meta'   => '',
 				'status' => '',
@@ -347,6 +348,9 @@ class UX {
 			$remaining = $total - count( $shown );
 			?>
 			<div class="wbam-action-summary">
+				<?php if ( '' !== $args['label'] ) : ?>
+					<p class="wbam-action-summary__title"><?php echo esc_html( $args['label'] ); ?></p>
+				<?php endif; ?>
 				<ul class="wbam-action-summary__list">
 					<?php foreach ( $shown as $item ) : ?>
 						<li><?php echo esc_html( $item ); ?></li>
