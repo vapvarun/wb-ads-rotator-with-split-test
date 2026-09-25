@@ -299,4 +299,11 @@ class Test_Billing_Independent_Of_Analytics extends Pro_Test_Case {
 		$this->assert_billed_once();
 		$this->assertSame( 2, $this->rows(), 'One impression row and one click row.' );
 	}
+
+	/** A pixel URL can only record an impression; type=click must not bill. */
+	public function test_pixel_accepts_impressions_only(): void {
+		$this->assertSame( 'impression', \WBAM_Pro\Modules\Analytics\Analytics_Tracker::pixel_event_type( 'impression' ) );
+		$this->assertSame( '', \WBAM_Pro\Modules\Analytics\Analytics_Tracker::pixel_event_type( 'click' ) );
+		$this->assertSame( '', \WBAM_Pro\Modules\Analytics\Analytics_Tracker::pixel_event_type( '' ) );
+	}
 }
