@@ -8,7 +8,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Wbcom Designs - WB Ad Manager
- * Plugin URI:        https://wordpress.org/plugins/wb-ads-rotator-with-split-test/
+ * Plugin URI:        https://wbcomdesigns.com/downloads/wb-ad-manager-pro/
  * Description:       Comprehensive ad management for WordPress with ad rotation, split testing, multiple placements, Google AdSense, BuddyPress and bbPress integration.
  * Version:           3.1.1
  * Author:            Wbcom Designs

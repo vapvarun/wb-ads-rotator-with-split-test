@@ -8,7 +8,7 @@
 **Plugin Name:** WB Ads Rotator with Split Test (FREE)
 **Slug:** `wb-ads-rotator-with-split-test`
 **Main File:** `wb-ads-rotator-with-split-test.php`
-**Current Stable:** `3.0.0` (free + Pro share one version number and release together)
+**Current Stable:** `3.1.1`, with `3.2.0` in development (free + Pro share one version number and release together)
 **Type:** WordPress Plugin (Free — paired with `wb-ad-manager-pro`)
 
 Ad rotation + A/B split-test plugin. Renamed from the legacy `buddypress-ads-rotator` plugin. **The old directory layout (`admin/`, `public/`, `buddypress-ads-rotator.php`) no longer exists** — everything is now under `includes/` with PSR-like class organization.
@@ -79,7 +79,7 @@ Push gates:
 1. Pick bugs from **Bugs** column — filter by `[Free]` prefix for this plugin
 2. Validate fix locally + Playwright screenshot
 3. Add comment with fix details to card
-4. Push changes to git (`2.8.1` dev branch)
+4. Push changes to git (current dev branch, e.g. `3.2.0`)
 5. Move card to **Ready for Testing**
 
 ---
@@ -114,9 +114,8 @@ wb-ads-rotator-with-split-test/
 
 | Branch | Purpose |
 |--------|---------|
-| `main` | Stable, latest release (currently `2.8.0`) |
-| `2.8.1` | Current dev branch (latest) |
-| `2.8.0`, `2.7.0`, `2.6.1`, `2.5.0` | Historical release branches |
+| `main` | Stable, latest release (currently `3.1.1`) |
+| `3.2.0` | Current dev branch; free and Pro use the same branch name |
 
 ---
 
@@ -126,10 +125,10 @@ wb-ads-rotator-with-split-test/
 
 ### Quick Reference
 - **Text domain:** `wb-ads-rotator-with-split-test`
-- **CSS prefix:** `.wbarst-` (BEM-lite)
-- **JS namespace:** `wbARST` / `window.wbARST`
-- **REST namespace:** `wb-ads/v1`
-- **DB prefix:** `wbarst_` / option prefix `wb_ads_rotator_`
+- **CSS prefix:** `.wbam-` (BEM-lite)
+- **JS globals:** `wbam*` objects via `wp_localize_script` (e.g. `wbamPartnership`, `wbamFormatData`)
+- **REST namespace:** `wbam/v1`
+- **DB prefix:** `wbam_` (DB version `1.8.0`) / main option `wbam_settings`, other options `wbam_*`
 - **Escaping:** `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()` on ALL output
 - **Sanitization:** `sanitize_text_field( wp_unslash( $_REQUEST['...'] ) )` — never raw `$_REQUEST`
 - **Capability checks:** `current_user_can()` required on every AJAX/REST handler

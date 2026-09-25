@@ -24,7 +24,7 @@ Your site already does several things — a blog, a community, maybe some affili
 
 The free version covers display ads and affiliate links. Upgrading to Pro adds the classifieds marketplace, advertiser portal, campaign management, and advanced analytics on top of everything you already have.
 
-**[Download WB Ad Manager Free](https://wordpress.org/plugins/wb-ads-rotator-with-split-test/)** — then **[upgrade to Pro](https://wbcomdesigns.com/downloads/wb-ad-manager-pro/)** when you're ready for the full stack.
+**[Get WB Ad Manager](https://wbcomdesigns.com/downloads/wb-ad-manager-pro/)**: start with the free plugin and add Pro when you're ready for the full stack.
 
 ---
 

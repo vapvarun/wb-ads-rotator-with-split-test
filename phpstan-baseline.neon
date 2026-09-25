@@ -2801,46 +2801,6 @@ parameters:
 			path: includes/Modules/Placements/interface-placement.php
 
 		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Content_Analyzer\\:\\:analyze\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/class-content-analyzer.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Content_Analyzer\\:\\:clear_cache\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/class-content-analyzer.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Content_Analyzer\\:\\:get_heading_count\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/class-content-analyzer.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Content_Analyzer\\:\\:get_reading_time\\(\\) should return int but returns float\\|int\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/class-content-analyzer.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Content_Analyzer\\:\\:get_suggested_positions\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/class-content-analyzer.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Content_Analyzer\\:\\:meets_requirements\\(\\) has parameter \\$min_reqs with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/class-content-analyzer.php
-
-		-
-			message: "#^Property WBAM\\\\Modules\\\\Targeting\\\\Content_Analyzer\\:\\:\\$cache type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/class-content-analyzer.php
-
-		-
-			message: "#^Unsafe usage of new static\\(\\)\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/class-content-analyzer.php
-
-		-
 			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Frequency_Manager\\:\\:filter_by_frequency\\(\\) has parameter \\$ad_ids with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: includes/Modules/Targeting/class-frequency-manager.php
@@ -2934,36 +2894,6 @@ parameters:
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: includes/Modules/Targeting/class-targeting-engine.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Targeting_Rule_Interface\\:\\:check\\(\\) has parameter \\$conditions with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/interface-targeting-rule.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Targeting_Rule_Interface\\:\\:check\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/interface-targeting-rule.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Targeting_Rule_Interface\\:\\:render_settings\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/interface-targeting-rule.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Targeting_Rule_Interface\\:\\:render_settings\\(\\) has parameter \\$conditions with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/interface-targeting-rule.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Targeting_Rule_Interface\\:\\:sanitize\\(\\) has parameter \\$conditions with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/interface-targeting-rule.php
-
-		-
-			message: "#^Method WBAM\\\\Modules\\\\Targeting\\\\Targeting_Rule_Interface\\:\\:sanitize\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: includes/Modules/Targeting/interface-targeting-rule.php
 
 		-
 			message: "#^Function bbp_is_single_forum not found\\.$#"

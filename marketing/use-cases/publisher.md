@@ -24,7 +24,7 @@ You run a niche blog — recipes, tech reviews, personal finance, fitness — an
 
 The free version is all you need to get started. No credit card, no artificial limits.
 
-**[Download WB Ad Manager Free from WordPress.org](https://wordpress.org/plugins/wb-ads-rotator-with-split-test/)**
+**[Get WB Ad Manager](https://wbcomdesigns.com/downloads/wb-ad-manager-pro/)**
 
 ---
 
