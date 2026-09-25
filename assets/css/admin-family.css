@@ -239,10 +239,8 @@
 .wbam-admin-table thead th {
 	background:     var(--wbam-surface);
 	font-weight:    var(--wbam-weight-semibold);
-	color:          var(--wbam-text-muted);
-	text-transform: uppercase;
-	font-size:      var(--wbam-font-size-xs);
-	letter-spacing: 0.03em;
+	color:          var(--wbam-text);
+	font-size:      var(--wbam-font-size-sm);
 	white-space:    nowrap;
 }
 
@@ -315,10 +313,8 @@
 .wbam-admin-table tfoot th {
 	background:     var(--wbam-surface);
 	font-weight:    var(--wbam-weight-semibold);
-	color:          var(--wbam-text-muted);
-	text-transform: uppercase;
-	font-size:      var(--wbam-font-size-xs);
-	letter-spacing: 0.03em;
+	color:          var(--wbam-text);
+	font-size:      var(--wbam-font-size-sm);
 	white-space:    nowrap;
 	border-top:     1px solid var(--wbam-border-subtle);
 }
