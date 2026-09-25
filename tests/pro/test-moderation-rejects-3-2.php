@@ -402,6 +402,39 @@ class Test_Moderation_Rejects_3_2 extends Pro_Test_Case {
 	}
 
 	/**
+	 * Card 10335670599 item 4: one approval, one email - also when the
+	 * approval comes from the editor's Publish button.
+	 */
+	public function test_editor_publish_sends_one_approval_email(): void {
+		$submission = $this->submit_flat_package_ad( 'Editor publish mail ad' );
+		$subjects   = array();
+		add_filter(
+			'pre_wp_mail',
+			function ( $short, $atts ) use ( &$subjects ) {
+				$subjects[] = $atts['subject'];
+				return true;
+			},
+			10,
+			2
+		);
+
+		wp_update_post(
+			array(
+				'ID'          => (int) $submission->ad_id,
+				'post_status' => 'publish',
+			)
+		);
+
+		$approved = array_filter(
+			$subjects,
+			static function ( $subject ) {
+				return false !== stripos( $subject, 'approved' );
+			}
+		);
+		$this->assertCount( 1, $approved, 'Emails: ' . implode( ' | ', $subjects ) );
+	}
+
+	/**
 	 * Reject 7 (money): if approve() fails when triggered from the editor
 	 * (e.g. the campaign cannot activate), the Publish click must be
 	 * reverted - not leave a live, unpaid, unreviewed ad in front of
