@@ -44,7 +44,7 @@ use WBAM\Core\Singleton;
  * - `wbam_partnership_form_data` - Modify submission data before save
  * - `wbam_partnership_form_success_message` - Modify success message
  * - `wbam_partnership_form_error_messages` - Modify error messages
- * - `wbam_partnership_form_styles` - Modify/disable inline styles
+ * - `wbam_partnership_form_styles` - Modify/disable the form's CSS
  * - `wbam_partnership_form_wrapper_class` - Modify wrapper CSS classes
  * - `wbam_partnership_form_button_class` - Modify submit button CSS classes
  * - `wbam_partnership_form_duplicate_hours` - Change duplicate check timeframe (default: 24)
@@ -87,17 +87,20 @@ class Partnership_Form {
 		// rendered any other way (the Pro dashboard's do_shortcode()) load it
 		// from render_form().
 		if ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'wbam_partnership_inquiry' ) ) {
-			$this->enqueue_form_script();
+			$this->enqueue_form_assets();
 		}
 	}
 
 	/**
-	 * Enqueue and localize the form script once per request.
+	 * Enqueue the form's stylesheet and localized script once per request.
 	 */
-	private function enqueue_form_script() {
+	private function enqueue_form_assets() {
 		if ( wp_script_is( 'wbam-partnership-form', 'enqueued' ) ) {
 			return;
 		}
+
+		wp_enqueue_style( 'wbam-partnership-form', WBAM_URL . 'assets/css/partnership-form.css', array(), WBAM_VERSION );
+		$this->apply_styles_filter();
 
 		wp_enqueue_script(
 			'wbam-partnership-form',
@@ -156,7 +159,7 @@ class Partnership_Form {
 	 * @return string
 	 */
 	public function render_form( $atts ) {
-		$this->enqueue_form_script();
+		$this->enqueue_form_assets();
 
 		$atts = shortcode_atts(
 			array(
@@ -424,9 +427,6 @@ class Partnership_Form {
 		</div>
 
 		<?php
-		// Output styles.
-		$this->render_styles();
-
 		/**
 		 * Fires after the partnership form.
 		 *
@@ -439,222 +439,41 @@ class Partnership_Form {
 	}
 
 	/**
-	 * Render form styles.
+	 * Honour the wbam_partnership_form_styles filter.
+	 *
+	 * Since 2.2.0 the filter received and returned the form's CSS, which was
+	 * printed inline. The CSS now ships as partnership-form.css; a site that
+	 * filters it still gets its result: an empty string drops the stylesheet,
+	 * any other change replaces it with the filtered CSS.
 	 */
-	private function render_styles() {
-		$styles = $this->get_default_styles();
+	private function apply_styles_filter() {
+		if ( ! has_filter( 'wbam_partnership_form_styles' ) ) {
+			return;
+		}
+
+		$default = (string) file_get_contents( WBAM_PATH . 'assets/css/partnership-form.css' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local plugin file, not a remote URL.
 
 		/**
-		 * Filter the inline styles for the form.
+		 * Filter the partnership form CSS.
 		 *
-		 * Return empty string to disable inline styles completely.
+		 * Return an empty string to drop the form's styles completely.
 		 *
 		 * @since 2.2.0
 		 * @param string $styles CSS styles.
 		 */
-		$styles = apply_filters( 'wbam_partnership_form_styles', $styles );
+		$styles = (string) apply_filters( 'wbam_partnership_form_styles', $default );
 
-		if ( ! empty( $styles ) ) {
-			echo '<style>' . $styles . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		if ( $styles === $default ) {
+			return;
 		}
-	}
 
-	/**
-	 * Get default form styles.
-	 *
-	 * @return string
-	 */
-	private function get_default_styles() {
-		return '
-		.wbam-partnership-form-wrap {
-			/* CSS Variables. Each token consumes the plugin semantic
-			   --wbam-* tokens first (defined in frontend.css, always enqueued
-			   on the frontend). Those chain through the host theme
-			   (BuddyX --bx-color-*, then Reign --reign-*) and are flipped to
-			   an explicit dark palette by frontend.css for every dark trigger
-			   incl. html[data-bx-mode="dark"] - so this form adopts dark mode
-			   automatically. Theme-var fallbacks kept for the
-			   disable_frontend_css edge case. */
-			--wbam-form-bg: var(--wbam-card-bg, var(--color-theme-white-box, var(--reign-site-sections-bg-color, #fff)));
-			--wbam-form-text: var(--wbam-text, var(--global-font-color, var(--reign-form-text-color, var(--reign-site-body-text-color, #333))));
-			--wbam-form-text-light: var(--wbam-text-muted, var(--color-meta, var(--reign-form-placeholder-color, var(--reign-site-alternate-text-color, #666))));
-			--wbam-form-border: var(--wbam-border, var(--global-border-color, var(--reign-form-border-color, var(--reign-site-border-color, #ddd))));
-			--wbam-form-input-bg: var(--wbam-surface-alt, var(--global-body-lightcolor, var(--reign-form-background-color, var(--reign-site-secondary-bg-color, #fff))));
-			--wbam-form-input-text: var(--wbam-text, var(--reign-form-text-color, #333));
-			--wbam-form-placeholder: var(--wbam-text-muted, var(--reign-form-placeholder-color, #767676));
-			--wbam-form-focus: var(--wbam-accent, var(--color-theme-primary, var(--reign-form-focus-border-color, var(--reign-accent-color, #0073aa))));
-			--wbam-form-focus-bg: var(--wbam-surface, var(--reign-form-focus-background-color, #fdfdfd));
-			--wbam-form-focus-text: var(--wbam-text, var(--reign-form-focus-text-color, #000));
-			--wbam-form-button-bg: var(--button-background-color, var(--reign-site-button-bg-color, var(--wbam-accent, #0073aa)));
-			--wbam-form-button-bg-hover: var(--button-background-hover-color, var(--reign-site-button-bg-hover-color, var(--wbam-accent-hover, #005a87)));
-			--wbam-form-button-text: var(--button-text-color, var(--reign-site-button-text-color, var(--wbam-accent-fg, #fff)));
-			--wbam-form-button-text-hover: var(--button-text-hover-color, var(--reign-site-button-text-hover-color, var(--wbam-accent-fg, #fff)));
-			--wbam-form-button-border: var(--button-border-color, var(--reign-site-button-bg-color, transparent));
-			--wbam-form-button-border-hover: var(--button-border-hover-color, var(--reign-site-button-bg-hover-color, transparent));
-			--wbam-form-required: var(--color-danger, var(--wbam-danger, #c00));
-			--wbam-form-radius: 4px;
-			--wbam-form-success-bg: var(--color-success-bg, #d4edda);
-			--wbam-form-success-border: var(--color-success-border, #c3e6cb);
-			--wbam-form-success-text: var(--color-success-text, #155724);
-			--wbam-form-error-bg: var(--color-error-bg, #f8d7da);
-			--wbam-form-error-border: var(--color-error-border, #f5c6cb);
-			--wbam-form-error-text: var(--color-error-text, #721c24);
-			
-			max-width: 600px;
-			margin: 0 auto;
-			padding: 20px;
+		wp_dequeue_style( 'wbam-partnership-form' );
+
+		if ( '' !== trim( $styles ) ) {
+			wp_register_style( 'wbam-partnership-form-custom', false, array(), WBAM_VERSION );
+			wp_enqueue_style( 'wbam-partnership-form-custom' );
+			wp_add_inline_style( 'wbam-partnership-form-custom', $styles );
 		}
-		.wbam-partnership-title {
-			margin-bottom: 10px;
-			font-size: 1.5em;
-			color: var(--wbam-form-text);
-		}
-		.wbam-partnership-description {
-			margin-bottom: 20px;
-			color: var(--wbam-form-text-light);
-		}
-		.wbam-form-row {
-			margin-bottom: 20px;
-			display: flex;
-			flex-wrap: wrap;
-			gap: 15px;
-		}
-		.wbam-form-field {
-			flex: 1;
-			min-width: 200px;
-		}
-		.wbam-field-half {
-			flex: 0 0 calc(50% - 8px);
-		}
-		.wbam-form-field label {
-			display: block;
-			margin-bottom: 5px;
-			font-weight: 600;
-			color: var(--wbam-form-text);
-		}
-		.wbam-form-field .required {
-			color: var(--wbam-form-required);
-		}
-		.wbam-form-field input,
-		.wbam-form-field textarea {
-			width: 100%;
-			padding: 10px 12px;
-			border: 1px solid var(--wbam-form-border);
-			border-radius: var(--wbam-form-radius);
-			font-size: 14px;
-			min-height: 44px;
-			background-color: var(--wbam-form-input-bg);
-			color: var(--wbam-form-input-text);
-		}
-		.wbam-form-field input::placeholder,
-		.wbam-form-field textarea::placeholder {
-			color: var(--wbam-form-placeholder);
-		}
-		.wbam-form-field select {
-			width: 100%;
-			padding: 10px 40px 10px 12px;
-			border: 1px solid var(--wbam-form-border);
-			border-radius: var(--wbam-form-radius);
-			font-size: 14px;
-			background-color: var(--wbam-form-input-bg);
-			color: var(--wbam-form-input-text);
-			background-image: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%23666\' d=\'M6 8L1 3h10z\'/%3E%3C/svg%3E");
-			background-repeat: no-repeat;
-			background-position: right 12px center;
-			background-size: 12px;
-			-webkit-appearance: none;
-			-moz-appearance: none;
-			appearance: none;
-			cursor: pointer;
-			line-height: 1.5;
-			min-height: 44px;
-		}
-		.wbam-form-field input:focus,
-		.wbam-form-field select:focus,
-		.wbam-form-field textarea:focus {
-			border-color: var(--wbam-form-focus);
-			background-color: var(--wbam-form-focus-bg);
-			color: var(--wbam-form-focus-text);
-			outline: none;
-			box-shadow: 0 0 0 1px var(--wbam-form-focus);
-		}
-		.wbam-field-help {
-			display: block;
-			margin-top: 5px;
-			font-size: 12px;
-			color: var(--wbam-form-text-light);
-		}
-		.wbam-full-width {
-			width: 100%;
-		}
-		.wbam-form-actions {
-			margin-top: 25px;
-		}
-		.wbam-btn {
-			padding: 12px 24px;
-			border: 2px solid transparent;
-			border-radius: var(--wbam-form-radius);
-			font-size: 16px;
-			cursor: pointer;
-			transition: all 0.2s ease;
-		}
-		.wbam-btn-primary {
-			background-color: var(--wbam-form-button-bg);
-			color: var(--wbam-form-button-text);
-			border-color: var(--wbam-form-button-border);
-		}
-		.wbam-btn-primary:hover {
-			background-color: var(--wbam-form-button-bg-hover);
-			color: var(--wbam-form-button-text-hover);
-			border-color: var(--wbam-form-button-border-hover);
-		}
-		.wbam-btn:disabled {
-			opacity: 0.6;
-			cursor: not-allowed;
-		}
-		.wbam-form-message {
-			margin-top: 20px;
-			padding: 15px;
-			border-radius: var(--wbam-form-radius);
-		}
-		.wbam-form-message.wbam-success {
-			background-color: var(--wbam-form-success-bg);
-			border: 1px solid var(--wbam-form-success-border);
-			color: var(--wbam-form-success-text);
-		}
-		.wbam-form-message.wbam-error {
-			background-color: var(--wbam-form-error-bg);
-			border: 1px solid var(--wbam-form-error-border);
-			color: var(--wbam-form-error-text);
-		}
-		@media (max-width: 600px) {
-			.wbam-field-half {
-				flex: 0 0 100%;
-			}
-		}
-		/* Dark mode: the select arrow SVG is a hardcoded data URI, so swap it
-		   for a light arrow under the same dark triggers frontend.css uses.
-		   Re-declare background-repeat/position/size here too so the override
-		   is self-contained: a host theme that restyles selects with the
-		   `background` shorthand under dark mode resets background-repeat to
-		   `repeat`, which tiled the arrow across the whole field (Basecamp
-		   #10033607741 round 2). Pinning all four longhands keeps a single
-		   arrow regardless of the theme cascade. */
-		html[data-bx-mode="dark"] .wbam-partnership-form-wrap .wbam-form-field select,
-		body.buddyx-dark-theme .wbam-partnership-form-wrap .wbam-form-field select,
-		html.dark-mode .wbam-partnership-form-wrap .wbam-form-field select,
-		body.dark-mode .wbam-partnership-form-wrap .wbam-form-field select,
-		body.dark-scheme .wbam-partnership-form-wrap .wbam-form-field select,
-		html.dark .wbam-partnership-form-wrap .wbam-form-field select,
-		[data-theme="dark"] .wbam-partnership-form-wrap .wbam-form-field select,
-		.buddyx-dark-mode .wbam-partnership-form-wrap .wbam-form-field select,
-		.bb-dark-mode .wbam-partnership-form-wrap .wbam-form-field select {
-			background-image: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%23b4b4b8\' d=\'M6 8L1 3h10z\'/%3E%3C/svg%3E");
-			background-repeat: no-repeat;
-			background-position: right 12px center;
-			background-size: 12px;
-		}
-		';
 	}
 
 	/**

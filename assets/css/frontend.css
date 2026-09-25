@@ -25,7 +25,11 @@
 	--wbam-text-inverse:  #ffffff;
 	--wbam-accent:        var(--bx-color-accent, var(--reign-colors-theme, var(--brand, var(--wp--preset--color--primary, #2271b1))));
 	--wbam-accent-hover:  var(--bx-color-link-hover, var(--reign-site-link-hover-color, var(--brand-hover, #135e96)));
-	--wbam-accent-fg:     #ffffff;
+	/* Text on an accent fill: white on a dark accent, black on a light one.
+	   Themes lighten their brand colour in dark mode (Reign: #97c0ee), where
+	   fixed white text falls to 1.9:1. 0.585 is the OKLCH lightness where the
+	   higher-contrast of the two flips. */
+	--wbam-accent-fg:     oklch(from var(--wbam-accent) clamp(0, (0.585 - l) * 1000, 1) 0 0);
 	--wbam-link:          var(--bx-color-link, var(--reign-site-link-color, var(--brand, #2271b1)));
 	--wbam-success:       #00a32a;
 	--wbam-danger:        #d63638;
@@ -495,6 +499,9 @@ html.dark,
 	--wbam-border-color-dark: #2f3645;
 	--wbam-border-color-darker: #3a4253;
 	--wbam-error-bg:      rgba(214, 54, 56, 0.18);
+	--wbam-danger-bg:     rgba(214, 54, 56, 0.18);
+	/* Re-resolve against this element's accent (dark triggers can sit on body). */
+	--wbam-accent-fg:     oklch(from var(--wbam-accent) clamp(0, (0.585 - l) * 1000, 1) 0 0);
 	--wbam-shadow-color:  rgba(0, 0, 0, 0.4);
 	--wbam-shadow-medium: rgba(0, 0, 0, 0.3);
 	--wbam-shadow-strong: rgba(0, 0, 0, 0.6);
