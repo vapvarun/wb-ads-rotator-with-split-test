@@ -26,6 +26,10 @@ WB Ad Manager fires actions and filters throughout its lifecycle so you can exte
 | Hook | Filters |
 |------|---------|
 | `wbam_ads_for_placement` | The final set of ads chosen for a placement |
+| `wbam_ads_eligible_for_placement` | Ads eligible for a placement before the winner is drawn |
+| `wbam_ad_delivery_tier` | An ad's tier: paid (20) beats house (10) beats sample (0) for a slot |
+| `wbam_rotation_pick` | The winner among same-tier ads (Pro's rotation model hooks here for paid ads) |
+| `wbam_ad_link_rel` | rel on an ad's link: `sponsored noopener` for paid ads, `noopener` for house ads |
 | `wbam_ad_output` | The rendered ad HTML |
 | `wbam_placement_render_mode` | Rotate (pick one) vs stack (render all) for a placement |
 | `wbam_enforce_page_cap` | Whether the once-per-page cap applies to an ad |

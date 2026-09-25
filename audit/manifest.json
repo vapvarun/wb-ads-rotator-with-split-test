@@ -1339,6 +1339,34 @@
       "purpose": "Filter the candidate ad list for a placement"
     },
     {
+      "name": "wbam_ads_eligible_for_placement",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Pre-draw eligibility for a placement; drop ads here so the next eligible ad fills the slot"
+    },
+    {
+      "name": "wbam_ad_delivery_tier",
+      "type": "filter",
+      "args": 3,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "An ad's delivery tier (sample 0, house 10, paid 20); the highest tier with a renderable ad wins the slot"
+    },
+    {
+      "name": "wbam_rotation_pick",
+      "type": "filter",
+      "args": 4,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Choose the winner from a same-tier pool; null keeps the priority-weighted draw"
+    },
+    {
+      "name": "wbam_ad_link_rel",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "rel on an ad's click-through link (sponsored noopener for paid ads, noopener for house ads)"
+    },
+    {
       "name": "wbam_code_ad_content",
       "type": "filter",
       "args": 2,
