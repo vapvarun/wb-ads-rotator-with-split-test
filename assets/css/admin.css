@@ -523,23 +523,9 @@
    Admin Columns
    ========================================================================== */
 
-.wbam-status-badge {
-	display: inline-block;
-	padding: 4px 10px;
-	border-radius: 3px;
-	font-size: var(--wbam-font-size-xs);
-	font-weight: 500;
-}
-
-.wbam-status-badge.wbam-enabled {
-	background: var(--wbam-success-bg);
-	color: var(--wbam-success-text);
-}
-
-.wbam-status-badge.wbam-disabled {
-	background: var(--wbam-danger-bg);
-	color: var(--wbam-danger-text);
-}
+/* The Ads list status column now renders the shared .wbam-status-badge
+   component (UX::status_badge(), admin-family.css) — no per-screen copy
+   needed here any more. */
 
 /* ==========================================================================
    Full Width Fields

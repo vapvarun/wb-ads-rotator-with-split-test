@@ -456,9 +456,8 @@ class Links_List_Table extends \WP_List_Table {
 	 */
 	public function column_status( $item ) {
 		$statuses = Link::get_statuses();
-		$label    = isset( $statuses[ $item->status ] ) ? $statuses[ $item->status ] : $item->status;
-
-		$class = 'wbam-status wbam-status-' . $item->status;
+		$status   = $item->status;
+		$label    = isset( $statuses[ $status ] ) ? $statuses[ $status ] : $status;
 
 		// Check if expired. strtotime() returns false on bad input — only flag
 		// as expired when we successfully parsed a past timestamp, so malformed
@@ -466,12 +465,12 @@ class Links_List_Table extends \WP_List_Table {
 		if ( 'active' === $item->status && $item->expires_at ) {
 			$expires_ts = strtotime( $item->expires_at );
 			if ( false !== $expires_ts && $expires_ts < time() ) {
-				$class = 'wbam-status wbam-status-expired';
-				$label = __( 'Expired', 'wb-ads-rotator-with-split-test' );
+				$status = 'expired';
+				$label  = __( 'Expired', 'wb-ads-rotator-with-split-test' );
 			}
 		}
 
-		return sprintf( '<span class="%s">%s</span>', esc_attr( $class ), esc_html( $label ) );
+		return \WBAM\Admin\UX::status_badge( $status, $label );
 	}
 
 	/**

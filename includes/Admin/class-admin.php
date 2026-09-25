@@ -2474,9 +2474,9 @@ class Admin {
 
 			case 'status':
 				$enabled = get_post_meta( $post_id, '_wbam_enabled', true );
-				$class   = '1' === $enabled ? 'wbam-enabled' : 'wbam-disabled';
+				$status  = '1' === $enabled ? 'enabled' : 'disabled';
 				$text    = '1' === $enabled ? __( 'Enabled', 'wb-ads-rotator-with-split-test' ) : __( 'Disabled', 'wb-ads-rotator-with-split-test' );
-				echo '<span class="wbam-status-badge ' . esc_attr( $class ) . '">' . esc_html( $text ) . '</span>';
+				echo wp_kses_post( \WBAM\Admin\UX::status_badge( $status, $text ) );
 
 				// Creative-health marker: an enabled ad whose creative cannot
 				// render (image deleted from the media library) is skipped by
@@ -2486,7 +2486,13 @@ class Admin {
 					$ad_data      = get_post_meta( $post_id, '_wbam_ad_data', true );
 					$type_handler = Placement_Engine::get_instance()->get_ad_type( isset( $ad_data['type'] ) ? $ad_data['type'] : '' );
 					if ( $type_handler && method_exists( $type_handler, 'has_creative' ) && ! $type_handler->has_creative( $post_id ) ) {
-						echo ' <span class="wbam-status-badge wbam-disabled" title="' . esc_attr__( 'This ad is skipped by delivery until its creative is restored.', 'wb-ads-rotator-with-split-test' ) . '">' . esc_html__( 'Creative missing', 'wb-ads-rotator-with-split-test' ) . '</span>';
+						echo ' ' . wp_kses_post( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- UX::status_badge() output plus a translated title attribute, both escaped inline.
+							sprintf(
+								'<span class="wbam-status-badge wbam-status-badge--danger" title="%s">%s</span>',
+								esc_attr__( 'This ad is skipped by delivery until its creative is restored.', 'wb-ads-rotator-with-split-test' ),
+								esc_html__( 'Creative missing', 'wb-ads-rotator-with-split-test' )
+							)
+						);
 					}
 				}
 				break;

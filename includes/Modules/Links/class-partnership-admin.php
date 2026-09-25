@@ -334,9 +334,7 @@ class Partnership_Admin {
 								</td>
 								<td><?php echo esc_html( $partnership->get_budget_range() ); ?></td>
 								<td>
-									<span class="wbam-status-badge wbam-status-<?php echo esc_attr( $partnership->status ); ?>">
-										<?php echo esc_html( $partnership->get_status_label() ); ?>
-									</span>
+									<?php echo wp_kses_post( \WBAM\Admin\UX::status_badge( $partnership->status, $partnership->get_status_label() ) ); ?>
 								</td>
 								<td>
 									<span title="<?php echo esc_attr( $partnership->created_at ); ?>">
@@ -490,9 +488,7 @@ class Partnership_Admin {
 				<div class="wbam-settings-card">
 					<div class="wbam-settings-card__head">
 						<h2 class="wbam-settings-card__title"><?php esc_html_e( 'Contact Information', 'wb-ads-rotator-with-split-test' ); ?></h2>
-						<span class="wbam-status-badge wbam-status-<?php echo esc_attr( $partnership->status ); ?>">
-							<?php echo esc_html( $partnership->get_status_label() ); ?>
-						</span>
+						<?php echo wp_kses_post( \WBAM\Admin\UX::status_badge( $partnership->status, $partnership->get_status_label() ) ); ?>
 					</div>
 					<div class="wbam-settings-card__body">
 						<table class="wbam-details-table">

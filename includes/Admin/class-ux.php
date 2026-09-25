@@ -154,31 +154,63 @@ class UX {
 	/**
 	 * Map any status slug to a family badge variant.
 	 *
+	 * One state map for every screen in both plugins, so "pending" is amber
+	 * everywhere and "rejected" is red everywhere, instead of nine badge
+	 * families each drawing the same handful of states differently.
 	 * Filterable so a module can add its own statuses without editing this map.
 	 *
 	 * @since 2.9.2
 	 * @param string $status Status slug.
-	 * @return string One of success|danger|warn|info|muted.
+	 * @return string One of success|danger|warning|info|muted.
 	 */
 	public static function status_variant( $status ) {
 		$map = array(
-			'active'    => 'success',
-			'enabled'   => 'success',
-			'completed' => 'success',
-			'paid'      => 'success',
-			'approved'  => 'success',
-			'published' => 'success',
-			'pending'   => 'warn',
-			'paused'    => 'warn',
-			'draft'     => 'muted',
-			'inactive'  => 'muted',
-			'disabled'  => 'muted',
-			'expired'   => 'muted',
-			'cancelled' => 'danger',
-			'canceled'  => 'danger',
-			'rejected'  => 'danger',
-			'failed'    => 'danger',
-			'refunded'  => 'info',
+			// Success — live, approved, paid.
+			'active'            => 'success',
+			'enabled'           => 'success',
+			'approved'          => 'success',
+			'accepted'          => 'success',
+			'paid'              => 'success',
+			'resolved'          => 'success',
+			'running'           => 'success',
+			'replied'           => 'success',
+			'live'              => 'success',
+			'published'         => 'success',
+
+			// Warning — needs attention, in progress.
+			'pending'           => 'warning',
+			'paused'            => 'warning',
+			'changes_requested' => 'warning',
+			'reviewed'          => 'warning',
+			'unread'            => 'warning',
+			'test'              => 'warning',
+
+			// Danger — stopped, refused, unsafe.
+			'rejected'          => 'danger',
+			'suspended'         => 'danger',
+			'expired'           => 'danger',
+			'cancelled'         => 'danger',
+			'canceled'          => 'danger',
+			'spam'              => 'danger',
+			'banned'            => 'danger',
+			'failed'            => 'danger',
+			'incomplete'        => 'danger',
+
+			// Info — neutral, final, awaiting nothing.
+			'completed'         => 'info',
+			'sold'              => 'info',
+			'draft'             => 'info',
+			'refunded'          => 'info',
+
+			// Muted — off, ordinary, no ad spend.
+			'inactive'          => 'muted',
+			'dismissed'         => 'muted',
+			'member'            => 'muted',
+			'archived'          => 'muted',
+			'read'              => 'muted',
+			'off'               => 'muted',
+			'standard'          => 'muted',
+			'disabled'          => 'muted',
 		);
 
 		$variant = isset( $map[ $status ] ) ? $map[ $status ] : 'muted';

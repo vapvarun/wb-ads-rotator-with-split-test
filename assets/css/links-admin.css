@@ -5,30 +5,8 @@
  * @since   2.1.0
  */
 
-/* Status badges */
-.wbam-status {
-	display: inline-block;
-	padding: 2px 8px;
-	border-radius: 3px;
-	font-size: 11px;
-	font-weight: 600;
-	text-transform: uppercase;
-}
-
-.wbam-status-active {
-	background: var(--wbam-success-bg);
-	color: var(--wbam-success-text);
-}
-
-.wbam-status-inactive {
-	background: var(--wbam-surface-sunken);
-	color: var(--wbam-text);
-}
-
-.wbam-status-expired {
-	background: var(--wbam-danger-bg);
-	color: var(--wbam-danger-text);
-}
+/* Status renders the shared .wbam-status-badge component (UX::status_badge()) —
+   no per-screen colour rules needed here any more. */
 
 /* Link type badges */
 .wbam-link-type {

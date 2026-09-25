@@ -82,35 +82,8 @@
 	height: 18px;
 }
 
-/* Status badges: soft tint pill, text at AA (white on amber was ~2:1). */
-.wbam-partnerships-wrap .wbam-status-badge {
-	display: inline-block;
-	padding: 3px 10px;
-	border-radius: 999px;
-	font-size: 11px;
-	font-weight: 600;
-	text-transform: uppercase;
-}
-
-.wbam-partnerships-wrap .wbam-status-pending {
-	background: #fff8e5;
-	color: #7a5a00;
-}
-
-.wbam-partnerships-wrap .wbam-status-accepted {
-	background: #e6f4ea;
-	color: #1e6b34;
-}
-
-.wbam-partnerships-wrap .wbam-status-rejected {
-	background: #fcebec;
-	color: #a32629;
-}
-
-.wbam-partnerships-wrap .wbam-status-spam {
-	background: #f1ecf8;
-	color: #5b3f8c;
-}
+/* Status renders the shared .wbam-status-badge component (UX::status_badge()) —
+   no per-screen colour rules needed here any more. */
 
 /* Type Badges */
 .wbam-type-badge {
