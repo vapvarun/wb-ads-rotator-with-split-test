@@ -108,7 +108,7 @@ class Image_Ad implements Ad_Type_Interface {
 		$html = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-ad-id="' . esc_attr( $ad_id ) . '" data-placement="' . esc_attr( $placement ) . '">';
 
 		if ( ! empty( $link_url ) ) {
-			$html .= '<a href="' . esc_url( $link_url ) . '" target="' . esc_attr( $target ) . '" rel="noopener noreferrer">';
+			$html .= '<a href="' . esc_url( $link_url ) . '" target="' . esc_attr( $target ) . '" rel="' . esc_attr( \WBAM\Modules\Placements\Placement_Engine::get_instance()->get_ad_link_rel( $ad_id ) ) . '">';
 		}
 
 		$html .= '<img src="' . esc_url( $image_url ) . '" alt="' . esc_attr( $alt_text ) . '" />';

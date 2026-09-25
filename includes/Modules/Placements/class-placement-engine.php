@@ -466,6 +466,30 @@ class Placement_Engine {
 	}
 
 	/**
+	 * The rel attribute for an ad's click-through link.
+	 *
+	 * Paid ads carry rel="sponsored" (Google requires paid links to be
+	 * qualified); the owner's house and sample ads do not.
+	 *
+	 * @since 3.2.0
+	 * @param int $ad_id Ad ID.
+	 * @return string
+	 */
+	public function get_ad_link_rel( $ad_id ) {
+		$rel = $this->get_delivery_tier( $ad_id, '' ) >= self::TIER_PAID ? 'sponsored noopener' : 'noopener';
+
+		/**
+		 * Filter the rel attribute of an ad's click-through link. Return
+		 * 'sponsored noopener' to mark a house ad as paid.
+		 *
+		 * @since 3.2.0
+		 * @param string $rel   Space-separated rel tokens.
+		 * @param int    $ad_id Ad ID.
+		 */
+		return (string) apply_filters( 'wbam_ad_link_rel', $rel, $ad_id );
+	}
+
+	/**
 	 * Pick one renderable ad from a pool of same-tier ads.
 	 *
 	 * Fill-fallback: when the pick cannot render right now (already shown

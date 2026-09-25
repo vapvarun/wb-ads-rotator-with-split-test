@@ -279,6 +279,18 @@ class Link {
 	}
 
 	/**
+	 * Whether a link is paid and must carry rel="sponsored" (Google's rule
+	 * for affiliate and sponsored links), whatever its sponsored flag says.
+	 *
+	 * @param bool   $sponsored Owner's sponsored flag.
+	 * @param string $link_type Link type.
+	 * @return bool
+	 */
+	public static function is_paid( $sponsored, $link_type ) {
+		return (bool) $sponsored || in_array( (string) $link_type, array( 'affiliate', 'sponsored' ), true );
+	}
+
+	/**
 	 * Get HTML link attributes.
 	 *
 	 * @return array
@@ -289,8 +301,11 @@ class Link {
 		if ( $this->nofollow ) {
 			$rel[] = 'nofollow';
 		}
-		if ( $this->sponsored ) {
+		if ( self::is_paid( $this->sponsored, $this->link_type ) ) {
 			$rel[] = 'sponsored';
+		}
+		if ( $this->new_tab ) {
+			$rel[] = 'noopener';
 		}
 
 		$attrs = array(

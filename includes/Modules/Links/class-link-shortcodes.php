@@ -131,13 +131,16 @@ class Link_Shortcodes {
 			$rel = array();
 
 			$nofollow  = '' !== $atts['nofollow'] ? filter_var( $atts['nofollow'], FILTER_VALIDATE_BOOLEAN ) : $link->nofollow;
-			$sponsored = '' !== $atts['sponsored'] ? filter_var( $atts['sponsored'], FILTER_VALIDATE_BOOLEAN ) : $link->sponsored;
+			$sponsored = '' !== $atts['sponsored'] ? filter_var( $atts['sponsored'], FILTER_VALIDATE_BOOLEAN ) : Link::is_paid( $link->sponsored, $link->link_type );
 
 			if ( $nofollow ) {
 				$rel[] = 'nofollow';
 			}
 			if ( $sponsored ) {
 				$rel[] = 'sponsored';
+			}
+			if ( $link->new_tab ) {
+				$rel[] = 'noopener';
 			}
 
 			$link_attrs['rel'] = implode( ' ', $rel );

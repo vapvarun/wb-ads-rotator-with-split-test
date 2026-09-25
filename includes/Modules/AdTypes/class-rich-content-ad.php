@@ -89,7 +89,7 @@ class Rich_Content_Ad implements Ad_Type_Interface {
 			$host   = wp_parse_url( $link_url, PHP_URL_HOST );
 			/* translators: %s: advertiser's website host name. */
 			$label   = sprintf( __( 'Visit %s', 'wb-ads-rotator-with-split-test' ), $host ? $host : $link_url );
-			$overlay = '<a class="wbam-ad-rich-content__link" href="' . esc_url( $link_url ) . '" target="' . esc_attr( $target ) . '" rel="noopener noreferrer" aria-label="' . esc_attr( $label ) . '"></a>';
+			$overlay = '<a class="wbam-ad-rich-content__link" href="' . esc_url( $link_url ) . '" target="' . esc_attr( $target ) . '" rel="' . esc_attr( \WBAM\Modules\Placements\Placement_Engine::get_instance()->get_ad_link_rel( $ad_id ) ) . '" aria-label="' . esc_attr( $label ) . '"></a>';
 
 			$classes[] = 'wbam-ad-rich-content--linked';
 		}
