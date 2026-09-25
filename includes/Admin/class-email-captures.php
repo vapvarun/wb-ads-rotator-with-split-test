@@ -36,6 +36,7 @@ class Email_Captures {
 	public function init() {
 		add_action( 'admin_post_wbam_export_email_captures', array( $this, 'handle_export' ) );
 		add_action( 'admin_post_wbam_delete_email_capture', array( $this, 'handle_delete' ) );
+		add_action( 'admin_init', array( $this, 'handle_bulk_delete' ) );
 	}
 
 	/**
@@ -49,50 +50,125 @@ class Email_Captures {
 	}
 
 	/**
-	 * Total number of captures.
+	 * WHERE clause and values for the list, its total and the export.
 	 *
-	 * @return int
+	 * @param array $args search (email or name), ad_id.
+	 * @return array{0: string, 1: array}
 	 */
-	public function count() {
+	private function where( array $args ) {
 		global $wpdb;
-		$table = $this->table();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table name from $wpdb->prefix.
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
+
+		$where  = array( '1=1' );
+		$values = array();
+
+		if ( ! empty( $args['search'] ) ) {
+			$like     = '%' . $wpdb->esc_like( (string) $args['search'] ) . '%';
+			$where[]  = '( email LIKE %s OR name LIKE %s )';
+			$values[] = $like;
+			$values[] = $like;
+		}
+		if ( ! empty( $args['ad_id'] ) ) {
+			$where[]  = 'ad_id = %d';
+			$values[] = absint( $args['ad_id'] );
+		}
+
+		return array( implode( ' AND ', $where ), $values );
 	}
 
 	/**
-	 * A page of captures, newest first.
+	 * Number of captures matching the filters.
 	 *
-	 * @param int $page     1-based page number.
-	 * @param int $per_page Rows per page.
+	 * @param array $args See where().
+	 * @return int
+	 */
+	public function count( array $args = array() ) {
+		global $wpdb;
+		$table = $this->table();
+
+		list( $where, $values ) = $this->where( $args );
+		$sql                    = "SELECT COUNT(*) FROM {$table} WHERE {$where}";
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table name from $wpdb->prefix; values bound via prepare().
+		return (int) $wpdb->get_var( $values ? $wpdb->prepare( $sql, $values ) : $sql );
+	}
+
+	/**
+	 * A page of captures, newest first unless sorted.
+	 *
+	 * @param int   $page     1-based page number.
+	 * @param int   $per_page Rows per page.
+	 * @param array $args     See where(), plus orderby (email|created_at) and order.
 	 * @return array<int, object>
 	 */
-	public function get_page( $page = 1, $per_page = self::PER_PAGE ) {
+	public function get_page( $page = 1, $per_page = self::PER_PAGE, array $args = array() ) {
 		global $wpdb;
 		$table    = $this->table();
 		$page     = max( 1, (int) $page );
-		$per_page = max( 1, min( 200, (int) $per_page ) );
+		$per_page = max( 1, min( 500, (int) $per_page ) );
 		$offset   = ( $page - 1 ) * $per_page;
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table name from $wpdb->prefix (identifier, not a value; no user input reaches it); LIMIT/OFFSET are prepared below.
+		list( $where, $values ) = $this->where( $args );
+
+		$orderby = isset( $args['orderby'] ) && 'email' === $args['orderby'] ? 'email' : 'id';
+		$order   = isset( $args['order'] ) && 'asc' === strtolower( (string) $args['order'] ) ? 'ASC' : 'DESC';
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table name from $wpdb->prefix; allow-listed order; values bound via prepare().
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT id, ad_id, email, name, ip_address, created_at
 				 FROM {$table}
-				 ORDER BY created_at DESC, id DESC
+				 WHERE {$where}
+				 ORDER BY {$orderby} {$order}
 				 LIMIT %d OFFSET %d",
-				$per_page,
-				$offset
+				array_merge( $values, array( $per_page, $offset ) )
 			)
 		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable
 
 		return is_array( $rows ) ? $rows : array();
 	}
 
 	/**
+	 * Ads that have captures, for the list's ad filter.
+	 *
+	 * @return array<int, string> Ad ID => title.
+	 */
+	public function captured_ads() {
+		global $wpdb;
+		$table = $this->table();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table name from $wpdb->prefix; one row per ad.
+		$ids = array_map( 'intval', (array) $wpdb->get_col( "SELECT DISTINCT ad_id FROM {$table} WHERE ad_id > 0 LIMIT 200" ) );
+		_prime_post_caches( $ids, false, false );
+
+		$ads = array();
+		foreach ( $ids as $id ) {
+			$ads[ $id ] = get_the_title( $id );
+		}
+		asort( $ads );
+
+		return $ads;
+	}
+
+	/**
+	 * The list and export filters from the request.
+	 *
+	 * @return array
+	 */
+	public static function request_args() {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only list filters; export and delete verify their own nonces.
+		return array(
+			'search'  => isset( $_GET['s'] ) ? trim( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ) : '',
+			'ad_id'   => isset( $_GET['capture_ad'] ) ? absint( $_GET['capture_ad'] ) : 0,
+			'orderby' => isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : '',
+			'order'   => isset( $_GET['order'] ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : '',
+		);
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+	}
+
+	/**
 	 * Render the Email Captures list, embedded inline on the Settings screen's
-	 * Tools section — no `.wrap`/page_header of its own, since the Settings
+	 * Tools section - no `.wrap`/page_header of its own, since the Settings
 	 * screen already provides those.
 	 *
 	 * @since 3.2.0 Replaces the standalone `wbam-email-captures` admin page.
@@ -102,16 +178,9 @@ class Email_Captures {
 			return;
 		}
 
-		$total       = $this->count();
-		$per_page    = self::PER_PAGE;
-		$total_pages = max( 1, (int) ceil( $total / $per_page ) );
-		$page        = isset( $_GET['paged'] ) ? max( 1, min( $total_pages, absint( $_GET['paged'] ) ) ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only pagination.
-		$rows        = $this->get_page( $page, $per_page );
-
-		$export_url = wp_nonce_url(
-			admin_url( 'admin-post.php?action=wbam_export_email_captures' ),
-			'wbam_export_email_captures'
-		);
+		$table = new Email_Captures_List_Table( $this );
+		$table->prepare_items();
+		$total = $this->count();
 		?>
 		<div class="wbam-email-captures">
 			<div class="wbam-settings-card__head">
@@ -127,87 +196,33 @@ class Email_Captures {
 					);
 					?>
 				</p>
-				<?php if ( $total > 0 ) : ?>
-					<p><a href="<?php echo esc_url( $export_url ); ?>" class="wbam-admin-btn wbam-admin-btn--primary"><?php esc_html_e( 'Export CSV', 'wb-ads-rotator-with-split-test' ); ?></a></p>
-				<?php endif; ?>
 			</div>
-
-			<?php if ( empty( $rows ) ) : ?>
+			<?php
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only notice after the delete redirect.
+			$deleted = isset( $_GET['deleted'] ) ? absint( $_GET['deleted'] ) : 0;
+			if ( $deleted ) {
+				/* translators: %s: number of deleted captures */
+				echo '<div class="notice notice-success inline"><p>' . esc_html( sprintf( _n( '%s capture deleted.', '%s captures deleted.', $deleted, 'wb-ads-rotator-with-split-test' ), number_format_i18n( $deleted ) ) ) . '</p></div>';
+			}
+			?>
+			<form method="get">
+				<input type="hidden" name="post_type" value="wbam-ad">
+				<input type="hidden" name="page" value="wbam-settings">
+				<input type="hidden" name="section" value="tools">
 				<?php
-				echo wp_kses_post(
-					\WBAM\Admin\UX::empty_state(
-						array(
-							'icon'    => 'mail',
-							'title'   => __( 'No email captures yet', 'wb-ads-rotator-with-split-test' ),
-							'message' => __( 'Submissions from the Email Capture ad type appear here.', 'wb-ads-rotator-with-split-test' ),
-						)
-					)
-				);
+				if ( $total > 0 ) {
+					$table->search_box( __( 'Search captures', 'wb-ads-rotator-with-split-test' ), 'wbam-captures' );
+				}
+				$table->display();
 				?>
-			<?php else : ?>
-				<table class="wp-list-table widefat fixed striped">
-					<thead>
-						<tr>
-							<th scope="col"><?php esc_html_e( 'Email', 'wb-ads-rotator-with-split-test' ); ?></th>
-							<th scope="col"><?php esc_html_e( 'Name', 'wb-ads-rotator-with-split-test' ); ?></th>
-							<th scope="col"><?php esc_html_e( 'Ad', 'wb-ads-rotator-with-split-test' ); ?></th>
-							<th scope="col"><?php esc_html_e( 'IP', 'wb-ads-rotator-with-split-test' ); ?></th>
-							<th scope="col"><?php esc_html_e( 'Date', 'wb-ads-rotator-with-split-test' ); ?></th>
-							<th scope="col"><?php esc_html_e( 'Action', 'wb-ads-rotator-with-split-test' ); ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php foreach ( $rows as $row ) : ?>
-							<?php
-							$ad_title   = $row->ad_id ? get_the_title( (int) $row->ad_id ) : '';
-							$delete_url = wp_nonce_url(
-								admin_url( 'admin-post.php?action=wbam_delete_email_capture&id=' . (int) $row->id . '&paged=' . $page ),
-								'wbam_delete_email_capture_' . (int) $row->id
-							);
-							?>
-							<tr>
-								<td><?php echo esc_html( $row->email ); ?></td>
-								<td><?php echo esc_html( $row->name ); ?></td>
-								<td><?php echo $ad_title ? esc_html( $ad_title ) : esc_html( '#' . (int) $row->ad_id ); ?></td>
-								<td><?php echo esc_html( $row->ip_address ); ?></td>
-								<td><?php echo esc_html( $row->created_at ); ?></td>
-								<td>
-									<a href="<?php echo esc_url( $delete_url ); ?>" class="submitdelete" data-wbam-confirm="<?php echo esc_attr__( 'Delete this capture? This cannot be undone.', 'wb-ads-rotator-with-split-test' ); ?>" data-wbam-confirm-tone="danger">
-										<?php esc_html_e( 'Delete', 'wb-ads-rotator-with-split-test' ); ?>
-									</a>
-								</td>
-							</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
-
-				<?php if ( $total_pages > 1 ) : ?>
-					<div class="tablenav bottom">
-						<div class="tablenav-pages">
-							<?php
-							echo wp_kses_post(
-								paginate_links(
-									array(
-										'base'      => add_query_arg( 'paged', '%#%' ),
-										'format'    => '',
-										'current'   => $page,
-										'total'     => $total_pages,
-										'prev_text' => __( '&laquo; Previous', 'wb-ads-rotator-with-split-test' ),
-										'next_text' => __( 'Next &raquo;', 'wb-ads-rotator-with-split-test' ),
-									)
-								)
-							);
-							?>
-						</div>
-					</div>
-				<?php endif; ?>
-			<?php endif; ?>
+			</form>
 		</div>
 		<?php
 	}
 
 	/**
-	 * admin-post: stream all captures as a CSV download.
+	 * admin-post: stream the filtered captures as a CSV download, 500 rows
+	 * at a time.
 	 */
 	public function handle_export() {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -215,37 +230,82 @@ class Email_Captures {
 		}
 		check_admin_referer( 'wbam_export_email_captures' );
 
-		global $wpdb;
-		$table = $this->table();
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table; full export for the site owner.
-		$rows = $wpdb->get_results( "SELECT ad_id, email, name, ip_address, created_at FROM {$table} ORDER BY created_at DESC, id DESC" );
-
 		nocache_headers();
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename="wbam-email-captures-' . gmdate( 'Y-m-d' ) . '.csv"' );
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.PHP.NoSilencedErrors.Discouraged
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$out = fopen( 'php://output', 'w' );
-		fputcsv( $out, array( 'Email', 'Name', 'Ad', 'Ad ID', 'IP', 'Date' ) );
+		$this->stream_csv( $out, self::request_args() );
+		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Closing php://output.
+		exit;
+	}
 
-		if ( is_array( $rows ) ) {
+	/**
+	 * Write the filtered captures to a CSV handle, 500 rows at a time.
+	 *
+	 * @param resource $handle Writable handle.
+	 * @param array    $args   See get_page().
+	 * @return void
+	 */
+	public function stream_csv( $handle, array $args ) {
+		$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+		fputcsv( $handle, array( 'Email', 'Name', 'Ad', 'Ad ID', 'IP', 'Date' ) );
+
+		$page = 1;
+		do {
+			$rows = $this->get_page( $page, 500, $args );
+			_prime_post_caches( array_filter( array_map( 'intval', wp_list_pluck( $rows, 'ad_id' ) ) ), false, false );
 			foreach ( $rows as $row ) {
 				fputcsv(
-					$out,
+					$handle,
 					array(
 						$row->email,
 						$row->name,
 						$row->ad_id ? get_the_title( (int) $row->ad_id ) : '',
 						(int) $row->ad_id,
 						$row->ip_address,
-						$row->created_at,
+						mysql2date( $date_format, $row->created_at ),
 					)
 				);
 			}
+			++$page;
+			$fetched = count( $rows );
+		} while ( 500 === $fetched );
+	}
+
+	/**
+	 * Delete bulk-selected captures from the list (GDPR erasure), then
+	 * return to it. Hooked on admin_init: the list form is a GET form, as on
+	 * every WordPress list.
+	 *
+	 * @return void
+	 */
+	public function handle_bulk_delete() {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- gatekeeper; the nonce is checked below.
+		if ( ! isset( $_GET['page'], $_GET['capture_ids'] ) || 'wbam-settings' !== $_GET['page'] ) {
+			return;
+		}
+		$action = isset( $_GET['action'] ) && '-1' !== $_GET['action'] ? sanitize_key( wp_unslash( $_GET['action'] ) ) : ( isset( $_GET['action2'] ) ? sanitize_key( wp_unslash( $_GET['action2'] ) ) : '' );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		if ( 'delete_captures' !== $action ) {
+			return;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to delete captures.', 'wb-ads-rotator-with-split-test' ) );
+		}
+		check_admin_referer( 'bulk-captures' );
+
+		$ids     = array_filter( array_map( 'absint', (array) wp_unslash( $_GET['capture_ids'] ) ) );
+		$deleted = 0;
+		if ( $ids ) {
+			global $wpdb;
+			$table = $this->table();
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; IDs bound via prepare().
+			$deleted = (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE id IN (" . implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')', $ids ) );
 		}
 
-		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Closing php://output.
+		wp_safe_redirect( add_query_arg( 'deleted', $deleted, \WBAM\Core\Admin_Links::settings( 'email-captures' ) ) );
 		exit;
 	}
 
