@@ -37,13 +37,12 @@ class Test_Transactions_List_Kinds extends Pro_Test_Case {
 	}
 
 	public function tear_down(): void {
-		unset( $_GET['entry_type'], $_GET['advertiser_id'] );
+		unset( $_GET['entry_type'] );
 		parent::tear_down();
 	}
 
 	private function list_for( string $kind ): Transactions_List_Table {
-		$_GET['entry_type']    = $kind;
-		$_GET['advertiser_id'] = (string) $this->advertiser->id;
+		$_GET['entry_type'] = $kind;
 
 		$table = new Transactions_List_Table();
 		$table->prepare_items();
