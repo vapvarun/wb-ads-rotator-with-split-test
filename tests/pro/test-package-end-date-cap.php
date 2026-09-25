@@ -79,4 +79,90 @@ class Test_Package_End_Date_Cap extends Pro_Test_Case {
 
 		$this->assertSame( $requested, substr( (string) $campaign->end_date, 0, 10 ) );
 	}
+
+	/**
+	 * Create an active 30-day package campaign starting at a fixed time.
+	 */
+	private function active_campaign(): int {
+		$ad_id    = self::factory()->post->create( array( 'post_type' => 'wbam-ad' ) );
+		$campaign = Campaign_Manager::get_instance()->create_from_package( $this->advertiser_id, $ad_id, $this->package );
+		$this->assertNotWPError( $campaign );
+
+		global $wpdb;
+		$wpdb->update(
+			$wpdb->prefix . 'wbam_campaigns',
+			array(
+				'status'     => 'active',
+				'start_date' => '2026-09-25 17:21:00',
+				'end_date'   => '2026-10-25 17:21:00',
+			),
+			array( 'id' => $campaign->id )
+		);
+		return (int) $campaign->id;
+	}
+
+	public function test_advertiser_edit_cannot_extend_an_active_campaign_past_its_term(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
+		$id = $this->active_campaign();
+
+		// The portal edit form re-posts the unchanged start and a year-out end.
+		$updated = Campaign_Manager::get_instance()->update(
+			$id,
+			array(
+				'start_date' => '2026-09-25',
+				'end_date'   => '2027-06-30',
+			)
+		);
+		$this->assertNotWPError( $updated );
+
+		$this->assertSame( '2026-09-25 17:21:00', $updated->start_date, 'An unchanged start date must keep its time.' );
+		$this->assertSame( '2026-10-25 17:21:00', $updated->end_date, 'End date must stay capped at start + package duration.' );
+	}
+
+	public function test_moving_the_start_later_on_a_running_campaign_buys_no_extra_days(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
+		$id = $this->active_campaign();
+
+		$updated = Campaign_Manager::get_instance()->update(
+			$id,
+			array(
+				'start_date' => '2026-12-01',
+				'end_date'   => '2026-12-31',
+			)
+		);
+
+		$this->assertLessThanOrEqual( strtotime( '2026-10-25 17:21:00' ), strtotime( $updated->end_date ) );
+	}
+
+	public function test_admin_extends_only_with_the_explicit_flag(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$id      = $this->active_campaign();
+		$manager = Campaign_Manager::get_instance();
+
+		$capped = $manager->update( $id, array( 'end_date' => '2027-06-30' ) );
+		$this->assertSame( '2026-10-25 17:21:00', $capped->end_date, 'Without the flag an admin edit is capped too.' );
+
+		$extended = $manager->update(
+			$id,
+			array(
+				'end_date'             => '2027-06-30',
+				'allow_term_extension' => true,
+			)
+		);
+		$this->assertSame( '2027-06-30 23:59:59', $extended->end_date );
+	}
+
+	public function test_advertiser_cannot_pass_the_admin_flag(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
+		$id = $this->active_campaign();
+
+		$updated = Campaign_Manager::get_instance()->update(
+			$id,
+			array(
+				'end_date'             => '2027-06-30',
+				'allow_term_extension' => true,
+			)
+		);
+		$this->assertSame( '2026-10-25 17:21:00', $updated->end_date );
+	}
 }

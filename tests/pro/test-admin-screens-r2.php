@@ -280,4 +280,34 @@ class Test_Admin_Screens_R2 extends Pro_Test_Case {
 		);
 		$this->assertStringContainsString( 'rate is zero', $result );
 	}
+
+	/** Re-saving the admin form with the dates unchanged keeps the stored times; a new campaign gets full days. */
+	public function test_admin_resave_keeps_start_and_end_times(): void {
+		$campaign = Campaign_Manager::get_instance()->create(
+			array(
+				'advertiser_id' => $this->advertiser->id,
+				'name'          => 'Timed campaign',
+				'start_date'    => '2026-09-25 17:21:00',
+				'end_date'      => '2026-10-25 17:21:00',
+			)
+		);
+		$fields   = array(
+			'name'           => 'Timed campaign',
+			'pricing_model'  => 'flat',
+			'price_per_unit' => '0',
+			'start_date'     => '2026-09-25',
+			'end_date'       => '2026-10-25',
+		);
+
+		$this->assertSame( 'saved', $this->post_campaign_form( array( 'campaign_id' => (string) $campaign->id ) + $fields ) );
+		$reloaded = Campaign_Manager::get_instance()->get( $campaign->id );
+		$this->assertSame( '2026-09-25 17:21:00', $reloaded->start_date );
+		$this->assertSame( '2026-10-25 17:21:00', $reloaded->end_date );
+
+		$this->assertSame( 'saved', $this->post_campaign_form( array( 'name' => 'New timed campaign' ) + $fields ) );
+		global $wpdb;
+		$row = $wpdb->get_row( "SELECT start_date, end_date FROM {$wpdb->prefix}wbam_campaigns WHERE name = 'New timed campaign'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test read.
+		$this->assertSame( '2026-09-25 00:00:00', $row->start_date );
+		$this->assertSame( '2026-10-25 23:59:59', $row->end_date );
+	}
 }
