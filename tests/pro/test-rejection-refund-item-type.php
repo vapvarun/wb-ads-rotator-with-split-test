@@ -21,6 +21,11 @@ use WBAM_Pro\Modules\Classifieds\Classified_Manager;
 class Test_Rejection_Refund_Item_Type extends Pro_Test_Case {
 
 	public function test_rejecting_a_listing_leaves_a_same_id_campaign_charge_alone(): void {
+		// Rows left by earlier runs survive the rollback (lazy DDL commits the
+		// test transaction) and collide on the UNIQUE post_id of a reused post ID.
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}wbam_classifieds" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- test isolation.
+
 		$enabled                = Settings_Helper::get( 'enabled_modules', array() );
 		$enabled['classifieds'] = true;
 		Settings_Helper::update( 'enabled_modules', $enabled );

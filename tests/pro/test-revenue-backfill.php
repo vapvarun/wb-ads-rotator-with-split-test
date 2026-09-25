@@ -115,6 +115,36 @@ class Test_Revenue_Backfill extends Pro_Test_Case {
 		$this->assertSame( 'classified', $row->item_type );
 	}
 
+	/**
+	 * A listing charge that bought a Featured upgrade, and the full refund of
+	 * a rejected featured listing, are listing revenue at the listing's price.
+	 * Matching "featured" anywhere in the note booked both as Featured.
+	 */
+	public function test_backfill_books_whole_listing_charges_as_listing_not_featured(): void {
+		global $wpdb;
+
+		$wpdb->insert(
+			$wpdb->prefix . 'wbam_classifieds',
+			array(
+				'post_id'       => self::factory()->post->create(),
+				'advertiser_id' => $this->advertiser->id,
+				'listing_type'  => 'featured',
+				'status'        => 'active',
+			)
+		);
+		$classified_id = (int) $wpdb->insert_id;
+
+		$charge  = $this->write_legacy_ledger_row( 'deduction', -3000, $classified_id, 'Classified listing: Premium package ($25.00) + upgrades: featured ($5.00)' );
+		$refund  = $this->write_legacy_ledger_row( 'topup', 3000, $classified_id, 'Refund for rejected featured classified #' . $classified_id );
+		$feature = $this->write_legacy_ledger_row( 'deduction', -1000, $classified_id, 'Featured listing fee for "Legacy listing"' );
+
+		$this->run_backfill();
+
+		$this->assertSame( Revenue_Ledger::SOURCE_CLASSIFIED_LISTING, $this->revenue_row_for_ledger( $charge )->source );
+		$this->assertSame( Revenue_Ledger::SOURCE_CLASSIFIED_LISTING, $this->revenue_row_for_ledger( $refund )->source );
+		$this->assertSame( Revenue_Ledger::SOURCE_CLASSIFIED_FEATURED, $this->revenue_row_for_ledger( $feature )->source );
+	}
+
 	public function test_backfill_unrecognized_note_lands_unclassified_with_item_type_set(): void {
 		global $wpdb;
 
