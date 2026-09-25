@@ -14,6 +14,7 @@ use WBAM_Pro\Core\Settings_Helper;
 use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
 use WBAM_Pro\Modules\AdSubmissions\Ad_Submission_Manager;
 use WBAM_Pro\Modules\Campaigns\Campaign_Manager;
+use WBAM_Pro\Modules\Classifieds\Classified_Manager;
 
 class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 
@@ -411,5 +412,269 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 		$source = (string) file_get_contents( WBAM_PRO_PATH . 'includes/Core/class-pro-admin.php' );
 		$this->assertStringContainsString( "'decline_form' === \$action", $source );
 		$this->assertStringContainsString( "\$redirect_args['message'] = 'advertiser_approved';", $source );
+	}
+
+	// ---------------------------------------------------------------------
+	// Classifieds.
+	// ---------------------------------------------------------------------
+
+	private function set_require_approval( bool $on ): void {
+		$settings                     = get_option( 'wbam_pro_classifieds_settings', array() );
+		$settings['require_approval'] = $on;
+		update_option( 'wbam_pro_classifieds_settings', $settings );
+	}
+
+	private function listing( string $title, bool $approve = true ): object {
+		$this->set_require_approval( true );
+		$term       = wp_insert_term( 'Edges ' . wp_generate_password( 6, false ), Classified_Manager::TAXONOMY_CATEGORY );
+		$classified = Classified_Manager::get_instance()->submit(
+			$this->advertiser,
+			array(
+				'title'      => $title,
+				'categories' => array( (int) $term['term_id'] ),
+			)
+		);
+		$this->assertNotWPError( $classified );
+		if ( $approve ) {
+			$this->assertTrue( Classified_Manager::get_instance()->approve( (int) $classified->id ) );
+		}
+		return Classified_Manager::get_instance()->get( (int) $classified->id );
+	}
+
+	private function mail_subjects(): \ArrayObject {
+		$subjects = new \ArrayObject();
+		add_filter(
+			'pre_wp_mail',
+			function ( $short, $atts ) use ( $subjects ) {
+				$subjects[] = $atts['subject'];
+				return true;
+			},
+			10,
+			2
+		);
+		return $subjects;
+	}
+
+	/**
+	 * Steps "An active classified has no single Reject row action; bulk
+	 * Reject on it reports 0 Classifieds rejected" and "meta-box status
+	 * change active->rejected or rejected->active sends no email".
+	 */
+	public function test_a_live_listing_can_be_rejected_and_reinstated_with_notices(): void {
+		$manager    = Classified_Manager::get_instance();
+		$classified = $this->listing( 'Takedown listing' );
+		$this->assertSame( 'active', $classified->status );
+
+		$rejected = 0;
+		$approved = 0;
+		add_action(
+			'wbam_classified_rejected',
+			function () use ( &$rejected ) {
+				++$rejected;
+			}
+		);
+		add_action(
+			'wbam_classified_approved',
+			function () use ( &$approved ) {
+				++$approved;
+			}
+		);
+
+		$this->assertTrue( $manager->moderate( (int) $classified->id, 'rejected', 'Counterfeit item' ) );
+		$this->assertSame( 'rejected', $manager->get( (int) $classified->id )->status );
+		$this->assertSame( 'draft', get_post_status( (int) $classified->post_id ), 'A rejected live listing must leave the site.' );
+		$this->assertSame( 1, $rejected, 'The seller gets the rejection email.' );
+		$this->assertWPError( $manager->reject( (int) $classified->id, 'again' ), 'A replayed reject stays refused.' );
+
+		$this->assertTrue( $manager->moderate( (int) $classified->id, 'active' ) );
+		$this->assertSame( 'active', $manager->get( (int) $classified->id )->status );
+		$this->assertSame( 1, $approved, 'Reinstating tells the seller it is live.' );
+
+		$this->assertNull( $manager->moderate( (int) $classified->id, 'sold' ), 'Non-moderation changes are left to the caller.' );
+
+		$meta_box = (string) file_get_contents( WBAM_PRO_PATH . 'includes/Admin/class-classified-meta-box.php' );
+		$this->assertStringContainsString( '$manager->moderate(', $meta_box );
+		$list = (string) file_get_contents( WBAM_PRO_PATH . 'includes/Admin/class-classifieds-list-table.php' );
+		$this->assertSame( 2, substr_count( $list, "\$actions['reject_classified']" ), 'Pending and active rows both offer Reject.' );
+	}
+
+	/**
+	 * Step "Wording": a bulk action that processed nothing is an error with
+	 * the reason, and the label follows the count.
+	 */
+	public function test_bulk_result_is_an_error_when_nothing_was_processed(): void {
+		$method = new \ReflectionMethod( \WBAM_Pro\Core\Pro_Admin::class, 'bulk_result_args' );
+		$this->assertSame( array( 'error' => 'bulk_failed' ), $method->invoke( null, 'bulk_reject_classified', 0, 'Only pending or active classifieds can be rejected.' ) );
+		$this->assertSame(
+			array(
+				'message' => 'bulk_reject_classified',
+				'count'   => 1,
+			),
+			$method->invoke( null, 'bulk_reject_classified', 1, '' )
+		);
+
+		$source = (string) file_get_contents( WBAM_PRO_PATH . 'includes/Core/class-pro-admin.php' );
+		$this->assertStringContainsString( "get_classifieds_label( 1 === \$count ? 'singular' : 'plural' )", $source );
+		$this->assertStringContainsString( 'confirmBulkDelete', $source );
+	}
+
+	/**
+	 * Step "REST seller update never moves a rejected listing to pending;
+	 * REST mark-sold skips the active-only check and wbam_classified_sold".
+	 */
+	public function test_rest_seller_update_resubmits_and_mark_sold_uses_the_manager(): void {
+		$manager = Classified_Manager::get_instance();
+		$api     = new \WBAM_Pro\Modules\Classifieds\Classified_API();
+		wp_set_current_user( $this->user );
+
+		$rejected = $this->listing( 'REST rejected listing', false );
+		$manager->reject( (int) $rejected->id, 'Fix the photos' );
+
+		$resubmitted = 0;
+		add_action(
+			'wbam_classified_resubmitted',
+			function () use ( &$resubmitted ) {
+				++$resubmitted;
+			}
+		);
+
+		$request = new \WP_REST_Request( 'PUT' );
+		$request->set_param( 'id', (int) $rejected->id );
+		$request->set_param( 'title', 'Fixed photos' );
+		$this->assertFalse( is_wp_error( $api->update_classified( $request ) ) );
+		$this->assertSame( 'pending', $manager->get( (int) $rejected->id )->status );
+		$this->assertSame( 1, $resubmitted );
+
+		$pending = new \WP_REST_Request( 'POST' );
+		$pending->set_param( 'id', (int) $rejected->id );
+		$this->assertWPError( $api->mark_as_sold( $pending ), 'Only an active listing can be sold.' );
+
+		$sold_fired = 0;
+		add_action(
+			'wbam_classified_sold',
+			function () use ( &$sold_fired ) {
+				++$sold_fired;
+			}
+		);
+		$live = $this->listing( 'REST sold listing' );
+		$sold = new \WP_REST_Request( 'POST' );
+		$sold->set_param( 'id', (int) $live->id );
+		$this->assertFalse( is_wp_error( $api->mark_as_sold( $sold ) ) );
+		$this->assertSame( 'sold', $manager->get( (int) $live->id )->status );
+		$this->assertSame( 1, $sold_fired );
+	}
+
+	/**
+	 * Step "An advertiser editing a live approved listing skips
+	 * re-moderation".
+	 */
+	public function test_seller_edit_of_a_live_listing_goes_back_to_review_when_review_is_on(): void {
+		$manager    = Classified_Manager::get_instance();
+		$classified = $this->listing( 'Live listing edit' );
+		$subjects   = $this->mail_subjects();
+
+		$updated = $manager->update_by_seller( (int) $classified->id, array( 'title' => 'Swapped title' ) );
+
+		$this->assertSame( 'pending', $updated->status );
+		$this->assertSame( 'pending', get_post_status( (int) $classified->post_id ) );
+		$this->assertNotEmpty( preg_grep( '/requires review/', (array) $subjects ), 'The admin is told it needs review.' );
+		$this->assertEquals( 1, $updated->get_meta( 'followers_notified' ), 'Followers were told at first approval; re-approval must not tell them again.' );
+
+		$this->set_require_approval( false );
+		$other = Classified_Manager::get_instance()->submit(
+			$this->advertiser,
+			array(
+				'title'      => 'No review site listing',
+				'categories' => array( (int) wp_insert_term( 'Edges nr ' . wp_generate_password( 6, false ), Classified_Manager::TAXONOMY_CATEGORY )['term_id'] ),
+			)
+		);
+		$this->assertSame( 'active', $manager->update_by_seller( (int) $other->id, array( 'title' => 'Edited' ) )->status, 'Without review an edit stays live.' );
+	}
+
+	/**
+	 * Step "Admin receives 'New classified listing requires review' for
+	 * listings that auto-publish".
+	 */
+	public function test_auto_published_listing_sends_no_requires_review_email(): void {
+		$this->set_require_approval( false );
+		$subjects = $this->mail_subjects();
+		$term     = wp_insert_term( 'Edges auto ' . wp_generate_password( 6, false ), Classified_Manager::TAXONOMY_CATEGORY );
+
+		$classified = Classified_Manager::get_instance()->submit(
+			$this->advertiser,
+			array(
+				'title'      => 'Auto published listing',
+				'categories' => array( (int) $term['term_id'] ),
+			)
+		);
+
+		$this->assertSame( 'active', $classified->status );
+		$this->assertEmpty( preg_grep( '/requires review/', (array) $subjects ), 'Emails: ' . implode( ' | ', (array) $subjects ) );
+	}
+
+	/**
+	 * Step "A seller renewing an expired listing into moderation sends no
+	 * 'requires review' email to the admin".
+	 */
+	public function test_renewal_into_review_emails_the_admin(): void {
+		$manager    = Classified_Manager::get_instance();
+		$classified = $this->listing( 'Renew into review' );
+		$manager->expire( (int) $classified->id );
+		$subjects = $this->mail_subjects();
+
+		$days = $manager->renew_by_seller( (int) $classified->id, (int) $this->advertiser->id );
+
+		$this->assertNotWPError( $days );
+		$this->assertSame( 'pending', $manager->get( (int) $classified->id )->status );
+		$this->assertNotEmpty( preg_grep( '/requires review/', (array) $subjects ), 'Emails: ' . implode( ' | ', (array) $subjects ) );
+	}
+
+	/**
+	 * Step "Deleting a listing leaves orphan rows in
+	 * wbam_classified_locations and wbam_message_threads/messages".
+	 */
+	public function test_deleting_a_listing_removes_its_location_and_conversations(): void {
+		global $wpdb;
+		foreach ( array( true, false ) as $force ) {
+			$classified = $this->listing( 'Orphan listing ' . (int) $force );
+			$id         = (int) $classified->id;
+
+			$wpdb->insert(
+				$wpdb->prefix . 'wbam_classified_locations',
+				array(
+					'classified_id' => $id,
+					'city'          => 'Pune',
+				)
+			);
+			$thread_id = \WBAM_Pro\Modules\Messaging\Message_Manager::get_instance()->get_or_create_thread( (int) self::factory()->user->create(), $this->user, $id );
+			$this->assertIsInt( $thread_id );
+			$wpdb->insert(
+				$wpdb->prefix . 'wbam_messages',
+				array(
+					'thread_id' => $thread_id,
+					'sender_id' => $this->user,
+					'content'   => 'Still available?',
+				)
+			);
+
+			$this->assertTrue( Classified_Manager::get_instance()->delete( $id, $force ) );
+
+			$this->assertSame( '0', $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}wbam_classified_locations WHERE classified_id = %d", $id ) ) );
+			$this->assertSame( '0', $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}wbam_message_threads WHERE classified_id = %d", $id ) ) );
+			$this->assertSame( '0', $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}wbam_messages WHERE thread_id = %d", $thread_id ) ) );
+		}
+	}
+
+	/**
+	 * Step "Classified::save() nulls any past expires_at, so an expired
+	 * listing loses its end date".
+	 */
+	public function test_saving_an_expired_listing_keeps_its_end_date(): void {
+		$classified             = $this->listing( 'Expired keeps date' );
+		$classified->expires_at = gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS );
+		$classified->status     = 'expired';
+		$classified->save();
+
+		$this->assertNotEmpty( Classified_Manager::get_instance()->get( (int) $classified->id )->expires_at );
 	}
 }
