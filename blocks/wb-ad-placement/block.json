@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wb-ads/placement",
+	"title": "WB Ad Placement",
+	"category": "wb-ads",
+	"icon": "layout",
+	"description": "Render a WB Ad Manager placement slot - whichever ad the rotation and targeting rules pick for it.",
+	"keywords": [ "ad", "placement", "slot", "wbam" ],
+	"textdomain": "wb-ads-rotator-with-split-test",
+	"attributes": {
+		"placementId": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ],
+		"spacing": {
+			"margin": true
+		}
+	},
+	"render": "file:./render.php"
+}

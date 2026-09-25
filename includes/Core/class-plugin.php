@@ -202,6 +202,12 @@ class Plugin {
 		$this->links = Links_Module::get_instance();
 		$this->links->init();
 
+		// Blocks - `wb-ads/ad` and `wb-ads/placement`, for block (FSE) theme
+		// Site Editor support. Always on (not is_admin()-gated): the block
+		// type must be registered on every request so its render.php runs
+		// on the front end too.
+		( new \WBAM\Modules\Blocks\Block_Registry() )->init();
+
 		// REST API — must load on both frontend and admin for rest_api_init to fire.
 		new API_Bootstrap();
 

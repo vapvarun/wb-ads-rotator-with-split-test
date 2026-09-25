@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wb-ads/ad",
+	"title": "WB Ad",
+	"category": "wb-ads",
+	"icon": "megaphone",
+	"description": "Show one specific ad from WB Ad Manager - the block equivalent of [wbam_ad id=\"…\"].",
+	"keywords": [ "ad", "advertisement", "banner", "wbam" ],
+	"textdomain": "wb-ads-rotator-with-split-test",
+	"attributes": {
+		"adId": {
+			"type": "integer",
+			"default": 0
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ],
+		"spacing": {
+			"margin": true
+		}
+	},
+	"render": "file:./render.php"
+}
