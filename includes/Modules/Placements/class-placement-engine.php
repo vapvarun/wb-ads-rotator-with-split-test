@@ -312,13 +312,13 @@ class Placement_Engine {
 
 		// Phase D of the format-aware matching plan: drop ads whose
 		// declared format doesn't match this placement's accepted list.
-		// Feature-flagged via the `wbam_format_matching_enabled` option
+		// Feature-flagged via Ad Display > Placements > Format matching
 		// so sites opt in after they've had a chance to review the
 		// backfilled formats on their existing ads. Filterable for
 		// A/B testing and per-env control.
 		$enforce_format = (bool) apply_filters(
 			'wbam_enforce_format_matching',
-			(bool) get_option( 'wbam_format_matching_enabled', false ),
+			\WBAM\Core\Settings_Helper::format_matching_enabled(),
 			$placement_id
 		);
 
@@ -509,6 +509,11 @@ class Placement_Engine {
 			$classes       = 'wbam-ad wbam-ad-slot';
 			if ( $is_responsive ) {
 				$classes .= ' wbam-ad-slot--responsive';
+			}
+			// Ad Display > Custom Container Class.
+			$container_class = sanitize_html_class( (string) \WBAM\Core\Settings_Helper::get( 'container_class', '' ) );
+			if ( '' !== $container_class ) {
+				$classes .= ' ' . $container_class;
 			}
 
 			// Ad-disclosure label. The `ad_label` / `ad_label_position` settings

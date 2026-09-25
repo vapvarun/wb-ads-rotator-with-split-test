@@ -200,8 +200,8 @@ class Partnership {
 			return __( 'Not specified', 'wb-ads-rotator-with-split-test' );
 		}
 
-		$currency = get_option( 'wbam_currency', 'USD' );
-		$symbol   = self::get_currency_symbol( $currency );
+		// The site currency: Pro overrides this symbol from its Credits setting.
+		$symbol = \WBAM\Core\Formatter::get_currency_symbol();
 
 		if ( null !== $this->budget_min && null !== $this->budget_max ) {
 			if ( $this->budget_min === $this->budget_max ) {
@@ -269,26 +269,6 @@ class Partnership {
 			'rejected' => __( 'Rejected', 'wb-ads-rotator-with-split-test' ),
 			'spam'     => __( 'Spam', 'wb-ads-rotator-with-split-test' ),
 		);
-	}
-
-	/**
-	 * Get currency symbol.
-	 *
-	 * @param string $currency Currency code.
-	 * @return string
-	 */
-	public static function get_currency_symbol( $currency = 'USD' ) {
-		$symbols = array(
-			'USD' => '$',
-			'EUR' => '€',
-			'GBP' => '£',
-			'INR' => '₹',
-			'CAD' => 'CA$',
-			'AUD' => 'A$',
-			'JPY' => '¥',
-		);
-
-		return isset( $symbols[ $currency ] ) ? $symbols[ $currency ] : $currency . ' ';
 	}
 
 	/**

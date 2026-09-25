@@ -277,6 +277,19 @@ class Settings {
 			'wbam-settings'
 		);
 
+		add_settings_field(
+			'format_matching',
+			__( 'Format Matching', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_checkbox_field' ),
+			'wbam-settings',
+			'wbam_placements',
+			array(
+				'id'          => 'format_matching',
+				'default'     => \WBAM\Core\Settings_Helper::format_matching_enabled(),
+				'description' => __( 'Only show an ad in placements that accept its size format, so oversize creatives never break the layout.', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+
 		// Geo Targeting Section.
 		add_settings_section(
 			'wbam_geo',
@@ -551,6 +564,8 @@ class Settings {
 		// AdSense settings.
 		$sanitized['adsense_publisher_id'] = sanitize_text_field( $input['adsense_publisher_id'] ?? '' );
 		$sanitized['adsense_auto_ads']     = ! empty( $input['adsense_auto_ads'] );
+
+		$sanitized['format_matching'] = ! empty( $input['format_matching'] );
 
 		// Privacy settings.
 		$sanitized['require_consent_adsense'] = ! empty( $input['require_consent_adsense'] );
@@ -1175,7 +1190,7 @@ class Settings {
 	public function render_checkbox_field( $args ) {
 		$settings = $this->get_settings();
 		$id       = $args['id'];
-		$value    = isset( $settings[ $id ] ) ? $settings[ $id ] : false;
+		$value    = isset( $settings[ $id ] ) ? $settings[ $id ] : ( $args['default'] ?? false );
 		$this->render_field_contract( $id );
 		?>
 		<label>

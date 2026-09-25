@@ -269,21 +269,21 @@ class Display_Options {
 	 * @param \WP_Post $post Post.
 	 */
 	public function render_schedule( $post ) {
-		$schedule   = get_post_meta( $post->ID, '_wbam_schedule', true );
-		$schedule   = is_array( $schedule ) ? $schedule : array();
-		$start_date = isset( $schedule['start_date'] ) ? $schedule['start_date'] : '';
-		$end_date   = isset( $schedule['end_date'] ) ? $schedule['end_date'] : '';
+		$schedule = get_post_meta( $post->ID, '_wbam_schedule', true );
+		$schedule = is_array( $schedule ) ? $schedule : array();
 
-		// Also check standalone date meta (used by PRO advertiser dashboard).
-		$standalone_start = get_post_meta( $post->ID, '_wbam_start_date', true );
-		$standalone_end   = get_post_meta( $post->ID, '_wbam_end_date', true );
-
-		// Use standalone dates if schedule dates are empty.
-		if ( empty( $start_date ) && ! empty( $standalone_start ) ) {
-			$start_date = $standalone_start;
+		// Dates live in _wbam_start_date / _wbam_end_date, the keys the PRO
+		// advertiser dashboard writes and Targeting_Engine::check_schedule()
+		// reads first. Dates inside _wbam_schedule are the pre-3.2.0 store,
+		// shown only when the standalone key is empty - the same precedence
+		// the delivery check uses, so this box never shows a stale date.
+		$start_date = (string) get_post_meta( $post->ID, '_wbam_start_date', true );
+		$end_date   = (string) get_post_meta( $post->ID, '_wbam_end_date', true );
+		if ( '' === $start_date && ! empty( $schedule['start_date'] ) ) {
+			$start_date = $schedule['start_date'];
 		}
-		if ( empty( $end_date ) && ! empty( $standalone_end ) ) {
-			$end_date = $standalone_end;
+		if ( '' === $end_date && ! empty( $schedule['end_date'] ) ) {
+			$end_date = $schedule['end_date'];
 		}
 
 		$days       = isset( $schedule['days'] ) ? (array) $schedule['days'] : array();
@@ -617,9 +617,13 @@ class Display_Options {
 		// Save schedule.
 		if ( isset( $_POST['wbam_schedule'] ) ) {
 			$schedule = $this->sanitize_schedule( wp_unslash( $_POST['wbam_schedule'] ) ); // phpcs:ignore
-			update_post_meta( $post_id, '_wbam_schedule', $schedule );
 
-			// Also sync to standalone date meta keys (used by PRO advertiser dashboard).
+			// Days and hours stay in _wbam_schedule; the dates have one store,
+			// the standalone keys below (see render_schedule()).
+			$schedule_rules = $schedule;
+			unset( $schedule_rules['start_date'], $schedule_rules['end_date'] );
+			update_post_meta( $post_id, '_wbam_schedule', $schedule_rules );
+
 			if ( ! empty( $schedule['start_date'] ) ) {
 				update_post_meta( $post_id, '_wbam_start_date', $schedule['start_date'] );
 			} else {

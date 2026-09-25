@@ -155,8 +155,10 @@ class Settings_API {
 			);
 		}
 
-		$existing = \WBAM\Core\Settings_Helper::get();
-		$merged   = array_merge( $existing, $this->sanitize_settings_input( $incoming ) );
+		// The admin form's sanitizer, run explicitly: register_setting() hooks
+		// it on admin_init only, which a REST request never fires. It keeps
+		// every stored key this write does not carry and drops unknown keys.
+		$merged = \WBAM\Admin\Settings::get_instance()->sanitize_settings( $incoming );
 
 		$result = update_option( 'wbam_settings', $merged );
 
@@ -236,8 +238,7 @@ class Settings_API {
 			);
 		}
 
-		$existing = \WBAM\Core\Settings_Helper::get();
-		$merged   = array_merge( $existing, $this->sanitize_settings_input( $filtered ) );
+		$merged = \WBAM\Admin\Settings::get_instance()->sanitize_settings( $filtered );
 
 		update_option( 'wbam_settings', $merged );
 
@@ -255,36 +256,6 @@ class Settings_API {
 				'settings' => $display,
 			)
 		);
-	}
-
-	/**
-	 * Sanitize incoming settings array before saving.
-	 *
-	 * Scalar values are sanitized; arrays and booleans preserved.
-	 *
-	 * @param array $settings Raw settings from request.
-	 * @return array
-	 */
-	private function sanitize_settings_input( $settings ) {
-		$sanitized = array();
-
-		foreach ( $settings as $key => $value ) {
-			$key = sanitize_key( $key );
-
-			if ( is_bool( $value ) ) {
-				$sanitized[ $key ] = $value;
-			} elseif ( is_int( $value ) ) {
-				$sanitized[ $key ] = (int) $value;
-			} elseif ( is_float( $value ) ) {
-				$sanitized[ $key ] = (float) $value;
-			} elseif ( is_array( $value ) ) {
-				$sanitized[ $key ] = array_map( 'sanitize_text_field', $value );
-			} else {
-				$sanitized[ $key ] = sanitize_text_field( (string) $value );
-			}
-		}
-
-		return $sanitized;
 	}
 
 	/**

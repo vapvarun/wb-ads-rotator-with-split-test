@@ -81,6 +81,20 @@ class Settings_Helper {
 	}
 
 	/**
+	 * Whether format-aware placement matching is on (Ad Display > Placements).
+	 *
+	 * Stored in `wbam_settings[format_matching]` since 3.2.0. Before that it
+	 * was the standalone `wbam_format_matching_enabled` option, which stays
+	 * the fallback until the owner saves the setting.
+	 *
+	 * @since 3.2.0
+	 * @return bool
+	 */
+	public static function format_matching_enabled() {
+		return (bool) self::get( 'format_matching', (bool) get_option( 'wbam_format_matching_enabled', false ) );
+	}
+
+	/**
 	 * Update a specific setting.
 	 *
 	 * @param string $key   Setting key.
