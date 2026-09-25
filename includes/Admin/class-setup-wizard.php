@@ -547,7 +547,7 @@ class Setup_Wizard {
 				'data'       => array(
 					'type'      => 'image',
 					'image_url' => 'https://placehold.co/728x90/4a90d9/ffffff?text=Header+Banner+Ad',
-					'link_url'  => '#',
+					'link_url'  => home_url( '/' ),
 					'alt_text'  => __( 'Sample Header Banner', 'wb-ads-rotator-with-split-test' ),
 					'new_tab'   => true,
 				),

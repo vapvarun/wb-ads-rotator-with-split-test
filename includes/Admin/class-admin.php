@@ -796,11 +796,15 @@ class Admin {
 			'wbam-admin',
 			'wbamAdmin',
 			array(
-				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'wbam-admin' ),
-				'i18n'    => array(
+				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( 'wbam-admin' ),
+				'restUrl'   => esc_url_raw( rest_url() ),
+				'restNonce' => wp_create_nonce( 'wp_rest' ),
+				'i18n'      => array(
 					'selectImage' => __( 'Select Image', 'wb-ads-rotator-with-split-test' ),
 					'useImage'    => __( 'Use This Image', 'wb-ads-rotator-with-split-test' ),
+					'noMatches'   => __( 'No matches.', 'wb-ads-rotator-with-split-test' ),
+					'selected'    => __( 'selected', 'wb-ads-rotator-with-split-test' ),
 				),
 			)
 		);
@@ -1902,20 +1906,7 @@ class Admin {
 		$max_ctr = max( array_column( $stats, 'ctr' ) );
 		$max_ctr = $max_ctr > 0 ? $max_ctr : 1;
 		?>
-		<style>
-			.wbam-comparison-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-			.wbam-comparison-table th { text-align: left; padding: 10px; border-bottom: 2px solid #ddd; }
-			.wbam-comparison-table td { padding: 10px; border-bottom: 1px solid #eee; }
-			.wbam-comparison-table tr.wbam-current-ad { background: #f0f7ff; }
-			.wbam-ctr-bar { background: #ddd; height: 20px; border-radius: 3px; overflow: hidden; min-width: 100px; }
-			.wbam-ctr-fill { background: #2271b1; height: 100%; transition: width 0.3s; }
-			.wbam-ctr-fill.winner { background: #00a32a; }
-			.wbam-winner-badge { background: #00a32a; color: #fff; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 5px; }
-			.wbam-current-badge { background: #2271b1; color: #fff; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 5px; }
-			.wbam-disable-btn { color: #b32d2e !important; }
-			.wbam-comparison-note { color: #666; font-style: italic; margin-top: 10px; }
-		</style>
-
+		<div class="wbam-comparison-scroll">
 		<table class="wbam-comparison-table">
 			<thead>
 				<tr>
@@ -1966,6 +1957,7 @@ class Admin {
 				<?php endforeach; ?>
 			</tbody>
 		</table>
+		</div>
 
 		<p class="wbam-comparison-note">
 			<?php

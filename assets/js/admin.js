@@ -156,3 +156,109 @@
 	});
 
 })(jQuery);
+
+/**
+ * Searchable checkbox picker for multi-selects marked .wbam-select2.
+ *
+ * The markup always asked for Select2, which neither plugin ships, so the
+ * pickers rendered as bare Ctrl-click lists. This keeps the original select
+ * as the form field (same POST shape) and drives it from a filterable
+ * checkbox list. A select with data-rest="wp/v2/pages" also searches the
+ * REST API, so a site with thousands of pages only renders a first page.
+ */
+(function($) {
+	'use strict';
+
+	var cfg = window.wbamAdmin || {};
+	var i18n = cfg.i18n || {};
+
+	function addChoice($list, $select, value, label, checked) {
+		var id = $select.attr('id') + '-opt-' + value;
+		if ($list.find('#' + id).length) {
+			return;
+		}
+		var $row = $('<label class="wbam-picker__item"></label>').attr('for', id);
+		$('<input type="checkbox">').attr({ id: id, value: value }).prop('checked', !!checked).appendTo($row);
+		$('<span></span>').text(label).appendTo($row);
+		$list.append($row);
+	}
+
+	function enhance(select) {
+		var $select = $(select);
+		if ($select.data('wbamPicker')) {
+			return;
+		}
+		$select.data('wbamPicker', true).addClass('wbam-picker__source').attr('aria-hidden', 'true').attr('tabindex', '-1');
+
+		var $wrap = $('<div class="wbam-picker"></div>');
+		var $search = $('<input type="search" class="wbam-picker__search">').attr({
+			placeholder: $select.data('placeholder') || '',
+			'aria-label': $select.data('placeholder') || ''
+		});
+		var $list = $('<div class="wbam-picker__list" role="group"></div>').attr('aria-label', $('label[for="' + select.id + '"]').text());
+		var $empty = $('<p class="wbam-picker__empty"></p>').text(i18n.noMatches || 'No matches.').hide();
+
+		// Selected first, so what is already chosen is visible without scrolling.
+		$select.find('option:selected').each(function() {
+			addChoice($list, $select, this.value, $(this).text().trim(), true);
+		});
+		$select.find('option:not(:selected)').each(function() {
+			addChoice($list, $select, this.value, $(this).text().trim(), false);
+		});
+
+		$wrap.append($search, $list, $empty).insertAfter($select);
+
+		$list.on('change', 'input', function() {
+			var value = this.value;
+			var $opt = $select.find('option').filter(function() { return this.value === value; });
+			if (!$opt.length) {
+				$opt = $('<option></option>').val(value).text($(this).next().text()).appendTo($select);
+			}
+			$opt.prop('selected', this.checked);
+			$select.trigger('change');
+		});
+
+		function applyFilter() {
+			var q = $.trim($search.val()).toLowerCase();
+			var shown = 0;
+			$list.children().each(function() {
+				var match = !q || $(this).text().toLowerCase().indexOf(q) !== -1;
+				$(this).toggle(match);
+				shown += match ? 1 : 0;
+			});
+			$empty.toggle(0 === shown);
+			return q;
+		}
+
+		var timer = null;
+		$search.on('input', function() {
+			var q = applyFilter();
+
+			var route = $select.data('rest');
+			if (!route || q.length < 2 || !cfg.restUrl) {
+				return;
+			}
+			clearTimeout(timer);
+			timer = setTimeout(function() {
+				$.ajax({
+					url: cfg.restUrl + route,
+					data: { search: q, per_page: 20, _fields: 'id,title' },
+					headers: { 'X-WP-Nonce': cfg.restNonce }
+				}).done(function(items) {
+					$.each(items || [], function(_, item) {
+						var title = item.title && item.title.rendered ? $('<div>').html(item.title.rendered).text() : '#' + item.id;
+						addChoice($list, $select, String(item.id), title, false);
+					});
+					applyFilter();
+				});
+			}, 250);
+		});
+	}
+
+	$(function() {
+		$('select[multiple].wbam-select2').each(function() {
+			enhance(this);
+		});
+	});
+
+})(jQuery);

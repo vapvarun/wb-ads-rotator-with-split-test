@@ -290,16 +290,18 @@ class Partnership_Admin {
 			</form>
 
 			<!-- Partnerships Table -->
-			<table class="wp-list-table widefat fixed striped wbam-partnerships-table">
+			<?php // Not .wp-list-table: core's responsive rules for real list tables mangled this hand-built one on phones. ?>
+			<div class="wbam-partnerships-scroll">
+			<table class="widefat striped wbam-partnerships-table">
 				<thead>
 					<tr>
-						<th style="width: 20%;"><?php esc_html_e( 'Contact', 'wb-ads-rotator-with-split-test' ); ?></th>
-						<th style="width: 20%;"><?php esc_html_e( 'Website', 'wb-ads-rotator-with-split-test' ); ?></th>
-						<th style="width: 15%;"><?php esc_html_e( 'Type', 'wb-ads-rotator-with-split-test' ); ?></th>
-						<th style="width: 15%;"><?php esc_html_e( 'Budget', 'wb-ads-rotator-with-split-test' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Status', 'wb-ads-rotator-with-split-test' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Date', 'wb-ads-rotator-with-split-test' ); ?></th>
-						<th style="width: 10%;"><?php esc_html_e( 'Actions', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th class="wbam-col-contact"><?php esc_html_e( 'Contact', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th class="wbam-col-website"><?php esc_html_e( 'Website', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th class="wbam-col-type"><?php esc_html_e( 'Type', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th class="wbam-col-budget"><?php esc_html_e( 'Budget', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th class="wbam-col-status"><?php esc_html_e( 'Status', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th class="wbam-col-date"><?php esc_html_e( 'Date', 'wb-ads-rotator-with-split-test' ); ?></th>
+						<th class="wbam-col-actions"><?php esc_html_e( 'Actions', 'wb-ads-rotator-with-split-test' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -357,6 +359,7 @@ class Partnership_Admin {
 					<?php endif; ?>
 				</tbody>
 			</table>
+			</div>
 
 			<!-- Pagination -->
 			<?php if ( $total_pages > 1 ) : ?>
@@ -474,7 +477,7 @@ class Partnership_Admin {
 			wp_die( esc_html__( 'Partnership not found.', 'wb-ads-rotator-with-split-test' ) );
 		}
 		?>
-		<div class="wrap wbam-partnership-view">
+		<div class="wrap wbam-admin wbam-partnerships-wrap wbam-partnership-view">
 			<h1>
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships' ) ); ?>" class="page-title-action">
 					<?php echo wbam_icon( 'arrow-left', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?>

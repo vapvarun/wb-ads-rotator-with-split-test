@@ -114,17 +114,24 @@ class Display_Options {
 				<?php // Specific Pages - Most specific targeting first. ?>
 				<div class="wbam-rule-row">
 					<label for="wbam_rules_posts"><?php esc_html_e( 'Selected Pages', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<select id="wbam_rules_posts" name="wbam_display_rules[posts][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Choose individual pages...', 'wb-ads-rotator-with-split-test' ); ?>">
+					<select id="wbam_rules_posts" name="wbam_display_rules[posts][]" multiple class="wbam-select2" data-rest="wp/v2/pages" data-placeholder="<?php esc_attr_e( 'Search pages...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php
-						$all_pages = get_pages(
+						// The first 50 pages plus whatever is already selected; the
+						// picker searches the rest over REST, so 2000+ pages stay cheap.
+						$first_pages    = get_pages(
 							array(
 								'sort_column' => 'post_title',
 								'sort_order'  => 'ASC',
 								'post_status' => 'publish',
+								'number'      => 50,
 							)
 						);
-						// get_pages() returns false on DB error; default to empty list.
-						$all_pages = is_array( $all_pages ) ? $all_pages : array();
+						$selected_pages = $specific_posts ? get_pages( array( 'include' => array_map( 'absint', $specific_posts ) ) ) : array();
+						$all_pages      = array();
+						// get_pages() returns false on DB error.
+						foreach ( array_merge( is_array( $selected_pages ) ? $selected_pages : array(), is_array( $first_pages ) ? $first_pages : array() ) as $page_item ) {
+							$all_pages[ $page_item->ID ] = $page_item;
+						}
 						foreach ( $all_pages as $page_item ) :
 							?>
 							<option value="<?php echo esc_attr( $page_item->ID ); ?>" <?php selected( in_array( $page_item->ID, $specific_posts, true ) ); ?>>

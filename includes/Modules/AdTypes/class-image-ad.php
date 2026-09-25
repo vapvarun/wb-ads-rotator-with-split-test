@@ -131,6 +131,11 @@ class Image_Ad implements Ad_Type_Interface {
 	public function render_metabox( $ad_id, $data ) {
 		$image_url = isset( $data['image_url'] ) ? $data['image_url'] : '';
 		$link_url  = isset( $data['link_url'] ) ? $data['link_url'] : '';
+		// Sample ads were seeded with '#', which the URL field rejects, so the
+		// ad could not be saved until the owner found the field. Show it empty.
+		if ( '#' === $link_url ) {
+			$link_url = '';
+		}
 		$alt_text  = isset( $data['alt_text'] ) ? $data['alt_text'] : '';
 		$target    = isset( $data['target'] ) ? $data['target'] : '_blank';
 		?>

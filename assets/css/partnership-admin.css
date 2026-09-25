@@ -11,8 +11,25 @@
 	margin: 0 0 20px 0;
 }
 
-.wbam-partnerships-table {
+.wbam-partnerships-scroll {
+	clear: both; /* sits after the floated search box; overflow would otherwise shrink it beside the float */
 	margin-top: 10px;
+	overflow-x: auto;
+}
+
+.wbam-partnerships-table {
+	min-width: 760px;
+	table-layout: auto;
+}
+
+.wbam-partnerships-table .wbam-col-status,
+.wbam-partnerships-table .wbam-col-date {
+	width: 9em;
+}
+
+/* Fits all five row actions: none may be clipped. */
+.wbam-partnerships-table .wbam-col-actions {
+	width: 180px;
 }
 
 .wbam-partnerships-table td {
@@ -24,10 +41,19 @@
 }
 
 .wbam-actions-cell a {
-	display: inline-block;
-	margin-right: 5px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: var(--wbam-r-md, 8px);
 	text-decoration: none;
 	color: var(--wbam-accent);
+}
+
+.wbam-actions-cell a:hover,
+.wbam-actions-cell a:focus-visible {
+	background: var(--wbam-surface-alt, #f0f0f1);
 }
 
 .wbam-actions-cell a:hover {
@@ -56,34 +82,34 @@
 	height: 18px;
 }
 
-/* Status Badges */
-.wbam-status-badge {
+/* Status badges: soft tint pill, text at AA (white on amber was ~2:1). */
+.wbam-partnerships-wrap .wbam-status-badge {
 	display: inline-block;
-	padding: 3px 8px;
-	border-radius: 3px;
-	font-size: var(--wbam-font-size-xs);
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 11px;
 	font-weight: 600;
 	text-transform: uppercase;
 }
 
-.wbam-status-pending {
-	background: #f0ad4e;
-	color: var(--wbam-bg);
+.wbam-partnerships-wrap .wbam-status-pending {
+	background: #fff8e5;
+	color: #7a5a00;
 }
 
-.wbam-status-accepted {
-	background: #46b450;
-	color: var(--wbam-bg);
+.wbam-partnerships-wrap .wbam-status-accepted {
+	background: #e6f4ea;
+	color: #1e6b34;
 }
 
-.wbam-status-rejected {
-	background: #dc3232;
-	color: var(--wbam-bg);
+.wbam-partnerships-wrap .wbam-status-rejected {
+	background: #fcebec;
+	color: #a32629;
 }
 
-.wbam-status-spam {
-	background: #826eb4;
-	color: var(--wbam-bg);
+.wbam-partnerships-wrap .wbam-status-spam {
+	background: #f1ecf8;
+	color: #5b3f8c;
 }
 
 /* Type Badges */
