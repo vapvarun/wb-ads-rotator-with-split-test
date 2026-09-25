@@ -469,14 +469,6 @@ do_action( 'wbam_daily_aggregation_complete', $stats );
 do_action( 'wbam_hourly_cleanup_complete' );
 
 /**
- * Fires when low balance check runs.
- *
- * @since 1.0.0
- * @param array $low_balance_advertisers Advertisers with low balance.
- */
-do_action( 'wbam_check_low_balances', $low_balance_advertisers );
-
-/**
  * Fires when classifieds expiration check runs.
  *
  * @since 1.0.0

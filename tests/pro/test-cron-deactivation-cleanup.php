@@ -23,12 +23,11 @@ class Test_Cron_Deactivation_Cleanup extends Pro_Test_Case {
 		$owned = Cron_Manager::get_instance()->owned_hooks();
 
 		$must_cover = array(
-			// The 8 hooks the old hand-written list orphaned.
+			// Hooks the old hand-written list orphaned (low-balance cron since retired).
 			'wbam_pro_daily_cleanup',
 			'wbam_pro_hourly_billing',
 			'wbam_pro_weekly_reports',
 			'wbam_check_campaign_budgets',
-			'wbam_check_low_balances',
 			'wbam_cleanup_audit_log',
 			'wbam_expire_classifieds',
 			'wbam_expire_upgrades',
