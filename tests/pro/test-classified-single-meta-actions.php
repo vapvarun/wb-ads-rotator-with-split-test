@@ -10,6 +10,10 @@
  * where buyers decide to save. The single template now renders the
  * .wbam-meta-footer block whose styles shipped all along.
  *
+ * 3.2.0 frontend-presentability update: the favourite heart is now a
+ * guest-visible login link (owner decision, matches the seller-profile
+ * Follow button) rather than hidden for anonymous visitors.
+ *
  * @package WBAM\Tests
  */
 
@@ -64,7 +68,8 @@ class Test_Classified_Single_Meta_Actions extends Pro_Test_Case {
 		$html = $this->render_single();
 
 		$this->assertStringContainsString( 'wbam-report-link', $html, 'Without the trigger the whole report pipeline is unreachable.' );
-		$this->assertStringNotContainsString( 'wbam-meta-favorite', $html, 'Favourites are a logged-in feature.' );
+		$this->assertStringContainsString( 'wbam-meta-favorite', $html, 'A signed-out visitor still sees the heart.' );
+		$this->assertStringContainsString( 'wbam-favorite-login', $html, 'It must link to login, not perform the AJAX toggle.' );
 	}
 
 	public function test_logged_in_visitor_gets_favourite_and_report(): void {
