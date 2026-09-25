@@ -164,9 +164,11 @@ class Test_Auto_Approve_Path extends Pro_Test_Case {
 			'Reject 2: the campaign must wait with the ad, not go ACTIVE at submit just because the package allows auto-approve.'
 		);
 
-		// Only the admin "requires review" email fires - the ad genuinely needs it.
-		$this->assertCount( 1, $this->mails );
+		// The admin "requires review" email (the ad genuinely needs it) and the
+		// advertiser's "we received your ad" receipt - nothing that says approved.
+		$this->assertCount( 2, $this->mails );
 		$this->assertStringContainsString( 'requires review', $this->mails[0]['subject'] );
+		$this->assertStringContainsString( 'We received your ad', $this->mails[1]['subject'] );
 	}
 
 	public function test_approving_the_forced_review_ad_activates_campaign_from_approval_time(): void {
