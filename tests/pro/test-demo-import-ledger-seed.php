@@ -36,6 +36,11 @@ class Test_Demo_Import_Ledger_Seed extends Pro_Test_Case {
 		$ids->setAccessible( true );
 		$ids->setValue( $generator, array( 0 => $advertiser_id ) );
 
+		// Credits are seeded only onto accounts the importer created.
+		$register = new \ReflectionMethod( \WBAM_Demo_Data_Generator::class, 'register_demo_id' );
+		$register->invoke( $generator, 'advertisers', $advertiser_id );
+		$register->invoke( $generator, 'users', Credits_Bridge::get_user_id( $advertiser_id ) );
+
 		$method = new \ReflectionMethod( \WBAM_Demo_Data_Generator::class, 'create_transactions' );
 		$method->setAccessible( true );
 		ob_start();
@@ -54,6 +59,28 @@ class Test_Demo_Import_Ledger_Seed extends Pro_Test_Case {
 			(float) Credits_Bridge::get_balance( (int) $advertiser->id ),
 			'The wallet reads the SDK ledger, so the promised demo balance must live there.'
 		);
+	}
+
+	public function test_no_credits_for_an_account_the_importer_did_not_create(): void {
+		if ( ! defined( 'WBAM_DEMO_DATA_INCLUDED' ) ) {
+			define( 'WBAM_DEMO_DATA_INCLUDED', true );
+		}
+		require_once WBAM_PRO_PATH . 'demo-data-setup.php';
+
+		$user       = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );
+
+		$generator = new \WBAM_Demo_Data_Generator();
+		foreach ( array( 'advertisers' => array( 0 => array( 'balance' => 500.0 ) ), 'advertiser_ids' => array( 0 => (int) $advertiser->id ) ) as $prop => $value ) {
+			$ref = new \ReflectionProperty( \WBAM_Demo_Data_Generator::class, $prop );
+			$ref->setValue( $generator, $value );
+		}
+		$method = new \ReflectionMethod( \WBAM_Demo_Data_Generator::class, 'create_transactions' );
+		ob_start();
+		$method->invoke( $generator );
+		ob_end_clean();
+
+		$this->assertSame( 0.0, (float) Credits_Bridge::get_balance( (int) $advertiser->id ), 'A reused real account must not be handed demo credits.' );
 	}
 
 	public function test_reseed_does_not_double_the_balance(): void {

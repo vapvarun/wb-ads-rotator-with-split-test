@@ -2,8 +2,8 @@
 /**
  * Next_Step_Banner's demo-data go-live step (10217449688 bullet 4): a
  * "This site still has demo data (N items)" step, counting everything in
- * wbam_pro_demo_data_ids except tracked pages, right after pending
- * advertisers and before every other step.
+ * wbam_pro_demo_data_ids except tracked pages. Ordering against pending
+ * applications and the per-import dismiss key: test-demo-data-safety.php.
  *
  * @package WBAM\Tests
  */
@@ -11,7 +11,6 @@
 namespace WBAM\Tests\Pro;
 
 use WBAM_Pro\Core\Next_Step_Banner;
-use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
 
 class Test_Next_Step_Banner_Demo extends Pro_Test_Case {
 
@@ -78,24 +77,6 @@ class Test_Next_Step_Banner_Demo extends Pro_Test_Case {
 		} else {
 			$this->assertNull( $step );
 		}
-	}
-
-	/**
-	 * Pending advertisers are a bigger blocker than leftover demo rows -
-	 * they come first in the priority order.
-	 */
-	public function test_pending_advertisers_take_priority_over_demo_data(): void {
-		update_option(
-			'wbam_pro_demo_data_ids',
-			array( 'ads' => array( 10 ) )
-		);
-
-		$user = self::factory()->user->create( array( 'role' => 'subscriber' ) );
-		Advertiser_Manager::get_instance()->get_or_create( (int) $user );
-
-		$step = Next_Step_Banner::resolve_next_step();
-		$this->assertNotNull( $step );
-		$this->assertStringStartsWith( 'review-applications-', $step['slug'] );
 	}
 
 	/**

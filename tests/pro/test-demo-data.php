@@ -24,16 +24,23 @@ class Test_Demo_Data extends Pro_Test_Case {
 	}
 
 	public function test_demo_import_does_not_emit_db_errors(): void {
-		if ( ! class_exists( '\\WBAM_Demo_Data_Generator' ) ) {
-			$this->markTestSkipped( 'Demo generator not yet loaded; gated behind admin action.' );
+		if ( ! defined( 'WBAM_DEMO_DATA_INCLUDED' ) ) {
+			define( 'WBAM_DEMO_DATA_INCLUDED', true );
 		}
+		require_once WBAM_PRO_PATH . 'demo-data-setup.php';
 
 		global $wpdb;
 		$wpdb->suppress_errors( true );
 		$wpdb->last_error = '';
 
-		\WBAM_Demo_Data_Generator::install();
+		$generator = new \WBAM_Demo_Data_Generator();
+		ob_start();
+		$generator->run();
+		ob_end_clean();
+		$error = $wpdb->last_error;
 
-		$this->assertEmpty( $wpdb->last_error, 'Demo data install must not produce DB errors' );
+		$generator->delete_tracked_demo_data();
+
+		$this->assertEmpty( $error, 'Demo data install must not produce DB errors' );
 	}
 }

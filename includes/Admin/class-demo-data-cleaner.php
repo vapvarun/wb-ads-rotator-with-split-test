@@ -259,8 +259,12 @@ class Demo_Data_Cleaner {
 	 * Render the "demo data cleared" admin notice after a successful clear.
 	 */
 	public static function maybe_render_notice() {
+		// Only this class's own redirect ('1'). Pro's Tools page reuses the
+		// query arg with 'ok'/'empty' and renders its own notice; answering
+		// that too printed "No demo items needed to be removed." next to
+		// Pro's "Removed N demo items."
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( empty( $_GET['wbam_demo_cleared'] ) ) {
+		if ( ! isset( $_GET['wbam_demo_cleared'] ) || '1' !== sanitize_text_field( wp_unslash( $_GET['wbam_demo_cleared'] ) ) ) {
 			return;
 		}
 
