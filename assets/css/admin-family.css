@@ -742,6 +742,9 @@
 	margin: 0;
 }
 
+/* .form-table prefix: core shows every .form-table tr as display:block
+   at 782px and below, which outranked the bare class on phones. */
+.form-table .wbam-geo-is-hidden,
 .wbam-geo-is-hidden {
 	display: none;
 }
