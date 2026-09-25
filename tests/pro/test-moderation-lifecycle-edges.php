@@ -834,4 +834,103 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 			$this->assertDoesNotMatchRegularExpression( '/%(\d\\?\$)?s plan\b/', (string) file_get_contents( WBAM_PRO_PATH . 'templates/emails/' . $template . '.php' ), $template );
 		}
 	}
+
+	// ---------------------------------------------------------------------
+	// Next-step banner and demo import (QA additions).
+	// ---------------------------------------------------------------------
+
+	/**
+	 * Step "Next-step banner: dismissing the top step returns early in
+	 * maybe_render() and hides every lower step".
+	 */
+	public function test_dismissing_the_top_banner_step_shows_the_next_one(): void {
+		$admin = (int) self::factory()->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $admin );
+		$applicant = Advertiser_Manager::get_instance()->get_or_create( (int) self::factory()->user->create() );
+		Advertiser_Manager::get_instance()->update_status( (int) $applicant->id, 'pending' );
+		update_option( 'wbam_pro_demo_data_ids', array( 'ads' => array( 10 ) ) );
+
+		$top = \WBAM_Pro\Core\Next_Step_Banner::resolve_next_step( true );
+		$this->assertStringStartsWith( 'demo-data-', $top['slug'] );
+
+		update_user_meta( $admin, \WBAM_Pro\Core\Next_Step_Banner::DISMISS_META, array( $top['slug'] ) );
+
+		$next = \WBAM_Pro\Core\Next_Step_Banner::resolve_next_step( true );
+		$this->assertStringStartsWith( 'review-applications-', $next['slug'], 'Dismissing the demo step must not hide pending approvals.' );
+
+		delete_option( 'wbam_pro_demo_data_ids' );
+	}
+
+	private function demo_generator(): \WBAM_Demo_Data_Generator {
+		if ( ! defined( 'WBAM_DEMO_DATA_INCLUDED' ) ) {
+			define( 'WBAM_DEMO_DATA_INCLUDED', true );
+		}
+		require_once WBAM_PRO_PATH . 'demo-data-setup.php';
+
+		return new \WBAM_Demo_Data_Generator();
+	}
+
+	private function run_demo_step( \WBAM_Demo_Data_Generator $generator, string $step ): void {
+		$method = new \ReflectionMethod( \WBAM_Demo_Data_Generator::class, $step );
+		ob_start();
+		$method->invoke( $generator );
+		ob_end_clean();
+	}
+
+	/**
+	 * Step "Demo re-import adds 6 more inquiries each time".
+	 */
+	public function test_demo_reimport_does_not_duplicate_inquiries(): void {
+		global $wpdb;
+		$post_ids = array();
+		foreach ( array( 'Demo inquiry A', 'Demo inquiry B', 'Demo inquiry C' ) as $title ) {
+			$post_ids[] = (int) $this->listing( $title )->post_id;
+		}
+		$ids_in = implode( ',', array_map( 'intval', $wpdb->get_col( "SELECT id FROM {$wpdb->prefix}wbam_classifieds WHERE post_id IN (" . implode( ',', $post_ids ) . ')' ) ) );
+
+		$generator = $this->demo_generator();
+		( new \ReflectionProperty( \WBAM_Demo_Data_Generator::class, 'classified_post_ids' ) )->setValue( $generator, $post_ids );
+
+		$this->run_demo_step( $generator, 'create_classified_inquiries' );
+		$first = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}wbam_classified_inquiries WHERE classified_id IN ({$ids_in})" );
+		$this->run_demo_step( $generator, 'create_classified_inquiries' );
+		$this->run_demo_step( $generator, 'create_classified_inquiries' );
+		$after = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}wbam_classified_inquiries WHERE classified_id IN ({$ids_in})" );
+
+		$this->assertGreaterThan( 0, $first );
+		$this->assertSame( $first, $after, 'Re-import must reuse the seeded inquiries, not add them again.' );
+	}
+
+	/**
+	 * Step "demo ads attach to leftover demo-email advertisers from older
+	 * imports, which Remove now keeps forever".
+	 */
+	public function test_demo_data_attaches_only_to_advertisers_the_importer_created(): void {
+		$leftover            = (int) self::factory()->user->create(
+			array(
+				'user_login' => 'techstartup_old',
+				'user_email' => 'ads@techstartup.demo',
+			)
+		);
+		$leftover_advertiser = Advertiser_Manager::get_instance()->get_or_create( $leftover );
+
+		$generator = $this->demo_generator();
+		$this->run_demo_step( $generator, 'create_advertisers' );
+
+		$user_ids       = array_map( 'intval', (array) ( new \ReflectionProperty( \WBAM_Demo_Data_Generator::class, 'user_ids' ) )->getValue( $generator ) );
+		$advertiser_ids = array_map( 'intval', (array) ( new \ReflectionProperty( \WBAM_Demo_Data_Generator::class, 'advertiser_ids' ) )->getValue( $generator ) );
+		$registry       = (array) get_option( \WBAM_Demo_Data_Generator::DEMO_IDS_OPTION, array() );
+
+		$this->assertNotContains( $leftover, $user_ids );
+		$this->assertNotContains( (int) $leftover_advertiser->id, $advertiser_ids );
+		foreach ( $advertiser_ids as $index => $advertiser_id ) {
+			$this->assertContains( $advertiser_id, array_map( 'intval', (array) $registry['advertisers'] ), 'Every advertiser demo rows attach to is one Remove will delete.' );
+			$this->assertSame( $advertiser_id, (int) get_user_meta( $user_ids[ $index ], \WBAM_Demo_Data_Generator::ADVERTISER_MARKER, true ) );
+		}
+
+		// A second import reuses the importer's own fallback user.
+		$again = $this->demo_generator();
+		$this->run_demo_step( $again, 'create_advertisers' );
+		$this->assertSame( $user_ids, array_map( 'intval', (array) ( new \ReflectionProperty( \WBAM_Demo_Data_Generator::class, 'user_ids' ) )->getValue( $again ) ) );
+	}
 }

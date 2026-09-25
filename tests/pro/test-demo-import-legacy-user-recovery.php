@@ -9,8 +9,9 @@
  * and `continue`d - leaving $user_ids/$advertiser_ids sparse, so the
  * downstream isset() guards silently skipped ad relinking and ledger
  * seeding for exactly the advertisers a healing re-import exists to
- * repair. The importer now falls back to email lookup and recovers a
- * colliding user rather than abandoning the index.
+ * repair. The importer now looks up by email too, and when the match is
+ * an account it did not create it fills the index with its own fallback
+ * identity instead of adopting the account or abandoning the index.
  *
  * @package WBAM\Tests
  */
@@ -65,7 +66,13 @@ class Test_Demo_Import_Legacy_User_Recovery extends Pro_Test_Case {
 		$generator = $this->run_create_advertisers();
 		$user_ids  = $this->generator_prop( $generator, 'user_ids' );
 
-		$this->assertContains( $legacy, array_map( 'intval', $user_ids ), 'The renamed legacy user must be recovered via its email, not abandoned to a create-collision.' );
+		// Card 10340186779: demo rows attach only to accounts the importer
+		// created - Remove never deletes a legacy account, so anything hung
+		// on it stayed forever. The index is filled by the importer's own
+		// fallback identity instead of being abandoned.
+		$this->assertNotContains( $legacy, array_map( 'intval', $user_ids ), 'Demo data must not attach to a legacy account the importer did not create.' );
+		$this->assertArrayHasKey( 0, $user_ids, 'The index is still filled, by an importer-created user.' );
+		$this->assertSame( '1', (string) get_user_meta( (int) $user_ids[0], \WBAM_Demo_Data_Generator::USER_MARKER, true ) );
 
 		$advertiser_ids = $this->generator_prop( $generator, 'advertiser_ids' );
 		$this->assertCount(
