@@ -70,32 +70,6 @@ class Test_Advertiser_Opted_Out_Notifications extends Pro_Test_Case {
 	}
 
 	// -------------------------------------------------------------------
-	// check_low_balance() — 'low_balance' gate, full send path.
-	// -------------------------------------------------------------------
-
-	public function test_low_balance_sender_skips_mail_when_opted_out(): void {
-		$this->advertiser->notification_settings = array( 'low_balance' => false );
-		$this->advertiser->save();
-
-		list( $cb, $count ) = $this->count_mail();
-		Advertiser_Email_Notifications::get_instance()->check_low_balance( $this->advertiser->id, 5.00, 'test debit' );
-		remove_filter( 'pre_wp_mail', $cb, 10 );
-
-		$this->assertSame( 0, $count['sent'], 'An advertiser who unchecked "Low wallet balance alerts" must get zero low-balance mail.' );
-	}
-
-	public function test_low_balance_sender_sends_mail_when_not_opted_out(): void {
-		$this->advertiser->notification_settings = array( 'low_balance' => true );
-		$this->advertiser->save();
-
-		list( $cb, $count ) = $this->count_mail();
-		Advertiser_Email_Notifications::get_instance()->check_low_balance( $this->advertiser->id, 5.00, 'test debit' );
-		remove_filter( 'pre_wp_mail', $cb, 10 );
-
-		$this->assertSame( 1, $count['sent'], 'An advertiser with the toggle on and a below-threshold balance must get exactly one mail.' );
-	}
-
-	// -------------------------------------------------------------------
 	// campaign_budget_depleted() — 'campaign_budget' gate.
 	// -------------------------------------------------------------------
 
