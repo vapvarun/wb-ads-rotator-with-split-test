@@ -37,6 +37,8 @@
 	--wbam-warning:       #dba617;
 	--wbam-border:        var(--bx-color-border, var(--reign-site-border-color, #e5e5e5));
 	--wbam-border-strong: #c3c4c7;
+	/* Form field edge: 3:1 against the surface (WCAG 1.4.11). Follows --wbam-text, so dark mode adapts. */
+	--wbam-input-border:  color-mix(in srgb, var(--wbam-text) 60%, transparent);
 	--wbam-border-subtle: #dcdcde;
 	--wbam-shadow-sm:     0 1px 2px rgba(0, 0, 0, 0.04);
 	--wbam-shadow-md:     0 2px 6px rgba(0, 0, 0, 0.08);
@@ -922,7 +924,7 @@ html.dark,
 	width: 100%;
 	padding: 12px 15px;
 	font-size: 15px;
-	border: 2px solid var(--wbam-border-color, #e0e0e0);
+	border: 2px solid var(--wbam-input-border, rgba(0, 0, 0, 0.42));
 	border-radius: 6px;
 	background: var(--wbam-bg-white, #fff);
 	color: var(--wbam-text-body, #1d2327);
