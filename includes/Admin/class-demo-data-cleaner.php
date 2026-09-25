@@ -59,6 +59,41 @@ class Demo_Data_Cleaner {
 	public function register() {
 		add_action( 'admin_post_wbam_clear_demo_data', array( __CLASS__, 'handle_clear_request' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'maybe_render_notice' ) );
+
+		// Help & Docs promises "Remove the samples any time from Tools" but
+		// render_clear_button() had no caller — the button never actually
+		// appeared there. Settings > Tools already fires this action for
+		// PRO's own demo-data cleaner; hook the same spot so a Free-only
+		// site (and a Free+Pro site, showing both) gets a working button.
+		add_action( 'wbam_settings_tools_content', array( __CLASS__, 'render_clear_button_section' ) );
+	}
+
+	/**
+	 * Wrapper for the `wbam_settings_tools_content` action: only prints a
+	 * heading + the button when there is something to remove, so an empty
+	 * section never appears on a site with no seeded demo data.
+	 *
+	 * @since 3.2.0
+	 */
+	public static function render_clear_button_section() {
+		$registry = get_option( self::OPTION_IDS, array() );
+		if ( ! is_array( $registry ) ) {
+			return;
+		}
+		$total = 0;
+		foreach ( array( 'ads', 'pages', 'links' ) as $bucket ) {
+			if ( ! empty( $registry[ $bucket ] ) && is_array( $registry[ $bucket ] ) ) {
+				$total += count( $registry[ $bucket ] );
+			}
+		}
+		if ( $total <= 0 ) {
+			return;
+		}
+		?>
+		<h3><?php esc_html_e( 'Sample data', 'wb-ads-rotator-with-split-test' ); ?></h3>
+		<p><?php esc_html_e( 'Remove the sample ads created by the setup wizard.', 'wb-ads-rotator-with-split-test' ); ?></p>
+		<?php
+		self::render_clear_button();
 	}
 
 	/**

@@ -200,6 +200,22 @@ class Help_Docs {
 						<li><strong><a href="<?php echo esc_url( $links_url ); ?>"><?php esc_html_e( 'Links', 'wb-ads-rotator-with-split-test' ); ?></a></strong>: <?php esc_html_e( 'cloaked affiliate URLs and the [wbam_partnership_inquiry] admin queue.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					</ul>
 				</div>
+
+				<?php if ( ! \WBAM\Modules\Jetonomy\Jetonomy_Module::is_jetonomy_active() ) : ?>
+					<div class="wbam-doc-section">
+						<h3><?php esc_html_e( 'Integrations', 'wb-ads-rotator-with-split-test' ); ?></h3>
+						<p>
+							<?php
+							printf(
+								/* translators: 1: opening link to Jetonomy store page, 2: closing link tag */
+								esc_html__( 'Running a community forum? Install %1$sJetonomy%2$s to unlock seven more placement positions (sidebar, topic, and reply injection points).', 'wb-ads-rotator-with-split-test' ),
+								'<a href="https://store.wbcomdesigns.com/jetonomy/" target="_blank" rel="noopener noreferrer">',
+								'</a>'
+							);
+							?>
+						</p>
+					</div>
+				<?php endif; ?>
 			<?php else : ?>
 				<div class="wbam-doc-section">
 					<h3><?php esc_html_e( 'Publish your first ad', 'wb-ads-rotator-with-split-test' ); ?></h3>

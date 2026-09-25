@@ -78,6 +78,18 @@ class Setup_Wizard {
 	}
 
 	/**
+	 * Whether Pro is active and still has its own first-run wizard left to
+	 * run. While true, Free defers to Pro instead of showing its own
+	 * competing wizard - one guided setup, not two.
+	 *
+	 * @since 3.2.0
+	 * @return bool
+	 */
+	public static function pro_wizard_pending() {
+		return defined( 'WBAM_PRO_VERSION' ) && ! get_option( 'wbam_pro_setup_complete' );
+	}
+
+	/**
 	 * Show setup notice.
 	 */
 	public function show_setup_notice() {
@@ -89,6 +101,11 @@ class Setup_Wizard {
 		if ( ! $screen || 'wbam-setup' === $screen->id ) {
 			return;
 		}
+		// One wizard: when Pro is active and hasn't finished its own first
+		// run, send the admin straight there instead of into Free's wizard.
+		$wizard_url = self::pro_wizard_pending()
+			? admin_url( 'admin.php?page=wbam-setup-wizard' )
+			: admin_url( 'index.php?page=wbam-setup' );
 		?>
 		<div class="notice notice-info wbam-setup-notice is-dismissible" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wbam_dismiss_setup' ) ); ?>">
 			<p>
@@ -96,7 +113,7 @@ class Setup_Wizard {
 				<?php esc_html_e( 'Get started quickly with our setup wizard to create sample ads and configure basic settings.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 			<p>
-				<a href="<?php echo esc_url( admin_url( 'index.php?page=wbam-setup' ) ); ?>" class="button button-primary">
+				<a href="<?php echo esc_url( $wizard_url ); ?>" class="button button-primary">
 					<?php esc_html_e( 'Run Setup Wizard', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad' ) ); ?>" class="button">
@@ -149,6 +166,15 @@ class Setup_Wizard {
 		// and POST save_step to create sample ads. Authorize here or not at all.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
+		}
+
+		// One wizard, not two competing ones. When Pro is active and its own
+		// wizard hasn't finished, Pro owns first-run end to end (its step 1
+		// picks the site mode Free has no notion of) - hand off instead of
+		// rendering Free's own Welcome/Sample/Ready flow underneath it.
+		if ( self::pro_wizard_pending() ) {
+			wp_safe_redirect( admin_url( 'admin.php?page=wbam-setup-wizard' ) );
+			exit;
 		}
 
 		// Start output buffering early to allow redirects.
@@ -766,6 +792,13 @@ class Setup_Wizard {
 			 * @since 2.3.0
 			 */
 			do_action( 'wbam_setup_wizard_ready_after_steps' );
+			?>
+
+			<?php
+			// Same button the Tools section renders — only shows itself
+			// when sample data actually exists to remove. Same namespace
+			// (WBAM\Admin), no `use` needed.
+			Demo_Data_Cleaner::render_clear_button( __( 'Remove sample ads', 'wb-ads-rotator-with-split-test' ) );
 			?>
 
 			<p class="wbam-setup-actions">
