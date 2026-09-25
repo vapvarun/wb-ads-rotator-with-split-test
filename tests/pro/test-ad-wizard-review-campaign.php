@@ -18,9 +18,20 @@ namespace WBAM\Tests\Pro;
  */
 class Test_Ad_Wizard_Review_Campaign extends Pro_Test_Case {
 
+	/**
+	 * The registry this test replaced; later tests need Free's handles.
+	 *
+	 * @var \WP_Scripts|null
+	 */
+	private $saved_scripts;
+
+	public function set_up(): void {
+		parent::set_up();
+		$this->saved_scripts = $GLOBALS['wp_scripts'] ?? null;
+	}
+
 	public function tear_down(): void {
-		global $wp_scripts;
-		$wp_scripts = null;
+		$GLOBALS['wp_scripts'] = $this->saved_scripts;
 		parent::tear_down();
 	}
 

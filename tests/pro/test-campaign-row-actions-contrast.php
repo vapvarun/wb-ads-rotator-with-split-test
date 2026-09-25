@@ -19,6 +19,12 @@ use WBAM_Pro\Admin\Campaigns_List_Table;
  */
 class Test_Campaign_Row_Actions_Contrast extends Pro_Test_Case {
 
+	public function tear_down(): void {
+		// An admin screen makes is_admin() true for every later test.
+		set_current_screen( 'front' );
+		parent::tear_down();
+	}
+
 	/**
 	 * @dataProvider statuses
 	 */
