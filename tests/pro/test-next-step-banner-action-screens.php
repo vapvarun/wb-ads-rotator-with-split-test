@@ -67,6 +67,24 @@ class Test_Next_Step_Banner_Action_Screens extends Pro_Test_Case {
 			'view (pre-existing)' => array( 'view' ),
 			'edit (pre-existing)' => array( 'edit' ),
 			'add (pre-existing)'  => array( 'add' ),
+			'new (Campaigns/A-B)' => array( 'new' ),
 		);
+	}
+
+	/**
+	 * Add New Ad (post-new.php?post_type=wbam-ad) never carries an `action`
+	 * query arg — core marks it via WP_Screen::$action = 'add' instead. The
+	 * banner must key off that too, not just $_GET['action'].
+	 */
+	public function test_banner_is_hidden_on_add_new_ad_screen(): void {
+		unset( $_GET['action'] );
+		set_current_screen( 'post-new.php' );
+		get_current_screen()->post_type = 'wbam-ad';
+
+		ob_start();
+		Next_Step_Banner::maybe_render();
+		$output = ob_get_clean();
+
+		$this->assertSame( '', $output );
 	}
 }
