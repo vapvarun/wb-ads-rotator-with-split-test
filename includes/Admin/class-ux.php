@@ -269,6 +269,8 @@ class UX {
 	 *
 	 * @since 2.9.2
 	 * @param array $args {
+	 *     @type string $icon    Optional. A Lucide icon name (rendered via
+	 *                           wbam_icon()) shown above the title.
 	 *     @type string $title   Optional. Headline.
 	 *     @type string $message Optional. One-line explanation.
 	 *     @type string $actions Optional. Pre-escaped action HTML.
@@ -279,6 +281,7 @@ class UX {
 		$args = wp_parse_args(
 			$args,
 			array(
+				'icon'    => '',
 				'title'   => __( 'Nothing here yet', 'wb-ads-rotator-with-split-test' ),
 				'message' => '',
 				'actions' => '',
@@ -288,6 +291,11 @@ class UX {
 		ob_start();
 		?>
 		<div class="wbam-empty-state">
+			<?php if ( '' !== $args['icon'] ) : ?>
+				<span class="wbam-empty-state__icon">
+					<?php echo wbam_icon( $args['icon'], array( 'size' => 'lg' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?>
+				</span>
+			<?php endif; ?>
 			<p class="wbam-empty-state__title"><?php echo esc_html( $args['title'] ); ?></p>
 			<?php if ( '' !== $args['message'] ) : ?>
 				<p><?php echo esc_html( $args['message'] ); ?></p>

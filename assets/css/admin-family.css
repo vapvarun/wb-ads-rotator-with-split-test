@@ -495,11 +495,35 @@
 	color:           var(--wbam-text-muted);
 }
 
+.wbam-empty-state__icon {
+	display:     inline-flex;
+	color:       var(--wbam-text-subtle);
+}
+
+.wbam-empty-state__icon [data-lucide] {
+	width:  40px;
+	height: 40px;
+}
+
 .wbam-empty-state__title {
 	margin:      0;
 	font-size:   var(--wbam-font-size-lg);
 	font-weight: var(--wbam-weight-semibold);
 	color:       var(--wbam-text);
+}
+
+/* A standalone empty state (a whole screen with nothing on it) reads as a
+   centred card, not a full-width band. */
+.wbam-empty-state {
+	max-width: 560px;
+	margin:    var(--wbam-space-6) auto;
+}
+
+/* Rendered inside a WP_List_Table placeholder row (both plugins' list
+   tables), where the outer margin above would push it off-centre inside
+   the row's own padding. */
+.wp-list-table .no-items .wbam-empty-state {
+	margin: var(--wbam-space-4) auto;
 }
 
 /* ── Settings screens: each <h2> + form-table reads as a labelled card ────── */

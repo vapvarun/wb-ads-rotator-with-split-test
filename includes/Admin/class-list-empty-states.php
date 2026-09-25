@@ -65,7 +65,7 @@ class List_Empty_States {
 
 		$this->render_empty_state(
 			array(
-				'icon'      => 'dashicons-megaphone',
+				'icon'      => 'megaphone',
 				'title'     => __( 'No ads yet', 'wb-ads-rotator-with-split-test' ),
 				'body'      => __( 'Ads are the creatives your visitors will see. Create your first ad to choose where and how it displays.', 'wb-ads-rotator-with-split-test' ),
 				'cta_label' => __( 'Create your first ad', 'wb-ads-rotator-with-split-test' ),
@@ -101,7 +101,7 @@ class List_Empty_States {
 		$instance = new self();
 		$instance->render_empty_state(
 			array(
-				'icon'      => 'dashicons-admin-links',
+				'icon'      => 'link',
 				'title'     => __( 'No links yet', 'wb-ads-rotator-with-split-test' ),
 				'body'      => __( 'Cloaked links let you track clicks, shorten destinations, and manage affiliate URLs. Create your first link to start tracking.', 'wb-ads-rotator-with-split-test' ),
 				'cta_label' => __( 'Create your first link', 'wb-ads-rotator-with-split-test' ),
@@ -173,10 +173,15 @@ class List_Empty_States {
 	/**
 	 * Render the empty-state callout markup.
 	 *
+	 * Thin wrapper around the shared UX::empty_state() component (one
+	 * empty-state look for the whole admin, per the design-system plan)
+	 * that adds the list-screen-specific chrome: the CTA button and the
+	 * `.notice` wrapper core needs to reposition this below the page title.
+	 *
 	 * @param array $args {
 	 *     Render arguments.
 	 *
-	 *     @type string $icon      Dashicon class (e.g. 'dashicons-megaphone').
+	 *     @type string $icon      Lucide icon name (e.g. 'megaphone').
 	 *     @type string $title     Heading copy.
 	 *     @type string $body      Explanatory sentence.
 	 *     @type string $cta_label Primary button label.
@@ -189,7 +194,7 @@ class List_Empty_States {
 		$args = wp_parse_args(
 			$args,
 			array(
-				'icon'      => 'dashicons-megaphone',
+				'icon'      => 'megaphone',
 				'title'     => '',
 				'body'      => '',
 				'cta_label' => '',
@@ -198,28 +203,29 @@ class List_Empty_States {
 			)
 		);
 
-		$card  = '<div class="wbam-empty-state">';
-		$card .= '<span class="wbam-empty-state__icon dashicons ' . esc_attr( $args['icon'] ) . '" aria-hidden="true"></span>';
-		$card .= '<h2 class="wbam-empty-state__title">' . esc_html( $args['title'] ) . '</h2>';
-		$card .= '<p class="wbam-empty-state__body">' . esc_html( $args['body'] ) . '</p>';
-
+		$actions = '';
 		if ( ! empty( $args['cta_label'] ) && ! empty( $args['cta_url'] ) ) {
-			$card .= '<a class="button button-primary button-hero wbam-empty-state__cta" href="'
+			$actions = '<a class="wbam-admin-btn wbam-admin-btn--primary" href="'
 				. esc_url( $args['cta_url'] ) . '">'
 				. esc_html( $args['cta_label'] ) . '</a>';
 		}
 
-		$card .= '</div>';
+		$card = UX::empty_state(
+			array(
+				'icon'    => $args['icon'],
+				'title'   => $args['title'],
+				'message' => $args['body'],
+				'actions' => $actions,
+			)
+		);
 
 		if ( $args['inline'] ) {
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- All fields escaped above.
-			echo $card;
+			echo wp_kses_post( $card );
 			return;
 		}
 
 		// .notice: core common.js moves notices below the page heading; without
 		// it the card printed above the title and the admin notices.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- All fields escaped above.
-		echo '<div class="notice wbam-empty-state-wrap">' . $card . '</div>';
+		echo '<div class="notice wbam-empty-state-wrap">' . wp_kses_post( $card ) . '</div>';
 	}
 }

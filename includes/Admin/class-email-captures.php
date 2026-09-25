@@ -141,7 +141,17 @@ class Email_Captures {
 			?>
 
 			<?php if ( empty( $rows ) ) : ?>
-				<div class="notice notice-info inline"><p><?php esc_html_e( 'No email captures yet. Submissions from the Email Capture ad type appear here.', 'wb-ads-rotator-with-split-test' ); ?></p></div>
+				<?php
+				echo wp_kses_post(
+					\WBAM\Admin\UX::empty_state(
+						array(
+							'icon'    => 'mail',
+							'title'   => __( 'No email captures yet', 'wb-ads-rotator-with-split-test' ),
+							'message' => __( 'Submissions from the Email Capture ad type appear here.', 'wb-ads-rotator-with-split-test' ),
+						)
+					)
+				);
+				?>
 			<?php else : ?>
 				<table class="wp-list-table widefat fixed striped">
 					<thead>

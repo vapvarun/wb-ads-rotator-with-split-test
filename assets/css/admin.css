@@ -1507,57 +1507,9 @@
 	box-shadow: none;
 }
 
-.wbam-empty-state {
-	box-sizing: border-box;
-	max-width: 560px;
-	margin: 24px auto;
-	padding: 40px 32px;
-	text-align: center;
-	background: linear-gradient( 180deg, var(--wbam-bg) 0%, var(--wbam-surface) 100% );
-	border: 1px dashed var(--wbam-border-strong);
-	border-radius: var(--wbam-r-lg);
-	box-shadow: 0 1px 2px rgba( 0, 0, 0, 0.04 );
-}
-
-.wbam-empty-state__icon.dashicons {
-	width: 48px;
-	height: 48px;
-	font-size: 48px;
-	line-height: 1;
-	color: var(--wbam-accent);
-	margin: 0 auto 16px;
-	display: inline-block;
-}
-
-.wbam-empty-state__title {
-	margin: 0 0 10px;
-	font-size: var(--wbam-font-size-xl);
-	font-weight: 600;
-	color: var(--wbam-text);
-	line-height: 1.3;
-}
-
-.wbam-empty-state__body {
-	margin: 0 auto 22px;
-	max-width: 420px;
-	font-size: 14px;
-	line-height: 1.55;
-	color: var(--wbam-text-muted);
-}
-
-.wbam-empty-state__cta.button.button-hero {
-	min-height: auto;
-	padding: 8px 22px;
-	font-size: 14px;
-	font-weight: 600;
-	line-height: 1.4;
-}
-
-/* Inline variant: rendered inside a WP_List_Table placeholder row,
-   so lose the outer margin that would push it off-center. */
-.wp-list-table .no-items .wbam-empty-state {
-	margin: 16px auto;
-}
+/* .wbam-empty-state itself (container, icon, title, message, actions, width
+   and centering, including the WP_List_Table placeholder-row variant) is the
+   shared component: admin-family.css, rendered via UX::empty_state(). */
 
 /* Searchable checkbox picker (admin.js enhances select.wbam-select2). */
 .wbam-picker__source {
