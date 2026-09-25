@@ -96,6 +96,22 @@
 			init: function() {
 				var stickyAds = document.querySelectorAll( '.wbam-sticky-ad' );
 
+				// Escape dismisses the sticky ad, unless a popup is open: then
+				// Escape belongs to the popup.
+				if ( stickyAds.length ) {
+					document.addEventListener( 'keydown', function( e ) {
+						if ( e.key !== 'Escape' || document.body.classList.contains( 'wbam-popup-open' ) ) {
+							return;
+						}
+						stickyAds.forEach( function( ad ) {
+							if ( ad.style.display !== 'none' ) {
+								ad.style.display = 'none';
+								WBAM.cookies.markClosed( parseInt( ad.getAttribute( 'data-ad-id' ), 10 ) );
+							}
+						} );
+					} );
+				}
+
 				stickyAds.forEach( function( ad ) {
 					var adId = parseInt( ad.getAttribute( 'data-ad-id' ), 10 );
 
@@ -132,14 +148,27 @@
 			init: function() {
 				var popups = document.querySelectorAll( '.wbam-popup-overlay' );
 
+				// Page views this browser session, for the "never on a phone's
+				// first page view" rule.
+				var views = 1;
+				try {
+					views = ( parseInt( window.sessionStorage.getItem( 'wbam_pv' ), 10 ) || 0 ) + 1;
+					window.sessionStorage.setItem( 'wbam_pv', String( views ) );
+				} catch ( e ) {}
+				var phoneFirstView = views === 1 && window.matchMedia && window.matchMedia( '(max-width: 767px)' ).matches;
+
 				popups.forEach( function( popup ) {
 					var adId    = parseInt( popup.getAttribute( 'data-ad-id' ), 10 );
 					var trigger = popup.getAttribute( 'data-trigger' );
 					var delay   = parseInt( popup.getAttribute( 'data-delay' ), 10 ) || 5;
 					var scroll  = parseInt( popup.getAttribute( 'data-scroll' ), 10 ) || 50;
 
-					// Skip if previously closed.
-					if ( WBAM.cookies.isClosed( adId ) ) {
+					// Skip if closed, already seen within its repeat window, or
+					// a phone's first page view (unless the owner allows it).
+					if ( WBAM.cookies.isClosed( adId ) || WBAM.cookies.get( 'wbam_popup_seen_' + adId ) ) {
+						return;
+					}
+					if ( phoneFirstView && popup.getAttribute( 'data-mobile-first-view' ) !== '1' ) {
 						return;
 					}
 
@@ -159,10 +188,15 @@
 						}
 					} );
 
-					// Close on Escape key.
+					// Escape closes; Tab stays inside the dialog while it is open.
 					document.addEventListener( 'keydown', function( e ) {
-						if ( e.key === 'Escape' && popup.style.display !== 'none' ) {
+						if ( popup.hidden ) {
+							return;
+						}
+						if ( e.key === 'Escape' ) {
 							WBAM.popup.close( popup, adId );
+						} else if ( e.key === 'Tab' ) {
+							WBAM.popup.trapTab( popup, e );
 						}
 					} );
 
@@ -188,12 +222,48 @@
 			 * @param {number}  adId  Ad ID.
 			 */
 			show: function( popup, adId ) {
-				if ( this.shown.indexOf( adId ) !== -1 ) {
+				if ( this.shown.indexOf( adId ) !== -1 || document.body.classList.contains( 'wbam-popup-open' ) ) {
 					return;
 				}
 				this.shown.push( adId );
-				popup.style.display = 'flex';
+
+				var days = parseInt( popup.getAttribute( 'data-repeat-days' ), 10 ) || 0;
+				if ( days > 0 ) {
+					WBAM.cookies.set( 'wbam_popup_seen_' + adId, '1', days );
+				}
+
+				this.returnFocus = document.activeElement;
+				popup.hidden = false;
 				document.body.style.overflow = 'hidden';
+				document.body.classList.add( 'wbam-popup-open' );
+
+				var closeBtn = popup.querySelector( '.wbam-popup-close' );
+				if ( closeBtn ) {
+					closeBtn.focus();
+				}
+			},
+
+			/**
+			 * Keep Tab focus inside the open dialog.
+			 *
+			 * @param {Element}       popup Popup element.
+			 * @param {KeyboardEvent} e     Keydown event.
+			 */
+			trapTab: function( popup, e ) {
+				var focusable = popup.querySelectorAll( 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, iframe, [tabindex]:not([tabindex="-1"])' );
+				if ( ! focusable.length ) {
+					e.preventDefault();
+					return;
+				}
+				var first = focusable[0];
+				var last  = focusable[ focusable.length - 1 ];
+				if ( e.shiftKey && ( document.activeElement === first || ! popup.contains( document.activeElement ) ) ) {
+					e.preventDefault();
+					last.focus();
+				} else if ( ! e.shiftKey && ( document.activeElement === last || ! popup.contains( document.activeElement ) ) ) {
+					e.preventDefault();
+					first.focus();
+				}
 			},
 
 			/**
@@ -203,9 +273,13 @@
 			 * @param {number}  adId  Ad ID.
 			 */
 			close: function( popup, adId ) {
-				popup.style.display = 'none';
+				popup.hidden = true;
 				document.body.style.overflow = '';
+				document.body.classList.remove( 'wbam-popup-open' );
 				WBAM.cookies.markClosed( adId );
+				if ( this.returnFocus && this.returnFocus.focus ) {
+					this.returnFocus.focus();
+				}
 			},
 
 			/**
@@ -392,7 +466,7 @@
 
 				// Hide previous error.
 				if ( errorEl ) {
-					errorEl.style.display = 'none';
+					errorEl.hidden = true;
 				}
 
 				// Send AJAX request.
@@ -431,7 +505,7 @@
 						// Show success message.
 						form.style.display = 'none';
 						if ( successEl ) {
-							successEl.style.display = 'block';
+							successEl.hidden = false;
 						}
 
 						// Auto-hide after 5 seconds.
@@ -460,7 +534,7 @@
 			showError: function( errorEl, errorMsgEl, message ) {
 				if ( errorEl && errorMsgEl ) {
 					errorMsgEl.textContent = message;
-					errorEl.style.display = 'block';
+					errorEl.hidden = false;
 				}
 			}
 		},

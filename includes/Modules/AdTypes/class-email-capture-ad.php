@@ -102,8 +102,6 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		$cookie_days  = isset( $data['cookie_days'] ) ? absint( $data['cookie_days'] ) : 7;
 		$redirect_url = isset( $data['redirect_url'] ) ? $data['redirect_url'] : '';
 		$privacy_text = isset( $data['privacy_text'] ) ? $data['privacy_text'] : '';
-		$bg_color     = isset( $data['bg_color'] ) ? $data['bg_color'] : '#ffffff';
-		$text_color   = isset( $data['text_color'] ) ? $data['text_color'] : '#1d2327';
 		$button_color = isset( $data['button_color'] ) ? $data['button_color'] : '#2271b1';
 
 		/**
@@ -204,7 +202,13 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 			data-ad-id="<?php echo esc_attr( $ad_id ); ?>"
 			data-placement="<?php echo esc_attr( $placement ); ?>"
 			data-cookie-days="<?php echo esc_attr( $cookie_days ); ?>"
-			style="--wbam-email-bg: <?php echo esc_attr( $bg_color ); ?>; --wbam-email-text: <?php echo esc_attr( $text_color ); ?>; --wbam-email-btn: <?php echo esc_attr( $button_color ); ?>;">
+			<?php
+			// The button follows the theme accent unless the owner picked
+			// their own colour (#2271b1 is the old shipped default).
+			if ( $button_color && '#2271b1' !== strtolower( $button_color ) ) :
+				?>
+				style="--wbam-accent: <?php echo esc_attr( $button_color ); ?>;"
+			<?php endif; ?>>
 
 			<button type="button" class="wbam-email-close" aria-label="<?php esc_attr_e( 'Close', 'wb-ads-rotator-with-split-test' ); ?>">
 				<?php echo wbam_icon( 'x', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -239,7 +243,8 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 					<div class="wbam-email-fields">
 						<?php if ( $show_name ) : ?>
 							<div class="wbam-email-field wbam-email-field-name">
-								<input type="text" name="subscriber_name" placeholder="<?php echo esc_attr( $placeholders['name'] ); ?>" aria-label="<?php echo esc_attr( $placeholders['name'] ); ?>" class="wbam-email-input">
+								<label class="wbam-email-label" for="<?php echo esc_attr( $form_id ); ?>-name"><?php echo esc_html( $placeholders['name'] ); ?></label>
+								<input type="text" id="<?php echo esc_attr( $form_id ); ?>-name" name="subscriber_name" autocomplete="name" class="wbam-email-input">
 							</div>
 							<?php
 							/**
@@ -254,7 +259,8 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 						<?php endif; ?>
 
 						<div class="wbam-email-field wbam-email-field-email">
-							<input type="email" name="subscriber_email" placeholder="<?php echo esc_attr( $placeholders['email'] ); ?>" aria-label="<?php echo esc_attr( $placeholders['email'] ); ?>" class="wbam-email-input" required>
+							<label class="wbam-email-label" for="<?php echo esc_attr( $form_id ); ?>-email"><?php echo esc_html( $placeholders['email'] ); ?></label>
+							<input type="email" id="<?php echo esc_attr( $form_id ); ?>-email" name="subscriber_email" autocomplete="email" class="wbam-email-input" required>
 						</div>
 
 						<?php
@@ -291,14 +297,14 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 					<?php endif; ?>
 				</form>
 
-				<div class="wbam-email-success" style="display: none;">
+				<div class="wbam-email-success" role="status" hidden>
 					<div class="wbam-email-success-icon">
 						<?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</div>
 					<p class="wbam-email-success-message"><?php echo esc_html( $success_msg ); ?></p>
 				</div>
 
-				<div class="wbam-email-error" style="display: none;">
+				<div class="wbam-email-error" role="alert" hidden>
 					<p class="wbam-email-error-message"></p>
 				</div>
 			</div>

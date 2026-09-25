@@ -58,7 +58,10 @@
 	--wbam-spacing: 20px;
 	--wbam-spacing-sm: 15px;
 	--wbam-border-radius: 4px;
-	--wbam-label-size: 11px;
+	/* 12px floor: the disclosure label must stay readable on phones. */
+	--wbam-label-size: 0.75rem;
+	/* Close buttons on sticky, popup and email ads: a 44px touch target. */
+	--wbam-close-size: 44px;
 	--wbam-transition: 0.2s ease;
 
 	/* ── Legacy aliases — deprecated, mapped onto the chained semantic tokens
@@ -246,8 +249,15 @@
    Rich Content Ads
    ========================================================================== */
 
+/* Media centres in the slot (.wbam-ad); prose reads from the start edge,
+   inside a bounded card so it is never mistaken for the article. */
 .wbam-ad-rich-content {
-	text-align: left;
+	text-align: start;
+	padding: var(--wbam-spacing-sm) var(--wbam-spacing);
+	background: var(--wbam-surface);
+	color: var(--wbam-text);
+	border: 1px solid var(--wbam-border);
+	border-radius: var(--wbam-r-md);
 }
 
 .wbam-ad-rich-content p:first-child {
@@ -302,6 +312,7 @@
 
 .wbam-placement-header {
 	margin: 0 0 var(--wbam-spacing);
+	padding-inline: var(--wbam-spacing-sm);
 }
 
 .wbam-placement-footer {
@@ -322,6 +333,14 @@
 
 .wbam-placement-shortcode {
 	margin: var(--wbam-spacing) 0;
+}
+
+/* Theme hooks for the archive slots often sit in a flex row; take the full
+   row instead of shrinking to the creative's intrinsic width. */
+.wbam-placement-before-archive,
+.wbam-placement-after-archive {
+	inline-size: 100%;
+	flex-basis: 100%;
 }
 
 /* Stacked creatives in a multi-ad shortcode need separation - flush
@@ -428,7 +447,6 @@
 	:root {
 		--wbam-spacing: 12px;
 		--wbam-spacing-sm: 8px;
-		--wbam-label-size: 10px;
 	}
 }
 
@@ -537,7 +555,8 @@ html.dark,
 	html.dark,
 	[data-theme="dark"],
 	.buddyx-dark-mode,
-	.bb-dark-mode {
+	.bb-dark-mode,
+	.wbam-ad-email-capture {
 		--wbam-accent-fg: oklch(from var(--wbam-accent) clamp(0, (0.585 - l) * 1000, 1) 0 0);
 	}
 }
@@ -562,28 +581,26 @@ html.dark,
 }
 
 .wbam-sticky-bottom-right {
-	bottom: 20px;
-	right: 20px;
+	inset-block-end: 20px;
+	inset-inline-end: 20px;
 }
 
 .wbam-sticky-bottom-left {
-	bottom: 20px;
-	left: 20px;
+	inset-block-end: 20px;
+	inset-inline-start: 20px;
 }
 
 .wbam-sticky-bottom-bar {
-	bottom: 0;
-	left: 0;
-	right: 0;
+	inset-block-end: 0;
+	inset-inline: 0;
 	max-width: 100%;
 	border-radius: 0;
 	padding: 15px 20px;
 }
 
 .wbam-sticky-top-bar {
-	top: 0;
-	left: 0;
-	right: 0;
+	inset-block-start: 0;
+	inset-inline: 0;
 	max-width: 100%;
 	border-radius: 0;
 	padding: 15px 20px;
@@ -591,16 +608,16 @@ html.dark,
 
 .wbam-sticky-close {
 	position: absolute;
-	top: -10px;
-	right: -10px;
-	width: 28px;
-	height: 28px;
+	inset-block-start: -12px;
+	inset-inline-end: -12px;
+	width: var(--wbam-close-size);
+	height: var(--wbam-close-size);
 	padding: 0;
 	background: var(--wbam-text);
 	color: var(--wbam-bg);
 	border: none;
 	border-radius: 50%;
-	font-size: var(--wbam-font-size-lg);
+	font-size: var(--wbam-font-size-xl);
 	line-height: 1;
 	cursor: pointer;
 	display: flex;
@@ -616,9 +633,19 @@ html.dark,
 
 .wbam-sticky-bottom-bar .wbam-sticky-close,
 .wbam-sticky-top-bar .wbam-sticky-close {
-	top: 50%;
-	right: 15px;
+	inset-block-start: 50%;
+	inset-inline-end: 8px;
 	transform: translateY(-50%);
+}
+
+.wbam-sticky-bottom-bar,
+.wbam-sticky-top-bar {
+	padding-inline-end: calc(var(--wbam-close-size) + 16px);
+}
+
+/* One interruption at a time: the sticky ad steps aside while a popup is open. */
+.wbam-popup-open .wbam-sticky-ad {
+	display: none;
 }
 
 @keyframes wbam-slide-in {
@@ -635,6 +662,10 @@ html.dark,
 /* ==========================================================================
    Popup/Modal Ads
    ========================================================================== */
+
+.wbam-popup-overlay[hidden] {
+	display: none;
+}
 
 .wbam-popup-overlay {
 	position: fixed;
@@ -664,6 +695,8 @@ html.dark,
 
 .wbam-popup-content {
 	padding: 25px;
+	/* Clear the close button so it never covers the disclosure label. */
+	padding-block-start: calc(var(--wbam-close-size) + 16px);
 }
 
 .wbam-popup-content .wbam-placement {
@@ -672,10 +705,10 @@ html.dark,
 
 .wbam-popup-close {
 	position: absolute;
-	top: 10px;
-	right: 10px;
-	width: 32px;
-	height: 32px;
+	inset-block-start: 8px;
+	inset-inline-end: 8px;
+	width: var(--wbam-close-size);
+	height: var(--wbam-close-size);
 	padding: 0;
 	background: var(--wbam-text);
 	color: var(--wbam-bg);
@@ -740,14 +773,43 @@ html.dark,
    ========================================================================== */
 
 @media screen and (max-width: 480px) {
-	.wbam-sticky-ad {
-		max-width: calc(100% - 40px);
+	/* Phones: every sticky ad becomes a slim, full-width, dismissible bar
+	   (owner decision 9: at most about 100px tall). */
+	.wbam-sticky-ad,
+	.wbam-sticky-bottom-right,
+	.wbam-sticky-bottom-left,
+	.wbam-sticky-bottom-bar {
+		inset-block-start: auto;
+		inset-block-end: 0;
+		inset-inline: 0;
+		max-width: none;
+		max-height: 100px;
+		overflow-y: auto;
+		border-radius: 0;
+		padding-block: 4px;
+		padding-inline: 8px calc(var(--wbam-close-size) + 12px);
 	}
 
-	.wbam-sticky-bottom-right,
-	.wbam-sticky-bottom-left {
-		left: 20px;
-		right: 20px;
+	.wbam-sticky-top-bar {
+		inset-block-start: 0;
+		inset-block-end: auto;
+	}
+
+	.wbam-sticky-ad .wbam-sticky-close {
+		inset-block-start: 50%;
+		inset-inline-end: 4px;
+		transform: translateY(-50%);
+	}
+
+	.wbam-sticky-ad .wbam-ad-image img,
+	.wbam-sticky-ad .wbam-ad-slot img {
+		max-height: 64px;
+		width: auto;
+		margin-inline: auto;
+	}
+
+	.wbam-sticky-ad .wbam-ad-label {
+		padding: 0;
 	}
 
 	.wbam-popup-modal {
@@ -757,6 +819,7 @@ html.dark,
 
 	.wbam-popup-content {
 		padding: 20px;
+		padding-block-start: calc(var(--wbam-close-size) + 12px);
 	}
 }
 
@@ -893,10 +956,11 @@ html.dark,
 
 .wbam-email-close {
 	position: absolute;
-	top: 10px;
-	right: 10px;
-	width: 28px;
-	height: 28px;
+	inset-block-start: 4px;
+	inset-inline-end: 4px;
+	width: var(--wbam-close-size);
+	height: var(--wbam-close-size);
+	color: inherit;
 	background: var(--wbam-hover-bg-darker, rgba(0, 0, 0, 0.1));
 	border: none;
 	border-radius: 50%;
@@ -950,12 +1014,23 @@ html.dark,
 
 .wbam-email-field {
 	width: 100%;
+	text-align: start;
 }
 
-.wbam-email-input {
+.wbam-email-label {
+	display: block;
+	margin-block-end: 4px;
+	font-size: var(--wbam-font-size-sm);
+	font-weight: 600;
+}
+
+/* Scoped under the ad so theme input[type] rules cannot thin the border
+   below 3:1 (WCAG 1.4.11). */
+.wbam-ad-email-capture .wbam-email-input {
 	width: 100%;
 	padding: 12px 15px;
-	font-size: 15px;
+	/* 16px: smaller text makes iOS zoom the page on focus. */
+	font-size: var(--wbam-font-size-md);
 	border: 2px solid var(--wbam-input-border, rgba(0, 0, 0, 0.42));
 	border-radius: 6px;
 	background: var(--wbam-bg-white, #fff);
@@ -963,18 +1038,14 @@ html.dark,
 	transition: border-color 0.2s ease;
 }
 
-.wbam-email-input:focus {
+.wbam-ad-email-capture .wbam-email-input:focus {
 	outline: none;
-	border-color: var(--wbam-email-btn, var(--wbam-bg-button, #2271b1));
+	border-color: var(--wbam-accent);
 }
 
-.wbam-email-input:focus-visible {
-	outline: 2px solid var(--wbam-email-btn, var(--wbam-bg-button, #2271b1));
+.wbam-ad-email-capture .wbam-email-input:focus-visible {
+	outline: 2px solid var(--wbam-accent);
 	outline-offset: 2px;
-}
-
-.wbam-email-input::placeholder {
-	color: var(--wbam-text-meta, #999);
 }
 
 .wbam-email-submit {
@@ -986,8 +1057,8 @@ html.dark,
 	padding: 14px 20px;
 	font-size: var(--wbam-font-size-md);
 	font-weight: 600;
-	color: var(--wbam-text-light, #fff);
-	background: var(--wbam-email-btn, var(--wbam-bg-button, #2271b1));
+	color: var(--wbam-accent-fg);
+	background: var(--wbam-accent);
 	border: none;
 	border-radius: 6px;
 	cursor: pointer;
@@ -1015,6 +1086,11 @@ html.dark,
 }
 
 /* Success State */
+.wbam-email-success[hidden],
+.wbam-email-error[hidden] {
+	display: none;
+}
+
 .wbam-email-success {
 	padding: 20px;
 	text-align: center;
@@ -1087,10 +1163,9 @@ html.dark,
 		font-size: var(--wbam-font-size-lg);
 	}
 
-	.wbam-email-input,
+	.wbam-ad-email-capture .wbam-email-input,
 	.wbam-email-button {
 		padding: 12px;
-		font-size: 14px;
 	}
 }
 
@@ -1100,24 +1175,11 @@ html.dark,
 		box-shadow: 0 4px 20px var(--wbam-shadow-strong);
 	}
 
-	.wbam-email-input {
-		background: var(--wbam-bg-darker);
-		border-color: var(--wbam-border-color-darker);
-		color: var(--wbam-text-light);
-	}
-
 	.wbam-email-error {
 		background: var(--wbam-error-bg-dark, rgba(214, 54, 56, 0.1));
 	}
 }
 
-.dark-mode .wbam-email-input,
-.theme-dark .wbam-email-input,
-[data-theme="dark"] .wbam-email-input {
-	background: var(--wbam-bg-darker);
-	border-color: var(--wbam-border-color-darker);
-	color: var(--wbam-text-light);
-}
 
 /* ==========================================================================
    Universal ad slot wrapper

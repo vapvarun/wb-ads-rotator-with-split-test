@@ -381,8 +381,8 @@ class Setup_Wizard {
 				'sidebar_widget' => array(
 					'label'       => __( 'Sidebar Widget Ad', 'wb-ads-rotator-with-split-test' ),
 					'description' => wp_is_block_theme()
-						? __( 'Code ad for a sidebar. Your theme has no widget areas: show it with the [wbam_ad] shortcode.', 'wb-ads-rotator-with-split-test' )
-						: __( 'Code ad, added to your first sidebar as a widget', 'wb-ads-rotator-with-split-test' ),
+						? __( 'Text ad for a sidebar. Your theme has no widget areas: show it with the [wbam_ad] shortcode.', 'wb-ads-rotator-with-split-test' )
+						: __( 'Text ad, added to your first sidebar as a widget', 'wb-ads-rotator-with-split-test' ),
 					'checked'     => true,
 				),
 				'content_promo'  => array(
@@ -543,30 +543,33 @@ class Setup_Wizard {
 	 * @param array $ads_to_create List of sample ads to create.
 	 */
 	private function create_sample_ads( $ads_to_create ) {
-		$sample_ads = array(
+		// Visitor-facing house promos: themed through the plugin's tokens (no
+		// inline colours, so dark mode works), a bundled image instead of a
+		// hot-linked one, and links that go somewhere real.
+		$contact_url = home_url( '/' );
+		$sample_ads  = array(
 			'header_banner'  => array(
 				'title'      => __( 'Sample Header Banner', 'wb-ads-rotator-with-split-test' ),
 				'type'       => 'image',
 				'placements' => array( 'header' ),
+				'size'       => array( 728, 90 ),
 				'data'       => array(
 					'type'      => 'image',
-					'image_url' => 'https://placehold.co/728x90/4a90d9/ffffff?text=Header+Banner+Ad',
-					'link_url'  => home_url( '/' ),
-					'alt_text'  => __( 'Sample Header Banner', 'wb-ads-rotator-with-split-test' ),
-					'new_tab'   => true,
+					'image_url' => WBAM_URL . 'assets/images/sample-leaderboard.svg',
+					'link_url'  => $contact_url,
+					'alt_text'  => __( 'Advertise here. Put your brand in front of our readers.', 'wb-ads-rotator-with-split-test' ),
+					'target'    => '_self',
 				),
 			),
 			'sidebar_widget' => array(
 				'title'      => __( 'Sample Sidebar Ad', 'wb-ads-rotator-with-split-test' ),
-				'type'       => 'code',
+				'type'       => 'rich-content',
 				'placements' => array( 'widget' ),
 				'data'       => array(
-					'type' => 'code',
-					'code' => '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; text-align: center; color: #fff;">
-	<h4 style="margin: 0 0 10px; color: inherit; font-size: 18px;">' . esc_html__( 'Advertise Here!', 'wb-ads-rotator-with-split-test' ) . '</h4>
-	<p style="margin: 0 0 15px; font-size: 14px;">' . esc_html__( 'This is a sample sidebar ad using custom HTML code.', 'wb-ads-rotator-with-split-test' ) . '</p>
-	<a href="#" style="display: inline-block; background: #fff; color: #667eea; padding: 8px 20px; border-radius: 4px; text-decoration: none; font-weight: bold;">' . esc_html__( 'Learn More', 'wb-ads-rotator-with-split-test' ) . '</a>
-</div>',
+					'type'    => 'rich-content',
+					'content' => '<p><strong>' . esc_html__( 'Advertise here', 'wb-ads-rotator-with-split-test' ) . '</strong></p>'
+						. '<p>' . esc_html__( 'Reach our readers with a spot in this sidebar.', 'wb-ads-rotator-with-split-test' ) . '</p>'
+						. '<p><a href="' . esc_url( $contact_url ) . '">' . esc_html__( 'Get in touch', 'wb-ads-rotator-with-split-test' ) . '</a></p>',
 				),
 			),
 			'content_promo'  => array(
@@ -575,10 +578,8 @@ class Setup_Wizard {
 				'placements' => array( 'after_paragraph' ),
 				'data'       => array(
 					'type'            => 'rich-content',
-					'content'         => '<div style="background: #f8f9fa; border-left: 4px solid #28a745; padding: 15px 20px; margin: 20px 0; border-radius: 4px;">
-	<strong style="color: #28a745;">💡 ' . esc_html__( 'Pro Tip:', 'wb-ads-rotator-with-split-test' ) . '</strong>
-	<p style="margin: 10px 0 0;">' . esc_html__( 'This is a sample in-content promotion. It appears after paragraph 2 in your posts. Great for newsletter signups, related content, or special offers!', 'wb-ads-rotator-with-split-test' ) . '</p>
-</div>',
+					'content'         => '<p><strong>' . esc_html__( 'Your message could be here', 'wb-ads-rotator-with-split-test' ) . '</strong></p>'
+						. '<p>' . esc_html__( 'Readers see this spot in the middle of our most-read posts.', 'wb-ads-rotator-with-split-test' ) . ' <a href="' . esc_url( $contact_url ) . '">' . esc_html__( 'Advertise with us', 'wb-ads-rotator-with-split-test' ) . '</a></p>',
 					'after_paragraph' => 2,
 				),
 			),
@@ -618,6 +619,11 @@ class Setup_Wizard {
 				update_post_meta( $post_id, '_wbam_enabled', '1' );
 				update_post_meta( $post_id, '_wbam_priority', 5 );
 				update_post_meta( $post_id, '_wbam_sample_ad', true );
+				if ( isset( $ad['size'] ) ) {
+					update_post_meta( $post_id, '_wbam_ad_format', \WBAM\Core\Ad_Formats::detect_by_dimensions( (int) $ad['size'][0], (int) $ad['size'][1] ) );
+					update_post_meta( $post_id, '_wbam_ad_width', (int) $ad['size'][0] );
+					update_post_meta( $post_id, '_wbam_ad_height', (int) $ad['size'][1] );
+				}
 
 				// Phase K: demo marker meta for safe one-click cleanup.
 				// The Demo_Data_Cleaner double-checks this meta flag before
