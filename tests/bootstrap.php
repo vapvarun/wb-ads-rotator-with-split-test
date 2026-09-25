@@ -58,6 +58,19 @@ tests_add_filter(
 
 		if ( getenv( 'WBAM_RUN_PRO_TESTS' ) === '1' && class_exists( '\\WBAM_Pro\\Core\\Installer' ) ) {
 			\WBAM_Pro\Core\Installer::install();
+
+			// Installer::install() on a fresh DB now defaults new installs to
+			// Site_Mode::PUBLISHER (owner decision, card 10342783654) - the
+			// least-exposed mode, with campaigns, classifieds, wallet, etc. all
+			// off until a wizard runs. The test suite exercises those modules
+			// directly and predates site modes, so simulate "the wizard
+			// finished and picked Full" here, matching what
+			// get_module_defaults() always returned before site modes existed.
+			// Individual tests that want a different mode apply their own and
+			// rely on WP_UnitTestCase's per-test transaction rollback to undo it.
+			if ( class_exists( '\\WBAM_Pro\\Core\\Site_Mode' ) ) {
+				\WBAM_Pro\Core\Site_Mode::apply( \WBAM_Pro\Core\Site_Mode::FULL );
+			}
 		}
 	}
 );
