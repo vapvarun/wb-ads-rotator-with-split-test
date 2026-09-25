@@ -41,6 +41,23 @@ class Test_Campaign_Row_Actions_Contrast extends Pro_Test_Case {
 		$this->assertStringNotContainsString( 'style=', $table->column_name( $item ) );
 	}
 
+	public function test_pending_approve_link_is_not_hidden_by_core_css(): void {
+		set_current_screen( 'toplevel_page_wbam-campaigns' );
+		$table = new Campaigns_List_Table();
+		$html  = $table->column_name(
+			(object) array(
+				'id'     => 7,
+				'name'   => 'Pending',
+				'status' => 'pending',
+				'ad_id'  => 0,
+			)
+		);
+
+		// Core admin CSS sets .row-actions .approve { display: none }.
+		$this->assertStringContainsString( 'Approve', $html );
+		$this->assertDoesNotMatchRegularExpression( '/class=[\'"]approve[\'"]/', $html );
+	}
+
 	public function statuses(): array {
 		return array( array( 'active' ), array( 'paused' ), array( 'pending' ) );
 	}
