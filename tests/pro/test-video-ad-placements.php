@@ -8,6 +8,11 @@
  * video ad anyway, and the portal review step then showed "Placements:
  * Default (all)" for a creative that has no placements at all.
  *
+ * Video is also only a valid type where it can play (MediaShield active):
+ * Video_Ad_Portal::allow_type() used to add it to wbam_pro_valid_ad_types
+ * unconditionally, so a posted video type was accepted and charged on a
+ * site that hides the card and can never render it.
+ *
  * @package WBAM\Tests
  */
 
@@ -60,6 +65,7 @@ class Test_Video_Ad_Placements extends Pro_Test_Case {
 		// $_POST (the wbam_pro_before_submit_ad filter contract), matching
 		// how the real form submission works.
 		$_POST['video_url'] = 'https://example.com/spot.mp4';
+		add_filter( 'wbam_pro_video_ads_available', '__return_true' );
 
 		$submission = Ad_Submission_Manager::get_instance()->submit_ad(
 			$this->advertiser->id,
@@ -95,5 +101,23 @@ class Test_Video_Ad_Placements extends Pro_Test_Case {
 			get_post_meta( (int) $submission->ad_id, '_wbam_placements', true ),
 			'Regression guard: the video-only fix must not affect other ad types.'
 		);
+	}
+
+	public function test_video_submission_is_refused_without_a_player(): void {
+		add_filter( 'wbam_pro_video_ads_available', '__return_false' );
+		$_POST['video_url'] = 'https://example.com/spot.mp4';
+
+		$this->assertNotContains( 'video', apply_filters( 'wbam_pro_valid_ad_types', array( 'image', 'code', 'rich-content' ) ) );
+
+		$submission = Ad_Submission_Manager::get_instance()->submit_ad(
+			$this->advertiser->id,
+			array(
+				'title'   => 'Video ad, no player',
+				'ad_type' => 'video',
+			),
+			$this->package_id
+		);
+		$this->assertWPError( $submission, 'A video ad must be refused where no player can show it.' );
+		$this->assertSame( 'invalid_ad_type', $submission->get_error_code() );
 	}
 }
