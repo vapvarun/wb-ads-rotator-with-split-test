@@ -737,4 +737,101 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 		$this->assertSame( 'campaign_end_date_passed', $result->get_error_code() );
 		$this->assertSame( 'draft', Campaign_Manager::get_instance()->get( (int) $campaign->id )->status );
 	}
+
+	// ---------------------------------------------------------------------
+	// Messaging, upgrades, copy.
+	// ---------------------------------------------------------------------
+
+	/**
+	 * Step "Message thread creation accepts any recipient_id/classified_id:
+	 * no check the listing belongs to the recipient or is live/unsold,
+	 * classified_id=0 allows DMs to any user".
+	 */
+	public function test_a_new_conversation_needs_a_live_listing_owned_by_the_recipient(): void {
+		$messages = \WBAM_Pro\Modules\Messaging\Message_Manager::get_instance();
+		$buyer    = (int) self::factory()->user->create();
+		$stranger = (int) self::factory()->user->create();
+		$live     = $this->listing( 'Message me listing' );
+
+		$this->assertWPError( $messages->get_or_create_thread( $buyer, $stranger, 0 ), 'No listing: no direct message to an arbitrary user.' );
+		$this->assertWPError( $messages->get_or_create_thread( $buyer, $stranger, (int) $live->id ), 'The recipient must own the listing.' );
+		$this->assertWPError( $messages->get_or_create_thread( $this->user, $this->user, (int) $live->id ), 'No thread with yourself.' );
+
+		$thread = $messages->get_or_create_thread( $buyer, $this->user, (int) $live->id );
+		$this->assertIsInt( $thread );
+
+		Classified_Manager::get_instance()->mark_sold( (int) $live->id );
+		$this->assertSame( $thread, $messages->get_or_create_thread( $buyer, $this->user, (int) $live->id ), 'An existing conversation continues after the sale.' );
+		$this->assertWPError( $messages->get_or_create_thread( (int) self::factory()->user->create(), $this->user, (int) $live->id ), 'A sold listing takes no new conversations.' );
+	}
+
+	/**
+	 * Step "4.3.2 message-time migration is a non-idempotent UPDATE on
+	 * admin_init with no lock - concurrent admin requests can shift every
+	 * message time twice".
+	 */
+	public function test_upgrades_do_not_rerun_when_another_request_already_finished_them(): void {
+		update_option( 'wbam_pro_db_version', \WBAM_Pro\Core\Installer::DB_VERSION );
+
+		// This request still holds the pre-upgrade value in its options cache,
+		// exactly like a second admin request that loaded before the first
+		// finished upgrading.
+		$all                        = wp_load_alloptions();
+		$all['wbam_pro_db_version'] = '4.3.1';
+		wp_cache_set( 'alloptions', $all, 'options' );
+		wp_cache_set( 'wbam_pro_db_version', '4.3.1', 'options' );
+
+		// Count the 4.3.2 message-time shift, the step that must never run
+		// twice. DDL is swapped for a no-op: it would commit the test
+		// transaction.
+		$shifts = 0;
+		add_filter(
+			'query',
+			function ( $query ) use ( &$shifts ) {
+				if ( false !== strpos( $query, 'wbam_messages SET created_at' ) ) {
+					++$shifts;
+				}
+				return preg_match( '/^\s*(CREATE|ALTER|DROP)\s/i', $query ) ? 'SELECT 1' : $query;
+			}
+		);
+
+		\WBAM_Pro\Core\Pro_Plugin::get_instance()->maybe_run_upgrades();
+		wp_cache_delete( 'alloptions', 'options' );
+
+		$this->assertSame( 0, $shifts, 'A finished upgrade must not run again from a stale options cache.' );
+	}
+
+	/**
+	 * "Plan plan" copy: a plan named "Capped plan" read "...on the Capped
+	 * plan plan".
+	 */
+	public function test_plan_names_are_not_followed_by_the_word_plan(): void {
+		$enabled                = Settings_Helper::get( 'enabled_modules', array() );
+		$enabled['memberships'] = true;
+		Settings_Helper::update( 'enabled_modules', $enabled );
+
+		$members = \WBAM_Pro\Modules\Memberships\Membership_Manager::get_instance();
+		$members->save_plan(
+			array(
+				'name'          => 'Capped plan',
+				'price'         => 0,
+				'billing_cycle' => 'monthly',
+				'max_listings'  => 1,
+				'max_featured'  => 0,
+				'status'        => 'active',
+			)
+		);
+		$plans = $members->get_plans();
+		$this->assertNotWPError( $members->subscribe( $this->advertiser->id, end( $plans )->id ) );
+		$this->set_require_approval( false );
+		$this->listing( 'Uses the one slot', false );
+
+		$blocked = $members->can_post_listing( (int) $this->advertiser->id );
+		$this->assertWPError( $blocked );
+		$this->assertStringNotContainsStringIgnoringCase( 'plan plan', $blocked->get_error_message() );
+
+		foreach ( array( 'subscription-created', 'subscription-switched', 'subscription-payment-failed' ) as $template ) {
+			$this->assertDoesNotMatchRegularExpression( '/%(\d\\?\$)?s plan\b/', (string) file_get_contents( WBAM_PRO_PATH . 'templates/emails/' . $template . '.php' ), $template );
+		}
+	}
 }
