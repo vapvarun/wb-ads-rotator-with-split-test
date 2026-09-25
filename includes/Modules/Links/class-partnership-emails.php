@@ -85,7 +85,7 @@ class Partnership_Emails {
 
 		$subject = sprintf(
 			/* translators: %s: site name */
-			__( 'Your Link Partnership Inquiry Has Been Accepted - %s', 'wb-ads-rotator-with-split-test' ),
+			__( '[%s] Your Link Partnership Inquiry Has Been Accepted', 'wb-ads-rotator-with-split-test' ),
 			$site_name
 		);
 
@@ -108,7 +108,7 @@ class Partnership_Emails {
 
 		$subject = sprintf(
 			/* translators: %s: site name */
-			__( 'Regarding Your Link Partnership Inquiry - %s', 'wb-ads-rotator-with-split-test' ),
+			__( '[%s] Regarding Your Link Partnership Inquiry', 'wb-ads-rotator-with-split-test' ),
 			$site_name
 		);
 
