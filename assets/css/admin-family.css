@@ -471,12 +471,13 @@
 /* ── Amount (ledger / money columns) ─────────────────────────────────────── */
 
 .wbam-amount-positive {
-	color:       var(--wbam-success);
+	/* -text shades: the base status colours fail AA as small text. */
+	color:       var(--wbam-success-text);
 	font-weight: var(--wbam-weight-medium);
 }
 
 .wbam-amount-negative {
-	color:       var(--wbam-danger);
+	color:       var(--wbam-danger-text);
 	font-weight: var(--wbam-weight-medium);
 }
 
