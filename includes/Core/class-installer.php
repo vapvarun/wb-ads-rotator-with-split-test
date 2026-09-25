@@ -26,7 +26,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.7.0';
+	const DB_VERSION = '1.8.0';
 
 	/**
 	 * Option name for database version.
@@ -161,6 +161,13 @@ class Installer {
 		if ( version_compare( $current_version, '1.7.0', '<' ) ) {
 			$this->create_tables();
 		}
+
+		// Migration to 1.8.0: ip_address columns widen from 45 to 64 chars.
+		// Privacy_Helper::get_storage_ip() returns a 64-char SHA-256 hash
+		// when IP anonymisation is on (the default), which a varchar(45)
+		// rejects, so every partnership inquiry and email capture failed
+		// to insert. install() runs create_tables() before this method, and
+		// dbDelta alters the column type in place, so nothing to do here.
 
 		// Phase K: backfill the `_wbam_is_demo` meta + `wbam_demo_data_ids`
 		// tracking option so existing installs benefit from the safe
@@ -448,7 +455,7 @@ class Installer {
 			placement varchar(100) DEFAULT NULL,
 			page_url varchar(2000) DEFAULT NULL,
 			visitor_hash varchar(64) DEFAULT NULL,
-			ip_address varchar(45) DEFAULT NULL,
+			ip_address varchar(64) DEFAULT NULL,
 			user_agent text,
 			referer varchar(2000) DEFAULT NULL,
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
@@ -469,7 +476,7 @@ class Installer {
 			ad_id bigint(20) UNSIGNED NOT NULL,
 			email varchar(255) NOT NULL,
 			name varchar(255) DEFAULT NULL,
-			ip_address varchar(45) DEFAULT NULL,
+			ip_address varchar(64) DEFAULT NULL,
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
 			PRIMARY KEY  (id),
 			KEY ad_id (ad_id),
@@ -494,7 +501,7 @@ class Installer {
 			budget_max decimal(10,2) DEFAULT NULL,
 			status varchar(20) DEFAULT 'pending',
 			admin_notes text,
-			ip_address varchar(45) DEFAULT NULL,
+			ip_address varchar(64) DEFAULT NULL,
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
 			responded_at datetime DEFAULT NULL,
 			PRIMARY KEY  (id),

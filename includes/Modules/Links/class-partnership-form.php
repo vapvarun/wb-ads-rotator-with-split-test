@@ -83,32 +83,45 @@ class Partnership_Form {
 	public function enqueue_scripts() {
 		global $post;
 
-		// Only enqueue if shortcode is present.
+		// Pages whose content holds the shortcode load it in the head; forms
+		// rendered any other way (the Pro dashboard's do_shortcode()) load it
+		// from render_form().
 		if ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'wbam_partnership_inquiry' ) ) {
-			wp_enqueue_script(
-				'wbam-partnership-form',
-				WBAM_URL . 'assets/js/partnership-form.js',
-				array( 'jquery' ),
-				WBAM_VERSION,
-				true
-			);
-
-			$script_data = array(
-				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'wbam_partnership_form' ),
-				'i18n'    => $this->get_i18n_strings(),
-			);
-
-			/**
-			 * Filter the localized script data.
-			 *
-			 * @since 2.2.0
-			 * @param array $script_data Script data.
-			 */
-			$script_data = apply_filters( 'wbam_partnership_form_scripts', $script_data );
-
-			wp_localize_script( 'wbam-partnership-form', 'wbamPartnership', $script_data );
+			$this->enqueue_form_script();
 		}
+	}
+
+	/**
+	 * Enqueue and localize the form script once per request.
+	 */
+	private function enqueue_form_script() {
+		if ( wp_script_is( 'wbam-partnership-form', 'enqueued' ) ) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'wbam-partnership-form',
+			WBAM_URL . 'assets/js/partnership-form.js',
+			array( 'jquery' ),
+			WBAM_VERSION,
+			true
+		);
+
+		$script_data = array(
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce'   => wp_create_nonce( 'wbam_partnership_form' ),
+			'i18n'    => $this->get_i18n_strings(),
+		);
+
+		/**
+		 * Filter the localized script data.
+		 *
+		 * @since 2.2.0
+		 * @param array $script_data Script data.
+		 */
+		$script_data = apply_filters( 'wbam_partnership_form_scripts', $script_data );
+
+		wp_localize_script( 'wbam-partnership-form', 'wbamPartnership', $script_data );
 	}
 
 	/**
@@ -143,6 +156,8 @@ class Partnership_Form {
 	 * @return string
 	 */
 	public function render_form( $atts ) {
+		$this->enqueue_form_script();
+
 		$atts = shortcode_atts(
 			array(
 				'title'            => __( 'Link Partnership Inquiry', 'wb-ads-rotator-with-split-test' ),
