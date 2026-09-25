@@ -37,17 +37,6 @@ class Test_Campaign_Pacing_Own_Spend extends Pro_Test_Case {
 	public function set_up(): void {
 		parent::set_up();
 
-		// Campaign_Manager sets its dedup cookie with setcookie(); under the
-		// CLI runner headers are already out, so drop only that warning.
-		$previous = set_error_handler(
-			static function ( $errno, $errstr, ...$rest ) use ( &$previous ) {
-				if ( false !== strpos( $errstr, 'headers already sent' ) ) {
-					return true;
-				}
-				return $previous ? $previous( $errno, $errstr, ...$rest ) : false;
-			}
-		);
-
 		$this->user_agent           = $_SERVER['HTTP_USER_AGENT'] ?? null;
 		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Safari/605.1.15';
 		unset( $_COOKIE['wbam_camp_imp'], $_COOKIE['wbam_camp_clk'] );
@@ -111,7 +100,6 @@ class Test_Campaign_Pacing_Own_Spend extends Pro_Test_Case {
 			$_SERVER['HTTP_USER_AGENT'] = $this->user_agent;
 		}
 		wp_set_current_user( 0 );
-		restore_error_handler();
 		$this->reset_pacing_cache();
 
 		parent::tear_down();

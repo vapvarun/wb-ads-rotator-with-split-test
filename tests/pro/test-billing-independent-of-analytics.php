@@ -35,18 +35,6 @@ class Test_Billing_Independent_Of_Analytics extends Pro_Test_Case {
 	public function set_up(): void {
 		parent::set_up();
 
-		// Campaign_Manager sets its dedup cookie with setcookie(); under the
-		// CLI runner headers are already out, so drop only that warning and
-		// let every other one through to PHPUnit.
-		$previous = set_error_handler(
-			static function ( $errno, $errstr, ...$rest ) use ( &$previous ) {
-				if ( false !== strpos( $errstr, 'headers already sent' ) ) {
-					return true;
-				}
-				return $previous ? $previous( $errno, $errstr, ...$rest ) : false;
-			}
-		);
-
 		$this->user_agent           = $_SERVER['HTTP_USER_AGENT'] ?? null;
 		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Safari/605.1.15';
 		unset( $_COOKIE['wbam_camp_imp'], $_COOKIE['wbam_camp_clk'] );
@@ -103,7 +91,6 @@ class Test_Billing_Independent_Of_Analytics extends Pro_Test_Case {
 			$_SERVER['HTTP_USER_AGENT'] = $this->user_agent;
 		}
 		wp_set_current_user( 0 );
-		restore_error_handler();
 
 		parent::tear_down();
 	}
@@ -298,6 +285,32 @@ class Test_Billing_Independent_Of_Analytics extends Pro_Test_Case {
 
 		$this->assert_billed_once();
 		$this->assertSame( 2, $this->rows(), 'One impression row and one click row.' );
+	}
+
+	/**
+	 * Render-time billing runs after output has started, so setcookie() can
+	 * no longer reach the browser. The dedup marker must still arrive, or a
+	 * reload bills the CPM impression again (Basecamp card 10342397427).
+	 */
+	public function test_render_dedup_survives_a_reload_after_output_started(): void {
+		$this->assertTrue( headers_sent(), 'Precondition: like a real page, output has started before the ad renders.' );
+
+		$this->render();
+
+		// The next request carries only what this response could still hand
+		// the browser: headers are gone, so whatever the footer sets.
+		remove_action( 'wp_footer', 'the_block_template_skip_link' ); // Core deprecation noise.
+		ob_start();
+		do_action( 'wp_footer' );
+		$footer  = (string) ob_get_clean();
+		$_COOKIE = array();
+		if ( preg_match( '/wbam_camp_imp=([^;"]+)/', $footer, $match ) ) {
+			$_COOKIE['wbam_camp_imp'] = rawurldecode( $match[1] );
+		}
+
+		$this->render();
+
+		$this->assertSame( 1, $this->billed()['impressions'] );
 	}
 
 	/** A pixel URL can only record an impression; type=click must not bill. */
