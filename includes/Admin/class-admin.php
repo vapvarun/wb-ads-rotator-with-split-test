@@ -1037,6 +1037,7 @@ class Admin {
 	 * "Use this ad": ways to show this ad without a placement.
 	 *
 	 * @param \WP_Post $post Post.
+	 * @return void
 	 */
 	public function render_usage_metabox( $post ) {
 		$shortcode = sprintf( '[wbam_ad id="%d"]', $post->ID );

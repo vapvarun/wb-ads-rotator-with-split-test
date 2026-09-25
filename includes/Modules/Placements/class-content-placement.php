@@ -99,8 +99,9 @@ class Content_Placement implements Placement_Interface {
 	/**
 	 * Render placement options.
 	 *
-	 * @param int   $ad_id Ad ID.
-	 * @param array $data  Ad data.
+	 * @param int                 $ad_id Ad ID.
+	 * @param array<string,mixed> $data  Ad data.
+	 * @return void
 	 */
 	public function render_options( $ad_id, $data ) {
 		$position = $this->save_options( $ad_id, (array) $data )['content_position'];
@@ -118,9 +119,9 @@ class Content_Placement implements Placement_Interface {
 	/**
 	 * Save placement options.
 	 *
-	 * @param int   $ad_id Ad ID.
-	 * @param array $data  Posted data.
-	 * @return array
+	 * @param int                 $ad_id Ad ID.
+	 * @param array<string,mixed> $data  Posted data.
+	 * @return array{content_position:string}
 	 */
 	public function save_options( $ad_id, $data ) {
 		return array(
