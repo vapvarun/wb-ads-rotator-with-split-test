@@ -51,7 +51,7 @@ class Test_Analytics_Dedup extends Pro_Test_Case {
 	 * same way the duplicate rows this migration cleans up were written by
 	 * two different code paths.
 	 */
-	private function insert_row( string $event_type, string $created_at, string $identity, ?int $campaign_id = null ): int {
+	private function insert_row( string $event_type, string $created_at, string $identity, ?int $campaign_id = null, string $placement = 'header' ): int {
 		global $wpdb;
 
 		$wpdb->insert(
@@ -61,6 +61,7 @@ class Test_Analytics_Dedup extends Pro_Test_Case {
 				'campaign_id' => $campaign_id,
 				'event_type'  => $event_type,
 				'ip_hash'     => $identity,
+				'placement'   => $placement,
 				'created_at'  => $created_at,
 			)
 		);
@@ -113,6 +114,21 @@ class Test_Analytics_Dedup extends Pro_Test_Case {
 			array_map( 'intval', $remaining_ids ),
 			'Only the two extra copies of the visitor-a impression must be removed.'
 		);
+	}
+
+	public function test_same_ad_in_two_slots_of_one_page_view_is_kept(): void {
+		// One page view showing the same ad in two placements is two real
+		// impressions from one visitor in the same second, not a duplicate.
+		$header  = $this->insert_row( 'impression', '2026-01-05 10:00:00', 'visitor-a', 7, 'header' );
+		$archive = $this->insert_row( 'impression', '2026-01-05 10:00:00', 'visitor-a', 7, 'before_archive' );
+
+		$this->run_dedup();
+
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$remaining_ids = $wpdb->get_col( "SELECT id FROM {$wpdb->prefix}wbam_analytics WHERE ad_id = {$this->ad_id} ORDER BY id" );
+
+		$this->assertSame( array( $header, $archive ), array_map( 'intval', $remaining_ids ) );
 	}
 
 	public function test_daily_rollup_row_is_recomputed_after_cleanup(): void {
