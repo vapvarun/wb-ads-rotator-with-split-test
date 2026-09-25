@@ -324,7 +324,8 @@ class Test_Moderation_Rejects_3_2 extends Pro_Test_Case {
 
 		$handler_start = strpos( $source, 'private function handle_review_actions()' );
 		$this->assertNotFalse( $handler_start );
-		$handler_body = substr( $source, $handler_start, 1500 );
+		// Up to the next method: the handler also takes bulk approve/reject.
+		$handler_body = substr( $source, $handler_start, strpos( $source, "\n\t/**", $handler_start ) - $handler_start );
 		$this->assertStringContainsString( 'wp_safe_redirect', $handler_body );
 		$this->assertStringContainsString( 'exit', $handler_body );
 	}
