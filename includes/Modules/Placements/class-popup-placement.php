@@ -99,7 +99,7 @@ class Popup_Placement implements Placement_Interface {
 			$delay   = isset( $data['popup_delay'] ) ? absint( $data['popup_delay'] ) : 5;
 			$scroll  = isset( $data['popup_scroll'] ) ? absint( $data['popup_scroll'] ) : 50;
 
-			$output = $engine->render_ad( $ad_id );
+			$output = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 
 			if ( ! empty( $output ) ) {
 				printf(

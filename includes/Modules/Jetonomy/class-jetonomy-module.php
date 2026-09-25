@@ -226,7 +226,7 @@ class Jetonomy_Placement implements Placement_Interface {
 				}
 			}
 
-			$html = $engine->render_ad( $ad_id );
+			$html = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 			if ( empty( $html ) ) {
 				continue;
 			}

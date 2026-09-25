@@ -143,7 +143,7 @@ class BP_Directory_Position implements Placement_Interface {
 		}
 
 		foreach ( $ads as $ad_id ) {
-			$html = $engine->render_ad( $ad_id );
+			$html = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 			if ( empty( $html ) ) {
 				continue;
 			}

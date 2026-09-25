@@ -97,7 +97,7 @@ class Sticky_Placement implements Placement_Interface {
 			$data     = get_post_meta( $ad_id, '_wbam_ad_data', true );
 			$position = isset( $data['sticky_position'] ) ? $data['sticky_position'] : 'bottom-right';
 
-			$output = $engine->render_ad( $ad_id );
+			$output = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 
 			if ( ! empty( $output ) ) {
 				printf(

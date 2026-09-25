@@ -80,7 +80,7 @@ class BP_Profile_Ad_Widget extends \WP_Widget {
 		}
 
 		$engine = Placement_Engine::get_instance();
-		$output = $engine->render_ad( $ad_id );
+		$output = $engine->render_ad( $ad_id, array( 'placement' => 'widget' ) );
 
 		if ( empty( $output ) ) {
 			return;
@@ -195,7 +195,7 @@ class BP_Group_Ad_Widget extends \WP_Widget {
 		}
 
 		$engine = Placement_Engine::get_instance();
-		$output = $engine->render_ad( $ad_id );
+		$output = $engine->render_ad( $ad_id, array( 'placement' => 'widget' ) );
 
 		if ( empty( $output ) ) {
 			return;
@@ -310,7 +310,7 @@ class BP_Activity_Ad_Widget extends \WP_Widget {
 		}
 
 		$engine = Placement_Engine::get_instance();
-		$output = $engine->render_ad( $ad_id );
+		$output = $engine->render_ad( $ad_id, array( 'placement' => 'widget' ) );
 
 		if ( empty( $output ) ) {
 			return;

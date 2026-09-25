@@ -230,7 +230,7 @@ class bbPress_Placement implements \WBAM\Modules\Placements\Placement_Interface 
 				continue;
 			}
 
-			$output = $engine->render_ad( $ad_id );
+			$output = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 
 			if ( ! empty( $output ) ) {
 				echo '<div class="wbam-bbpress-ad wbam-bbpress-' . esc_attr( $position ) . '">' . $output . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -274,7 +274,7 @@ class bbPress_Placement implements \WBAM\Modules\Placements\Placement_Interface 
 				continue;
 			}
 
-			$output = $engine->render_ad( $ad_id );
+			$output = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 
 			if ( ! empty( $output ) ) {
 				echo '<div class="wbam-bbpress-ad wbam-bbpress-between-' . esc_attr( $type ) . '">' . $output . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -423,7 +423,7 @@ class bbPress_Forum_Ad_Widget extends \WP_Widget {
 		}
 
 		$engine = Placement_Engine::get_instance();
-		$output = $engine->render_ad( $ad_id );
+		$output = $engine->render_ad( $ad_id, array( 'placement' => 'widget' ) );
 
 		if ( empty( $output ) ) {
 			return;
@@ -547,7 +547,7 @@ class bbPress_Topic_Ad_Widget extends \WP_Widget {
 		}
 
 		$engine = Placement_Engine::get_instance();
-		$output = $engine->render_ad( $ad_id );
+		$output = $engine->render_ad( $ad_id, array( 'placement' => 'widget' ) );
 
 		if ( empty( $output ) ) {
 			return;

@@ -158,7 +158,7 @@ class Comment_Placement implements Placement_Interface {
 				continue;
 			}
 
-			$output = $engine->render_ad( $ad_id );
+			$output = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 
 			if ( ! empty( $output ) ) {
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Ad types escape their own output. Code ads require unfiltered_html capability.
@@ -203,7 +203,7 @@ class Comment_Placement implements Placement_Interface {
 				continue;
 			}
 
-			$ad_output = $engine->render_ad( $ad_id );
+			$ad_output = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 
 			if ( ! empty( $ad_output ) ) {
 				$output .= '<div class="wbam-comment-ad wbam-comment-between">' . $ad_output . '</div>';
