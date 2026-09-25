@@ -16,7 +16,6 @@ module.exports = function( grunt ) {
 
 		// Clean generated files.
 		clean: {
-			dist: [ 'dist' ],
 			build: [
 				'assets/css/*.min.css',
 				'assets/js/*.min.js'
@@ -84,75 +83,10 @@ module.exports = function( grunt ) {
 			}
 		},
 
-		// Copy files for distribution.
-		copy: {
-			dist: {
-				files: [ {
-					expand: true,
-					src: [
-						'**',
-						'!node_modules/**',
-						'!vendor/**',
-						'!dist/**',
-						'!tests/**',
-						'!docs/**',
-						'!marketing/**',
-						'!audit/**',
-						'!plan/**',
-						'!bin/**',
-						'!.claude-tmp/**',
-						'!.git/**',
-						'!.github/**',
-						'!.gitignore',
-						'!.gitattributes',
-						'!.distignore',
-						'!.editorconfig',
-						'!.eslintrc*',
-						'!.prettierrc*',
-						'!.stylelintrc*',
-						'!Gruntfile.js',
-						'!package.json',
-						'!package-lock.json',
-						'!composer.json',
-						'!composer.lock',
-						'!phpcs.xml',
-						'!phpcs.xml.dist',
-						'!phpunit.xml',
-						'!phpunit.xml.dist',
-						'!phpstan*.neon',
-						'!phpstan*.neon.dist',
-						'!phpstan-bootstrap.php',
-						'!phpstan-baseline.neon',
-						'!phpstan-combined.neon.dist',
-						'!*.md',
-						'!**/*.md',
-						'!**/*.map',
-						'!*.log',
-						'!*.zip',
-						'!CLAUDE.md',
-						'!sales-page.html',
-						'!scripts/**'
-					],
-					dest: 'dist/wb-ads-rotator-with-split-test'
-				} ]
-			}
-		},
-
-		// Create ZIP archive.
-		compress: {
-			dist: {
-				options: {
-					archive: 'dist/wb-ads-rotator-with-split-test-<%= pkg.version %>.zip',
-					mode: 'zip'
-				},
-				files: [ {
-					expand: true,
-					cwd: 'dist',
-					src: [ 'wb-ads-rotator-with-split-test/**' ],
-					dest: ''
-				} ]
-			}
-		},
+		// No copy/compress dist task on purpose. The release zip is built by
+		// npm run release (scripts/build-release.mjs) or the free plugin's
+		// bin/build-zips.sh, and both read .distignore - the one list of what
+		// ships. A third hand-kept list here drifted from it and shipped dev files.
 
 		// Watch for changes.
 		watch: {
@@ -171,6 +105,5 @@ module.exports = function( grunt ) {
 	grunt.registerTask( 'minify', [ 'cssmin', 'uglify' ] );
 	grunt.registerTask( 'i18n', [ 'makepot' ] );
 	grunt.registerTask( 'build', [ 'clean:build', 'minify', 'makepot' ] );
-	grunt.registerTask( 'dist', [ 'build', 'clean:dist', 'copy:dist', 'compress:dist' ] );
 	grunt.registerTask( 'default', [ 'build' ] );
 };

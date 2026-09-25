@@ -1,3 +1,7 @@
+# The ONE list of what never ships in the free zip. Read with rsync
+# --exclude-from semantics by bin/build-zips.sh and scripts/build-release.mjs
+# (npm run release). Gruntfile.js has no dist task, so there is no other list.
+#
 # Directories
 # NOTE: entries are anchored with a leading "/" (root-relative) on purpose.
 # Unanchored patterns match at ANY depth in both `wp dist-archive` and the
@@ -5,10 +9,15 @@
 # used to strip assets/vendor/ (lucide.min.js) out of the release zip and
 # 404 every icon on the frontend. Only .git / node_modules stay unanchored
 # (they must never ship at any depth).
+#
+# Every top-level dotfile and dot-directory (.github, .wordpress-org,
+# .eslintrc.json, .pa11yci, .phpcs.xml.dist, .phpcs-cache, .superpowers, ...).
+# Nothing at the root that starts with a dot is ever runtime, so new config
+# files are excluded without anyone having to remember to list them.
+/.*
 .git
 node_modules
-/.github
-/.wordpress-org
+.gitkeep
 /tests
 /vendor
 /dist
@@ -25,19 +34,8 @@ node_modules
 /audit
 /plan
 /plans
-/.autovap
 
 # Build files
-.distignore
-.editorconfig
-.gitattributes
-.gitignore
-.phpunit.result.cache
-.phpcs.xml.dist
-.eslintignore
-.eslintrc.json
-.stylelintrc.json
-.pa11yci
 composer.json
 composer.lock
 package.json
@@ -70,9 +68,6 @@ ROADMAP.md
 CONTRIBUTING.md
 CLAUDE.md
 AUDIT-VERDICT.md
-
-# Internal tooling artifacts (never ship)
-.contract-audit-baseline.json
 
 # IDE/Editor files
 .idea

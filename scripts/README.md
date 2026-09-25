@@ -4,8 +4,8 @@
 customers. It runs four defences so a broken zip cannot escape the
 build:
 
-1. **Strip dev files** per `.distignore` (directory-aware; empty dirs
-   are swept so no hollow `docs/`, `tests/`, etc. ship).
+1. **Strip dev files** per `.distignore`, applied with
+   `rsync --exclude-from` exactly as `bin/build-zips.sh` applies it.
 2. **Completeness scan** — walks `assets/` for every CSS / JS / image
    file and `includes/` for every PHP file, confirms each ends up in
    the zip tree.
@@ -32,12 +32,15 @@ That is the only command. Everything else is automatic.
 
 ## What goes into the zip
 
-- Defined in `.distignore`. Only what is NOT excluded ships.
-- Patterns are plugin-root-relative. `vendor` means the top-level
-  `vendor/` — it does NOT match `assets/vendor/`. Use `/vendor` if you
-  want to be explicit.
-- Bare dot-prefix filenames (`.DS_Store`, `.editorconfig`) and glob
-  extensions (`*.log`) match anywhere in the tree.
+- Defined in `.distignore`, the only exclude list. Only what is NOT
+  excluded ships. `npm run release` and the free plugin's
+  `bin/build-zips.sh` (free, Pro and combo zips) all read it; Grunt has
+  no dist task.
+- rsync pattern rules: a leading `/` anchors to the plugin root. A
+  pattern without `/` matches that name at any depth, so an unanchored
+  `vendor` would also strip `assets/vendor/`. Anchor directories.
+- `/.*` excludes every top-level dotfile, so a new config file never
+  needs listing.
 
 ## The release name vs. in-zip folder name
 

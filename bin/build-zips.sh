@@ -12,9 +12,8 @@
 # ended up advertising its version twice ("3.1.0+3.1.0"). Build it, test with
 # it, do not upload it.
 #
-# All respect the free plugin's .distignore. The pro folder adds its own
-# exclusions on top, defined once in PRO_EXCLUDES and shared by the
-# standalone and combo builds.
+# Each plugin's .distignore is its only exclude list: free reads its own,
+# the Pro standalone and combo builds read Pro's.
 #
 # Packaging is gated on a green browser smoke report — see docs/qa/.
 
@@ -139,8 +138,8 @@ verify_runtime_assets() {
 	fi
 }
 
-# Guard: no internal artifact may reach a customer zip. .distignore and
-# PRO_EXCLUDES are allow-by-omission - anything nobody thought to list ships.
+# Guard: no internal artifact may reach a customer zip. Each .distignore is
+# allow-by-omission - anything nobody thought to list ships.
 # That is exactly how AUDIT-VERDICT.md went out in 3.1.0. This asserts the
 # payload after the copy, so a stray file fails the build instead of a QA card.
 #
@@ -178,7 +177,7 @@ verify_no_internal_artifacts() {
 
 	if [ "$found" -ne 0 ]; then
 		echo "Build aborted: dev/QA artifacts would ship to customers." >&2
-		echo "  Add them to .distignore (free) or PRO_EXCLUDES (pro) and rebuild." >&2
+		echo "  Add them to that plugin's .distignore and rebuild." >&2
 		exit 1
 	fi
 }
@@ -206,47 +205,21 @@ rm -f "$FREE_ZIP"
 ( cd "$BUILD_DIR/free" && zip -rq "$FREE_ZIP" "wb-ads-rotator-with-split-test" )
 
 # ------------------------------------------------------------------
-# Pro rsync rules — defined once, used by both the standalone Pro zip
-# and the combo. This previously lived inline in the combo branch only,
-# so any future standalone build would have drifted from it.
-#
-# vendor/ used to need surgery: the bundled Credits SDK lived inside it and
-# MUST ship, while everything else under vendor/ is composer dev tooling
-# (phpstan alone is 47MB). Keeping both meant include-before-exclude rsync
-# rules, and getting them slightly wrong is how the combo went from 2.9MB to
-# 18MB of static analysers, and how the 3.1.0 zip reached customers carrying
-# the dev tree.
-#
-# Pro now bundles the SDK at libs/wbcom-credits-sdk (portfolio standard), so
-# vendor/ is dev-only and excluded outright. No ordering to get wrong, and no
-# dev dependency can ship by sitting next to something that must.
+# Pro rsync rules come from Pro's own .distignore - the one list of what
+# never ships in Pro. npm run release in the Pro repo reads the same file,
+# so the standalone zip, the combo and the Pro release builder cannot drift.
+# This used to be a hand-kept PRO_EXCLUDES array that disagreed with it.
 # ------------------------------------------------------------------
-PRO_EXCLUDES=(
-	--exclude=/vendor
-	--exclude=/libs/wbcom-credits-sdk/docs
-	--exclude=.git --exclude=.github --exclude=node_modules
-	--exclude=tests --exclude=dist --exclude=docs --exclude=marketing
-	--exclude=/bin --exclude=/plan --exclude=/audit
-	--exclude=.contract-audit-baseline.json --exclude=.phpcs-cache
-	--exclude=.distignore --exclude=.editorconfig --exclude=.gitattributes
-	--exclude=.gitignore --exclude=.phpunit.result.cache
-	--exclude=composer.json --exclude=composer.lock
-	--exclude=package.json --exclude=package-lock.json --exclude=Gruntfile.js
-	--exclude=phpunit.xml --exclude=phpunit.xml.dist
-	--exclude=phpcs.xml --exclude=phpcs.xml.dist
-	# Dot-prefixed variants are separate filenames, not matched by the rules
-	# above. Pro's own .distignore excludes .phpcs.xml.dist, so the standalone
-	# Pro zip was clean while the combo - which builds its Pro payload from
-	# this list instead - shipped it.
-	--exclude=.phpcs.xml.dist --exclude=.phpstan.neon --exclude=.phpunit.result.cache
-	--exclude=phpstan.neon --exclude=phpstan-baseline.neon --exclude=phpstan-bootstrap.php
-	--exclude='*.md' --exclude=CLAUDE.md --exclude=sales-page.html
-	# Front-end tooling configs and the release script: dev only. The 3.1.1
-	# zip shipped all of these.
-	--exclude=/scripts --exclude=.eslintrc.json --exclude=.eslintignore
-	--exclude=.stylelintrc.json --exclude=.pa11yci --exclude=.gitkeep
-	--exclude=.bundled-from
-)
+PRO_EXCLUDES=()
+if [ -n "$PRO_VERSION" ]; then
+	if [ ! -f "$PRO_DIR/.distignore" ]; then
+		echo "ERROR: $PRO_DIR/.distignore missing - it defines what Pro ships." >&2
+		exit 2
+	fi
+	while IFS= read -r line; do
+		PRO_EXCLUDES+=("$line")
+	done < <(build_exclude_args "$PRO_DIR/.distignore")
+fi
 
 # ------------------------------------------------------------------
 # 2. Pro standalone zip (only if pro is present)

@@ -1867,7 +1867,7 @@
     "Setup-wizard hook wbam_setup_wizard_sample_save_after is the canonical PRO extension point for advertiser-flag option sync"
   ],
   "build_commands": {
-    "release": "grunt copy:dist (creates build/free/wb-ads-rotator-with-split-test/)",
+    "release": "npm run release (scripts/build-release.mjs) or bin/build-zips.sh; both read .distignore",
     "ci_local": "phpcs / phpstan / phpunit"
   },
   "generated": {

@@ -5,7 +5,8 @@
  * What it does:
  *   1. Reads the plugin slug + version from the main PHP header.
  *   2. git archive HEAD -> temp tree.
- *   3. Strips paths listed in .distignore.
+ *   3. Copies it through .distignore (rsync --exclude-from, same as
+ *      bin/build-zips.sh) into the staging tree.
  *   4. Verifies every CSS file under assets/css/ is in the zip tree.
  *   5. Verifies every JS file under assets/js/ is in the zip tree.
  *   6. Verifies every PHP file under includes/ is in the zip tree.
@@ -66,14 +67,13 @@ function walk(dir, exts = null) {
 	return out;
 }
 
-function readDistignore() {
+function requireDistignore() {
+	// .distignore is the ONE list of what never ships. It is applied with
+	// rsync --exclude-from, the same way bin/build-zips.sh applies it, so the
+	// two release paths cannot disagree about a pattern.
 	if (!existsSync('.distignore')) {
 		die(2, '.distignore not found. Create one listing paths/files to exclude from the release zip.');
 	}
-	return readFileSync('.distignore', 'utf8')
-		.split('\n')
-		.map((l) => l.trim())
-		.filter((l) => l && !l.startsWith('#'));
 }
 
 function parseMainPlugin() {
@@ -143,56 +143,11 @@ function parseRequires(phpPath) {
 	return [...out];
 }
 
-function isExcluded(relPath, patterns) {
-	// Patterns are ALWAYS plugin-root-relative. A bare "vendor" means
-	// only "/vendor" and "/vendor/..." — NOT "assets/vendor" anywhere.
-	// This matches what the user's mental model is for .distignore in
-	// a WordPress plugin context (we want explicit control, not
-	// gitignore's walk-everywhere semantics).
-	//
-	// Semantics supported:
-	//   vendor        -> top-level dir/file only
-	//   /vendor       -> same as above (leading slash allowed)
-	//   vendor/bin    -> top-level vendor/bin subtree
-	//   *.log         -> any file ending in .log, anywhere
-	//   .DS_Store     -> any file named .DS_Store, anywhere
-	const name = relPath.split('/').pop();
-	for (const raw of patterns) {
-		let pat = raw;
-		if (pat.startsWith('/')) pat = pat.slice(1);
-		if (pat.endsWith('/*')) pat = pat.slice(0, -2);
-		// Wildcard extension patterns ("*.log") match any file by suffix.
-		if (pat.startsWith('*')) {
-			if (name.endsWith(pat.slice(1))) return true;
-			continue;
-		}
-		// Bare dot-prefixed names or filenames with no slash match
-		// anywhere (they're "file-name" patterns, not path patterns):
-		// .DS_Store, Thumbs.db, .editorconfig, etc.
-		if (!pat.includes('/')) {
-			// If the pattern is a file-name with an extension (has a dot
-			// after the first char), match basename anywhere.
-			// Otherwise it's a bare dir/file name — match plugin root only.
-			const looksLikeFilename = /\.[a-z0-9]+$/i.test(pat);
-			if (looksLikeFilename) {
-				if (name === pat) return true;
-				continue;
-			}
-			// Bare name: plugin-root-relative only.
-			if (relPath === pat || relPath.startsWith(pat + '/')) return true;
-			continue;
-		}
-		// Path pattern (contains slash) — exact match or prefix.
-		if (relPath === pat || relPath.startsWith(pat + '/')) return true;
-	}
-	return false;
-}
-
 function main() {
 	const { mainFile, slug, releaseName, version } = parseMainPlugin();
 	console.log(BOLD(`\nBuilding release: ${releaseName} ${version}`));
 
-	const patterns = readDistignore();
+	requireDistignore();
 	const DIST = resolve(ROOT, 'dist');
 	const WORK = resolve(DIST, `_build-${slug}`);
 	mkdirSync(DIST, { recursive: true });
@@ -204,54 +159,20 @@ function main() {
 	run('git', ['archive', '--format=zip', `--prefix=${slug}/`, 'HEAD', '-o', rawZip]);
 	console.log(DIM(`  git archive -> ${relative(ROOT, rawZip)}`));
 
-	// 2. Extract + strip distignore paths.
+	// 2. Extract, then copy through .distignore into the staging tree.
 	const extractRoot = resolve(WORK, 'extract');
+	const stageRoot = resolve(WORK, 'stage');
 	mkdirSync(extractRoot, { recursive: true });
+	mkdirSync(stageRoot, { recursive: true });
 	run('unzip', ['-q', rawZip, '-d', extractRoot]);
-	const pluginDir = resolve(extractRoot, slug);
-	let stripped = 0;
+	const archivedDir = resolve(extractRoot, slug);
+	const pluginDir = resolve(stageRoot, slug);
+	run('rsync', ['-a', `--exclude-from=${resolve(ROOT, '.distignore')}`, `${archivedDir}/`, `${pluginDir}/`]);
+	const stripped = walk(archivedDir).length - walk(pluginDir).length;
+	console.log(DIM(`  distignore  -> stripped ${stripped} files`));
 
-	function walkAll(dir) {
-		const out = [];
-		function visit(current) {
-			if (!existsSync(current)) return;
-			for (const entry of readdirSync(current)) {
-				const full = join(current, entry);
-				const s = statSync(full);
-				const rel = relative(pluginDir, full);
-				if (s.isDirectory()) {
-					out.push({ path: full, rel, isDir: true });
-					visit(full);
-				} else {
-					out.push({ path: full, rel, isDir: false });
-				}
-			}
-		}
-		visit(dir);
-		return out;
-	}
-
-	const entries = walkAll(pluginDir);
-	const deletedDirs = [];
-	for (const e of entries) {
-		if (!e.isDir) continue;
-		if (deletedDirs.some((d) => e.rel === d || e.rel.startsWith(d + '/'))) continue;
-		if (isExcluded(e.rel, patterns)) {
-			rmSync(e.path, { recursive: true, force: true });
-			deletedDirs.push(e.rel);
-			stripped++;
-		}
-	}
-	for (const e of entries) {
-		if (e.isDir) continue;
-		if (deletedDirs.some((d) => e.rel.startsWith(d + '/'))) continue;
-		if (!existsSync(e.path)) continue;
-		if (isExcluded(e.rel, patterns)) {
-			rmSync(e.path, { force: true });
-			stripped++;
-		}
-	}
-	console.log(DIM(`  distignore  -> stripped ${stripped} entries (dirs + files)`));
+	// A committed path that did not survive the copy was excluded on purpose.
+	const isExcluded = (rel) => existsSync(resolve(archivedDir, rel)) && !existsSync(resolve(pluginDir, rel));
 
 	// 3. Completeness checks.
 	const errors = [];
@@ -266,14 +187,14 @@ function main() {
 	// assets/vendor/ (lucide, chart.js, etc.) and those must ship too.
 	for (const f of walk('assets', ['.css', '.js'])) {
 		const rel = relative(ROOT, f);
-		if (isExcluded(rel, patterns)) continue;
+		if (isExcluded(rel)) continue;
 		const kind = f.endsWith('.css') ? 'CSS' : 'JS';
 		requireInZip(rel, kind);
 	}
 	// 3c. Every PHP file under includes/.
 	for (const phpFile of walk('includes', ['.php'])) {
 		const rel = relative(ROOT, phpFile);
-		if (isExcluded(rel, patterns)) continue;
+		if (isExcluded(rel)) continue;
 		requireInZip(rel, 'PHP');
 	}
 	// 3d. Runtime file references across the whole PHP tree.
@@ -292,7 +213,7 @@ function main() {
 		for (const r of parseRequires(src)) referencedPaths.add(r);
 	}
 	for (const r of referencedPaths) {
-		if (isExcluded(r, patterns)) continue;
+		if (isExcluded(r)) continue;
 		const kind = r.endsWith('.php') ? 'PHP reference' : `${r.split('.').pop().toUpperCase()} reference`;
 		requireInZip(r, kind);
 	}
@@ -338,7 +259,7 @@ function main() {
 	// 5. Build final zip. Using cwd instead of "cd X && zip" keeps us shell-free.
 	const outZip = resolve(DIST, `${releaseName}-${version}.zip`);
 	rmSync(outZip, { force: true });
-	run('zip', ['-rq', outZip, slug], { cwd: extractRoot });
+	run('zip', ['-rq', outZip, slug], { cwd: stageRoot });
 
 	// 5. Summary.
 	const zipStats = statSync(outZip);
