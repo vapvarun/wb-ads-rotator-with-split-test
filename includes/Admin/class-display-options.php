@@ -12,6 +12,7 @@ namespace WBAM\Admin;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+use WBAM\Core\Settings_Helper;
 use WBAM\Core\Singleton;
 use WBAM\Modules\GeoTargeting\Geo_Engine;
 
@@ -501,8 +502,28 @@ class Display_Options {
 
 		$geo_engine = Geo_Engine::get_instance();
 		$countries  = $geo_engine->get_countries_list();
+
+		// Owner decision 8: geolocation is off by default and needs a
+		// provider chosen before any country lookup runs. This ad's rules
+		// below are saved either way (never silently discarded) but won't
+		// take effect - or block/hide the ad - until both are true, so say
+		// so plainly instead of leaving the toggle looking broken.
+		$geo_active = Settings_Helper::is_enabled( 'geo_enabled' ) && '' !== Settings_Helper::get( 'geo_primary_provider', '' );
 		?>
 		<div class="wbam-geo-targeting">
+			<?php if ( ! $geo_active ) : ?>
+				<div class="notice notice-warning inline">
+					<p>
+						<?php
+						printf(
+							/* translators: %s: link to the Geo Targeting settings. */
+							esc_html__( 'Geolocation is off site-wide, so any rules below have no effect yet. %s', 'wb-ads-rotator-with-split-test' ),
+							'<a href="' . esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-settings' ) . '#wbam_geo' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Turn it on in Settings', 'wb-ads-rotator-with-split-test' ) . '</a>'
+						);
+						?>
+					</p>
+				</div>
+			<?php endif; ?>
 			<div class="wbam-geo-toggle">
 				<label class="wbam-toggle-label">
 					<input type="checkbox" name="wbam_geo_targeting[enabled]" value="1" <?php checked( $enabled ); ?> class="wbam-geo-enable" />

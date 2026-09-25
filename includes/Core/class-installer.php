@@ -26,7 +26,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.9.0';
+	const DB_VERSION = '1.9.1';
 
 	/**
 	 * Option name for database version.
@@ -44,6 +44,7 @@ class Installer {
 		// returns the default we pass in, not a stored value). Upgrade =
 		// any stored value exists, even '0'.
 		$this->maybe_set_onboarding_pointers_default();
+		$this->maybe_set_geo_enabled_default();
 
 		$this->create_tables();
 		$this->run_migrations();
@@ -70,6 +71,46 @@ class Installer {
 		$default = $is_fresh_install ? 1 : 0;
 
 		add_option( 'wbam_onboarding_pointers_enabled', $default );
+	}
+
+	/**
+	 * Stamp `geo_enabled`'s default exactly once, at install time (owner
+	 * decision 8, 3.2.0).
+	 *
+	 * A fresh install gets geolocation off - Settings::$defaults already
+	 * ships `geo_enabled => false`, so there's nothing to write here. An
+	 * existing site upgrading from a version that had no such gate was
+	 * already relying on IP lookups (ad geo rules, PRO's country
+	 * analytics), so it must not go dark on upgrade: `geo_enabled` is
+	 * stamped `true` and whatever provider it already had keeps running.
+	 * Settings::get_legacy_geo_provider_notice() recommends switching off
+	 * the two legacy-only providers afterwards.
+	 *
+	 * Checks the settings array itself (not a separate flag) so re-running
+	 * install() - e.g. via maybe_update_database() - never overwrites an
+	 * owner's own later choice to turn geolocation off.
+	 *
+	 * @since 1.9.1
+	 */
+	private function maybe_set_geo_enabled_default() {
+		$stored_db_version = get_option( self::DB_VERSION_OPTION, null );
+		$is_fresh_install  = ( null === $stored_db_version );
+
+		if ( $is_fresh_install ) {
+			return; // Settings::$defaults already ships geo_enabled = false.
+		}
+
+		$settings = get_option( 'wbam_settings', array() );
+		if ( is_array( $settings ) && array_key_exists( 'geo_enabled', $settings ) ) {
+			return; // Already decided - this ran before, or the owner set it.
+		}
+
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+
+		$settings['geo_enabled'] = true;
+		update_option( 'wbam_settings', $settings );
 	}
 
 	/**
@@ -172,6 +213,13 @@ class Installer {
 		// Migration to 1.9.0: wbam_analytics_daily, where Analytics_Rollup
 		// keeps the totals of raw events past retention. Created by
 		// create_tables() above, like 1.8.0.
+
+		// Migration to 1.9.1: geolocation moves from always-on to an
+		// explicit owner opt-in (owner decision 8). Handled by
+		// maybe_set_geo_enabled_default(), called from install() before
+		// this method runs (not here) so it can tell fresh-install apart
+		// from upgrade using the same sentinel as the onboarding-pointers
+		// default, before run_migrations() ever sees a stored DB version.
 
 		// Phase K: backfill the `_wbam_is_demo` meta + `wbam_demo_data_ids`
 		// tracking option so existing installs benefit from the safe

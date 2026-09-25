@@ -16,6 +16,12 @@ parameters:
         # BuddyPress is an optional runtime dependency — resolved for static
         # analysis only so its guarded call sites aren't reported "not found".
         - tests/stubs/buddypress.php
+    scanDirectories:
+        # Vendored MaxMind DB reader (libs/maxmind-db-reader/README.md) - not
+        # in phpstan's `paths` (never linted/analyzed, same as the rest of
+        # libs/), just made resolvable so Geo_Engine::query_maxmind()'s
+        # \MaxMind\Db\Reader usage isn't reported "class not found".
+        - libs/maxmind-db-reader/src
     bootstrapFiles:
         - phpstan-bootstrap.php
     treatPhpDocTypesAsCertain: false

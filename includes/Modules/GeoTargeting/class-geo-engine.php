@@ -42,18 +42,28 @@ class Geo_Engine {
 	/**
 	 * Available providers.
 	 *
+	 * `ip-api` and `ipapi-co` are legacy-only (owner decision 8, 3.2.0):
+	 * still queryable so a pre-3.2.0 site's existing choice keeps working,
+	 * but no longer offered on the settings screen. `maxmind` reads a local
+	 * file - nothing leaves the site.
+	 *
 	 * @var array
 	 */
 	private $providers = array(
-		'ip-api'   => array(
-			'name'         => 'ip-api.com',
+		'maxmind'  => array(
+			'name'         => 'MaxMind (local database)',
 			'requires_key' => false,
-			'limit'        => '45 requests/minute',
+			'limit'        => 'unlimited, local file',
 		),
 		'ipinfo'   => array(
 			'name'         => 'ipinfo.io',
 			'requires_key' => true,
 			'limit'        => '50K requests/month',
+		),
+		'ip-api'   => array(
+			'name'         => 'ip-api.com',
+			'requires_key' => false,
+			'limit'        => '45 requests/minute',
 		),
 		'ipapi-co' => array(
 			'name'         => 'ipapi.co',
@@ -74,6 +84,12 @@ class Geo_Engine {
 	/**
 	 * Get visitor location.
 	 *
+	 * @since 3.2.0 IP-based lookup is gated behind `geo_enabled` (owner
+	 *              decision 8) - off by default, no visitor IP is resolved
+	 *              or sent anywhere until the owner opts in. The BuddyPress
+	 *              profile path is unaffected: that's the visitor's own
+	 *              profile data, already on this site, nothing sent to a
+	 *              third party either way.
 	 * @return array
 	 */
 	public function get_visitor_location() {
@@ -90,12 +106,35 @@ class Geo_Engine {
 			}
 		}
 
-		// Fall back to IP geolocation with provider fallback.
+		if ( ! Settings_Helper::is_enabled( 'geo_enabled' ) ) {
+			$this->current_location = $this->empty_location();
+			return $this->current_location;
+		}
+
+		// Geolocation is on - look up the visitor's IP with the chosen provider.
 		$ip       = $this->get_visitor_ip();
 		$location = $this->get_location_by_ip( $ip );
 
 		$this->current_location = $location;
 		return $this->current_location;
+	}
+
+	/**
+	 * Empty/unknown location shape - fail-open result used whenever
+	 * geolocation is off, unconfigured, or a lookup fails.
+	 *
+	 * @since 3.2.0
+	 * @return array
+	 */
+	private function empty_location() {
+		return array(
+			'country'      => '',
+			'country_code' => '',
+			'region'       => '',
+			'city'         => '',
+			'source'       => 'ip',
+			'provider'     => '',
+		);
 	}
 
 	/**
@@ -173,23 +212,28 @@ class Geo_Engine {
 	}
 
 	/**
-	 * Get location by IP with provider fallback.
+	 * Get location for an IP using whichever single provider the owner
+	 * chose.
 	 *
+	 * @since 3.2.0 No more cross-provider fallback. When an owner picks
+	 *              MaxMind ("nothing leaves your site") or ipinfo.io ("my
+	 *              own key"), silently trying a different, unconsented
+	 *              third-party service behind their back on failure would
+	 *              defeat the point of asking. A failed lookup fails open
+	 *              to unknown instead - see empty_location().
 	 * @param string $ip IP address.
 	 * @return array
 	 */
 	private function get_location_by_ip( $ip ) {
-		$default = array(
-			'country'      => '',
-			'country_code' => '',
-			'region'       => '',
-			'city'         => '',
-			'source'       => 'ip',
-			'provider'     => '',
-		);
+		$default = $this->empty_location();
 
 		if ( empty( $ip ) || in_array( $ip, array( '127.0.0.1', '::1' ), true ) ) {
 			return $default;
+		}
+
+		$primary = Settings_Helper::get( 'geo_primary_provider', '' );
+		if ( empty( $primary ) ) {
+			return $default; // Enabled, but no provider chosen yet.
 		}
 
 		// Check cache.
@@ -200,51 +244,18 @@ class Geo_Engine {
 			return $cached;
 		}
 
-		// Get provider order from settings.
-		$primary        = Settings_Helper::get( 'geo_primary_provider', 'ip-api' );
-		$provider_order = $this->get_provider_order( $primary );
-		$settings       = Settings_Helper::get();
+		$location = $this->query_provider( $primary, $ip, Settings_Helper::get() );
 
-		$location = null;
-
-		// Try each provider in order.
-		foreach ( $provider_order as $provider ) {
-			$location = $this->query_provider( $provider, $ip, $settings );
-
-			if ( ! empty( $location['country_code'] ) ) {
-				$location['provider'] = $provider;
-				break;
-			}
-		}
-
-		if ( empty( $location ) || empty( $location['country_code'] ) ) {
+		if ( empty( $location['country_code'] ) ) {
 			return $default;
 		}
+
+		$location['provider'] = $primary;
 
 		// Cache the result.
 		set_transient( $cache_key, $location, self::CACHE_EXPIRATION );
 
 		return $location;
-	}
-
-	/**
-	 * Get provider order with primary first.
-	 *
-	 * @param string $primary Primary provider.
-	 * @return array
-	 */
-	private function get_provider_order( $primary ) {
-		$all = array_keys( $this->providers );
-
-		// Move primary to front.
-		$order = array( $primary );
-		foreach ( $all as $provider ) {
-			if ( $provider !== $primary ) {
-				$order[] = $provider;
-			}
-		}
-
-		return $order;
 	}
 
 	/**
@@ -257,19 +268,69 @@ class Geo_Engine {
 	 */
 	private function query_provider( $provider, $ip, $settings ) {
 		switch ( $provider ) {
-			case 'ip-api':
-				return $this->query_ip_api( $ip );
+			case 'maxmind':
+				$db_path = isset( $settings['geo_maxmind_db_path'] ) ? $settings['geo_maxmind_db_path'] : '';
+				return $this->query_maxmind( $ip, $db_path );
 
 			case 'ipinfo':
 				$api_key = isset( $settings['geo_ipinfo_key'] ) ? $settings['geo_ipinfo_key'] : '';
 				return $this->query_ipinfo( $ip, $api_key );
 
-			case 'ipapi-co':
+			case 'ip-api': // Legacy - pre-3.2.0 installs only, see $this->providers.
+				return $this->query_ip_api( $ip );
+
+			case 'ipapi-co': // Legacy - pre-3.2.0 installs only.
 				return $this->query_ipapi_co( $ip );
 
 			default:
 				return null;
 		}
+	}
+
+	/**
+	 * Query a local MaxMind GeoLite2/GeoIP2 database. No network call - the
+	 * owner-supplied `.mmdb` file never leaves the server, and neither does
+	 * the visitor's IP.
+	 *
+	 * Fails open (empty array) on any missing/unreadable/corrupt database
+	 * rather than letting a bad file fatal the page — geolocation is a
+	 * targeting nicety, never a render blocker.
+	 *
+	 * @since 3.2.0
+	 * @param string $ip      IP address.
+	 * @param string $db_path Absolute path to the .mmdb file.
+	 * @return array
+	 */
+	private function query_maxmind( $ip, $db_path ) {
+		if ( empty( $db_path ) || ! is_readable( $db_path ) ) {
+			return array();
+		}
+
+		if ( ! class_exists( '\MaxMind\Db\Reader', false ) ) {
+			require_once WBAM_PATH . 'libs/maxmind-db-reader/load.php';
+		}
+
+		try {
+			$reader = new \MaxMind\Db\Reader( $db_path );
+			$record = $reader->get( $ip );
+			$reader->close();
+		} catch ( \Throwable $e ) {
+			return array();
+		}
+
+		if ( empty( $record['country']['iso_code'] ) ) {
+			return array();
+		}
+
+		$country_code = strtoupper( $record['country']['iso_code'] );
+
+		return array(
+			'country'      => $record['country']['names']['en'] ?? $this->get_country_name( $country_code ),
+			'country_code' => $country_code,
+			'region'       => $record['subdivisions'][0]['names']['en'] ?? '',
+			'city'         => $record['city']['names']['en'] ?? '',
+			'source'       => 'ip',
+		);
 	}
 
 	/**

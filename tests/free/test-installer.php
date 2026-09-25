@@ -64,4 +64,56 @@ class Test_Installer extends WP_UnitTestCase {
 	public function test_cpt_registered_after_init(): void {
 		$this->assertTrue( post_type_exists( 'wbam-ad' ), 'wbam-ad CPT must be registered' );
 	}
+
+	/**
+	 * Owner decision 8 (3.2.0): a fresh install never opts a visitor's IP
+	 * into geolocation. Settings::$defaults ships geo_enabled = false and
+	 * Installer::maybe_set_geo_enabled_default() must not override it.
+	 */
+	public function test_fresh_install_leaves_geolocation_off(): void {
+		delete_option( \WBAM\Core\Installer::DB_VERSION_OPTION );
+		delete_option( 'wbam_settings' );
+
+		wbam_activate();
+
+		$this->assertFalse(
+			\WBAM\Core\Settings_Helper::is_enabled( 'geo_enabled' ),
+			'A fresh install must not enable geolocation.'
+		);
+	}
+
+	/**
+	 * A site upgrading from before 3.2.0 (any stored DB version, no
+	 * geo_enabled key yet) was already relying on IP lookups - ad geo
+	 * rules, PRO's country analytics - so it must keep working rather than
+	 * going dark the moment this DB version ships. Its existing provider
+	 * choice is left untouched too.
+	 */
+	public function test_upgrade_from_pre_320_keeps_geolocation_working(): void {
+		update_option( \WBAM\Core\Installer::DB_VERSION_OPTION, '1.8.0' );
+		update_option( 'wbam_settings', array( 'geo_primary_provider' => 'ip-api' ) );
+
+		wbam_activate();
+
+		$settings = get_option( 'wbam_settings' );
+		$this->assertTrue( $settings['geo_enabled'], 'An upgrading site must keep geolocation on.' );
+		$this->assertSame( 'ip-api', $settings['geo_primary_provider'], 'An upgrading site must keep its existing provider.' );
+	}
+
+	/**
+	 * Re-running install() (e.g. maybe_update_database() on every
+	 * admin_init) must never re-flip geo_enabled back to true after an
+	 * owner has explicitly turned it off post-upgrade.
+	 */
+	public function test_reinstall_does_not_override_owners_later_choice(): void {
+		update_option( \WBAM\Core\Installer::DB_VERSION_OPTION, '1.8.0' );
+		update_option( 'wbam_settings', array( 'geo_enabled' => false ) );
+
+		wbam_activate();
+
+		$this->assertFalse(
+			\WBAM\Core\Settings_Helper::is_enabled( 'geo_enabled' ),
+			'A re-run install must not override an explicit owner choice already on record.'
+		);
+	}
 }

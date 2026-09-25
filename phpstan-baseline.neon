@@ -601,6 +601,11 @@ parameters:
 			path: includes/Admin/class-settings.php
 
 		-
+			message: "#^Method WBAM\\\\Admin\\\\Settings\\:\\:maybe_render_legacy_geo_notice\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: includes/Admin/class-settings.php
+
+		-
 			message: "#^Method WBAM\\\\Admin\\\\Settings\\:\\:register_feature_settings\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: includes/Admin/class-settings.php
@@ -1132,6 +1137,11 @@ parameters:
 
 		-
 			message: "#^Method WBAM\\\\Core\\\\Installer\\:\\:maybe_backfill_demo_markers\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: includes/Core/class-installer.php
+
+		-
+			message: "#^Method WBAM\\\\Core\\\\Installer\\:\\:maybe_set_geo_enabled_default\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: includes/Core/class-installer.php
 
@@ -1706,12 +1716,17 @@ parameters:
 			path: includes/Modules/GeoTargeting/class-geo-engine.php
 
 		-
+			message: "#^Method WBAM\\\\Modules\\\\GeoTargeting\\\\Geo_Engine\\:\\:empty_location\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: includes/Modules/GeoTargeting/class-geo-engine.php
+
+		-
 			message: "#^Method WBAM\\\\Modules\\\\GeoTargeting\\\\Geo_Engine\\:\\:get_location_by_ip\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: includes/Modules/GeoTargeting/class-geo-engine.php
 
 		-
-			message: "#^Method WBAM\\\\Modules\\\\GeoTargeting\\\\Geo_Engine\\:\\:get_provider_order\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Method WBAM\\\\Modules\\\\GeoTargeting\\\\Geo_Engine\\:\\:query_maxmind\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: includes/Modules/GeoTargeting/class-geo-engine.php
 

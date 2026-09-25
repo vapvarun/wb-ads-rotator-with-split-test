@@ -44,8 +44,18 @@ class Settings {
 		'container_class'          => '',
 		'disable_on_post_types'    => array(),
 		'max_ads_per_page'         => 10,     // Sensible limit to prevent ad overload.
-		'geo_primary_provider'     => 'ip-api',
+		// Geolocation (owner decision 8, 3.2.0): off by default on a fresh
+		// install - no visitor IP is looked up, let alone sent to a third
+		// party, until the owner opts in and picks a provider. Installer
+		// stamps geo_enabled = true on upgrade from a pre-3.2.0 DB version
+		// so an existing site's ad geo rules and PRO country analytics keep
+		// working; see Installer::maybe_set_geo_enabled_default(). Empty
+		// provider string means "not chosen yet" - deliberately not
+		// defaulted to a provider so the owner makes an explicit pick.
+		'geo_enabled'              => false,
+		'geo_primary_provider'     => '',
 		'geo_ipinfo_key'           => '',
+		'geo_maxmind_db_path'      => '',
 		'adsense_publisher_id'     => '',
 		'adsense_auto_ads'         => false,
 		'require_consent_adsense'  => false,  // Require consent before loading AdSense.
@@ -70,6 +80,59 @@ class Settings {
 		// Use priority 25 so Settings appears under PRO's Settings section header (priority 20) when PRO is active.
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 25 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_notices', array( $this, 'maybe_render_legacy_geo_notice' ) );
+	}
+
+	/**
+	 * Sitewide notice recommending a switch off a legacy geo provider.
+	 *
+	 * Owner decision 8: an install upgraded from before 3.2.0 keeps its
+	 * existing provider working (Installer::maybe_set_geo_enabled_default()),
+	 * but ip-api.com/ipapi.co are no longer offered as a new choice. Shown
+	 * on any WB Ad Manager admin screen — not just the Settings page — so an
+	 * owner who never opens Settings still sees the recommendation. WP core
+	 * `is-dismissible` hides it for the current page view; it reappears on
+	 * the next screen until the provider is actually switched, which is
+	 * deliberate for a standing configuration recommendation rather than a
+	 * one-time announcement.
+	 *
+	 * @since 3.2.0
+	 */
+	public function maybe_render_legacy_geo_notice() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$screen  = get_current_screen();
+		$is_ours = $screen && ( false !== strpos( (string) $screen->id, 'wbam' )
+			|| in_array( $screen->post_type, array( 'wbam-ad', 'wbam-classified' ), true ) );
+		if ( ! $is_ours ) {
+			return;
+		}
+
+		$notice = $this->get_legacy_geo_provider_notice();
+		if ( ! $notice ) {
+			return;
+		}
+
+		// #wbam_geo matches the Geo Targeting section's data-subsection value
+		// (see render_ad_display_subsections()); admin-settings-nav.js reads
+		// it on load and activates that pill directly.
+		$settings_url = add_query_arg(
+			array(
+				'post_type' => 'wbam-ad',
+				'page'      => 'wbam-settings',
+			),
+			admin_url( 'edit.php' )
+		) . '#wbam_geo';
+		?>
+		<div class="notice notice-warning is-dismissible">
+			<p>
+				<?php echo wp_kses_post( $notice ); ?>
+				<a href="<?php echo esc_url( $settings_url ); ?>"><?php esc_html_e( 'Open Geo Targeting settings', 'wb-ads-rotator-with-split-test' ); ?></a>
+			</p>
+		</div>
+		<?php
 	}
 
 	/**
@@ -299,13 +362,41 @@ class Settings {
 		);
 
 		add_settings_field(
+			'geo_enabled',
+			__( 'Geolocation', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_checkbox_field' ),
+			'wbam-settings',
+			'wbam_geo',
+			array(
+				'label_for'   => 'wbam_setting_geo_enabled',
+				'id'          => 'geo_enabled',
+				'description' => __( "Allow country/region lookup for this visitor's IP.", 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+
+		add_settings_field(
 			'geo_primary_provider',
-			__( 'Primary Provider', 'wb-ads-rotator-with-split-test' ),
+			__( 'Provider', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_geo_provider_field' ),
 			'wbam-settings',
 			'wbam_geo',
 			array(
 				'id' => 'geo_primary_provider',
+			)
+		);
+
+		add_settings_field(
+			'geo_maxmind_db_path',
+			__( 'MaxMind Database Path', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_text_field' ),
+			'wbam-settings',
+			'wbam_geo',
+			array(
+				'label_for'   => 'wbam_setting_geo_maxmind_db_path',
+				'id'          => 'geo_maxmind_db_path',
+				'placeholder' => __( '/absolute/path/to/GeoLite2-Country.mmdb', 'wb-ads-rotator-with-split-test' ),
+				'description' => __( 'Absolute server path to a GeoLite2 (or GeoIP2) .mmdb file you downloaded from your own MaxMind account. Nothing is sent anywhere for this provider.', 'wb-ads-rotator-with-split-test' ),
+				'wrapper'     => 'wbam-geo-provider-field wbam-geo-provider-maxmind',
 			)
 		);
 
@@ -318,8 +409,9 @@ class Settings {
 			array(
 				'label_for'   => 'wbam_setting_geo_ipinfo_key',
 				'id'          => 'geo_ipinfo_key',
-				'placeholder' => __( 'Enter API key (optional)', 'wb-ads-rotator-with-split-test' ),
-				'description' => __( 'Get a free API key from ipinfo.io for 50K requests/month.', 'wb-ads-rotator-with-split-test' ),
+				'placeholder' => __( 'Enter your ipinfo.io API key', 'wb-ads-rotator-with-split-test' ),
+				'description' => __( 'Required. Get a free key from ipinfo.io (50K requests/month). The visitor\'s IP is sent to ipinfo.io over HTTPS to resolve it.', 'wb-ads-rotator-with-split-test' ),
+				'wrapper'     => 'wbam-geo-provider-field wbam-geo-provider-ipinfo',
 			)
 		);
 
@@ -555,11 +647,24 @@ class Settings {
 			$sanitized['disable_on_post_types'] = array();
 		}
 
-		// Geo targeting settings.
-		$valid_providers                   = array( 'ip-api', 'ipinfo', 'ipapi-co' );
-		$geo_provider                      = isset( $input['geo_primary_provider'] ) ? sanitize_key( $input['geo_primary_provider'] ) : 'ip-api';
-		$sanitized['geo_primary_provider'] = in_array( $geo_provider, $valid_providers, true ) ? $geo_provider : 'ip-api';
-		$sanitized['geo_ipinfo_key']       = sanitize_text_field( $input['geo_ipinfo_key'] ?? '' );
+		// Geolocation settings (owner decision 8, 3.2.0). geo_primary_provider
+		// is declared via the _fields[] contract because a radio group can
+		// legitimately post nothing (no provider chosen yet) - an absent
+		// value keeps whatever was already stored instead of forcing a
+		// default onto a save that never touched this section. 'ip-api' and
+		// 'ipapi-co' stay valid for sanitization only so a pre-3.2.0 site's
+		// existing value round-trips; they are not offered on the form.
+		$sanitized['geo_enabled'] = ! empty( $input['geo_enabled'] );
+
+		$valid_providers = array( 'maxmind', 'ipinfo', 'ip-api', 'ipapi-co' );
+		if ( array_key_exists( 'geo_primary_provider', $input ) ) {
+			$geo_provider                      = sanitize_key( $input['geo_primary_provider'] );
+			$sanitized['geo_primary_provider'] = in_array( $geo_provider, $valid_providers, true ) ? $geo_provider : $this->get( 'geo_primary_provider', '' );
+		} else {
+			$sanitized['geo_primary_provider'] = $this->get( 'geo_primary_provider', '' );
+		}
+		$sanitized['geo_ipinfo_key']      = sanitize_text_field( $input['geo_ipinfo_key'] ?? '' );
+		$sanitized['geo_maxmind_db_path'] = sanitize_text_field( $input['geo_maxmind_db_path'] ?? '' );
 
 		// AdSense settings.
 		$sanitized['adsense_publisher_id'] = sanitize_text_field( $input['adsense_publisher_id'] ?? '' );
@@ -1070,9 +1175,61 @@ class Settings {
 
 	/**
 	 * Render geo section.
+	 *
+	 * @since 3.2.0 Rewritten for owner decision 8 - geolocation is an
+	 *              explicit opt-in, so the intro leads with what turning it
+	 *              on actually does before the toggle below it.
 	 */
 	public function render_geo_section() {
-		echo '<p>' . esc_html__( 'Configure IP geolocation providers for geo-targeting. The system will try providers in order until one succeeds.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+		echo '<p>' . esc_html__( 'Off by default. No visitor IP address is looked up - or sent anywhere - until you turn this on and choose a provider below.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Turning this on lets ads use country/region rules and lets analytics show visitor country. A local MaxMind database keeps everything on your server; the HTTPS API option sends the visitor\'s IP address to that provider using your own key.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+
+		$legacy_notice = $this->get_legacy_geo_provider_notice();
+		if ( $legacy_notice ) {
+			echo '<div class="notice notice-warning inline"><p>' . wp_kses_post( $legacy_notice ) . '</p></div>';
+		}
+	}
+
+	/**
+	 * Legacy-provider notice shown inline in the Geo Targeting section.
+	 *
+	 * Sites upgrading from before 3.2.0 keep working on whichever provider
+	 * they already had (Installer::maybe_set_geo_enabled_default()), but
+	 * ip-api.com is plain HTTP with a non-commercial-use license and
+	 * ipapi.co has no owner key - neither is a choice this settings screen
+	 * offers going forward. Recommend a switch without breaking them.
+	 *
+	 * @since 3.2.0
+	 * @return string Empty string when nothing to warn about.
+	 */
+	private function get_legacy_geo_provider_notice() {
+		$provider = $this->get( 'geo_primary_provider', '' );
+		$legacy   = $this->get_legacy_geo_providers();
+
+		if ( ! isset( $legacy[ $provider ] ) ) {
+			return '';
+		}
+
+		return sprintf(
+			/* translators: %s: legacy provider display name, e.g. "ip-api.com". */
+			esc_html__( 'This site is still using %s from before geolocation required an explicit provider choice. It keeps working, but we recommend switching to the local MaxMind database or the HTTPS API option below.', 'wb-ads-rotator-with-split-test' ),
+			'<strong>' . esc_html( $legacy[ $provider ] ) . '</strong>'
+		);
+	}
+
+	/**
+	 * Provider values a pre-3.2.0 install may still have stored, keyed by
+	 * display name. Not offered as a choice on this screen; kept only so an
+	 * upgraded site's existing value still resolves to something readable.
+	 *
+	 * @since 3.2.0
+	 * @return array<string,string>
+	 */
+	private function get_legacy_geo_providers() {
+		return array(
+			'ip-api'   => 'ip-api.com',
+			'ipapi-co' => 'ipapi.co',
+		);
 	}
 
 	/**
@@ -1099,40 +1256,51 @@ class Settings {
 	/**
 	 * Render geo provider field.
 	 *
+	 * Owner decision 8 (3.2.0): exactly two choices going forward - a local
+	 * MaxMind database (nothing leaves the site) or an HTTPS API using the
+	 * owner's own key (ipinfo.io). A pre-3.2.0 install that still has a
+	 * legacy value stored (ip-api / ipapi-co) gets that value listed too,
+	 * pre-selected, so the form never silently switches its provider out
+	 * from under it on save - see get_legacy_geo_provider_notice() for the
+	 * matching admin notice recommending a switch.
+	 *
 	 * @param array $args Field arguments.
 	 */
 	public function render_geo_provider_field( $args ) {
-		$settings = $this->get_settings();
-		$id       = $args['id'];
-		$value    = isset( $settings[ $id ] ) ? $settings[ $id ] : 'ip-api';
+		$id    = $args['id'];
+		$value = $this->get( $id, '' );
 
 		$providers = array(
-			'ip-api'   => array(
-				'name'  => 'ip-api.com',
-				'limit' => __( '45 requests/minute, no API key', 'wb-ads-rotator-with-split-test' ),
+			'maxmind' => array(
+				'name' => __( 'MaxMind database (local file)', 'wb-ads-rotator-with-split-test' ),
+				'note' => __( 'Nothing leaves your site.', 'wb-ads-rotator-with-split-test' ),
 			),
-			'ipinfo'   => array(
-				'name'  => 'ipinfo.io',
-				'limit' => __( '50K requests/month, API key optional', 'wb-ads-rotator-with-split-test' ),
-			),
-			'ipapi-co' => array(
-				'name'  => 'ipapi.co',
-				'limit' => __( '1K requests/day, no API key', 'wb-ads-rotator-with-split-test' ),
+			'ipinfo'  => array(
+				'name' => __( 'HTTPS API (ipinfo.io)', 'wb-ads-rotator-with-split-test' ),
+				'note' => __( 'Visitor IP sent to ipinfo.io over HTTPS using your own key.', 'wb-ads-rotator-with-split-test' ),
 			),
 		);
+
+		$legacy = $this->get_legacy_geo_providers();
+		if ( isset( $legacy[ $value ] ) ) {
+			$providers[ $value ] = array(
+				/* translators: %s: legacy provider display name, e.g. "ip-api.com". */
+				'name' => sprintf( __( '%s (legacy - not offered for new setups)', 'wb-ads-rotator-with-split-test' ), $legacy[ $value ] ),
+				'note' => __( 'Already in use on this site from before this choice existed.', 'wb-ads-rotator-with-split-test' ),
+			);
+		}
+
+		$this->render_field_contract( $id );
 		?>
-		<fieldset>
+		<fieldset class="wbam-geo-provider-picker">
 			<?php foreach ( $providers as $key => $provider ) : ?>
-				<label style="display: block; margin-bottom: 8px;">
-					<input type="radio" name="<?php echo esc_attr( self::OPTION_NAME . '[' . $id . ']' ); ?>" value="<?php echo esc_attr( $key ); ?>" <?php checked( $value, $key ); ?> />
+				<label class="wbam-geo-provider-option">
+					<input type="radio" class="wbam-geo-provider-radio" name="<?php echo esc_attr( self::OPTION_NAME . '[' . $id . ']' ); ?>" value="<?php echo esc_attr( $key ); ?>" <?php checked( $value, $key ); ?> />
 					<strong><?php echo esc_html( $provider['name'] ); ?></strong>
-					<span class="description" style="margin-left: 5px;">(<?php echo esc_html( $provider['limit'] ); ?>)</span>
+					<span class="description"><?php echo esc_html( $provider['note'] ); ?></span>
 				</label>
 			<?php endforeach; ?>
 		</fieldset>
-		<p class="description" style="margin-top: 10px;">
-			<?php esc_html_e( 'If the primary provider fails, the system will automatically try the next provider.', 'wb-ads-rotator-with-split-test' ); ?>
-		</p>
 		<?php
 	}
 
@@ -1194,7 +1362,7 @@ class Settings {
 		$this->render_field_contract( $id );
 		?>
 		<label>
-			<input type="checkbox" name="<?php echo esc_attr( self::OPTION_NAME . '[' . $id . ']' ); ?>" value="1" <?php checked( $value ); ?> />
+			<input type="checkbox" id="wbam_setting_<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( self::OPTION_NAME . '[' . $id . ']' ); ?>" value="1" <?php checked( $value ); ?> />
 			<?php echo esc_html( $args['description'] ?? '' ); ?>
 		</label>
 		<?php
@@ -1210,12 +1378,21 @@ class Settings {
 		$id          = $args['id'];
 		$value       = isset( $settings[ $id ] ) ? $settings[ $id ] : '';
 		$placeholder = $args['placeholder'] ?? '';
+		// Optional wrapper class so JS can show/hide a field row (e.g. per
+		// selected geo provider) without an inline style attribute.
+		$wrapper = $args['wrapper'] ?? '';
+		if ( $wrapper ) {
+			echo '<div class="' . esc_attr( $wrapper ) . '">';
+		}
 		?>
 		<input type="text" id="wbam_setting_<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( self::OPTION_NAME . '[' . $id . ']' ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>" class="regular-text" />
 		<?php if ( ! empty( $args['description'] ) ) : ?>
 			<p class="description"><?php echo esc_html( $args['description'] ); ?></p>
 		<?php endif; ?>
 		<?php
+		if ( $wrapper ) {
+			echo '</div>';
+		}
 	}
 
 	/**

@@ -718,6 +718,34 @@
 	display: block;
 }
 
+/* Geo Targeting section: provider picker + its per-provider field rows
+   (admin-settings-nav.js toggles wbam-geo-is-hidden; every row stays in
+   the DOM either way so the form keeps posting stored values). */
+.wbam-geo-provider-picker {
+	display:        flex;
+	flex-direction: column;
+	gap:            var(--wbam-space-2);
+	margin:         0;
+	padding:        0;
+	border:         0;
+}
+
+.wbam-geo-provider-option {
+	display:     flex;
+	flex-wrap:   wrap;
+	align-items: baseline;
+	gap:         var(--wbam-space-2);
+	cursor:      pointer;
+}
+
+.wbam-geo-provider-option .description {
+	margin: 0;
+}
+
+.wbam-geo-is-hidden {
+	display: none;
+}
+
 @media screen and (max-width: 390px) {
 	.wbam-settings-layout {
 		grid-template-columns: minmax(0, 1fr);
