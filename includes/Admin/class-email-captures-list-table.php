@@ -47,7 +47,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 	/**
 	 * Columns.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function get_columns() {
 		return array(
@@ -63,7 +63,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 	/**
 	 * Sortable columns. Date sorts by ID: rows are written in order.
 	 *
-	 * @return array
+	 * @return array<string, array{0: string, 1: bool}>
 	 */
 	protected function get_sortable_columns() {
 		return array(
@@ -84,7 +84,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 	/**
 	 * Checkbox.
 	 *
-	 * @param object $item Row.
+	 * @param \stdClass $item Row.
 	 * @return string
 	 */
 	public function column_cb( $item ) {
@@ -99,7 +99,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 	/**
 	 * Email, with the single Delete action.
 	 *
-	 * @param object $item Row.
+	 * @param \stdClass $item Row.
 	 * @return string
 	 */
 	public function column_email( $item ) {
@@ -123,7 +123,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 	/**
 	 * Default column output.
 	 *
-	 * @param object $item        Row.
+	 * @param \stdClass $item        Row.
 	 * @param string $column_name Column.
 	 * @return string
 	 */
@@ -133,7 +133,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 				$title = $item->ad_id ? get_the_title( (int) $item->ad_id ) : '';
 				return '' !== $title ? esc_html( $title ) : esc_html( '#' . (int) $item->ad_id );
 			case 'created_at':
-				return esc_html( mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $item->created_at ) );
+				return esc_html( (string) mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $item->created_at ) );
 			default:
 				return isset( $item->$column_name ) ? esc_html( (string) $item->$column_name ) : '';
 		}
@@ -142,7 +142,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 	/**
 	 * Bulk actions.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	protected function get_bulk_actions() {
 		return array( 'delete_captures' => __( 'Delete', 'wb-ads-rotator-with-split-test' ) );
@@ -152,6 +152,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 	 * Ad filter and export.
 	 *
 	 * @param string $which top|bottom.
+	 * @return void
 	 */
 	protected function extra_tablenav( $which ) {
 		if ( 'top' !== $which ) {
@@ -166,7 +167,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 				<select name="capture_ad" id="wbam-capture-ad">
 					<option value=""><?php esc_html_e( 'All ads', 'wb-ads-rotator-with-split-test' ); ?></option>
 					<?php foreach ( $ads as $id => $title ) : ?>
-						<option value="<?php echo esc_attr( $id ); ?>" <?php selected( $args['ad_id'], $id ); ?>><?php echo esc_html( '' !== $title ? $title : '#' . $id ); ?></option>
+						<option value="<?php echo esc_attr( (string) $id ); ?>" <?php selected( $args['ad_id'], $id ); ?>><?php echo esc_html( '' !== $title ? $title : '#' . $id ); ?></option>
 					<?php endforeach; ?>
 				</select>
 				<?php submit_button( __( 'Filter', 'wb-ads-rotator-with-split-test' ), '', 'filter_action', false ); ?>
@@ -198,6 +199,8 @@ class Email_Captures_List_Table extends \WP_List_Table {
 
 	/**
 	 * Prepare items.
+	 *
+	 * @return void
 	 */
 	public function prepare_items() {
 		$this->_column_headers = array( $this->get_columns(), array(), $this->get_sortable_columns() );
@@ -220,6 +223,8 @@ class Email_Captures_List_Table extends \WP_List_Table {
 
 	/**
 	 * Empty state.
+	 *
+	 * @return void
 	 */
 	public function no_items() {
 		echo wp_kses_post(

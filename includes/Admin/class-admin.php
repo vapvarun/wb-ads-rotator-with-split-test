@@ -466,8 +466,8 @@ class Admin {
 	 * Sortable columns on the ads list. Impressions and clicks are not: they
 	 * are totals over the analytics tables, not stored on the ad.
 	 *
-	 * @param array $columns Sortable columns.
-	 * @return array
+	 * @param array<string, mixed> $columns Sortable columns.
+	 * @return array<string, mixed>
 	 */
 	public function sortable_columns( $columns ) {
 		$columns['ad_type'] = 'wbam_type';
@@ -2835,7 +2835,7 @@ class Admin {
 		 *
 		 * @since 3.2.0
 		 *
-		 * @param array<int, array{impression: int, click: int}> $totals Raw events plus daily totals, keyed by ad ID.
+		 * @param array<int, array<string, int>> $totals Raw events plus daily totals (impression, click), keyed by ad ID.
 		 */
 		$totals = (array) apply_filters( 'wbam_ad_event_totals', $totals );
 

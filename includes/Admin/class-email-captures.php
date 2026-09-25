@@ -52,8 +52,8 @@ class Email_Captures {
 	/**
 	 * WHERE clause and values for the list, its total and the export.
 	 *
-	 * @param array $args search (email or name), ad_id.
-	 * @return array{0: string, 1: array}
+	 * @param array<string, mixed> $args search (email or name), ad_id.
+	 * @return array{0: string, 1: array<int, int|string>}
 	 */
 	private function where( array $args ) {
 		global $wpdb;
@@ -78,7 +78,7 @@ class Email_Captures {
 	/**
 	 * Number of captures matching the filters.
 	 *
-	 * @param array $args See where().
+	 * @param array<string, mixed> $args See where().
 	 * @return int
 	 */
 	public function count( array $args = array() ) {
@@ -97,7 +97,7 @@ class Email_Captures {
 	 *
 	 * @param int   $page     1-based page number.
 	 * @param int   $per_page Rows per page.
-	 * @param array $args     See where(), plus orderby (email|created_at) and order.
+	 * @param array<string, mixed> $args See where(), plus orderby (email|created_at) and order.
 	 * @return array<int, object>
 	 */
 	public function get_page( $page = 1, $per_page = self::PER_PAGE, array $args = array() ) {
@@ -153,7 +153,7 @@ class Email_Captures {
 	/**
 	 * The list and export filters from the request.
 	 *
-	 * @return array
+	 * @return array{search: string, ad_id: int, orderby: string, order: string}
 	 */
 	public static function request_args() {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only list filters; export and delete verify their own nonces.
@@ -172,6 +172,7 @@ class Email_Captures {
 	 * screen already provides those.
 	 *
 	 * @since 3.2.0 Replaces the standalone `wbam-email-captures` admin page.
+	 * @return void
 	 */
 	public function render_embedded() {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -236,6 +237,9 @@ class Email_Captures {
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$out = fopen( 'php://output', 'w' );
+		if ( false === $out ) {
+			exit;
+		}
 		$this->stream_csv( $out, self::request_args() );
 		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Closing php://output.
 		exit;
@@ -244,8 +248,8 @@ class Email_Captures {
 	/**
 	 * Write the filtered captures to a CSV handle, 500 rows at a time.
 	 *
-	 * @param resource $handle Writable handle.
-	 * @param array    $args   See get_page().
+	 * @param resource             $handle Writable handle.
+	 * @param array<string, mixed> $args   See get_page().
 	 * @return void
 	 */
 	public function stream_csv( $handle, array $args ) {
