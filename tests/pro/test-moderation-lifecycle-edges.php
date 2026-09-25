@@ -933,4 +933,29 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 		$this->run_demo_step( $again, 'create_advertisers' );
 		$this->assertSame( $user_ids, array_map( 'intval', (array) ( new \ReflectionProperty( \WBAM_Demo_Data_Generator::class, 'user_ids' ) )->getValue( $again ) ) );
 	}
+
+	/**
+	 * Step "Widget/bbPress/BP slots are buyable while no widget or
+	 * integration is placed". bbPress and BuddyPress slots already drop out
+	 * when their plugin is inactive (is_available()), and serve on their own
+	 * hooks when it is active; the Widget slot needed the fix.
+	 */
+	public function test_widget_slot_is_not_for_sale_until_the_widget_is_placed(): void {
+		$registry = array(
+			'header' => array( 'name' => 'Header' ),
+			'widget' => array( 'name' => 'Widget' ),
+		);
+		$saved    = get_option( 'sidebars_widgets' );
+		// wp_get_sidebars_widgets() prefers this request cache over the option.
+		$GLOBALS['_wp_sidebars_widgets'] = array();
+
+		update_option( 'sidebars_widgets', array( 'sidebar-1' => array( 'search-2' ) ) );
+		$this->assertArrayNotHasKey( 'widget', \WBAM_Pro\Core\Advertiser_Placement_Gate::apply( $registry ) );
+
+		update_option( 'sidebars_widgets', array( 'sidebar-1' => array( 'wbam_ad_widget-2' ) ) );
+		$GLOBALS['_wp_sidebars_widgets'] = array();
+		$this->assertArrayHasKey( 'widget', \WBAM_Pro\Core\Advertiser_Placement_Gate::apply( $registry ) );
+
+		update_option( 'sidebars_widgets', $saved );
+	}
 }
