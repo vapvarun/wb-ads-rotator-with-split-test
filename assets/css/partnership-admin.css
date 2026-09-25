@@ -240,3 +240,19 @@
 		align-items: flex-start;
 	}
 }
+
+/* Bulk selection. */
+.wbam-partnerships-table .check-column {
+	width: 2.2em;
+}
+
+.wbam-partnerships-bulk-bar {
+	display: flex;
+	gap: var(--wbam-space-2);
+	align-items: center;
+	margin-block: var(--wbam-space-2);
+}
+
+.wbam-partnership-view .wbam-button-reject {
+	color: var(--wbam-danger);
+}

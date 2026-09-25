@@ -127,6 +127,40 @@ class Partnership_Admin {
 			return;
 		}
 
+		// Bulk actions from the list: bulk_action (top) or bulk_action2
+		// (bottom) + partnership_ids[].
+		if ( isset( $_GET['partnership_ids'], $_GET['_wpnonce'] ) ) {
+			check_admin_referer( 'bulk-partnerships' );
+
+			$bulk = isset( $_GET['bulk_action'] ) && '-1' !== $_GET['bulk_action'] ? sanitize_key( wp_unslash( $_GET['bulk_action'] ) ) : '';
+			if ( '' === $bulk && isset( $_GET['bulk_action2'] ) ) {
+				$bulk = sanitize_key( wp_unslash( $_GET['bulk_action2'] ) );
+			}
+			$methods = array(
+				'accept' => 'accept',
+				'reject' => 'reject',
+				'spam'   => 'mark_as_spam',
+				'delete' => 'delete',
+			);
+			$done    = 0;
+			if ( isset( $methods[ $bulk ] ) ) {
+				foreach ( array_filter( array_map( 'absint', (array) wp_unslash( $_GET['partnership_ids'] ) ) ) as $id ) {
+					$done += $this->manager->{$methods[ $bulk ]}( $id ) ? 1 : 0;
+				}
+			}
+
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'message' => $done ? 'bulk_' . $bulk : 'bulk_none',
+						'count'   => $done,
+					),
+					admin_url( 'admin.php?page=wbam-partnerships' )
+				)
+			);
+			exit;
+		}
+
 		// Handle single actions.
 		if ( isset( $_GET['action'] ) && isset( $_GET['partnership_id'] ) && isset( $_GET['_wpnonce'] ) ) {
 			$action = sanitize_text_field( wp_unslash( $_GET['action'] ) );
@@ -291,10 +325,15 @@ class Partnership_Admin {
 
 			<!-- Partnerships Table -->
 			<?php // Not .wp-list-table: core's responsive rules for real list tables mangled this hand-built one on phones. ?>
+			<form method="get" class="wbam-partnerships-bulk">
+			<input type="hidden" name="page" value="wbam-partnerships">
+			<?php wp_nonce_field( 'bulk-partnerships' ); ?>
+			<?php $this->render_bulk_select( 'bulk_action' ); ?>
 			<div class="wbam-partnerships-scroll">
 			<table class="widefat striped wbam-partnerships-table">
 				<thead>
 					<tr>
+						<td class="manage-column check-column"><label class="screen-reader-text" for="wbam-partnerships-select-all"><?php esc_html_e( 'Select all', 'wb-ads-rotator-with-split-test' ); ?></label><input type="checkbox" id="wbam-partnerships-select-all" class="wbam-select-all"></td>
 						<th class="wbam-col-contact"><?php esc_html_e( 'Contact', 'wb-ads-rotator-with-split-test' ); ?></th>
 						<th class="wbam-col-website"><?php esc_html_e( 'Website', 'wb-ads-rotator-with-split-test' ); ?></th>
 						<th class="wbam-col-type"><?php esc_html_e( 'Type', 'wb-ads-rotator-with-split-test' ); ?></th>
@@ -307,7 +346,7 @@ class Partnership_Admin {
 				<tbody>
 					<?php if ( empty( $partnerships ) ) : ?>
 						<tr>
-							<td colspan="7" class="no-items">
+							<td colspan="8" class="no-items">
 								<?php
 								echo wp_kses_post(
 									\WBAM\Admin\UX::empty_state(
@@ -320,6 +359,15 @@ class Partnership_Admin {
 					<?php else : ?>
 						<?php foreach ( $partnerships as $partnership ) : ?>
 							<tr>
+								<th scope="row" class="check-column">
+									<label class="screen-reader-text" for="wbam-partnership-<?php echo esc_attr( $partnership->id ); ?>">
+										<?php
+										/* translators: %s: requester name */
+										echo esc_html( sprintf( __( 'Select %s', 'wb-ads-rotator-with-split-test' ), $partnership->name ) );
+										?>
+									</label>
+									<input type="checkbox" id="wbam-partnership-<?php echo esc_attr( $partnership->id ); ?>" name="partnership_ids[]" value="<?php echo esc_attr( $partnership->id ); ?>">
+								</th>
 								<td>
 									<strong>
 										<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&view=' . $partnership->id ) ); ?>">
@@ -366,6 +414,8 @@ class Partnership_Admin {
 				</tbody>
 			</table>
 			</div>
+			<?php $this->render_bulk_select( 'bulk_action2' ); ?>
+			</form>
 
 			<!-- Pagination -->
 			<?php if ( $total_pages > 1 ) : ?>
@@ -456,6 +506,28 @@ class Partnership_Admin {
 			'icon'  => 'handshake',
 			'title' => isset( $status_titles[ $status ] ) ? $status_titles[ $status ] : __( 'No results match', 'wb-ads-rotator-with-split-test' ),
 		);
+	}
+
+	/**
+	 * Bulk action picker above/below the list.
+	 *
+	 * @param string $name Field name (bulk_action or bulk_action2).
+	 * @return void
+	 */
+	private function render_bulk_select( $name ) {
+		?>
+		<div class="tablenav wbam-partnerships-bulk-bar">
+			<label for="wbam-<?php echo esc_attr( $name ); ?>" class="screen-reader-text"><?php esc_html_e( 'Bulk action', 'wb-ads-rotator-with-split-test' ); ?></label>
+			<select name="<?php echo esc_attr( $name ); ?>" id="wbam-<?php echo esc_attr( $name ); ?>">
+				<option value="-1"><?php esc_html_e( 'Bulk actions', 'wb-ads-rotator-with-split-test' ); ?></option>
+				<option value="accept"><?php esc_html_e( 'Accept', 'wb-ads-rotator-with-split-test' ); ?></option>
+				<option value="reject"><?php esc_html_e( 'Reject', 'wb-ads-rotator-with-split-test' ); ?></option>
+				<option value="spam"><?php esc_html_e( 'Mark as spam', 'wb-ads-rotator-with-split-test' ); ?></option>
+				<option value="delete"><?php esc_html_e( 'Delete', 'wb-ads-rotator-with-split-test' ); ?></option>
+			</select>
+			<?php submit_button( __( 'Apply', 'wb-ads-rotator-with-split-test' ), 'action', '', false ); ?>
+		</div>
+		<?php
 	}
 
 	/**
@@ -561,10 +633,13 @@ class Partnership_Admin {
 									</a>
 								</td>
 							</tr>
+							<?php // With IP anonymising on, the stored value is a one-way hash: meaningless to a person, so only a real address is shown. ?>
+							<?php if ( filter_var( (string) $partnership->ip_address, FILTER_VALIDATE_IP ) ) : ?>
 							<tr>
 								<th><?php esc_html_e( 'IP Address', 'wb-ads-rotator-with-split-test' ); ?></th>
-								<td><?php echo esc_html( ! empty( $partnership->ip_address ) ? $partnership->ip_address : '-' ); ?></td>
+								<td><?php echo esc_html( $partnership->ip_address ); ?></td>
 							</tr>
+							<?php endif; ?>
 						</table>
 					</div>
 				</div>
@@ -658,16 +733,17 @@ class Partnership_Admin {
 							</div>
 
 							<div class="wbam-form-actions">
-								<button type="submit" name="wbam_update_partnership" class="button button-primary">
+								<?php // One primary action: Accept while the inquiry waits, Save otherwise. ?>
+								<button type="submit" name="wbam_update_partnership" class="button<?php echo $partnership->is_pending() ? '' : ' button-primary'; ?>">
 									<?php esc_html_e( 'Save Notes', 'wb-ads-rotator-with-split-test' ); ?>
 								</button>
 
 								<?php if ( $partnership->is_pending() ) : ?>
-									<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=accept&partnership_id=' . $partnership->id ), 'wbam_partnership_accept_' . $partnership->id ) ); ?>" class="button button-primary" style="background: #46b450; border-color: #46b450;">
+									<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=accept&partnership_id=' . $partnership->id ), 'wbam_partnership_accept_' . $partnership->id ) ); ?>" class="button button-primary">
 										<?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?>
 										<?php esc_html_e( 'Accept', 'wb-ads-rotator-with-split-test' ); ?>
 									</a>
-									<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=reject&partnership_id=' . $partnership->id ), 'wbam_partnership_reject_' . $partnership->id ) ); ?>" class="button" style="color: #a00;">
+									<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=wbam-partnerships&action=reject&partnership_id=' . $partnership->id ), 'wbam_partnership_reject_' . $partnership->id ) ); ?>" class="button wbam-button-reject">
 										<?php echo wbam_icon( 'x', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?>
 										<?php esc_html_e( 'Reject', 'wb-ads-rotator-with-split-test' ); ?>
 									</a>
@@ -703,6 +779,17 @@ class Partnership_Admin {
 			'deleted'  => array( 'success', __( 'Partnership inquiry deleted.', 'wb-ads-rotator-with-split-test' ) ),
 			'updated'  => array( 'success', __( 'Partnership inquiry updated.', 'wb-ads-rotator-with-split-test' ) ),
 		);
+
+		$count = isset( $_GET['count'] ) ? absint( $_GET['count'] ) : 0;
+		/* translators: %s: number of inquiries */
+		$messages['bulk_accept'] = array( 'success', sprintf( _n( '%s inquiry accepted.', '%s inquiries accepted.', $count, 'wb-ads-rotator-with-split-test' ), number_format_i18n( $count ) ) );
+		/* translators: %s: number of inquiries */
+		$messages['bulk_reject'] = array( 'success', sprintf( _n( '%s inquiry rejected.', '%s inquiries rejected.', $count, 'wb-ads-rotator-with-split-test' ), number_format_i18n( $count ) ) );
+		/* translators: %s: number of inquiries */
+		$messages['bulk_spam'] = array( 'success', sprintf( _n( '%s inquiry marked as spam.', '%s inquiries marked as spam.', $count, 'wb-ads-rotator-with-split-test' ), number_format_i18n( $count ) ) );
+		/* translators: %s: number of inquiries */
+		$messages['bulk_delete'] = array( 'success', sprintf( _n( '%s inquiry deleted.', '%s inquiries deleted.', $count, 'wb-ads-rotator-with-split-test' ), number_format_i18n( $count ) ) );
+		$messages['bulk_none']   = array( 'warning', __( 'Pick a bulk action and at least one inquiry.', 'wb-ads-rotator-with-split-test' ) );
 
 		$message_key = sanitize_text_field( wp_unslash( $_GET['message'] ) );
 		// phpcs:enable
