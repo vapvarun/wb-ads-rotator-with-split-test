@@ -44,7 +44,7 @@ class Test_Ad_Edit_Screen_Helpers extends \WP_UnitTestCase {
 
 		ob_start();
 		$admin->render_column( 'placements', $ad_id );
-		$this->assertSame( 'Popup/Modal, Header', ob_get_clean(), 'Placements read as labels, not slugs.' );
+		$this->assertSame( 'Popup/Modal, Header', wp_strip_all_tags( ob_get_clean() ), 'Placements read as labels, not slugs.' );
 
 		ob_start();
 		$admin->render_status_metabox( get_post( $ad_id ) );
