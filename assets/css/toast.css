@@ -3,16 +3,25 @@
  *
  * Companion stylesheet for assets/js/toast.js (handle `wbam-toast`). Shared
  * by the free plugin and WB Ad Manager Pro. Deliberately self-contained
- * (its own :root fallback chain) rather than depending on
- * `wbam-admin-tokens`, because Pro also enqueues this on frontend advertiser
- * portal pages where the admin-only token stylesheet is never loaded.
+ * (its own fallback chain) rather than depending on `wbam-admin-tokens`,
+ * because Pro also enqueues this on frontend advertiser portal pages where
+ * the admin-only token stylesheet is never loaded.
+ *
+ * Scoped to `body:not(.wp-admin)`, not `:root` — this file used to declare
+ * the same tokens on `:root`, which fought admin-tokens.css's own (also
+ * `:root`) declaration for the same custom properties, source order
+ * deciding the winner. Whichever stylesheet printed last painted every
+ * admin button its own hardcoded "Fresh" blue, ignoring the scheme the
+ * owner picked under Users > Profile. `body:not(.wp-admin)` makes this file
+ * apply only where admin-tokens.css is never loaded at all — the frontend
+ * portal/classifieds pages these tokens exist for.
  *
  * @package WB_Ad_Manager
  * @since   1.5.0 Introduced in WB Ad Manager Pro.
  * @since   2.10.0 Moved to the free plugin as the shared toolkit.
  */
 
-:root {
+body:not(.wp-admin) {
 	/* ── Toast semantic tokens ── */
 	--wbam-bg:           var(--bg, var(--wp--preset--color--base, #ffffff));
 	--wbam-text:         var(--text-1, var(--wp--preset--color--contrast, #1d2327));

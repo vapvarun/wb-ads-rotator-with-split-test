@@ -21,19 +21,26 @@
  *
  * Accent follows the WordPress admin colour scheme (Users > Profile). Core
  * writes `--wp-admin-theme-color` / `--wp-admin-theme-color-darker-10` on
- * every admin screen for the scheme the user picked (Fresh, Ocean, Midnight,
- * …), so this is the one accent WP's own buttons/links and our controls
- * already share — no second blue to drift from it.
+ * `body.admin-color-*` — not `:root`/`<html>` — for the scheme the user
+ * picked (Fresh, Ocean, Midnight, …), so this is the one accent WP's own
+ * buttons/links and our controls already share — no second blue to drift
+ * from it. That's why this whole block is declared on `body`, not `:root`:
+ * a `:root` rule can't see a custom property core only ever writes on
+ * `<body>` (a descendant), so `var(--wp-admin-theme-color, …)` evaluated
+ * at `:root` always falls through to the hardcoded fallback, on every
+ * scheme. `body` is guaranteed present on every wp-admin screen.
  *
  * Pro-only tokens (credits SDK aliases, marketplace status colours, etc.) are
- * NOT here — Pro adds those in its own :root block, extending this base. Free
+ * NOT here — Pro adds those in its own `body` block, extending this base
+ * (same reasoning: its `--wbam-primary` alias reads `--wbam-accent`, so it
+ * must live on `body` too, or the same problem recurs one level down). Free
  * owns the base; Pro extends it. Never the reverse.
  *
  * @package WB_Ad_Manager
  * @since   2.9.2
  */
 
-:root {
+body {
 	/* Surfaces */
 	--wbam-bg:            var(--bg, var(--wp--preset--color--base, #ffffff));
 	--wbam-surface:       var(--surface, #f6f7f7);
