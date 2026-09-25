@@ -71,9 +71,12 @@ class Paragraph_Placement implements Placement_Interface {
 			return $content;
 		}
 
-		// Count paragraphs first.
-		preg_match_all( '/<\/p>/i', $content, $matches );
-		$total_paragraphs = count( $matches[0] );
+		// Paragraph ends, as byte offsets just past each </p>. Paragraphs
+		// inside an ad already in the content (a [wbam_ad] shortcode, a
+		// before-content ad) are not the post's paragraphs: counting them
+		// put other ads inside that ad's markup, and inside its click link.
+		$paragraph_ends   = $this->get_paragraph_ends( $content );
+		$total_paragraphs = count( $paragraph_ends );
 
 		if ( 0 === $total_paragraphs ) {
 			return $content;
@@ -108,20 +111,59 @@ class Paragraph_Placement implements Placement_Interface {
 			return $content;
 		}
 
-		// Use preg_replace_callback to insert ads at the right positions.
-		$paragraph_count = 0;
-
-		$content = preg_replace_callback(
-			'/<\/p>/i',
-			function ( $matched ) use ( &$paragraph_count, $insertions ) {
-				++$paragraph_count;
-				$suffix = isset( $insertions[ $paragraph_count ] ) ? $insertions[ $paragraph_count ] : '';
-				return $matched[0] . $suffix;
-			},
-			$content
-		);
+		// Splice from the end so earlier offsets stay valid.
+		for ( $i = $total_paragraphs; $i >= 1; $i-- ) {
+			if ( isset( $insertions[ $i ] ) ) {
+				$content = substr_replace( $content, $insertions[ $i ], $paragraph_ends[ $i - 1 ], 0 );
+			}
+		}
 
 		return $content;
+	}
+
+	/**
+	 * Offsets just past each </p> that is not inside an ad (.wbam-ad).
+	 *
+	 * @param string $content Content.
+	 * @return int[]
+	 */
+	private function get_paragraph_ends( $content ) {
+		// Byte ranges covered by ad elements: an opening tag whose class
+		// list holds the wbam-ad token, through its matching closing tag.
+		$ranges   = array();
+		$last_end = 0;
+		preg_match_all( '/<([a-z][a-z0-9]*)\b[^>]*\bclass\s*=\s*(["\'])(?:[^"\']*\s)?wbam-ad(?:\s[^"\']*)?\2[^>]*>/i', $content, $openers, PREG_OFFSET_CAPTURE | PREG_SET_ORDER );
+		foreach ( $openers as $opener ) {
+			$start = $opener[0][1];
+			if ( $start < $last_end ) {
+				continue; // Nested inside an ad already masked.
+			}
+			$end   = strlen( $content );
+			$depth = 0;
+			preg_match_all( '/<(\/?)' . $opener[1][0] . '\b[^>]*>/i', $content, $tags, PREG_OFFSET_CAPTURE | PREG_SET_ORDER, $start );
+			foreach ( $tags as $tag ) {
+				$depth += '' === $tag[1][0] ? 1 : -1;
+				if ( 0 === $depth ) {
+					$end = $tag[0][1] + strlen( $tag[0][0] );
+					break;
+				}
+			}
+			$ranges[] = array( $start, $end );
+			$last_end = $end;
+		}
+
+		$ends = array();
+		preg_match_all( '/<\/p>/i', $content, $matches, PREG_OFFSET_CAPTURE );
+		foreach ( $matches[0] as $match ) {
+			foreach ( $ranges as $range ) {
+				if ( $match[1] >= $range[0] && $match[1] < $range[1] ) {
+					continue 2;
+				}
+			}
+			$ends[] = $match[1] + strlen( $match[0] );
+		}
+
+		return $ends;
 	}
 
 	/**

@@ -264,10 +264,16 @@
 	color: inherit;
 }
 
-/* Whole-creative click-through link (set when the ad has a click URL). */
+/* Whole-creative click-through (set when the ad has a click URL): an empty
+   link laid over the creative, so block content is never wrapped in <a>. */
+.wbam-ad-rich-content--linked {
+	position: relative;
+}
+
 .wbam-ad-rich-content__link {
-	display: block;
-	text-decoration: none;
+	position: absolute;
+	inset: 0;
+	z-index: 1;
 }
 
 /* ==========================================================================

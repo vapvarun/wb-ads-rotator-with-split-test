@@ -78,16 +78,24 @@ class Rich_Content_Ad implements Ad_Type_Interface {
 		$body     = wp_kses_post( wpautop( $content ) );
 		$link_url = isset( $data['link_url'] ) ? $data['link_url'] : '';
 
-		// Make the creative clickable through its click URL. Content that
-		// already carries its own links keeps them: an <a> inside an <a> is
-		// invalid HTML and browsers split it apart.
+		// Make the creative clickable through its click URL with a full-cover
+		// overlay link beside it, never around it: block content inside an <a>
+		// let paragraph injection place other ads inside this link. Content
+		// that already carries its own links keeps them and gets no overlay,
+		// which would sit on top of them.
+		$overlay = '';
 		if ( '' !== $link_url && false === stripos( $body, '<a ' ) ) {
 			$target = isset( $data['target'] ) ? $data['target'] : '_blank';
-			$body   = '<a class="wbam-ad-rich-content__link" href="' . esc_url( $link_url ) . '" target="' . esc_attr( $target ) . '" rel="noopener noreferrer">' . $body . '</a>';
+			$host   = wp_parse_url( $link_url, PHP_URL_HOST );
+			/* translators: %s: advertiser's website host name. */
+			$label   = sprintf( __( 'Visit %s', 'wb-ads-rotator-with-split-test' ), $host ? $host : $link_url );
+			$overlay = '<a class="wbam-ad-rich-content__link" href="' . esc_url( $link_url ) . '" target="' . esc_attr( $target ) . '" rel="noopener noreferrer" aria-label="' . esc_attr( $label ) . '"></a>';
+
+			$classes[] = 'wbam-ad-rich-content--linked';
 		}
 
 		$html  = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-ad-id="' . esc_attr( $ad_id ) . '" data-placement="' . esc_attr( $placement ) . '">';
-		$html .= $body;
+		$html .= $body . $overlay;
 		$html .= '</div>';
 
 		return $html;
