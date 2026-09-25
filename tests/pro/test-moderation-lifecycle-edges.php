@@ -734,7 +734,7 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 		$result = Campaign_Manager::get_instance()->activate( (int) $campaign->id );
 
 		$this->assertWPError( $result );
-		$this->assertSame( 'campaign_end_date_passed', $result->get_error_code() );
+		$this->assertSame( 'end_date_passed', $result->get_error_code() );
 		$this->assertSame( 'draft', Campaign_Manager::get_instance()->get( (int) $campaign->id )->status );
 	}
 
