@@ -256,9 +256,23 @@ Best regards,
 	 * @return bool
 	 */
 	private function send_email( $to, $subject, $message ) {
-		$headers = apply_filters( 'wbam_partnership_email_headers', array() );
+		/**
+		 * Short-circuit sending a partnership email, e.g. to route it through
+		 * another mailer or email layout.
+		 *
+		 * @since 3.2.0
+		 *
+		 * @param bool|null $sent    Null to send with wp_mail() as plain text; a bool to skip it and report that result.
+		 * @param string    $to      Recipient email.
+		 * @param string    $subject Email subject.
+		 * @param string    $message Plain-text email body.
+		 */
+		$sent = apply_filters( 'wbam_partnership_pre_send_email', null, $to, $subject, $message );
 
-		$sent = wp_mail( $to, $subject, $message, $headers );
+		if ( null === $sent ) {
+			$headers = apply_filters( 'wbam_partnership_email_headers', array() );
+			$sent    = wp_mail( $to, $subject, $message, $headers );
+		}
 
 		do_action( 'wbam_partnership_email_sent', $to, $subject, $message, $sent );
 

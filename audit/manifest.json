@@ -1556,6 +1556,13 @@
       "purpose": "Filter admin notification email"
     },
     {
+      "name": "wbam_partnership_pre_send_email",
+      "type": "filter",
+      "args": 4,
+      "where": "includes/Modules/Links/class-partnership-emails.php",
+      "purpose": "Short-circuit a partnership email (Pro routes it through its branded email layout)"
+    },
+    {
       "name": "wbam_partnership_email_headers",
       "type": "filter",
       "args": 1,
