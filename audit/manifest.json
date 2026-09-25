@@ -522,6 +522,11 @@
       "where": "includes/Core/class-installer.php:425"
     },
     {
+      "name": "{prefix}wbam_analytics_daily",
+      "purpose": "Daily per-ad totals of raw analytics past retention (shared with Pro, same definition)",
+      "where": "includes/Core/class-installer.php"
+    },
+    {
       "name": "{prefix}wbam_email_submissions",
       "purpose": "Email capture form submissions",
       "where": "includes/Core/class-installer.php:455"
@@ -1703,6 +1708,20 @@
       "args": 2,
       "where": "includes/Modules/Targeting/class-frequency-manager.php",
       "purpose": "Fired when an ad reaches its total impression cap and stops being eligible for delivery"
+    },
+    {
+      "name": "wbam_analytics_raw_retention_days",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Core/class-analytics-rollup.php",
+      "purpose": "Days raw analytics events are kept before roll-up (default 90)"
+    },
+    {
+      "name": "wbam_count_visitor_views",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Targeting/class-frequency-manager.php",
+      "purpose": "Whether visitor views of an ad are counted in the wbam_ad_views cookie (Pro advertiser/campaign caps)"
     }
   ],
   "buddypress_integration": {
@@ -1834,7 +1853,15 @@
       }
     ]
   },
-  "cron": [],
+  "cron": [
+    {
+      "hook": "wbam_analytics_rollup",
+      "type": "single, self-rescheduling (Action Scheduler when loaded, WP-Cron otherwise)",
+      "callback": "WBAM\\Core\\Analytics_Rollup::run",
+      "where": "includes/Core/class-analytics-rollup.php",
+      "purpose": "Roll raw analytics past retention into wbam_analytics_daily; idle while Pro is active"
+    }
+  ],
   "wp_cli": [],
   "storage_drivers": [],
   "security": {

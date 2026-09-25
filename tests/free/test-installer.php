@@ -16,6 +16,7 @@ class Test_Installer extends WP_UnitTestCase {
 		'wbam_link_categories',
 		'wbam_link_clicks',
 		'wbam_analytics',
+		'wbam_analytics_daily',
 		'wbam_email_submissions',
 		'wbam_link_partnerships',
 		'wbam_rate_limits',

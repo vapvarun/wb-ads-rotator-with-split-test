@@ -13,6 +13,10 @@ defined( 'WBAM_PATH' ) || define( 'WBAM_PATH', __DIR__ . '/' );
 defined( 'WBAM_URL' ) || define( 'WBAM_URL', 'https://example.test/wp-content/plugins/wb-ads-rotator-with-split-test/' );
 defined( 'WBAM_BASENAME' ) || define( 'WBAM_BASENAME', 'wb-ads-rotator-with-split-test/wb-ads-rotator-with-split-test.php' );
 
+// WordPress constants defined at runtime by wp_cookie_constants().
+defined( 'COOKIEPATH' ) || define( 'COOKIEPATH', '/' );
+defined( 'COOKIE_DOMAIN' ) || define( 'COOKIE_DOMAIN', '' );
+
 // Pro plugin constants (dir resolved relative to free plugin root).
 $wbam_pro_dir = realpath( __DIR__ . '/../wb-ad-manager-pro' );
 if ( $wbam_pro_dir ) {

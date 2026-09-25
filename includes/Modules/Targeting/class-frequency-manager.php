@@ -253,7 +253,7 @@ class Frequency_Manager {
 
 		$data           = $this->get_cookie_data();
 		$data[ $ad_id ] = ( isset( $data[ $ad_id ] ) ? $data[ $ad_id ] : 0 ) + 1;
-		$value          = wp_json_encode( $data );
+		$value          = (string) wp_json_encode( $data );
 
 		setcookie( self::COOKIE_NAME, $value, $this->cookie_expiry(), COOKIEPATH, COOKIE_DOMAIN, is_ssl(), false );
 		$_COOKIE[ self::COOKIE_NAME ] = $value;
@@ -533,7 +533,7 @@ class Frequency_Manager {
 			return;
 		}
 
-		$cookie = self::COOKIE_NAME . '=' . rawurlencode( wp_json_encode( $cookie_data ) )
+		$cookie = self::COOKIE_NAME . '=' . rawurlencode( (string) wp_json_encode( $cookie_data ) )
 			. '; expires=' . gmdate( 'D, d M Y H:i:s', $this->cookie_expiry() ) . ' GMT; path=' . COOKIEPATH
 			. ( COOKIE_DOMAIN ? '; domain=' . COOKIE_DOMAIN : '' )
 			. ( is_ssl() ? '; secure' : '' );

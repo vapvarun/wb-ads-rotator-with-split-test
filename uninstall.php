@@ -68,6 +68,7 @@ $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_links" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_categories" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_clicks" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_analytics" );
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_analytics_daily" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_email_submissions" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_partnerships" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_rate_limits" );
@@ -91,6 +92,7 @@ delete_transient( '_wbam_activation_redirect' );
 // Clear any scheduled cron events.
 wp_clear_scheduled_hook( 'wbam_daily_cleanup' );
 wp_clear_scheduled_hook( 'wbam_hourly_stats' );
+wp_clear_scheduled_hook( 'wbam_analytics_rollup' );
 
 // Clean up user meta.
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup of plugin custom tables.

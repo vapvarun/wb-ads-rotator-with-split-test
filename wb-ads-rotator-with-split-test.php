@@ -110,6 +110,10 @@ register_activation_hook( __FILE__, 'wbam_activate' );
  */
 function wbam_deactivate() {
 	flush_rewrite_rules();
+	wp_clear_scheduled_hook( 'wbam_analytics_rollup' );
+	if ( function_exists( 'as_unschedule_all_actions' ) ) {
+		as_unschedule_all_actions( 'wbam_analytics_rollup' );
+	}
 }
 register_deactivation_hook( __FILE__, 'wbam_deactivate' );
 

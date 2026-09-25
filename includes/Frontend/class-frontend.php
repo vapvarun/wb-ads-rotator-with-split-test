@@ -239,6 +239,8 @@ class Frontend {
 		// persistent object cache.
 		\WBAM\Admin\Admin::flush_event_totals( $ad_id );
 
+		\WBAM\Core\Analytics_Rollup::schedule();
+
 		return $inserted;
 	}
 

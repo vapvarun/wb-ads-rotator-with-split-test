@@ -26,7 +26,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.8.0';
+	const DB_VERSION = '1.9.0';
 
 	/**
 	 * Option name for database version.
@@ -168,6 +168,10 @@ class Installer {
 		// rejects, so every partnership inquiry and email capture failed
 		// to insert. install() runs create_tables() before this method, and
 		// dbDelta alters the column type in place, so nothing to do here.
+
+		// Migration to 1.9.0: wbam_analytics_daily, where Analytics_Rollup
+		// keeps the totals of raw events past retention. Created by
+		// create_tables() above, like 1.8.0.
 
 		// Phase K: backfill the `_wbam_is_demo` meta + `wbam_demo_data_ids`
 		// tracking option so existing installs benefit from the safe
@@ -469,6 +473,29 @@ class Installer {
 
 		dbDelta( $sql_analytics );
 
+		// Daily totals of raw events past retention (Analytics_Rollup). Pro
+		// reads and writes the same table; keep this definition identical to
+		// Pro's so neither plugin's dbDelta alters the other's.
+		$table_daily = $wpdb->prefix . 'wbam_analytics_daily';
+		$sql_daily   = "CREATE TABLE {$table_daily} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			ad_id bigint(20) unsigned NOT NULL,
+			campaign_id bigint(20) unsigned DEFAULT NULL,
+			date date NOT NULL,
+			impressions int(11) unsigned NOT NULL DEFAULT 0,
+			clicks int(11) unsigned NOT NULL DEFAULT 0,
+			unique_impressions int(11) unsigned NOT NULL DEFAULT 0,
+			unique_clicks int(11) unsigned NOT NULL DEFAULT 0,
+			conversions int(11) unsigned NOT NULL DEFAULT 0,
+			revenue decimal(10,4) NOT NULL DEFAULT 0.0000,
+			PRIMARY KEY  (id),
+			UNIQUE KEY ad_date (ad_id,date),
+			KEY campaign_id (campaign_id),
+			KEY date (date)
+		) {$charset_collate};";
+
+		dbDelta( $sql_daily );
+
 		// Email submissions table.
 		$table_submissions = $wpdb->prefix . 'wbam_email_submissions';
 		$sql_submissions   = "CREATE TABLE {$table_submissions} (
@@ -546,6 +573,7 @@ class Installer {
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_categories" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_clicks" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_analytics" );
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_analytics_daily" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_email_submissions" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_partnerships" );
 		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_rate_limits" );

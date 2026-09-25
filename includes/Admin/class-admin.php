@@ -1847,8 +1847,6 @@ class Admin {
 	 * @param \WP_Post $post Post.
 	 */
 	public function render_comparison_metabox( $post ) {
-		global $wpdb;
-
 		$current_placements = get_post_meta( $post->ID, '_wbam_placements', true );
 		if ( empty( $current_placements ) || ! is_array( $current_placements ) ) {
 			echo '<p>' . esc_html__( 'No placements assigned to this ad.', 'wb-ads-rotator-with-split-test' ) . '</p>';
@@ -1894,33 +1892,11 @@ class Admin {
 		// Add current ad to comparison.
 		array_unshift( $competing_ads, $post );
 
-		// Get stats for all ads.
-		$table_name   = $wpdb->prefix . 'wbam_analytics';
-		$table_exists = $this->table_exists( $table_name );
-
+		// Get stats for all ads (lifetime, same totals as the ads list).
 		$stats = array();
 		foreach ( $competing_ads as $ad ) {
-			$impressions = 0;
-			$clicks      = 0;
-
-			if ( $table_exists ) {
-				// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$impressions = (int) $wpdb->get_var(
-					$wpdb->prepare(
-						'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
-						$ad->ID,
-						'impression'
-					)
-				);
-				$clicks      = (int) $wpdb->get_var(
-					$wpdb->prepare(
-						'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
-						$ad->ID,
-						'click'
-					)
-				);
-				// phpcs:enable
-			}
+			$impressions = $this->get_event_total( $ad->ID, 'impression' );
+			$clicks      = $this->get_event_total( $ad->ID, 'click' );
 
 			$ctr = $impressions > 0 ? ( $clicks / $impressions ) * 100 : 0;
 
@@ -2581,12 +2557,9 @@ class Admin {
 	/**
 	 * Lifetime total of an event type for one ad, as shown in the list table.
 	 *
-	 * Counts rows in the raw events table. That table is not the whole story
-	 * once PRO is active: PRO rolls events older than its aggregation window
-	 * into `wbam_analytics_daily` and DELETES the raw rows, so a raw-only count
-	 * silently decays to zero while Ad Analytics still reports lifetime totals.
-	 * The `wbam_ad_event_total` filter is the seam PRO uses to add the
-	 * aggregated remainder back, keeping both screens in agreement.
+	 * Raw events plus the rolled-up daily totals: raw rows past retention
+	 * (Analytics_Rollup, or Pro's aggregation) are summed into
+	 * `wbam_analytics_daily` and deleted, so a raw-only count would decay.
 	 *
 	 * @since 3.1.1
 	 *
@@ -2611,6 +2584,12 @@ class Admin {
 						$event_type
 					)
 				);
+				$count += (int) $wpdb->get_var(
+					$wpdb->prepare(
+						'SELECT SUM(' . ( 'click' === $event_type ? 'clicks' : 'impressions' ) . ') FROM ' . $wpdb->prefix . 'wbam_analytics_daily WHERE ad_id = %d', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- column from a fixed whitelist.
+						$post_id
+					)
+				);
 				// phpcs:enable
 			} else {
 				$count = 0;
@@ -2619,12 +2598,9 @@ class Admin {
 			/**
 			 * Filters the lifetime event total shown in the ads list table.
 			 *
-			 * PRO adds the aggregated daily rows, which the raw table no
-			 * longer holds after aggregation has run.
-			 *
 			 * @since 3.1.1
 			 *
-			 * @param int    $count      Count from the raw events table.
+			 * @param int    $count      Raw events plus daily totals.
 			 * @param int    $post_id    Ad ID.
 			 * @param string $event_type Event type ('impression' or 'click').
 			 */

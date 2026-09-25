@@ -128,7 +128,7 @@ wb-ads-rotator-with-split-test/
 - **CSS prefix:** `.wbam-` (BEM-lite)
 - **JS globals:** `wbam*` objects via `wp_localize_script` (e.g. `wbamPartnership`, `wbamFormatData`)
 - **REST namespace:** `wbam/v1`
-- **DB prefix:** `wbam_` (DB version `1.8.0`) / main option `wbam_settings`, other options `wbam_*`
+- **DB prefix:** `wbam_` (DB version `1.9.0`) / main option `wbam_settings`, other options `wbam_*`
 - **Escaping:** `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()` on ALL output
 - **Sanitization:** `sanitize_text_field( wp_unslash( $_REQUEST['...'] ) )` — never raw `$_REQUEST`
 - **Capability checks:** `current_user_can()` required on every AJAX/REST handler
