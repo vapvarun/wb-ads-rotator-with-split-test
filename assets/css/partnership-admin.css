@@ -89,7 +89,7 @@
 .wbam-type-badge {
 	display: inline-block;
 	padding: 3px 8px;
-	border-radius: 3px;
+	border-radius: var(--wbam-r-pill);
 	font-size: var(--wbam-font-size-xs);
 	font-weight: 500;
 }

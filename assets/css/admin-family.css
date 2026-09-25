@@ -731,3 +731,22 @@
 		flex-direction: column;
 	}
 }
+
+/* ── Form fields ──────────────────────────────────────────────────────────
+   Plain WP-core text inputs/selects/textareas on a `.wbam-admin` screen
+   (Adjust Balance, Campaign, Package, filter forms, …) inherited core's own
+   radius instead of the 8px control radius every wbam-specific field and
+   button already uses (report filters, action-bar buttons). One rule, not
+   a per-screen override. */
+.wbam-admin input[type="text"],
+.wbam-admin input[type="number"],
+.wbam-admin input[type="email"],
+.wbam-admin input[type="url"],
+.wbam-admin input[type="tel"],
+.wbam-admin input[type="search"],
+.wbam-admin input[type="date"],
+.wbam-admin input[type="datetime-local"],
+.wbam-admin select,
+.wbam-admin textarea {
+	border-radius: var(--wbam-r-md);
+}
