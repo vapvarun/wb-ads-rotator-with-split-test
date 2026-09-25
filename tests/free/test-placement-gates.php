@@ -108,9 +108,12 @@ class Test_Placement_Gates extends WP_UnitTestCase {
 	 * @return array
 	 */
 	private function matrix_post( array $offered, array $site, ?array $adv = null ): array {
+		// The matrix as Pro draws it, Advertisers column included; free hides
+		// that column and omits the flag (see sanitize_placement_gates()).
 		$post = array(
-			'placement_gates_submitted' => '1',
-			'placement_gates_offered'   => implode( ',', $offered ),
+			'placement_gates_submitted'     => '1',
+			'placement_gates_adv_submitted' => '1',
+			'placement_gates_offered'       => implode( ',', $offered ),
 		);
 
 		// An unticked checkbox posts nothing, so an empty tick list means

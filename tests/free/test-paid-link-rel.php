@@ -13,8 +13,14 @@ namespace WBAM\Tests\Free;
 
 use WBAM\Modules\Links\Link;
 use WBAM\Modules\Placements\Placement_Engine;
+use WBAM\Tests\Helpers\Factory;
 
 class Test_Paid_Link_Rel extends \WP_UnitTestCase {
+
+	public function tear_down(): void {
+		Factory::reset_page_ads();
+		parent::tear_down();
+	}
 
 	private function image_ad(): int {
 		$ad_id = (int) self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
@@ -40,14 +46,14 @@ class Test_Paid_Link_Rel extends \WP_UnitTestCase {
 		$engine = Placement_Engine::get_instance();
 		$ad_id  = $this->image_ad();
 
-		$this->assertSame( 'noopener', $this->rel_of( $engine->render_ad( $ad_id, array( 'skip_targeting' => true ) ) ), 'A house ad is the owner\'s own link and must not be marked sponsored.' );
+		$this->assertSame( 'noopener', $this->rel_of( $engine->render_ad( $ad_id, array( 'skip_targeting' => true, 'allow_duplicate' => true ) ) ), 'A house ad is the owner\'s own link and must not be marked sponsored.' );
 
 		$paid = static function () {
 			return Placement_Engine::TIER_PAID;
 		};
 		add_filter( 'wbam_ad_delivery_tier', $paid );
 		$paid_ad = $this->image_ad();
-		$rel     = $this->rel_of( $engine->render_ad( $paid_ad, array( 'skip_targeting' => true ) ) );
+		$rel     = $this->rel_of( $engine->render_ad( $paid_ad, array( 'skip_targeting' => true, 'allow_duplicate' => true ) ) );
 		remove_filter( 'wbam_ad_delivery_tier', $paid );
 
 		$this->assertSame( 'sponsored noopener', $rel, 'A paid ad link must be qualified as sponsored.' );

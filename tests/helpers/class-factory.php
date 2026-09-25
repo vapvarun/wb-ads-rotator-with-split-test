@@ -10,6 +10,18 @@ namespace WBAM\Tests\Helpers;
 class Factory {
 
 	/**
+	 * Forget the ads "rendered on this page". Frequency_Manager is a
+	 * per-request singleton, so without this every render in the suite
+	 * counts toward one page's max_ads_per_page and later tests see ads
+	 * withheld for a limit their own page never reached.
+	 */
+	public static function reset_page_ads(): void {
+		$page_ads = new \ReflectionProperty( \WBAM\Modules\Targeting\Frequency_Manager::class, 'page_ads' );
+		$page_ads->setAccessible( true );
+		$page_ads->setValue( \WBAM\Modules\Targeting\Frequency_Manager::get_instance(), array() );
+	}
+
+	/**
 	 * Create a wbam-ad post with sensible defaults.
 	 */
 	public static function make_ad( array $overrides = array() ): int {

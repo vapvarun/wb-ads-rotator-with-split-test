@@ -14,8 +14,14 @@ namespace WBAM\Tests\Free;
 
 use WBAM\Admin\Setup_Wizard;
 use WBAM\Modules\Placements\Placement_Engine;
+use WBAM\Tests\Helpers\Factory;
 
 class Test_Visitor_Ad_Surfaces extends \WP_UnitTestCase {
+
+	public function tear_down(): void {
+		Factory::reset_page_ads();
+		parent::tear_down();
+	}
 
 	public function test_sample_ads_are_visitor_ready(): void {
 		$wizard = new \ReflectionMethod( Setup_Wizard::class, 'create_sample_ads' );
@@ -33,7 +39,7 @@ class Test_Visitor_Ad_Surfaces extends \WP_UnitTestCase {
 		$this->assertCount( 3, $ads );
 
 		foreach ( $ads as $ad_id ) {
-			$html = Placement_Engine::get_instance()->render_ad( $ad_id, array( 'skip_targeting' => true ) );
+			$html = Placement_Engine::get_instance()->render_ad( $ad_id, array( 'skip_targeting' => true, 'allow_duplicate' => true ) );
 
 			$this->assertNotSame( '', $html );
 			$this->assertStringNotContainsString( 'style=', $html, 'Colours come from theme tokens, so dark mode works.' );

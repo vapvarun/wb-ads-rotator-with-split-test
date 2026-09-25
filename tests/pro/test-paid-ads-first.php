@@ -12,8 +12,15 @@
 namespace WBAM\Tests\Pro;
 
 use WBAM\Modules\Placements\Placement_Engine;
+use WBAM\Tests\Helpers\Factory;
 
 class Test_Paid_Ads_First extends Pro_Test_Case {
+
+	public function set_up(): void {
+		parent::set_up();
+		// Earlier tests' renders count toward one "page" in this process.
+		Factory::reset_page_ads();
+	}
 
 	private function make_ad( string $title, array $meta = array() ): int {
 		$ad_id = (int) self::factory()->post->create(

@@ -14,8 +14,14 @@ namespace WBAM\Tests\Free;
 
 use WBAM\Admin\Admin;
 use WBAM\Modules\Placements\Placement_Engine;
+use WBAM\Tests\Helpers\Factory;
 
 class Test_Placement_Options extends \WP_UnitTestCase {
+
+	public function tear_down(): void {
+		Factory::reset_page_ads();
+		parent::tear_down();
+	}
 
 	private function ad( array $placements, array $data = array() ): int {
 		$ad_id = (int) self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
@@ -85,6 +91,7 @@ class Test_Placement_Options extends \WP_UnitTestCase {
 
 		$this->go_to( get_permalink( self::factory()->post->create() ) );
 		add_filter( 'wbam_skip_content_injection', '__return_false' );
+		add_filter( 'wbam_enforce_page_cap', '__return_false' );
 		$GLOBALS['wp_query']->in_the_loop = true;
 
 		$html = Placement_Engine::get_instance()->get_placement( 'content' )->filter_content( '<p>Body</p>' );
