@@ -121,6 +121,15 @@
 	outline: none;
 	box-shadow: 0 0 0 1px var(--wbam-form-focus);
 }
+/* One solid, opaque :focus-visible outline for every field and button in
+   this standalone form - the 1px var(--wbam-form-focus) box-shadow above
+   still renders but is too thin/subtle to read as a focus indicator on
+   some controls (select, textarea). !important guarantees this wins over
+   the outline: none a few lines up regardless of load order. */
+.wbam-partnership-form-wrap :focus-visible {
+	outline: 2px solid var(--wbam-form-focus) !important;
+	outline-offset: 2px !important;
+}
 :where(.wbam-partnership-form-wrap) .wbam-field-help {
 	display: block;
 	margin-top: 5px;
