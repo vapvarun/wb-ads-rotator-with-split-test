@@ -93,7 +93,7 @@ class Field_Tooltips {
 	 */
 	public static function copy() {
 		return array(
-			'session_limit' => __( 'Caps how many times one visitor sees this ad per browser session. 0 or empty means unlimited. Pairs with Pro advertiser-level caps if installed.', 'wb-ads-rotator-with-split-test' ),
+			'session_limit' => __( 'Caps how many times one visitor sees this ad per day, counted in a browser cookie. 0 or empty means unlimited. Pairs with Pro advertiser-level caps if installed.', 'wb-ads-rotator-with-split-test' ),
 			'priority'      => __( 'Weighted rotation: an ad with priority 10 appears twice as often as one with priority 5. Default 5 is neutral.', 'wb-ads-rotator-with-split-test' ),
 			'sizing_mode'   => __( 'Responsive fits any slot and suits AdSense auto or fluid HTML. Fixed size matches only placements that accept your exact width and height.', 'wb-ads-rotator-with-split-test' ),
 			'custom_dims'   => __( 'Width and height in pixels are matched against each placement exactly. Only placements that accept these dimensions will render this ad.', 'wb-ads-rotator-with-split-test' ),

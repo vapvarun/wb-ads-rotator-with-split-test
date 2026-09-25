@@ -1342,7 +1342,7 @@ class Admin {
 			</div>
 
 			<div class="wbam-session-limit-field">
-				<label for="wbam_session_limit"><?php esc_html_e( 'Session Limit', 'wb-ads-rotator-with-split-test' ); ?></label><?php echo Field_Tooltips::tip_for( 'session_limit' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?>
+				<label for="wbam_session_limit"><?php esc_html_e( 'Max views per visitor per day', 'wb-ads-rotator-with-split-test' ); ?></label><?php echo Field_Tooltips::tip_for( 'session_limit' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?>
 				<input type="number" id="wbam_session_limit" name="wbam_session_limit" min="0" value="<?php echo esc_attr( $session_limit ); ?>" placeholder="<?php esc_attr_e( 'Unlimited', 'wb-ads-rotator-with-split-test' ); ?>" />
 				<p class="description"><?php esc_html_e( 'Max views per visitor session. Leave empty for unlimited.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>

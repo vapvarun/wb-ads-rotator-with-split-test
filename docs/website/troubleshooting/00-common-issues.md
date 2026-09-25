@@ -30,7 +30,7 @@ Check each item:
 - The **Enabled** toggle in the Ad Status metabox is on (a disabled ad never serves).
 - At least one placement is checked, or you are using a shortcode with the correct ID.
 - The start date has passed and the end date has not.
-- The **Session limit** or **Impression cap** for this ad has not been reached - test in incognito.
+- The **Max views per visitor per day** or **Impression cap** for this ad has not been reached - test in incognito.
 - **Disable for admins** or **Disable for logged-in users** is not hiding the ad from you (**Settings -> General**).
 - The placement is open under **Settings -> Placements**.
 

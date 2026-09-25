@@ -13,7 +13,7 @@ When you add or edit an ad you get these metaboxes:
 | Ad Settings | The ad type and its creative fields |
 | Preview | A live preview (appears after the first save) |
 | Placements | Checkboxes for every location the ad may appear |
-| Ad Status (sidebar) | Enabled toggle, Priority (1-10), session limit, impression cap |
+| Ad Status (sidebar) | Enabled toggle, Priority (1-10), max views per visitor per day, impression cap |
 | Display Rules | Which pages the ad may show on |
 | Visitor Conditions | Device, login status, and role targeting |
 | Schedule | Start/end dates, days of week, time of day |

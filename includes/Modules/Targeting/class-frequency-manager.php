@@ -23,20 +23,18 @@ class Frequency_Manager {
 	use Singleton;
 
 	/**
-	 * Cookie name for session tracking.
+	 * Cookie holding this visitor's views today, ad id => views.
+	 *
+	 * Only ads that some cap reads are counted, and the count lives only in
+	 * this cookie: no per-view rows in wp_options.
 	 */
 	const COOKIE_NAME = 'wbam_ad_views';
-
-	/**
-	 * Cookie expiration (1 day).
-	 */
-	const COOKIE_EXPIRATION = DAY_IN_SECONDS;
 
 	/**
 	 * Total lifetime impressions this ad may be delivered. 0/empty = unlimited.
 	 *
 	 * Distinct from `_wbam_session_limit`, which caps how many times ONE visitor
-	 * sees the ad in a session. This caps the ad across the whole site and every
+	 * sees the ad per day. This caps the ad across the whole site and every
 	 * visitor — "run this creative 5,000 times, then stop".
 	 */
 	const CAP_META = '_wbam_impression_cap';
@@ -241,31 +239,58 @@ class Frequency_Manager {
 	 *
 	 * set_view_cookie() runs on `wp_footer` and is how server-rendered ads
 	 * record that this visitor has now seen them. An AJAX request has no
-	 * footer, so a surface that reports its impressions over AJAX never
-	 * incremented the per-visitor counter at all — which quietly made
-	 * `_wbam_session_limit` unenforceable on that surface, since get_ad_views()
-	 * stayed at zero forever.
-	 *
-	 * Writes the IP+UA transient rather than the cookie: get_ad_views() already
-	 * takes the higher of the two, and the transient is the half that a request
-	 * outside the page lifecycle can actually set.
+	 * footer, but its headers are still open, so it sets the cookie directly.
 	 *
 	 * @param int $ad_id Ad ID.
 	 * @return void
 	 */
 	public function record_session_view( $ad_id ) {
-		$ad_id        = (int) $ad_id;
-		$visitor_hash = $this->get_visitor_hash();
+		$ad_id = (int) $ad_id;
 
-		if ( $ad_id <= 0 || empty( $visitor_hash ) ) {
+		if ( $ad_id <= 0 || headers_sent() || ! $this->counts_views( $ad_id ) ) {
 			return;
 		}
 
-		$transient_key = 'wbam_freq_' . $visitor_hash . '_' . $ad_id;
-		$current       = get_transient( $transient_key );
-		$current       = false !== $current ? (int) $current : 0;
+		$data           = $this->get_cookie_data();
+		$data[ $ad_id ] = ( isset( $data[ $ad_id ] ) ? $data[ $ad_id ] : 0 ) + 1;
+		$value          = wp_json_encode( $data );
 
-		set_transient( $transient_key, $current + 1, self::COOKIE_EXPIRATION );
+		setcookie( self::COOKIE_NAME, $value, $this->cookie_expiry(), COOKIEPATH, COOKIE_DOMAIN, is_ssl(), false );
+		$_COOKIE[ self::COOKIE_NAME ] = $value;
+	}
+
+	/**
+	 * Whether this visitor's views of an ad need counting at all.
+	 *
+	 * Only when some cap reads the count: the ad's own daily limit, or
+	 * anything hooked on the filter. Uncapped ads cost nothing.
+	 *
+	 * @param int $ad_id Ad ID.
+	 * @return bool
+	 */
+	public function counts_views( $ad_id ) {
+		$counts = (int) get_post_meta( (int) $ad_id, '_wbam_session_limit', true ) > 0;
+
+		/**
+		 * Filters whether visitor views of an ad are counted.
+		 *
+		 * Return true when a cap outside the ad's own daily limit reads
+		 * get_ad_views() for this ad.
+		 *
+		 * @since 3.2.0
+		 * @param bool $counts Whether the ad has its own daily limit.
+		 * @param int  $ad_id  Ad ID.
+		 */
+		return (bool) apply_filters( 'wbam_count_visitor_views', $counts, (int) $ad_id );
+	}
+
+	/**
+	 * When today's view counts expire: midnight in the site's timezone.
+	 *
+	 * @return int Unix timestamp.
+	 */
+	private function cookie_expiry() {
+		return ( new \DateTimeImmutable( 'tomorrow', wp_timezone() ) )->getTimestamp();
 	}
 
 	/**
@@ -420,7 +445,7 @@ class Frequency_Manager {
 	}
 
 	/**
-	 * Check if specific ad can be shown (session limit).
+	 * Check if specific ad can be shown (page, total and per-visitor daily limits).
 	 *
 	 * @param int $ad_id Ad ID.
 	 * @return bool
@@ -437,7 +462,7 @@ class Frequency_Manager {
 			return false;
 		}
 
-		// Check session limit for this specific ad.
+		// Per-visitor daily limit for this specific ad.
 		$session_limit = get_post_meta( $ad_id, '_wbam_session_limit', true );
 
 		if ( empty( $session_limit ) || $session_limit <= 0 ) {
@@ -449,104 +474,71 @@ class Frequency_Manager {
 	}
 
 	/**
-	 * Get ad views from cookie with server-side fallback.
+	 * This visitor's views of an ad today, from the view cookie.
 	 *
-	 * Uses cookie-based tracking as primary method, with IP-based
-	 * transient fallback for when cookies are disabled or cleared.
+	 * A visitor who blocks cookies is not capped; that is the price of not
+	 * writing a database row per view.
 	 *
 	 * @param int $ad_id Ad ID.
 	 * @return int
 	 */
 	public function get_ad_views( $ad_id ) {
-		$cookie_data  = $this->get_cookie_data();
-		$cookie_views = isset( $cookie_data[ $ad_id ] ) ? (int) $cookie_data[ $ad_id ] : 0;
+		$cookie_data = $this->get_cookie_data();
 
-		// Server-side fallback: Check IP-based transient.
-		$visitor_hash = $this->get_visitor_hash();
-		if ( ! empty( $visitor_hash ) ) {
-			$transient_key = 'wbam_freq_' . $visitor_hash . '_' . $ad_id;
-			$server_views  = get_transient( $transient_key );
-			$server_views  = false !== $server_views ? (int) $server_views : 0;
-
-			// Return the higher count to prevent bypassing limits.
-			return max( $cookie_views, $server_views );
-		}
-
-		return $cookie_views;
+		return isset( $cookie_data[ (int) $ad_id ] ) ? $cookie_data[ (int) $ad_id ] : 0;
 	}
 
 	/**
-	 * Get cookie data.
+	 * Get cookie data, reduced to ad id => views integers.
 	 *
-	 * @return array
+	 * @return array<int,int>
 	 */
 	private function get_cookie_data() {
 		if ( ! isset( $_COOKIE[ self::COOKIE_NAME ] ) ) {
 			return array();
 		}
 
-		$data = json_decode( sanitize_text_field( wp_unslash( $_COOKIE[ self::COOKIE_NAME ] ) ), true );
-		return is_array( $data ) ? $data : array();
-	}
+		$data  = json_decode( sanitize_text_field( wp_unslash( $_COOKIE[ self::COOKIE_NAME ] ) ), true );
+		$clean = array();
 
-	/**
-	 * Generate visitor hash for server-side tracking.
-	 *
-	 * Uses IP address and User-Agent with daily rotating salt for
-	 * GDPR-compliant anonymized tracking.
-	 *
-	 * @since 2.3.2
-	 * @return string Visitor hash or empty string if IP not available.
-	 */
-	private function get_visitor_hash() {
-		if ( ! isset( $_SERVER['REMOTE_ADDR'] ) ) {
-			return '';
+		foreach ( is_array( $data ) ? $data : array() as $ad_id => $views ) {
+			if ( (int) $ad_id > 0 ) {
+				$clean[ (int) $ad_id ] = absint( $views );
+			}
 		}
 
-		$ip_address     = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
-		$user_agent_raw = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-		$daily_salt     = wp_hash( gmdate( 'Y-m-d' ) );
-
-		return hash( 'sha256', $ip_address . $user_agent_raw . $daily_salt );
+		return $clean;
 	}
 
 	/**
-	 * Set view cookie in footer with server-side fallback.
+	 * Count this page's views of capped ads in the view cookie.
+	 *
+	 * Runs on wp_footer, after output has started, so the cookie is set from
+	 * a script rather than a header.
 	 */
 	public function set_view_cookie() {
-		if ( empty( $this->page_ads ) ) {
+		$cookie_data = $this->get_cookie_data();
+		$counted     = false;
+
+		foreach ( $this->page_ads as $ad_id ) {
+			if ( ! $this->counts_views( $ad_id ) ) {
+				continue;
+			}
+
+			$cookie_data[ $ad_id ] = ( isset( $cookie_data[ $ad_id ] ) ? $cookie_data[ $ad_id ] : 0 ) + 1;
+			$counted               = true;
+		}
+
+		if ( ! $counted ) {
 			return;
 		}
 
-		$cookie_data  = $this->get_cookie_data();
-		$visitor_hash = $this->get_visitor_hash();
+		$cookie = self::COOKIE_NAME . '=' . rawurlencode( wp_json_encode( $cookie_data ) )
+			. '; expires=' . gmdate( 'D, d M Y H:i:s', $this->cookie_expiry() ) . ' GMT; path=' . COOKIEPATH
+			. ( COOKIE_DOMAIN ? '; domain=' . COOKIE_DOMAIN : '' )
+			. ( is_ssl() ? '; secure' : '' );
 
-		foreach ( $this->page_ads as $ad_id ) {
-			if ( isset( $cookie_data[ $ad_id ] ) ) {
-				++$cookie_data[ $ad_id ];
-			} else {
-				$cookie_data[ $ad_id ] = 1;
-			}
-
-			// Server-side fallback: Update transient for IP-based tracking.
-			if ( ! empty( $visitor_hash ) ) {
-				$transient_key = 'wbam_freq_' . $visitor_hash . '_' . $ad_id;
-				$current_count = get_transient( $transient_key );
-				$current_count = false !== $current_count ? (int) $current_count : 0;
-				set_transient( $transient_key, $current_count + 1, self::COOKIE_EXPIRATION );
-			}
-		}
-
-		// Output JS to set cookie.
-		$json = wp_json_encode( $cookie_data );
-		$exp  = time() + self::COOKIE_EXPIRATION;
-		?>
-		<script>
-		(function() {
-			document.cookie = '<?php echo esc_js( self::COOKIE_NAME ); ?>=' + encodeURIComponent('<?php echo esc_js( $json ); ?>') + ';expires=<?php echo esc_js( gmdate( 'D, d M Y H:i:s', $exp ) ); ?> GMT;path=/';
-		})();
-		</script>
-		<?php
+		wp_print_inline_script_tag( 'document.cookie=' . wp_json_encode( $cookie, JSON_HEX_TAG | JSON_HEX_AMP ) . ';' );
 	}
 
 	/**

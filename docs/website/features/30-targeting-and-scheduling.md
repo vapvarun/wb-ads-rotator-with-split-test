@@ -55,7 +55,7 @@ Country is resolved from the visitor's BuddyPress profile where present, otherwi
 
 The **Ad Status** metabox exposes two caps:
 
-- **Session limit** - the maximum times a single visitor sees the ad per session (cookie-based).
+- **Max views per visitor per day** - the maximum times a single visitor sees the ad in a day (counted in a browser cookie that resets at midnight site time).
 - **Impression cap** - a total lifetime impression limit across all visitors; once reached, the ad stops serving.
 
 ## Next steps
