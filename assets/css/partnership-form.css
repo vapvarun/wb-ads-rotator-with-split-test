@@ -30,51 +30,51 @@
 	--wbam-form-button-border: var(--button-border-color, var(--reign-site-button-bg-color, transparent));
 	--wbam-form-button-border-hover: var(--button-border-hover-color, var(--reign-site-button-bg-hover-color, transparent));
 	--wbam-form-required: var(--color-danger, var(--wbam-danger, #c00));
-	--wbam-form-radius: 4px;
-	--wbam-form-success-bg: var(--color-success-bg, #d4edda);
-	--wbam-form-success-border: var(--color-success-border, #c3e6cb);
-	--wbam-form-success-text: var(--color-success-text, #155724);
-	--wbam-form-error-bg: var(--color-error-bg, #f8d7da);
-	--wbam-form-error-border: var(--color-error-border, #f5c6cb);
-	--wbam-form-error-text: var(--color-error-text, #721c24);
+	--wbam-form-radius: var(--wbam-r-md, 8px);
+	--wbam-form-success-bg: var(--color-success-bg, color-mix(in srgb, var(--wbam-success) 14%, var(--wbam-card-bg)));
+	--wbam-form-success-border: var(--color-success-border, color-mix(in srgb, var(--wbam-success) 35%, var(--wbam-card-bg)));
+	--wbam-form-success-text: var(--color-success-text, color-mix(in srgb, var(--wbam-success) 60%, var(--wbam-text)));
+	--wbam-form-error-bg: var(--color-error-bg, var(--wbam-danger-bg));
+	--wbam-form-error-border: var(--color-error-border, color-mix(in srgb, var(--wbam-danger) 35%, var(--wbam-card-bg)));
+	--wbam-form-error-text: var(--color-error-text, color-mix(in srgb, var(--wbam-danger) 60%, var(--wbam-text)));
 	
 	max-width: 600px;
 	margin: 0 auto;
 	padding: 20px;
 }
-.wbam-partnership-title {
+.wbam-partnership-form-wrap .wbam-partnership-title {
 	margin-bottom: 10px;
 	font-size: 1.5em;
 	color: var(--wbam-form-text);
 }
-.wbam-partnership-description {
+.wbam-partnership-form-wrap .wbam-partnership-description {
 	margin-bottom: 20px;
 	color: var(--wbam-form-text-light);
 }
-.wbam-form-row {
+.wbam-partnership-form-wrap .wbam-form-row {
 	margin-bottom: 20px;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 15px;
 }
-.wbam-form-field {
+.wbam-partnership-form-wrap .wbam-form-field {
 	flex: 1;
 	min-width: 200px;
 }
-.wbam-field-half {
+.wbam-partnership-form-wrap .wbam-field-half {
 	flex: 0 0 calc(50% - 8px);
 }
-.wbam-form-field label {
+.wbam-partnership-form-wrap .wbam-form-field label {
 	display: block;
 	margin-bottom: 5px;
 	font-weight: 600;
 	color: var(--wbam-form-text);
 }
-.wbam-form-field .required {
+.wbam-partnership-form-wrap .wbam-form-field .required {
 	color: var(--wbam-form-required);
 }
-.wbam-form-field input,
-.wbam-form-field textarea {
+.wbam-partnership-form-wrap .wbam-form-field input,
+.wbam-partnership-form-wrap .wbam-form-field textarea {
 	width: 100%;
 	padding: 10px 12px;
 	border: 1px solid var(--wbam-form-border);
@@ -84,11 +84,11 @@
 	background-color: var(--wbam-form-input-bg);
 	color: var(--wbam-form-input-text);
 }
-.wbam-form-field input::placeholder,
-.wbam-form-field textarea::placeholder {
+.wbam-partnership-form-wrap .wbam-form-field input::placeholder,
+.wbam-partnership-form-wrap .wbam-form-field textarea::placeholder {
 	color: var(--wbam-form-placeholder);
 }
-.wbam-form-field select {
+.wbam-partnership-form-wrap .wbam-form-field select {
 	width: 100%;
 	padding: 10px 40px 10px 12px;
 	border: 1px solid var(--wbam-form-border);
@@ -107,28 +107,28 @@
 	line-height: 1.5;
 	min-height: 44px;
 }
-.wbam-form-field input:focus,
-.wbam-form-field select:focus,
-.wbam-form-field textarea:focus {
+.wbam-partnership-form-wrap .wbam-form-field input:focus,
+.wbam-partnership-form-wrap .wbam-form-field select:focus,
+.wbam-partnership-form-wrap .wbam-form-field textarea:focus {
 	border-color: var(--wbam-form-focus);
 	background-color: var(--wbam-form-focus-bg);
 	color: var(--wbam-form-focus-text);
 	outline: none;
 	box-shadow: 0 0 0 1px var(--wbam-form-focus);
 }
-.wbam-field-help {
+.wbam-partnership-form-wrap .wbam-field-help {
 	display: block;
 	margin-top: 5px;
 	font-size: 12px;
 	color: var(--wbam-form-text-light);
 }
-.wbam-full-width {
+.wbam-partnership-form-wrap .wbam-full-width {
 	width: 100%;
 }
-.wbam-form-actions {
+.wbam-partnership-form-wrap .wbam-form-actions {
 	margin-top: 25px;
 }
-.wbam-btn {
+.wbam-partnership-form-wrap .wbam-btn {
 	padding: 12px 24px;
 	border: 2px solid transparent;
 	border-radius: var(--wbam-form-radius);
@@ -136,37 +136,37 @@
 	cursor: pointer;
 	transition: all 0.2s ease;
 }
-.wbam-btn-primary {
+.wbam-partnership-form-wrap .wbam-btn-primary {
 	background-color: var(--wbam-form-button-bg);
 	color: var(--wbam-form-button-text);
 	border-color: var(--wbam-form-button-border);
 }
-.wbam-btn-primary:hover {
+.wbam-partnership-form-wrap .wbam-btn-primary:hover {
 	background-color: var(--wbam-form-button-bg-hover);
 	color: var(--wbam-form-button-text-hover);
 	border-color: var(--wbam-form-button-border-hover);
 }
-.wbam-btn:disabled {
+.wbam-partnership-form-wrap .wbam-btn:disabled {
 	opacity: 0.6;
 	cursor: not-allowed;
 }
-.wbam-form-message {
+.wbam-partnership-form-wrap .wbam-form-message {
 	margin-top: 20px;
 	padding: 15px;
 	border-radius: var(--wbam-form-radius);
 }
-.wbam-form-message.wbam-success {
+.wbam-partnership-form-wrap .wbam-form-message.wbam-success {
 	background-color: var(--wbam-form-success-bg);
 	border: 1px solid var(--wbam-form-success-border);
 	color: var(--wbam-form-success-text);
 }
-.wbam-form-message.wbam-error {
+.wbam-partnership-form-wrap .wbam-form-message.wbam-error {
 	background-color: var(--wbam-form-error-bg);
 	border: 1px solid var(--wbam-form-error-border);
 	color: var(--wbam-form-error-text);
 }
 @media (max-width: 600px) {
-	.wbam-field-half {
+	.wbam-partnership-form-wrap .wbam-field-half {
 		flex: 0 0 100%;
 	}
 }
