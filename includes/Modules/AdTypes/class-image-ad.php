@@ -111,7 +111,13 @@ class Image_Ad implements Ad_Type_Interface {
 			$html .= '<a href="' . esc_url( $link_url ) . '" target="' . esc_attr( $target ) . '" rel="' . esc_attr( \WBAM\Modules\Placements\Placement_Engine::get_instance()->get_ad_link_rel( $ad_id ) ) . '">';
 		}
 
-		$html .= '<img src="' . esc_url( $image_url ) . '" alt="' . esc_attr( $alt_text ) . '" />';
+		// Known dimensions reserve the slot's space before the image loads
+		// (no layout shift); CSS keeps it fluid with height:auto.
+		$width  = (int) get_post_meta( $ad_id, '_wbam_ad_width', true );
+		$height = (int) get_post_meta( $ad_id, '_wbam_ad_height', true );
+		$size   = $width > 0 && $height > 0 ? sprintf( ' width="%d" height="%d"', $width, $height ) : '';
+
+		$html .= '<img src="' . esc_url( $image_url ) . '" alt="' . esc_attr( $alt_text ) . '"' . $size . ' />';
 
 		if ( ! empty( $link_url ) ) {
 			$html .= '</a>';

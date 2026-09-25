@@ -95,14 +95,14 @@ class Sticky_Placement implements Placement_Interface {
 
 		foreach ( $ads as $ad_id ) {
 			$data     = get_post_meta( $ad_id, '_wbam_ad_data', true );
-			$position = isset( $data['sticky_position'] ) ? $data['sticky_position'] : 'bottom-right';
+			$position = $this->save_options( $ad_id, (array) $data )['sticky_position'];
 
 			$output = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 
 			if ( ! empty( $output ) ) {
 				printf(
 					'<div class="wbam-sticky-ad wbam-sticky-%s" data-ad-id="%d">
-						<button class="wbam-sticky-close" aria-label="%s">&times;</button>
+						<button type="button" class="wbam-sticky-close" aria-label="%s">&times;</button>
 						%s
 					</div>',
 					esc_attr( $position ),

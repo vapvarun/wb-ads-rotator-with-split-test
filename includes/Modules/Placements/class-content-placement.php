@@ -67,29 +67,64 @@ class Content_Placement implements Placement_Interface {
 
 		$engine = Placement_Engine::get_instance();
 
-		// Get ads with 'content' placement (shows both before and after).
-		$content_ads = $engine->get_ads_for_placement( 'content' );
-
-		// Before content.
+		// One creative per page: it renders where its Position option puts
+		// it. The engine's page cap made the old second copy (after the
+		// content) an empty wrapper on every page.
 		$before = '';
-		if ( ! empty( $content_ads ) ) {
-			$before = '<div class="wbam-placement wbam-placement-before-content">';
-			foreach ( $content_ads as $ad_id ) {
-				$before .= $engine->render_ad( $ad_id, array( 'placement' => 'content' ) );
+		$after  = '';
+		foreach ( $engine->get_ads_for_placement( 'content' ) as $ad_id ) {
+			$html = $engine->render_ad( $ad_id, array( 'placement' => 'content' ) );
+			if ( '' === $html ) {
+				continue;
 			}
-			$before .= '</div>';
+
+			$position = $this->save_options( $ad_id, (array) get_post_meta( $ad_id, '_wbam_ad_data', true ) )['content_position'];
+			if ( 'after' === $position ) {
+				$after .= $html;
+			} else {
+				$before .= $html;
+			}
 		}
 
-		// After content.
-		$after = '';
-		if ( ! empty( $content_ads ) ) {
-			$after = '<div class="wbam-placement wbam-placement-after-content">';
-			foreach ( $content_ads as $ad_id ) {
-				$after .= $engine->render_ad( $ad_id, array( 'placement' => 'content' ) );
-			}
-			$after .= '</div>';
+		if ( '' !== $before ) {
+			$before = '<div class="wbam-placement wbam-placement-before-content">' . $before . '</div>';
+		}
+		if ( '' !== $after ) {
+			$after = '<div class="wbam-placement wbam-placement-after-content">' . $after . '</div>';
 		}
 
 		return $before . $content . $after;
+	}
+
+	/**
+	 * Render placement options.
+	 *
+	 * @param int   $ad_id Ad ID.
+	 * @param array $data  Ad data.
+	 */
+	public function render_options( $ad_id, $data ) {
+		$position = $this->save_options( $ad_id, (array) $data )['content_position'];
+		?>
+		<div class="wbam-placement-extra">
+			<label for="wbam_content_position"><?php esc_html_e( 'Position', 'wb-ads-rotator-with-split-test' ); ?></label>
+			<select id="wbam_content_position" name="wbam_data[content_position]">
+				<option value="before" <?php selected( $position, 'before' ); ?>><?php esc_html_e( 'Before the content', 'wb-ads-rotator-with-split-test' ); ?></option>
+				<option value="after" <?php selected( $position, 'after' ); ?>><?php esc_html_e( 'After the content', 'wb-ads-rotator-with-split-test' ); ?></option>
+			</select>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Save placement options.
+	 *
+	 * @param int   $ad_id Ad ID.
+	 * @param array $data  Posted data.
+	 * @return array
+	 */
+	public function save_options( $ad_id, $data ) {
+		return array(
+			'content_position' => isset( $data['content_position'] ) && 'after' === $data['content_position'] ? 'after' : 'before',
+		);
 	}
 }

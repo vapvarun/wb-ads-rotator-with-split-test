@@ -996,6 +996,17 @@ class Admin {
 			'high'
 		);
 
+		if ( $post && $post->ID && 'auto-draft' !== $post->post_status ) {
+			add_meta_box(
+				'wbam-ad-usage',
+				__( 'Use this ad', 'wb-ads-rotator-with-split-test' ),
+				array( $this, 'render_usage_metabox' ),
+				'wbam-ad',
+				'side',
+				'default'
+			);
+		}
+
 		add_meta_box(
 			'wbam-ad-status',
 			__( 'Ad Status', 'wb-ads-rotator-with-split-test' ),
@@ -1020,6 +1031,27 @@ class Admin {
 				);
 			}
 		}
+	}
+
+	/**
+	 * "Use this ad": ways to show this ad without a placement.
+	 *
+	 * @param \WP_Post $post Post.
+	 */
+	public function render_usage_metabox( $post ) {
+		$shortcode = sprintf( '[wbam_ad id="%d"]', $post->ID );
+		?>
+		<p><?php esc_html_e( 'Paste this shortcode into any post, page or text widget:', 'wb-ads-rotator-with-split-test' ); ?></p>
+		<p class="wbam-usage-row">
+			<input type="text" class="code" readonly value="<?php echo esc_attr( $shortcode ); ?>" aria-label="<?php esc_attr_e( 'Shortcode', 'wb-ads-rotator-with-split-test' ); ?>" />
+			<button type="button" class="button wbam-copy-btn" data-clipboard="<?php echo esc_attr( $shortcode ); ?>"><?php esc_html_e( 'Copy', 'wb-ads-rotator-with-split-test' ); ?></button>
+		</p>
+		<?php if ( ! wp_is_block_theme() ) : ?>
+			<p class="description">
+				<?php esc_html_e( 'Or add the WB Ad Manager widget to a sidebar under Appearance, Widgets and pick this ad.', 'wb-ads-rotator-with-split-test' ); ?>
+			</p>
+		<?php endif; ?>
+		<?php
 	}
 
 	/**
@@ -1188,6 +1220,35 @@ class Admin {
 				</div>
 			<?php endforeach; ?>
 
+			<?php
+			// Per-placement options (popup trigger, sticky position, comment
+			// position...), shown while that placement is ticked.
+			foreach ( $all_places as $group_placements ) :
+				foreach ( $group_placements as $placement ) :
+					if ( ! method_exists( $placement, 'render_options' ) ) {
+						continue;
+					}
+					ob_start();
+					$placement->render_options( $post->ID, is_array( $data ) ? $data : array() );
+					$options_html = trim( (string) ob_get_clean() );
+					if ( '' === $options_html ) {
+						continue;
+					}
+					?>
+					<div class="wbam-extra-settings wbam-placement-settings" data-placement="<?php echo esc_attr( $placement->get_id() ); ?>"<?php echo in_array( $placement->get_id(), $placements, true ) ? '' : ' hidden'; ?>>
+						<h4>
+							<?php
+							/* translators: %s: placement name, e.g. "Popup/Modal". */
+							echo esc_html( sprintf( __( '%s settings', 'wb-ads-rotator-with-split-test' ), $placement->get_name() ) );
+							?>
+						</h4>
+						<?php echo $options_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by the placement's render_options(). ?>
+					</div>
+					<?php
+				endforeach;
+			endforeach;
+			?>
+
 			<div class="wbam-extra-settings wbam-paragraph-settings" <?php echo ! in_array( 'after_paragraph', $placements, true ) ? 'style="display:none;"' : ''; ?>>
 				<h4><?php esc_html_e( 'Paragraph Settings', 'wb-ads-rotator-with-split-test' ); ?></h4>
 				<div class="wbam-field">
@@ -1276,6 +1337,78 @@ class Admin {
 	}
 
 	/**
+	 * Data for the priority share hint: the summed priority of the other
+	 * enabled ads that share this ad's placements, and the sentence to show.
+	 *
+	 * @param int $post_id Ad ID.
+	 * @return array{others:int,template:string}
+	 */
+	private static function priority_hint_data( $post_id ) {
+		$placements = get_post_meta( $post_id, '_wbam_placements', true );
+		$others     = array();
+
+		if ( is_array( $placements ) && $placements ) {
+			$like = array( 'relation' => 'OR' );
+			foreach ( $placements as $slug ) {
+				$like[] = array(
+					'key'     => '_wbam_placements',
+					'value'   => sprintf( 's:%d:"%s"', strlen( $slug ), $slug ),
+					'compare' => 'LIKE',
+				);
+			}
+			// ponytail: capped at 100 rivals; the share is a hint, not billing.
+			$others = get_posts(
+				array(
+					'post_type'      => 'wbam-ad',
+					'post_status'    => 'publish',
+					'posts_per_page' => 100,
+					'fields'         => 'ids',
+					'post__not_in'   => array( (int) $post_id ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- one ad excluded from a capped admin query.
+					'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- admin edit screen only, capped.
+						'relation' => 'AND',
+						array(
+							'key'   => '_wbam_enabled',
+							'value' => '1',
+						),
+						$like,
+					),
+				)
+			);
+		}
+
+		if ( ! $others ) {
+			return array(
+				'others'   => 0,
+				'template' => __( 'No other enabled ad shares this ad\'s placements, so it gets every impression there.', 'wb-ads-rotator-with-split-test' ),
+			);
+		}
+
+		update_postmeta_cache( $others );
+		$sum = 0;
+		foreach ( $others as $other_id ) {
+			$priority = (int) get_post_meta( $other_id, '_wbam_priority', true );
+			$sum     += $priority ? $priority : 5;
+		}
+
+		$count = count( $others );
+		return array(
+			'others'   => $sum,
+			// %2$d is filled in by the slider script as the priority changes.
+			'template' => str_replace(
+				'%1$d',
+				number_format_i18n( $count ),
+				/* translators: %1$d: number of other ads in the same placements. %2$d: this ad's share of impressions, in percent. */
+				_n(
+					'This ad shares its placements with %1$d other ad and wins about %2$d%% of impressions at this priority.',
+					'This ad shares its placements with %1$d other ads and wins about %2$d%% of impressions at this priority.',
+					$count,
+					'wb-ads-rotator-with-split-test'
+				)
+			),
+		);
+	}
+
+	/**
 	 * Render status metabox.
 	 *
 	 * @param \WP_Post $post Post.
@@ -1336,9 +1469,7 @@ class Admin {
 				<input type="range" id="wbam_priority" name="wbam_priority" min="1" max="10" value="<?php echo esc_attr( $priority ); ?>" />
 				<span class="wbam-priority-value"><?php echo esc_html( $priority ); ?></span>
 				<p class="description"><?php esc_html_e( 'Higher priority = bigger share when multiple ads compete for the same slot. Default is 5.', 'wb-ads-rotator-with-split-test' ); ?></p>
-				<p class="wbam-priority-share-hint" aria-live="polite">
-					<?php /* Filled in by JS: 'In a 3-way tie with two default-priority ads, this ad wins ~X% of impressions.' */ ?>
-				</p>
+				<p class="wbam-priority-share-hint" aria-live="polite"></p>
 			</div>
 
 			<div class="wbam-session-limit-field">
@@ -1415,28 +1546,17 @@ class Admin {
 		</div>
 		<script>
 		jQuery(function($) {
-			// Priority slider live value + win-share transparency hint.
-			//
-			// Phase H.3: site owners and advertisers should see exactly
-			// what raising the priority slider does. Frequency_Manager
+			// Priority slider live value + win-share hint. Frequency_Manager
 			// builds a weighted pool where each ad contributes `priority`
-			// copies, so the win share in a tie of N ads at priorities
-			// p1..pN is p_i / sum(p). We illustrate the most common tie
-			// scenario (3 ads, two at the default priority of 5).
-			var priorityHintTpl = 
-			<?php
-				/* translators: %d: this ad's share of impressions (percent) in a 3-way priority tie */
-				echo wp_json_encode( __( 'In a 3-way tie with two default-priority (5) ads, this ad would win about %d%% of impressions.', 'wb-ads-rotator-with-split-test' ) );
-			?>
-			;
+			// copies, so this ad's share is p / (p + sum of the others).
+			// The others are the real enabled ads sharing its placements.
+			var priorityHint = <?php echo wp_json_encode( self::priority_hint_data( $post->ID ) ); ?>;
 
 			function updatePriorityHint( value ) {
 				var p     = parseInt( value, 10 ) || 5;
-				var share = Math.round( ( p / ( p + 5 + 5 ) ) * 100 );
-				// Translation string uses printf-style %d / %% — un-escape
-				// the literal percent so JS shows '33%' not '33%%'.
+				var share = Math.round( ( p / ( p + priorityHint.others ) ) * 100 );
 				$( '.wbam-priority-share-hint' ).text(
-					priorityHintTpl.replace( '%d', share ).replace( /%%/g, '%' )
+					priorityHint.template.replace( '%2$d', share ).replace( /%%/g, '%' )
 				);
 			}
 
@@ -2158,6 +2278,14 @@ class Admin {
 				$data      = array_merge( $data, $type_data );
 			}
 
+			// Per-placement options. Only placements the form offered, so a
+			// hidden one cannot reset to defaults.
+			foreach ( $engine->get_selectable_placements() as $placement ) {
+				if ( method_exists( $placement, 'save_options' ) ) {
+					$data = array_merge( $data, (array) $placement->save_options( $post_id, $raw_data ) );
+				}
+			}
+
 			// Paragraph settings.
 			$data['after_paragraph']  = isset( $raw_data['after_paragraph'] ) ? absint( $raw_data['after_paragraph'] ) : 2;
 			$data['paragraph_repeat'] = isset( $raw_data['paragraph_repeat'] ) ? true : false;
@@ -2516,7 +2644,12 @@ class Admin {
 
 			case 'placements':
 				$placements = get_post_meta( $post_id, '_wbam_placements', true );
-				echo ! empty( $placements ) ? esc_html( implode( ', ', $placements ) ) : '—';
+				$names      = array();
+				foreach ( (array) $placements as $slug ) {
+					$placement = Placement_Engine::get_instance()->get_placement( $slug );
+					$names[]   = $placement ? $placement->get_name() : $slug;
+				}
+				echo $names ? esc_html( implode( ', ', $names ) ) : '—';
 				break;
 
 			case 'impressions':

@@ -305,7 +305,7 @@ class bbPress_Placement implements \WBAM\Modules\Placements\Placement_Interface 
 		?>
 		<div class="wbam-placement-extra">
 			<label for="wbam_bbpress_position"><?php esc_html_e( 'Position', 'wb-ads-rotator-with-split-test' ); ?></label>
-			<select id="wbam_bbpress_position" name="wbam_data[bbpress_position]" class="wbam-bbpress-position-select">
+			<select id="wbam_bbpress_position" name="wbam_data[bbpress_position]">
 				<?php foreach ( $positions as $key => $label ) : ?>
 					<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $position, $key ); ?>>
 						<?php echo esc_html( $label ); ?>
@@ -313,11 +313,11 @@ class bbPress_Placement implements \WBAM\Modules\Placements\Placement_Interface 
 				<?php endforeach; ?>
 			</select>
 		</div>
-		<div class="wbam-placement-extra wbam-bbpress-between-options" <?php echo ( strpos( $position, 'between' ) === false ) ? 'style="display:none;"' : ''; ?>>
+		<div class="wbam-placement-extra" data-wbam-show-when="wbam_bbpress_position:between_replies"<?php echo ( 'between_replies' !== $position ) ? ' hidden' : ''; ?>>
 			<label for="wbam_bbpress_after"><?php esc_html_e( 'Show after every', 'wb-ads-rotator-with-split-test' ); ?></label>
-			<input type="number" id="wbam_bbpress_after" name="wbam_data[bbpress_after]" value="<?php echo esc_attr( $after_count ); ?>" min="1" max="50" style="width:60px;" />
+			<input type="number" id="wbam_bbpress_after" class="small-text" name="wbam_data[bbpress_after]" value="<?php echo esc_attr( $after_count ); ?>" min="1" max="50" />
 			<?php esc_html_e( 'replies', 'wb-ads-rotator-with-split-test' ); ?>
-			<label style="margin-left:15px;">
+			<label>
 				<input type="checkbox" name="wbam_data[bbpress_repeat]" value="1" <?php checked( $repeat ); ?> />
 				<?php esc_html_e( 'Repeat', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>

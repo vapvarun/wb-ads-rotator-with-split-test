@@ -422,6 +422,36 @@
 	font-weight: normal;
 }
 
+.wbam-placement-extra {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--wbam-space-2) var(--wbam-space-4);
+	margin-block-end: var(--wbam-space-3);
+}
+
+.wbam-placement-extra:last-child {
+	margin-block-end: 0;
+}
+
+.wbam-placement-extra[hidden] {
+	display: none;
+}
+
+.wbam-placement-extra .description {
+	flex-basis: 100%;
+}
+
+.wbam-usage-row {
+	display: flex;
+	gap: var(--wbam-space-2);
+}
+
+.wbam-usage-row input {
+	flex: 1;
+	min-width: 0;
+}
+
 /* ==========================================================================
    Status Metabox
    ========================================================================== */

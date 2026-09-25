@@ -87,6 +87,21 @@
 			$('.wbam-paragraph-settings').toggle($('input[value="after_paragraph"]').is(':checked'));
 			$('.wbam-activity-settings').toggle($('input[value="bp_activity"]').is(':checked'));
 			$('.wbam-archive-settings').toggle($('input[value="archive"]').is(':checked'));
+			$('.wbam-placement-settings').each(function() {
+				var slug = $(this).data('placement');
+				$(this).prop('hidden', ! $('input[name="wbam_placements[]"]').filter(function() {
+					return this.value === slug;
+				}).is(':checked'));
+			});
+		});
+
+		// Option rows that only apply to one choice of a select, e.g. the
+		// popup delay: data-wbam-show-when="select_id:value|value".
+		$(document).on('change', '.wbam-placement-settings select', function() {
+			$('[data-wbam-show-when]').each(function() {
+				var rule = String($(this).data('wbam-show-when')).split(':');
+				$(this).prop('hidden', rule[1].split('|').indexOf($('#' + rule[0]).val()) === -1);
+			});
 		});
 		// Trigger on page load to show/hide settings based on initial state
 		$('input[name="wbam_placements[]"]').first().trigger('change');
