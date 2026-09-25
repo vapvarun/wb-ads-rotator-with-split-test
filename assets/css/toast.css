@@ -277,6 +277,7 @@ body:not(.wp-admin) {
 
 .wbam-confirm-dialog__btn--info {
 	background: var(--wbam-accent);
+	color: var(--wbam-accent-fg);
 }
 
 .wbam-confirm-dialog__btn--info:hover {
