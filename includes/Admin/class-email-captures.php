@@ -27,9 +27,13 @@ class Email_Captures {
 
 	/**
 	 * Hook into admin.
+	 *
+	 * @since 3.2.0 No longer registers its own submenu page — the list now
+	 *              renders inline on the Settings screen's Tools section
+	 *              (see WBAM\Admin\Settings::render_tools_section()). The old
+	 *              `wbam-email-captures` URL redirects there.
 	 */
 	public function init() {
-		add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		add_action( 'admin_post_wbam_export_email_captures', array( $this, 'handle_export' ) );
 		add_action( 'admin_post_wbam_delete_email_capture', array( $this, 'handle_delete' ) );
 	}
@@ -42,20 +46,6 @@ class Email_Captures {
 	private function table() {
 		global $wpdb;
 		return $wpdb->prefix . 'wbam_email_submissions';
-	}
-
-	/**
-	 * Register the submenu page under the WB Ad Manager menu.
-	 */
-	public function register_menu() {
-		add_submenu_page(
-			'edit.php?post_type=wbam-ad',
-			__( 'Email Captures', 'wb-ads-rotator-with-split-test' ),
-			__( 'Email Captures', 'wb-ads-rotator-with-split-test' ),
-			'manage_options',
-			'wbam-email-captures',
-			array( $this, 'render_page' )
-		);
 	}
 
 	/**
@@ -101,11 +91,15 @@ class Email_Captures {
 	}
 
 	/**
-	 * Render the admin page.
+	 * Render the Email Captures list, embedded inline on the Settings screen's
+	 * Tools section — no `.wrap`/page_header of its own, since the Settings
+	 * screen already provides those.
+	 *
+	 * @since 3.2.0 Replaces the standalone `wbam-email-captures` admin page.
 	 */
-	public function render_page() {
+	public function render_embedded() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to view this page.', 'wb-ads-rotator-with-split-test' ) );
+			return;
 		}
 
 		$total       = $this->count();
@@ -119,26 +113,24 @@ class Email_Captures {
 			'wbam_export_email_captures'
 		);
 		?>
-		<div class="wrap wbam-admin wbam-email-captures">
-			<?php
-			// Every other screen in the plugin renders its heading through
-			// UX::page_header(). This one hand-rolled a wp-heading-inline, so it
-			// was the one screen with WordPress's default heading treatment
-			// sitting next to siblings using the branded one.
-			\WBAM\Admin\UX::page_header(
-				array(
-					'title'   => __( 'Email Captures', 'wb-ads-rotator-with-split-test' ),
-					'desc'    => sprintf(
-						/* translators: %s: number of captured emails */
-						esc_html( _n( '%s captured email address.', '%s captured email addresses.', $total, 'wb-ads-rotator-with-split-test' ) ),
-						esc_html( number_format_i18n( $total ) )
-					),
-					'actions' => $total > 0
-						? '<a href="' . esc_url( $export_url ) . '" class="wbam-admin-btn wbam-admin-btn--primary">' . esc_html__( 'Export CSV', 'wb-ads-rotator-with-split-test' ) . '</a>'
-						: '',
-				)
-			);
-			?>
+		<div class="wbam-email-captures">
+			<div class="wbam-settings-card__head">
+				<h2 class="wbam-settings-card__title"><?php esc_html_e( 'Email Captures', 'wb-ads-rotator-with-split-test' ); ?></h2>
+				<p class="wbam-settings-card__desc">
+					<?php
+					echo esc_html(
+						sprintf(
+							/* translators: %s: number of captured emails */
+							_n( '%s captured email address.', '%s captured email addresses.', $total, 'wb-ads-rotator-with-split-test' ),
+							number_format_i18n( $total )
+						)
+					);
+					?>
+				</p>
+				<?php if ( $total > 0 ) : ?>
+					<p><a href="<?php echo esc_url( $export_url ); ?>" class="wbam-admin-btn wbam-admin-btn--primary"><?php esc_html_e( 'Export CSV', 'wb-ads-rotator-with-split-test' ); ?></a></p>
+				<?php endif; ?>
+			</div>
 
 			<?php if ( empty( $rows ) ) : ?>
 				<?php
@@ -278,12 +270,10 @@ class Email_Captures {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'post_type' => 'wbam-ad',
-					'page'      => 'wbam-email-captures',
-					'paged'     => $paged,
-					'deleted'   => 1,
+					'paged'   => $paged,
+					'deleted' => 1,
 				),
-				admin_url( 'edit.php' )
+				\WBAM\Core\Admin_Links::settings( 'email-captures' )
 			)
 		);
 		exit;

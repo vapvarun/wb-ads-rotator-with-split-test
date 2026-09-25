@@ -38,6 +38,7 @@ class Admin {
 		// `wbam-admin-tokens` handle too, so it must exist early.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_tokens' ), 5 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_settings_assets' ) );
 
 		// Group the WB Ad Manager submenu into labelled sections. Priority 99
 		// so it runs after both Free (default 10) and Pro (20/22) have
@@ -73,6 +74,53 @@ class Admin {
 		// main query so the filter persists through pagination.
 		add_action( 'restrict_manage_posts', array( $this, 'render_status_filter' ) );
 		add_action( 'pre_get_posts', array( $this, 'apply_status_filter' ) );
+
+		// Legacy settings URLs (wbam-pro-settings&tab=X, wbam-tools,
+		// wbam-email-captures) no longer resolve to a registered page now
+		// that everything lives on the one wbam-settings screen. WordPress
+		// fires this action right before the "Sorry, you are not allowed to
+		// access this page" wp_die() for any $_GET['page'] with no matching
+		// menu entry — redirect there instead of dying.
+		add_action( 'admin_page_access_denied', array( $this, 'redirect_legacy_settings_url' ) );
+	}
+
+	/**
+	 * Redirect a pre-3.2.0 settings URL to its new home on `wbam-settings`.
+	 *
+	 * @since 3.2.0
+	 */
+	public function redirect_legacy_settings_url() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only redirect routing, no state change.
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+
+		if ( 'wbam-pro-settings' === $page ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only redirect routing.
+			$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general';
+			/**
+			 * Filter the old Pro Settings tab slug -> new section slug map.
+			 *
+			 * Most tabs keep their slug as the section slug; PRO adds the
+			 * few that were renamed or merged (analytics -> privacy;
+			 * modules/pages/rotation -> advertising).
+			 *
+			 * @since 3.2.0
+			 * @param array<string,string> $map Old tab slug => new section slug.
+			 */
+			$map     = (array) apply_filters( 'wbam_legacy_settings_tab_map', array() );
+			$section = isset( $map[ $tab ] ) ? $map[ $tab ] : $tab;
+			wp_safe_redirect( \WBAM\Core\Admin_Links::settings( $section ) );
+			exit;
+		}
+
+		if ( 'wbam-tools' === $page ) {
+			wp_safe_redirect( \WBAM\Core\Admin_Links::settings( 'tools' ) );
+			exit;
+		}
+
+		if ( 'wbam-email-captures' === $page ) {
+			wp_safe_redirect( \WBAM\Core\Admin_Links::settings( 'email-captures' ) );
+			exit;
+		}
 	}
 
 	/**
@@ -577,11 +625,12 @@ class Admin {
 				'wbam-analytics'                 => 'reports',
 				'wbam-revenue'                   => 'reports',
 				'wbam-audit-log'                 => 'reports',
-				// Settings. Order matters here: the main configuration first,
-				// then the ad-display options, then tools and help.
-				'wbam-pro-settings'              => 'settings',
+				// Settings. wbam-pro-settings and wbam-tools no longer exist
+				// as separate submenu items as of 3.2.0 - both live inside
+				// the one wbam-settings screen (see WBAM\Admin\Settings) -
+				// so they are gone from this map rather than left as dead
+				// entries that never match a registered page.
 				'wbam-settings'                  => 'settings',
-				'wbam-tools'                     => 'settings',
 				'wbam-help'                      => 'settings',
 			),
 			array(
@@ -842,6 +891,33 @@ class Admin {
 					'wb-ads-rotator-with-split-test'
 				),
 			)
+		);
+	}
+
+	/**
+	 * Enqueue the Settings-screen-only sub-nav script (Ad Display pills).
+	 *
+	 * Separate from enqueue_assets() because that method gates on
+	 * `$screen->post_type === 'wbam-ad'`, which the settings screen may or
+	 * may not carry depending on how WP resolved the hybrid `edit.php?post_type=`
+	 * submenu hook — checking `$_GET['page']` directly here is unambiguous.
+	 *
+	 * @since 3.2.0
+	 */
+	public function enqueue_settings_assets() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only screen gate, no state change.
+		if ( ! isset( $_GET['page'] ) || 'wbam-settings' !== $_GET['page'] ) {
+			return;
+		}
+
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
+		wp_enqueue_script(
+			'wbam-admin-settings-nav',
+			WBAM_URL . 'assets/js/admin-settings-nav' . $suffix . '.js',
+			array(),
+			WBAM_VERSION,
+			true
 		);
 	}
 

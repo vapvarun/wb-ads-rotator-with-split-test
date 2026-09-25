@@ -390,6 +390,48 @@ class UX {
 	}
 
 	/**
+	 * Render a left-hand section nav for a multi-section admin screen.
+	 *
+	 * Used by the one-page Settings screen (General, Ad Display, Classifieds,
+	 * Credits, ...) so every section lives behind one URL with `?section=`
+	 * instead of one submenu page per section. Renders a `<ul>` for desktop
+	 * and a `<select>` that navigates on change for narrow screens — CSS in
+	 * admin-family.css swaps between them at 390px, no JS required for the
+	 * `<select>` to work (plain navigation via onchange).
+	 *
+	 * @since 3.2.0
+	 * @param array<string,array{label:string,url:string}> $sections Ordered
+	 *        map of section slug => { label, url }.
+	 * @param string                                        $current  Active section slug.
+	 * @return void
+	 */
+	public static function settings_nav( array $sections, string $current ) {
+		if ( empty( $sections ) ) {
+			return;
+		}
+		?>
+		<nav class="wbam-settings-nav" aria-label="<?php esc_attr_e( 'Settings sections', 'wb-ads-rotator-with-split-test' ); ?>">
+			<select class="wbam-settings-nav__select" onchange="if(this.value)window.location.href=this.value;">
+				<?php foreach ( $sections as $slug => $section ) : ?>
+					<option value="<?php echo esc_url( $section['url'] ); ?>" <?php selected( $slug, $current ); ?>>
+						<?php echo esc_html( $section['label'] ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+			<ul class="wbam-settings-nav__list">
+				<?php foreach ( $sections as $slug => $section ) : ?>
+					<li>
+						<a href="<?php echo esc_url( $section['url'] ); ?>" class="wbam-settings-nav__link<?php echo $slug === $current ? ' is-active' : ''; ?>" <?php echo $slug === $current ? 'aria-current="page"' : ''; ?>>
+							<?php echo esc_html( $section['label'] ); ?>
+						</a>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		</nav>
+		<?php
+	}
+
+	/**
 	 * Render the action bar at the bottom of an action-screen card: a submit
 	 * button (primary or danger) plus a Cancel link back to the list.
 	 *

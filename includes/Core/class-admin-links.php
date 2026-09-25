@@ -61,15 +61,21 @@ class Admin_Links {
 	}
 
 	/**
-	 * Get settings page URL.
+	 * Get the one Settings screen URL, optionally for a specific section.
 	 *
-	 * @param string $tab Optional tab slug.
+	 * The canonical URL builder for the sidebar Settings screen (`wbam-settings`).
+	 * Both Free and Pro link here rather than hard-coding `page=`/`section=`
+	 * query args, so a future section rename only touches this method.
+	 *
+	 * @since 3.2.0 Renamed from a `$tab`/`tab=` pair to `$section`/`section=`
+	 *              to match the sidebar-section settings screen.
+	 * @param string $section Optional section slug (e.g. 'general', 'classifieds').
 	 * @return string Admin URL.
 	 */
-	public static function settings( $tab = '' ) {
+	public static function settings( $section = '' ) {
 		$url = admin_url( 'edit.php?post_type=' . self::POST_TYPE . '&page=wbam-settings' );
 
-		return $tab ? add_query_arg( 'tab', $tab, $url ) : $url;
+		return $section ? add_query_arg( 'section', $section, $url ) : $url;
 	}
 
 	/**

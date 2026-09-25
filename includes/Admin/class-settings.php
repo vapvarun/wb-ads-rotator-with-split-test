@@ -74,17 +74,19 @@ class Settings {
 
 	/**
 	 * Add submenu page.
+	 *
+	 * `wbam-settings` is the ONE Settings screen for both plugins: a left
+	 * sidebar of sections (General, Ad Display, Classifieds, Credits, ...).
+	 * Free supplies its own display settings as the "Ad Display" section;
+	 * PRO maps its settings tabs into the same sidebar via the
+	 * `wbam_settings_sections` filter instead of registering its own
+	 * "Settings" submenu. See render_page() / get_sections().
+	 *
+	 * @since 3.2.0 Was two separate screens (Free "Ad Display" +/or PRO
+	 *              "Settings"); merged into one sidebar screen.
 	 */
 	public function add_menu() {
-		// Standalone, this IS the settings screen, so it is simply "Settings".
-		// With PRO active there are two config screens, so name this one for
-		// what it actually holds - how ads render on the site - while PRO's
-		// carries the business configuration under "Settings". A site owner can
-		// then tell them apart without opening both.
-		$pro_active = defined( 'WBAM_PRO_VERSION' );
-		$title      = $pro_active
-			? __( 'Ad Display', 'wb-ads-rotator-with-split-test' )
-			: __( 'Settings', 'wb-ads-rotator-with-split-test' );
+		$title = __( 'Settings', 'wb-ads-rotator-with-split-test' );
 
 		add_submenu_page(
 			'edit.php?post_type=wbam-ad',
@@ -791,7 +793,10 @@ class Settings {
 	}
 
 	/**
-	 * Render settings page.
+	 * Render settings page: page chrome + left sidebar nav + active section body.
+	 *
+	 * @since 3.2.0 Rebuilt around get_sections() / UX::settings_nav() — was a
+	 *              single flat do_settings_sections() call.
 	 */
 	public function render_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -802,47 +807,216 @@ class Settings {
 		if ( isset( $_GET['settings-updated'] ) ) {
 			add_settings_error( 'wbam_messages', 'wbam_message', __( 'Settings saved.', 'wb-ads-rotator-with-split-test' ), 'updated' );
 		}
+
+		$sections = $this->get_sections();
+
+		// Some old URLs (e.g. Email Captures) now point at content rendered
+		// *inside* another section rather than a section of their own. Map
+		// those here so both the nav highlight and the body agree on which
+		// section is "current" — see render_tools_section().
+		$aliases = array( 'email-captures' => 'tools' );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only section selector, no state change.
+		$requested = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : '';
+		$current   = isset( $aliases[ $requested ] ) ? $aliases[ $requested ] : $requested;
+
+		if ( ! isset( $sections[ $current ] ) ) {
+			$keys    = array_keys( $sections );
+			$current = isset( $keys[0] ) ? $keys[0] : 'ad-display';
+		}
+
+		$nav_items = array();
+		foreach ( $sections as $slug => $section ) {
+			$nav_items[ $slug ] = array(
+				'label' => $section['label'],
+				'url'   => \WBAM\Core\Admin_Links::settings( $slug ),
+			);
+		}
 		?>
 		<div class="wrap wbam-admin wbam-settings-page wbam-settings-wrap">
 			<?php
 			\WBAM\Admin\UX::page_header(
 				array(
-					'title' => get_admin_page_title(),
-					'desc'  => __( 'Ad display, geo-targeting, privacy, link cloaking and more.', 'wb-ads-rotator-with-split-test' ),
+					'title' => __( 'Settings', 'wb-ads-rotator-with-split-test' ),
+					'desc'  => __( 'Ad display, billing, notifications and modules for this site.', 'wb-ads-rotator-with-split-test' ),
 				)
 			);
 			settings_errors( 'wbam_messages' );
 			?>
 
-			<div class="wbam-settings-container">
-				<form action="options.php" method="post" class="wbam-settings-form">
+			<div class="wbam-settings-layout">
+				<?php \WBAM\Admin\UX::settings_nav( $nav_items, $current ); ?>
+				<div class="wbam-settings-content">
 					<?php
-					settings_fields( 'wbam_settings_group' );
-					do_settings_sections( 'wbam-settings' );
-					submit_button( __( 'Save Settings', 'wb-ads-rotator-with-split-test' ) );
+					if ( isset( $sections[ $current ]['render'] ) && is_callable( $sections[ $current ]['render'] ) ) {
+						call_user_func( $sections[ $current ]['render'] );
+					}
 					?>
-				</form>
-
-				<div class="wbam-settings-sidebar">
-					<div class="wbam-sidebar-box">
-						<h3><?php esc_html_e( 'Quick Links', 'wb-ads-rotator-with-split-test' ); ?></h3>
-						<ul>
-							<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad' ) ); ?>"><?php esc_html_e( 'All Ads', 'wb-ads-rotator-with-split-test' ); ?></a></li>
-							<li><a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=wbam-ad' ) ); ?>"><?php esc_html_e( 'Add New Ad', 'wb-ads-rotator-with-split-test' ); ?></a></li>
-						</ul>
-					</div>
-
-					<div class="wbam-sidebar-box">
-						<h3><?php esc_html_e( 'Shortcodes', 'wb-ads-rotator-with-split-test' ); ?></h3>
-						<p><code>[wbam_ad id="123"]</code></p>
-						<p class="description"><?php esc_html_e( 'Display a single ad by ID.', 'wb-ads-rotator-with-split-test' ); ?></p>
-						<p><code>[wbam_ads ids="1,2,3"]</code></p>
-						<p class="description"><?php esc_html_e( 'Display multiple ads.', 'wb-ads-rotator-with-split-test' ); ?></p>
-					</div>
 				</div>
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Sections this plugin contributes to the one Settings screen on its own.
+	 *
+	 * @since 3.2.0
+	 * @return array<string,array{label:string,render:callable}>
+	 */
+	private function default_sections() {
+		return array(
+			'ad-display' => array(
+				'label'  => __( 'Ad Display', 'wb-ads-rotator-with-split-test' ),
+				'render' => array( $this, 'render_ad_display_section' ),
+			),
+			'tools'      => array(
+				'label'  => __( 'Tools', 'wb-ads-rotator-with-split-test' ),
+				'render' => array( $this, 'render_tools_section' ),
+			),
+		);
+	}
+
+	/**
+	 * The full, ordered sidebar section list for the Settings screen.
+	 *
+	 * Free supplies 'ad-display' (this plugin's own display settings) and
+	 * 'tools' (demo-data / maintenance utilities + Email Captures). PRO maps
+	 * its own settings tabs (general, classifieds, credits, emails, links,
+	 * geolocation, privacy, license, ...) into this same list via the filter
+	 * — see `WBAM_Pro\Core\Pro_Admin::map_settings_sections()`.
+	 *
+	 * @since 3.2.0
+	 * @return array<string,array{label:string,render:callable}>
+	 */
+	private function get_sections() {
+		/**
+		 * Filter the sidebar sections on the one Settings screen.
+		 *
+		 * @since 3.2.0
+		 * @param array<string,array{label:string,render:callable}> $sections Ordered section map.
+		 */
+		return (array) apply_filters( 'wbam_settings_sections', $this->default_sections() );
+	}
+
+	/**
+	 * Render the "Ad Display" section: this plugin's existing settings form.
+	 *
+	 * Still ONE form and ONE `sanitize_settings()` round-trip — the sub-nav
+	 * only toggles which `.wbam-card` is visible via CSS/JS; every field stays
+	 * in the DOM (and therefore in the POST) regardless of which sub-section
+	 * is showing, so the `_fields[]` contract in sanitize_settings() keeps
+	 * seeing every field this form owns on every save.
+	 *
+	 * @since 3.2.0
+	 */
+	public function render_ad_display_section() {
+		?>
+		<form action="options.php" method="post" class="wbam-settings-form" id="wbam-ad-display-form">
+			<?php
+			settings_fields( 'wbam_settings_group' );
+			$this->render_ad_display_subnav();
+			$this->render_ad_display_subsections();
+			submit_button();
+			?>
+		</form>
+		<?php
+	}
+
+	/**
+	 * Render the pill sub-nav above the Ad Display sections.
+	 *
+	 * Pure progressive enhancement: without JS these buttons do nothing (all
+	 * sections are already visible), so no `<noscript>` fallback is needed.
+	 *
+	 * @since 3.2.0
+	 */
+	private function render_ad_display_subnav() {
+		global $wp_settings_sections;
+
+		if ( empty( $wp_settings_sections['wbam-settings'] ) ) {
+			return;
+		}
+
+		echo '<div class="wbam-ad-display-subnav" role="tablist">';
+		$first = true;
+		foreach ( (array) $wp_settings_sections['wbam-settings'] as $section ) {
+			printf(
+				'<button type="button" class="wbam-ad-display-subnav__item%s" data-subsection="%s" role="tab">%s</button>',
+				$first ? ' is-active' : '',
+				esc_attr( $section['id'] ),
+				esc_html( $section['title'] )
+			);
+			$first = false;
+		}
+		echo '</div>';
+	}
+
+	/**
+	 * Render every registered `wbam-settings` section, each wrapped in its
+	 * own `.wbam-card` with a `data-subsection` hook for the sub-nav JS.
+	 *
+	 * Re-implements `do_settings_sections( 'wbam-settings' )` rather than
+	 * calling it directly, purely to add that wrapper — the section/field
+	 * registration (register_settings()) is untouched.
+	 *
+	 * @since 3.2.0
+	 */
+	private function render_ad_display_subsections() {
+		global $wp_settings_sections, $wp_settings_fields;
+
+		if ( empty( $wp_settings_sections['wbam-settings'] ) ) {
+			return;
+		}
+
+		echo '<div id="wbam-ad-display-sections" class="wbam-ad-display-sections">';
+		$first = true;
+		foreach ( (array) $wp_settings_sections['wbam-settings'] as $section ) {
+			printf(
+				'<div class="wbam-card wbam-ad-display-subsection%s" data-subsection="%s">',
+				$first ? ' is-active' : '',
+				esc_attr( $section['id'] )
+			);
+			if ( $section['title'] ) {
+				echo '<h2>' . esc_html( $section['title'] ) . '</h2>';
+			}
+			if ( $section['callback'] ) {
+				call_user_func( $section['callback'], $section );
+			}
+			if ( isset( $wp_settings_fields['wbam-settings'][ $section['id'] ] ) ) {
+				echo '<table class="form-table" role="presentation">';
+				do_settings_fields( 'wbam-settings', $section['id'] );
+				echo '</table>';
+			}
+			echo '</div>';
+			$first = false;
+		}
+		echo '</div>';
+	}
+
+	/**
+	 * Render the "Tools" section: demo-data/maintenance utilities (PRO, via
+	 * the `wbam_settings_tools_content` action) plus this plugin's own Email
+	 * Captures list. The old `wbam-email-captures` URL redirects to
+	 * `?section=email-captures`, which render_page() aliases to this section.
+	 *
+	 * @since 3.2.0
+	 */
+	public function render_tools_section() {
+		if ( has_action( 'wbam_settings_tools_content' ) ) {
+			echo '<div class="wbam-card">';
+			/**
+			 * Fires inside the Tools section, before Email Captures.
+			 *
+			 * @since 3.2.0
+			 */
+			do_action( 'wbam_settings_tools_content' );
+			echo '</div>';
+		}
+
+		echo '<div class="wbam-card" id="email-captures">';
+		( new Email_Captures() )->render_embedded();
+		echo '</div>';
 	}
 
 	/**
