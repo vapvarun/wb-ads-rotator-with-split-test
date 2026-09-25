@@ -30,6 +30,16 @@ class Placement_Engine {
 	use Singleton;
 
 	/**
+	 * Delivery tiers. A slot goes to the highest tier that has an eligible,
+	 * renderable ad; lower tiers only fill slots nothing above can serve.
+	 * Pro marks advertiser and campaign ads as paid. Filter
+	 * `wbam_ad_delivery_tier` to change an ad's tier.
+	 */
+	const TIER_SAMPLE = 0;
+	const TIER_HOUSE  = 10;
+	const TIER_PAID   = 20;
+
+	/**
 	 * Registered placements.
 	 *
 	 * @var array
@@ -306,6 +316,9 @@ class Placement_Engine {
 			wp_cache_set( $cache_key, $ad_ids, 'wbam', 5 * MINUTE_IN_SECONDS );
 		}
 
+		// One meta query for every candidate instead of one per ad below.
+		update_postmeta_cache( $ad_ids );
+
 		// Filter through targeting engine and verify exact placement match.
 		$targeting = Targeting_Engine::get_instance();
 		$filtered  = array();
@@ -350,29 +363,45 @@ class Placement_Engine {
 			}
 		}
 
-		// Sort filtered ads by priority (higher priority first).
+		/**
+		 * Filter the ads eligible for a placement, before a winner is picked.
+		 *
+		 * Eligibility rules that depend on the placement belong here, not on
+		 * `wbam_ads_for_placement`: dropping the winner after the draw blanks
+		 * the slot instead of letting the next eligible ad fill it.
+		 *
+		 * @since 3.2.0
+		 * @param int[]  $filtered     Ad IDs that passed targeting.
+		 * @param string $placement_id Placement ID.
+		 */
+		$filtered = array_values( (array) apply_filters( 'wbam_ads_eligible_for_placement', $filtered, $placement_id ) );
+
+		// Delivery tier first (paid, then house, then sample), then priority.
+		$tiers = array();
+		foreach ( $filtered as $ad_id ) {
+			$tiers[ $ad_id ] = $this->get_delivery_tier( $ad_id, $placement_id );
+		}
+
 		usort(
 			$filtered,
-			function ( $a, $b ) {
+			function ( $a, $b ) use ( $tiers ) {
+				if ( $tiers[ $a ] !== $tiers[ $b ] ) {
+					return $tiers[ $b ] - $tiers[ $a ];
+				}
+
+				// Default priority is 5 if not set. Higher priority first.
 				$priority_a = (int) get_post_meta( $a, '_wbam_priority', true );
 				$priority_b = (int) get_post_meta( $b, '_wbam_priority', true );
 
-				// Default priority is 5 if not set.
-				$priority_a = $priority_a ? $priority_a : 5;
-				$priority_b = $priority_b ? $priority_b : 5;
-
-				// Higher priority first (descending).
-				return $priority_b - $priority_a;
+				return ( $priority_b ? $priority_b : 5 ) - ( $priority_a ? $priority_a : 5 );
 			}
 		);
 
 		// Slot policy: fixed-inventory placements render AT MOST ONE ad
 		// per hook invocation. When multiple advertisers target the same
-		// slot, we pick a weighted-random winner rather than stacking
-		// every creative (which would give one advertiser visibility and
-		// the other a pixel below them — not what either of them paid
-		// for). Rotation honors the ad priority weight already set on
-		// each creative.
+		// slot, we pick one winner rather than stacking every creative
+		// (which would give one advertiser visibility and the other a pixel
+		// below them - not what either of them paid for).
 		//
 		// Placements that legitimately render multiple ads per page
 		// (widget areas, between_replies with frequency counters) can
@@ -381,32 +410,20 @@ class Placement_Engine {
 		$render_mode = apply_filters( 'wbam_placement_render_mode', 'rotate', $placement_id );
 
 		if ( 'rotate' === $render_mode && count( $filtered ) > 1 ) {
-			$frequency = Frequency_Manager::get_instance();
+			// The highest tier with a renderable ad wins the slot; a lower
+			// tier only fills it when nothing above can serve.
+			$pools = array();
+			foreach ( $filtered as $ad_id ) {
+				$pools[ $tiers[ $ad_id ] ][] = (int) $ad_id;
+			}
+			krsort( $pools );
 
-			// Phase I.1 fill-fallback: keep the slot full when the
-			// weighted winner can't actually render right now (already
-			// shown elsewhere on this page via the per-creative cap,
-			// or filtered out by some other layer that returns empty).
-			// Drop the unrenderable winner from the pool and pick the
-			// next weighted winner. Continue until either an ad clears
-			// or the pool is exhausted (slot empty as last resort,
-			// same as before — but only after every option is tried).
-			$pool   = array_values( array_unique( array_map( 'intval', $filtered ) ) );
 			$winner = null;
-
-			while ( ! empty( $pool ) ) {
-				$candidate = $frequency->get_weighted_random( $pool );
-				if ( null === $candidate ) {
+			foreach ( $pools as $tier => $pool ) {
+				$winner = $this->pick_winner( array_values( array_unique( $pool ) ), $placement_id, (int) $tier );
+				if ( null !== $winner ) {
 					break;
 				}
-
-				if ( ! $this->ad_is_renderable( (int) $candidate ) ) {
-					$pool = array_values( array_diff( $pool, array( (int) $candidate ) ) );
-					continue;
-				}
-
-				$winner = (int) $candidate;
-				break;
 			}
 
 			$filtered = null === $winner ? array() : array( $winner );
@@ -421,6 +438,75 @@ class Placement_Engine {
 		 * @param array  $ad_ids       Original array of ad IDs before targeting.
 		 */
 		return apply_filters( 'wbam_ads_for_placement', $filtered, $placement_id, $ad_ids );
+	}
+
+	/**
+	 * Delivery tier of an ad in a placement.
+	 *
+	 * Plugin sample ads never outrank the owner's own ads; everything else
+	 * is a house ad until an extension (Pro) marks it paid.
+	 *
+	 * @since 3.2.0
+	 * @param int    $ad_id        Ad ID.
+	 * @param string $placement_id Placement ID.
+	 * @return int One of the TIER_* constants, or any int from the filter.
+	 */
+	public function get_delivery_tier( $ad_id, $placement_id ) {
+		$is_sample = get_post_meta( $ad_id, '_wbam_is_demo', true ) || get_post_meta( $ad_id, '_wbam_sample_ad', true );
+
+		/**
+		 * Filter an ad's delivery tier. Higher tiers win the slot first.
+		 *
+		 * @since 3.2.0
+		 * @param int    $tier         Placement_Engine::TIER_SAMPLE, TIER_HOUSE or TIER_PAID.
+		 * @param int    $ad_id        Ad ID.
+		 * @param string $placement_id Placement ID.
+		 */
+		return (int) apply_filters( 'wbam_ad_delivery_tier', $is_sample ? self::TIER_SAMPLE : self::TIER_HOUSE, $ad_id, $placement_id );
+	}
+
+	/**
+	 * Pick one renderable ad from a pool of same-tier ads.
+	 *
+	 * Fill-fallback: when the pick cannot render right now (already shown
+	 * elsewhere on this page, broken creative) it leaves the pool and the
+	 * next pick is tried, so the slot stays full while any option remains.
+	 *
+	 * @param int[]  $pool         Ad IDs of one tier.
+	 * @param string $placement_id Placement ID.
+	 * @param int    $tier         The pool's tier.
+	 * @return int|null
+	 */
+	private function pick_winner( array $pool, $placement_id, $tier ) {
+		$frequency = Frequency_Manager::get_instance();
+
+		while ( ! empty( $pool ) ) {
+			/**
+			 * Choose the winner from a pool of same-tier ads. Return an ID
+			 * from the pool, or null for the default priority-weighted draw.
+			 *
+			 * @since 3.2.0
+			 * @param int|null $pick         Chosen ad ID.
+			 * @param int[]    $pool         Candidate ad IDs.
+			 * @param string   $placement_id Placement ID.
+			 * @param int      $tier         The pool's delivery tier.
+			 */
+			$candidate = apply_filters( 'wbam_rotation_pick', null, $pool, $placement_id, $tier );
+			if ( ! in_array( (int) $candidate, $pool, true ) ) {
+				$candidate = $frequency->get_weighted_random( $pool );
+			}
+			if ( null === $candidate ) {
+				return null;
+			}
+
+			if ( $this->ad_is_renderable( (int) $candidate ) ) {
+				return (int) $candidate;
+			}
+
+			$pool = array_values( array_diff( $pool, array( (int) $candidate ) ) );
+		}
+
+		return null;
 	}
 
 	/**
