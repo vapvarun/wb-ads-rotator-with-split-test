@@ -105,6 +105,21 @@ class Before_Archive_Placement implements Placement_Interface {
 		add_action( 'ocean_before_content', array( $this, 'display_ads' ) );
 		// Theme My Login / General themes.
 		add_action( 'theme_before_content', array( $this, 'display_ads' ) );
+
+		// Block (FSE) themes: `loop_start`/the theme hooks above never fire on
+		// a block-template archive/home/search page - there is no PHP loop,
+		// the Query Loop block runs its own `WP_Query`. And even where
+		// `loop_start` DOES fire (the Query Loop block's `the_post()` still
+		// triggers it), `get_the_block_template_html()` builds the whole
+		// page's HTML as a string BEFORE `<!DOCTYPE html>` is echoed (see
+		// wp-includes/template-canvas.php) - so a direct echo() here would
+		// print above the doctype. Use the block-safe `render_block_core/query`
+		// filter instead: it receives the rendered Query Loop block markup and
+		// returns a string, which composes into the template HTML in the
+		// right place, after the doctype.
+		if ( wp_is_block_theme() ) {
+			add_filter( 'render_block_core/query', array( $this, 'inject_before_query_block' ), 10, 2 );
+		}
 	}
 
 	/**
@@ -124,34 +139,77 @@ class Before_Archive_Placement implements Placement_Interface {
 	 * Display ads before archive content.
 	 */
 	public function display_ads() {
-		// Only on archive pages (category, tag, date, author, etc.), home/blog, and search.
-		if ( ! is_archive() && ! is_home() && ! is_search() ) {
+		if ( ! $this->should_display() ) {
 			return;
 		}
 
-		// Don't show on singular pages.
-		if ( is_singular() ) {
-			return;
-		}
+		$markup = $this->get_ads_markup();
 
-		// Prevent duplicate output.
-		if ( $this->displayed ) {
-			return;
-		}
-
-		$engine = Placement_Engine::get_instance();
-		$ads    = $engine->get_ads_for_placement( $this->get_id() );
-
-		if ( empty( $ads ) ) {
+		if ( '' === $markup ) {
 			return;
 		}
 
 		$this->displayed = true;
 
-		echo '<div class="wbam-placement wbam-placement-before-archive">';
-		foreach ( $ads as $ad_id ) {
-			echo $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by Placement_Engine::render_placement(), already escaped there.
+	}
+
+	/**
+	 * Block-safe equivalent of display_ads() - prepend the placement's ads
+	 * to the main Query Loop block's rendered content instead of echoing.
+	 *
+	 * @param string $block_content Rendered `core/query` block HTML.
+	 * @param array  $parsed_block  Parsed block, including attrs.
+	 * @return string
+	 */
+	public function inject_before_query_block( $block_content, $parsed_block ) {
+		// Only the main/inherited query (the page's own archive loop) - never
+		// a "Related posts" or other secondary Query Loop block on the page.
+		if ( empty( $parsed_block['attrs']['query']['inherit'] ) ) {
+			return $block_content;
 		}
-		echo '</div>';
+
+		if ( ! $this->should_display() ) {
+			return $block_content;
+		}
+
+		$markup = $this->get_ads_markup();
+
+		if ( '' === $markup ) {
+			return $block_content;
+		}
+
+		$this->displayed = true;
+
+		return $markup . $block_content;
+	}
+
+	/**
+	 * Whether this placement is eligible to render on the current request.
+	 *
+	 * @return bool
+	 */
+	private function should_display() {
+		// Only on archive pages (category, tag, date, author, etc.), home/blog, and search.
+		if ( ! is_archive() && ! is_home() && ! is_search() ) {
+			return false;
+		}
+
+		// Don't show on singular pages.
+		if ( is_singular() ) {
+			return false;
+		}
+
+		// Prevent duplicate output.
+		return ! $this->displayed;
+	}
+
+	/**
+	 * Build the placement's ad markup via the single shared renderer.
+	 *
+	 * @return string
+	 */
+	private function get_ads_markup() {
+		return Placement_Engine::get_instance()->render_placement( $this->get_id() );
 	}
 }

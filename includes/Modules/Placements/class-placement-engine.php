@@ -670,6 +670,40 @@ class Placement_Engine {
 	}
 
 	/**
+	 * Render every ad assigned to a placement, wrapped in the standard
+	 * `.wbam-placement` container.
+	 *
+	 * Single source for "render a whole placement slot" — used by
+	 * Before/After Archive Placement (both the classic-theme hook and the
+	 * block-safe `render_block_core/query` filter) and the `wb-ads/placement`
+	 * block, so all three can't drift into different markup.
+	 *
+	 * @since 3.2.0
+	 * @param string $placement_id Placement ID.
+	 * @return string HTML, or '' if the placement has nothing to show.
+	 */
+	public function render_placement( $placement_id ) {
+		$ads = $this->get_ads_for_placement( $placement_id );
+
+		if ( empty( $ads ) ) {
+			return '';
+		}
+
+		// CSS class suffix uses hyphens (matches every existing placement's
+		// hand-written wrapper - e.g. `before_archive` -> `wbam-placement-before-archive`),
+		// while $placement_id itself (data attrs, get_ads_for_placement()) keeps underscores.
+		$css_suffix = sanitize_html_class( str_replace( '_', '-', $placement_id ) );
+
+		$html = '<div class="wbam-placement wbam-placement-' . esc_attr( $css_suffix ) . '">';
+		foreach ( $ads as $ad_id ) {
+			$html .= $this->render_ad( $ad_id, array( 'placement' => $placement_id ) );
+		}
+		$html .= '</div>';
+
+		return $html;
+	}
+
+	/**
 	 * Clear placement cache when an ad is saved.
 	 *
 	 * Clears cache for all placements the ad uses, ensuring fresh
