@@ -958,4 +958,43 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 
 		update_option( 'sidebars_widgets', $saved );
 	}
+
+	/**
+	 * Step "Submission rejection email says 'Your ad requires changes /
+	 * Status: Changes Required' for an ad that was taken down; submission
+	 * reject summary has no advertiser line".
+	 */
+	public function test_rejection_email_names_a_rejection_or_a_takedown_and_the_form_names_the_advertiser(): void {
+		$mails = array();
+		add_filter(
+			'pre_wp_mail',
+			function ( $short, $atts ) use ( &$mails ) {
+				$mails[] = $atts;
+				return true;
+			},
+			10,
+			2
+		);
+		$manager = Ad_Submission_Manager::get_instance();
+
+		$pending = $this->submit_flat_package_ad( 'Rejected before review ad' );
+		$manager->reject( (int) $pending->id, 'Wrong size' );
+		$rejected = end( $mails );
+		$this->assertStringContainsString( 'not approved', $rejected['subject'] );
+		$this->assertStringNotContainsString( 'Changes Required', $rejected['message'] );
+
+		$live = $this->submit_flat_package_ad( 'Taken down ad' );
+		$manager->approve( (int) $live->id );
+		$manager->reject( (int) $live->id, 'Landing page changed' );
+		$takedown = end( $mails );
+		$this->assertStringContainsString( 'taken down', $takedown['subject'] );
+		$this->assertStringContainsString( 'Taken down', $takedown['message'] );
+
+		wp_set_current_user( (int) self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$form = new \ReflectionMethod( \WBAM_Pro\Core\Pro_Admin::class, 'render_submission_action_form' );
+		ob_start();
+		$form->invoke( ( new \ReflectionClass( \WBAM_Pro\Core\Pro_Admin::class ) )->newInstanceWithoutConstructor(), (int) $live->id, 'reject' );
+		$html = (string) ob_get_clean();
+		$this->assertStringContainsString( 'Advertiser:', $html );
+	}
 }
