@@ -129,6 +129,8 @@ class Test_Lifecycle_3_2 extends Pro_Test_Case {
 		global $wpdb;
 		$wpdb->update( $wpdb->prefix . 'wbam_campaigns', array( 'created_at' => $submitted ), array( 'id' => $campaign->id ) );
 
+		// Approving a pending campaign is the site owner's call.
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$this->assertTrue( $campaigns->activate( $campaign->id ) );
 
 		$live = $campaigns->get( $campaign->id );
