@@ -81,14 +81,17 @@ class Display_Options {
 		$rules      = is_array( $rules ) ? $rules : array();
 		$display_on = isset( $rules['display_on'] ) ? $rules['display_on'] : 'all';
 
+		// Category/tag/post IDs are numeric; normalise to int on read so a
+		// strict in_array() below matches regardless of whether they were
+		// saved as ints or (older/legacy) strings — see sanitize_display_rules().
 		$post_types     = isset( $rules['post_types'] ) ? $rules['post_types'] : array();
-		$categories     = isset( $rules['categories'] ) ? $rules['categories'] : array();
-		$tags           = isset( $rules['tags'] ) ? $rules['tags'] : array();
+		$categories     = isset( $rules['categories'] ) ? array_map( 'absint', $rules['categories'] ) : array();
+		$tags           = isset( $rules['tags'] ) ? array_map( 'absint', $rules['tags'] ) : array();
 		$page_types     = isset( $rules['page_types'] ) ? $rules['page_types'] : array();
-		$specific_posts = isset( $rules['posts'] ) ? array_map( 'intval', $rules['posts'] ) : array();
-		$exclude_posts  = isset( $rules['exclude_posts'] ) ? $rules['exclude_posts'] : array();
-		$exclude_cats   = isset( $rules['exclude_categories'] ) ? $rules['exclude_categories'] : array();
-		$exclude_tags   = isset( $rules['exclude_tags'] ) ? $rules['exclude_tags'] : array();
+		$specific_posts = isset( $rules['posts'] ) ? array_map( 'absint', $rules['posts'] ) : array();
+		$exclude_posts  = isset( $rules['exclude_posts'] ) ? array_map( 'absint', $rules['exclude_posts'] ) : array();
+		$exclude_cats   = isset( $rules['exclude_categories'] ) ? array_map( 'absint', $rules['exclude_categories'] ) : array();
+		$exclude_tags   = isset( $rules['exclude_tags'] ) ? array_map( 'absint', $rules['exclude_tags'] ) : array();
 		$exclude_pages  = isset( $rules['exclude_page_types'] ) ? $rules['exclude_page_types'] : array();
 		?>
 		<div class="wbam-display-rules">
@@ -690,9 +693,18 @@ class Display_Options {
 			'exclude_page_types',
 		);
 
+		// Category/tag/post ID fields must be stored as ints — the render
+		// side compares them with a strict in_array() against term_id/post
+		// ID ints. Storing them as strings (sanitize_text_field) made every
+		// previously-saved choice show unticked on reload, and a second save
+		// silently dropped them (BC#10339874175 item 3).
+		$id_fields = array( 'categories', 'tags', 'posts', 'exclude_categories', 'exclude_tags', 'exclude_posts' );
+
 		foreach ( $array_fields as $field ) {
 			if ( ! empty( $input[ $field ] ) && is_array( $input[ $field ] ) ) {
-				$sanitized[ $field ] = array_map( 'sanitize_text_field', $input[ $field ] );
+				$sanitized[ $field ] = in_array( $field, $id_fields, true )
+					? array_map( 'absint', $input[ $field ] )
+					: array_map( 'sanitize_text_field', $input[ $field ] );
 			}
 		}
 
