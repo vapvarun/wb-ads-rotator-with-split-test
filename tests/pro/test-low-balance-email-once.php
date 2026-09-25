@@ -1,19 +1,22 @@
 <?php
 /**
- * Low balance emails go out once, not twice, per crossing.
+ * Low balance emails go out once per 24h, triggered by a real debit.
  *
  * Advertiser_Email_Notifications::check_low_balance() (listening on
  * wbam_advertiser_balance_debited) and Notifications\Email_Notifications::
- * send_low_balance_notification() (listening on wbam_advertiser_low_balance,
- * bridged from the Credits SDK) both emailed the same crossing with
- * different subject lines. The first listener is removed; the cooldown
- * that used to dedup it now lives on the surviving one.
+ * send_low_balance_notification() both emailed the same crossing. The first
+ * listener was removed, but the survivor was fed only by the SDK's
+ * wbcom_credits_low, which fires from Credits::hold() alone (never called
+ * here) and compares cents to a dollar threshold, so no email went out.
+ * Credits_Bridge::charge()'s debit hook is now the single trigger.
  *
  * @package WBAM\Tests
  */
 
 namespace WBAM\Tests\Pro;
 
+use WBAM_Pro\Core\Credits_Bridge;
+use WBAM_Pro\Core\Revenue_Ledger;
 use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
 use WBAM_Pro\Modules\Notifications\Email_Notifications;
 
@@ -73,5 +76,46 @@ class Test_Low_Balance_Email_Once extends Pro_Test_Case {
 
 		Email_Notifications::get_instance()->send_low_balance_notification( (int) $this->advertiser->id, 5 );
 		$this->assertSame( 2, $this->mail_count, 'A crossing after the cooldown window must email again.' );
+	}
+
+	/** Tops the advertiser up to $amount (major units) and zeroes the mail counter. */
+	private function fund( float $amount ): void {
+		$this->assertNotWPError( Credits_Bridge::topup( (int) $this->advertiser->id, $amount, 'seed' ) );
+		$this->mail_count = 0;
+	}
+
+	public function test_debit_below_threshold_sends_one_email_per_24h(): void {
+		$this->fund( 51 );
+
+		// $51 - $49 Starter approval = $2, under the default $10 threshold.
+		Credits_Bridge::charge( (int) $this->advertiser->id, 49, 0, 'Starter', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		$this->assertSame( 1, $this->mail_count, 'A debit that leaves the balance under threshold must email.' );
+		$this->assertNotEmpty( get_user_meta( $this->advertiser->user_id, '_wbam_low_balance_notified', true ) );
+
+		Credits_Bridge::charge( (int) $this->advertiser->id, 1, 0, 'Another debit', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		$this->assertSame( 1, $this->mail_count, 'A second debit within 24h must not email again.' );
+	}
+
+	public function test_debit_above_threshold_sends_nothing(): void {
+		$this->fund( 100 );
+
+		Credits_Bridge::charge( (int) $this->advertiser->id, 49, 0, 'Starter', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		$this->assertSame( 0, $this->mail_count );
+	}
+
+	public function test_advertiser_opt_out_is_respected(): void {
+		$this->fund( 51 );
+		Advertiser_Manager::get_instance()->update(
+			(int) $this->advertiser->id,
+			array( 'notification_settings' => array( 'low_balance' => false ) )
+		);
+
+		Credits_Bridge::charge( (int) $this->advertiser->id, 49, 0, 'Starter', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		$this->assertSame( 0, $this->mail_count, 'An advertiser who opted out must not get the email.' );
+	}
+
+	public function test_sdk_low_hook_is_not_a_second_trigger(): void {
+		do_action( 'wbcom_credits_low', 'wbam-pro', $this->user, 200 );
+		$this->assertSame( 0, $this->mail_count, 'Only the debit hook may trigger the email.' );
 	}
 }
