@@ -997,4 +997,56 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 		$html = (string) ob_get_clean();
 		$this->assertStringContainsString( 'Advertiser:', $html );
 	}
+
+	/**
+	 * Step "Portal: end-date clamp is silent and moving start resets stored
+	 * times; portal ads always target=_self; flat package campaign shows an
+	 * editable Budget with an 'unlimited' hint".
+	 */
+	public function test_portal_campaign_and_ad_form_edges(): void {
+		$manager = Campaign_Manager::get_instance();
+
+		// Date-only edits keep the stored time of day.
+		$draft = $manager->create(
+			array(
+				'advertiser_id' => $this->advertiser->id,
+				'name'          => 'Timed draft',
+				'pricing_model' => 'flat',
+				'start_date'    => '2030-01-10 17:21:00',
+				'end_date'      => '2030-02-10 17:21:00',
+				'status'        => 'draft',
+			)
+		);
+		$moved = $manager->update( (int) $draft->id, array( 'start_date' => '2030-01-15' ) );
+		$this->assertSame( '2030-01-15 17:21:00', $moved->start_date );
+
+		// A running campaign's start does not move.
+		global $wpdb;
+		$wpdb->update( $wpdb->prefix . 'wbam_campaigns', array( 'status' => 'active' ), array( 'id' => (int) $draft->id ) );
+		$running = $manager->update( (int) $draft->id, array( 'start_date' => '2030-01-20' ) );
+		$this->assertSame( '2030-01-15 17:21:00', $running->start_date );
+
+		// New-tab choice reaches the ad data, per ad type.
+		$shortcodes = ( new \ReflectionClass( \WBAM_Pro\Modules\AdSubmissions\Ad_Submission_Shortcodes::class ) )->newInstanceWithoutConstructor();
+		$collect    = new \ReflectionMethod( $shortcodes, 'collect_ad_data_from_post' );
+		$_POST      = array(
+			'ad_type'      => 'rich-content',
+			'title'        => 'Rich',
+			'rich_new_tab' => '1',
+		);
+		$this->assertTrue( $collect->invoke( $shortcodes )['new_tab'] );
+		$_POST = array(
+			'ad_type'      => 'image',
+			'title'        => 'Image',
+			'rich_new_tab' => '1',
+		);
+		$this->assertFalse( $collect->invoke( $shortcodes )['new_tab'], 'A hidden rich-content box must not decide an image ad.' );
+		$_POST = array();
+
+		$source = (string) file_get_contents( WBAM_PRO_PATH . 'includes/Modules/Advertisers/class-advertiser-shortcodes.php' );
+		$this->assertStringContainsString( 'the last day your package covers', $source, 'A capped end date is announced.' );
+		$this->assertStringContainsString( 'charged once on approval. It is not a spending limit.', $source, 'A flat campaign shows its price, not an unlimited budget field.' );
+		$form = (string) file_get_contents( WBAM_PRO_PATH . 'templates/portal/ad-form.php' );
+		$this->assertStringContainsString( 'name="new_tab"', $form );
+	}
 }
