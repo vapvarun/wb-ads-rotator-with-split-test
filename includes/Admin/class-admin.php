@@ -55,6 +55,7 @@ class Admin {
 		// publish, via wp_after_insert_post so it runs AFTER save_meta().
 		add_action( 'wp_after_insert_post', array( $this, 'enable_on_publish' ), 10, 4 );
 		add_filter( 'manage_wbam-ad_posts_columns', array( $this, 'add_columns' ) );
+		add_filter( 'manage_edit-wbam-ad_sortable_columns', array( $this, 'sortable_columns' ) );
 		add_action( 'manage_wbam-ad_posts_custom_column', array( $this, 'render_column' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'handle_disable_ad' ) );
 		add_action( 'admin_init', array( $this, 'handle_row_toggle' ) );
@@ -284,6 +285,27 @@ class Admin {
 			<option value="disabled" <?php selected( $current, 'disabled' ); ?>><?php esc_html_e( 'Disabled', 'wb-ads-rotator-with-split-test' ); ?></option>
 		</select>
 		<?php
+		$engine = Placement_Engine::get_instance();
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only list-table filters.
+		$type      = isset( $_GET['wbam_type'] ) ? sanitize_key( wp_unslash( $_GET['wbam_type'] ) ) : '';
+		$placement = isset( $_GET['wbam_placement'] ) ? sanitize_key( wp_unslash( $_GET['wbam_placement'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		?>
+		<label for="wbam_type" class="screen-reader-text"><?php esc_html_e( 'Filter by ad type', 'wb-ads-rotator-with-split-test' ); ?></label>
+		<select name="wbam_type" id="wbam_type">
+			<option value=""><?php esc_html_e( 'All types', 'wb-ads-rotator-with-split-test' ); ?></option>
+			<?php foreach ( $engine->get_ad_types() as $id => $ad_type ) : ?>
+				<option value="<?php echo esc_attr( $id ); ?>" <?php selected( $type, $id ); ?>><?php echo esc_html( $ad_type->get_name() ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<label for="wbam_placement" class="screen-reader-text"><?php esc_html_e( 'Filter by placement', 'wb-ads-rotator-with-split-test' ); ?></label>
+		<select name="wbam_placement" id="wbam_placement">
+			<option value=""><?php esc_html_e( 'All placements', 'wb-ads-rotator-with-split-test' ); ?></option>
+			<?php foreach ( $engine->get_placements() as $id => $placement_obj ) : ?>
+				<option value="<?php echo esc_attr( $id ); ?>" <?php selected( $placement, $id ); ?>><?php echo esc_html( $placement_obj->get_name() ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<?php
 
 		$this->render_ad_tag_filter();
 	}
@@ -353,7 +375,8 @@ class Admin {
 	}
 
 	/**
-	 * Apply the Status filter to the list table's main query.
+	 * Apply the status, type and placement filters and the type/status sort
+	 * to the list table's main query.
 	 *
 	 * @param \WP_Query $query Current query object.
 	 * @return void
@@ -366,43 +389,90 @@ class Admin {
 			return;
 		}
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only list-table filter. Standard WP admin GET pattern (no nonce on pre_get_posts filters).
-		if ( empty( $_GET['wbam_enabled_filter'] ) ) {
-			return;
+		$mode      = isset( $_GET['wbam_enabled_filter'] ) ? sanitize_key( wp_unslash( $_GET['wbam_enabled_filter'] ) ) : '';
+		$type      = isset( $_GET['wbam_type'] ) ? sanitize_key( wp_unslash( $_GET['wbam_type'] ) ) : '';
+		$placement = isset( $_GET['wbam_placement'] ) ? sanitize_key( wp_unslash( $_GET['wbam_placement'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		$meta_query = array( 'relation' => 'AND' );
+
+		if ( 'enabled' === $mode ) {
+			$meta_query[] = array(
+				'key'     => '_wbam_enabled',
+				'value'   => '1',
+				'compare' => '=',
+			);
+		} elseif ( 'disabled' === $mode ) {
+			// "Disabled" = meta exists and != '1', OR meta is missing entirely.
+			$meta_query[] = array(
+				'relation' => 'OR',
+				array(
+					'key'     => '_wbam_enabled',
+					'compare' => 'NOT EXISTS',
+				),
+				array(
+					'key'     => '_wbam_enabled',
+					'value'   => '1',
+					'compare' => '!=',
+				),
+			);
 		}
 
-		$mode = sanitize_key( wp_unslash( $_GET['wbam_enabled_filter'] ) );
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended
-		if ( 'enabled' === $mode ) {
-			$query->set(
-				'meta_query',
-				array(
-					array(
-						'key'     => '_wbam_enabled',
-						'value'   => '1',
-						'compare' => '=',
-					),
-				)
-			);
-			return;
-		}
-		if ( 'disabled' === $mode ) {
-			// "Disabled" = meta exists and != '1', OR meta is missing entirely.
-			$query->set(
-				'meta_query',
-				array(
-					'relation' => 'OR',
-					array(
-						'key'     => '_wbam_enabled',
-						'compare' => 'NOT EXISTS',
-					),
-					array(
-						'key'     => '_wbam_enabled',
-						'value'   => '1',
-						'compare' => '!=',
-					),
-				)
+		if ( '' !== $type ) {
+			$meta_query[] = array(
+				'key'   => \WBAM\Core\Ad_Type_Meta::KEY,
+				'value' => $type,
 			);
 		}
+
+		// `_wbam_placements` is a serialised array of slugs; match the quoted
+		// slug, as Placement_Engine::get_ads_for_placement() does.
+		if ( '' !== $placement ) {
+			$meta_query[] = array(
+				'key'     => '_wbam_placements',
+				'value'   => '"' . $placement . '"',
+				'compare' => 'LIKE',
+			);
+		}
+
+		// Sort on a meta key without dropping the ads that lack it: a named
+		// EXISTS / NOT EXISTS pair keeps them (LEFT JOIN) and orders on it.
+		$sort_keys = array(
+			'wbam_type'   => \WBAM\Core\Ad_Type_Meta::KEY,
+			'wbam_status' => '_wbam_enabled',
+		);
+		$orderby   = $query->get( 'orderby' );
+		if ( is_string( $orderby ) && isset( $sort_keys[ $orderby ] ) ) {
+			$meta_query[] = array(
+				'relation'   => 'OR',
+				'wbam_sort'  => array(
+					'key'     => $sort_keys[ $orderby ],
+					'compare' => 'EXISTS',
+				),
+				'wbam_blank' => array(
+					'key'     => $sort_keys[ $orderby ],
+					'compare' => 'NOT EXISTS',
+				),
+			);
+			$query->set( 'orderby', array( 'wbam_sort' => 'desc' === strtolower( (string) $query->get( 'order' ) ) ? 'DESC' : 'ASC' ) );
+		}
+
+		if ( count( $meta_query ) > 1 ) {
+			$query->set( 'meta_query', $meta_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- admin list filter, one page per request.
+		}
+	}
+
+	/**
+	 * Sortable columns on the ads list. Impressions and clicks are not: they
+	 * are totals over the analytics tables, not stored on the ad.
+	 *
+	 * @param array $columns Sortable columns.
+	 * @return array
+	 */
+	public function sortable_columns( $columns ) {
+		$columns['ad_type'] = 'wbam_type';
+		$columns['status']  = 'wbam_status';
+		return $columns;
 	}
 
 	/**
@@ -2644,13 +2714,7 @@ class Admin {
 				break;
 
 			case 'placements':
-				$placements = get_post_meta( $post_id, '_wbam_placements', true );
-				$names      = array();
-				foreach ( (array) $placements as $slug ) {
-					$placement = Placement_Engine::get_instance()->get_placement( $slug );
-					$names[]   = $placement ? $placement->get_name() : $slug;
-				}
-				echo $names ? esc_html( implode( ', ', $names ) ) : '—';
+				echo $this->placements_summary( (array) get_post_meta( $post_id, '_wbam_placements', true ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in placements_summary().
 				break;
 
 			case 'impressions':
@@ -2706,44 +2770,121 @@ class Admin {
 		$count     = wp_cache_get( $cache_key, 'wbam' );
 
 		if ( false === $count ) {
-			global $wpdb;
-			$table_name = $wpdb->prefix . 'wbam_analytics';
-
-			if ( $this->table_exists( $table_name ) ) {
-				// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$count = (int) $wpdb->get_var(
-					$wpdb->prepare(
-						'SELECT COUNT(*) FROM ' . $wpdb->prefix . 'wbam_analytics WHERE ad_id = %d AND event_type = %s',
-						$post_id,
-						$event_type
-					)
-				);
-				$count += (int) $wpdb->get_var(
-					$wpdb->prepare(
-						'SELECT SUM(' . ( 'click' === $event_type ? 'clicks' : 'impressions' ) . ') FROM ' . $wpdb->prefix . 'wbam_analytics_daily WHERE ad_id = %d', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- column from a fixed whitelist.
-						$post_id
-					)
-				);
-				// phpcs:enable
-			} else {
-				$count = 0;
-			}
-
-			/**
-			 * Filters the lifetime event total shown in the ads list table.
-			 *
-			 * @since 3.1.1
-			 *
-			 * @param int    $count      Raw events plus daily totals.
-			 * @param int    $post_id    Ad ID.
-			 * @param string $event_type Event type ('impression' or 'click').
-			 */
-			$count = (int) apply_filters( 'wbam_ad_event_total', $count, $post_id, $event_type );
-
-			wp_cache_set( $cache_key, $count, 'wbam', HOUR_IN_SECONDS );
+			// The list's main query holds the whole page; total every ad on
+			// it in one go rather than two queries per row.
+			global $wp_query;
+			$page_ids = ( $wp_query instanceof \WP_Query && is_array( $wp_query->posts ) ) ? wp_list_pluck( $wp_query->posts, 'ID' ) : array();
+			$this->prime_event_totals( in_array( (int) $post_id, array_map( 'intval', $page_ids ), true ) ? $page_ids : array( $post_id ) );
+			$count = wp_cache_get( $cache_key, 'wbam' );
 		}
 
 		return absint( $count );
+	}
+
+	/**
+	 * Total impressions and clicks for a set of ads in two GROUP BY queries,
+	 * cached per ad under the keys get_event_total() reads.
+	 *
+	 * Raw events plus the rolled-up daily totals: raw rows past retention
+	 * (Analytics_Rollup, or Pro's aggregation) are summed into
+	 * `wbam_analytics_daily` and deleted, so a raw-only count would decay.
+	 *
+	 * @since 3.2.0
+	 * @param int[] $ad_ids Ad IDs.
+	 * @return void
+	 */
+	private function prime_event_totals( array $ad_ids ) {
+		$ad_ids = array_values( array_unique( array_filter( array_map( 'absint', $ad_ids ) ) ) );
+		$todo   = array();
+		foreach ( $ad_ids as $id ) {
+			if ( false === wp_cache_get( 'wbam_total_impression_' . $id, 'wbam' ) || false === wp_cache_get( 'wbam_total_click_' . $id, 'wbam' ) ) {
+				$todo[] = $id;
+			}
+		}
+		if ( ! $todo ) {
+			return;
+		}
+
+		global $wpdb;
+		$totals = array_fill_keys(
+			$todo,
+			array(
+				'impression' => 0,
+				'click'      => 0,
+			)
+		);
+
+		if ( $this->table_exists( $wpdb->prefix . 'wbam_analytics' ) ) {
+			$in = implode( ',', array_fill( 0, count( $todo ), '%d' ) );
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- plugin tables; IDs bound via prepare() through the %d list in $in; cached below.
+			$raw   = $wpdb->get_results( $wpdb->prepare( "SELECT ad_id, event_type, COUNT(*) AS total FROM {$wpdb->prefix}wbam_analytics WHERE ad_id IN ({$in}) AND event_type IN ('impression','click') GROUP BY ad_id, event_type", $todo ) );
+			$daily = $wpdb->get_results( $wpdb->prepare( "SELECT ad_id, SUM(impressions) AS impression, SUM(clicks) AS click FROM {$wpdb->prefix}wbam_analytics_daily WHERE ad_id IN ({$in}) GROUP BY ad_id", $todo ) );
+			// phpcs:enable
+
+			foreach ( (array) $raw as $row ) {
+				$totals[ (int) $row->ad_id ][ $row->event_type ] += (int) $row->total;
+			}
+			foreach ( (array) $daily as $row ) {
+				$totals[ (int) $row->ad_id ]['impression'] += (int) $row->impression;
+				$totals[ (int) $row->ad_id ]['click']      += (int) $row->click;
+			}
+		}
+
+		/**
+		 * Filters the lifetime event totals for a page of ads.
+		 *
+		 * @since 3.2.0
+		 *
+		 * @param array<int, array{impression: int, click: int}> $totals Raw events plus daily totals, keyed by ad ID.
+		 */
+		$totals = (array) apply_filters( 'wbam_ad_event_totals', $totals );
+
+		foreach ( $todo as $id ) {
+			foreach ( array( 'impression', 'click' ) as $event_type ) {
+				/**
+				 * Filters the lifetime event total shown in the ads list table.
+				 *
+				 * @since 3.1.1
+				 *
+				 * @param int    $count      Raw events plus daily totals.
+				 * @param int    $post_id    Ad ID.
+				 * @param string $event_type Event type ('impression' or 'click').
+				 */
+				$count = (int) apply_filters( 'wbam_ad_event_total', isset( $totals[ $id ][ $event_type ] ) ? (int) $totals[ $id ][ $event_type ] : 0, $id, $event_type );
+				wp_cache_set( 'wbam_total_' . $event_type . '_' . $id, $count, 'wbam', HOUR_IN_SECONDS );
+			}
+		}
+	}
+
+	/**
+	 * Placement names for the list column: the first two, then "+N more",
+	 * with the full list in the tooltip. Unknown slugs show as stored.
+	 *
+	 * @since 3.2.0
+	 * @param string[] $slugs Placement IDs.
+	 * @return string Escaped HTML.
+	 */
+	private function placements_summary( array $slugs ) {
+		$slugs = array_values( array_filter( array_map( 'strval', $slugs ) ) );
+		if ( ! $slugs ) {
+			return '&mdash;';
+		}
+
+		$engine = Placement_Engine::get_instance();
+		$names  = array();
+		foreach ( $slugs as $slug ) {
+			$placement = $engine->get_placement( $slug );
+			$names[]   = $placement ? $placement->get_name() : $slug;
+		}
+
+		$shown = esc_html( implode( ', ', array_slice( $names, 0, 2 ) ) );
+		$more  = count( $names ) - 2;
+		if ( $more > 0 ) {
+			/* translators: %s: number of further placements */
+			$shown .= ' ' . esc_html( sprintf( _n( '+%s more', '+%s more', $more, 'wb-ads-rotator-with-split-test' ), number_format_i18n( $more ) ) );
+		}
+
+		return sprintf( '<span title="%s">%s</span>', esc_attr( implode( ', ', $names ) ), $shown );
 	}
 
 	/**

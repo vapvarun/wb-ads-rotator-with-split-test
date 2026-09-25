@@ -230,6 +230,7 @@ class Plugin {
 		add_action( 'init', array( $this, 'register_shared_assets' ), 1 );
 
 		Analytics_Rollup::register();
+		Ad_Type_Meta::register();
 
 		// Invalidate the per-placement ad-count cache (Settings screen,
 		// Task 7) on the same triggers Placement_Engine already uses to
