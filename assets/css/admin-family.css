@@ -629,3 +629,105 @@
 	opacity: 0.7;
 	margin-inline-start: var(--wbam-space-1);
 }
+
+/* ============================================================
+   Settings screen: left sidebar nav (UX::settings_nav()) + content.
+   One `wbam-settings` page for both plugins, sections registered
+   through the `wbam_settings_sections` filter. See WBAM\Admin\Settings.
+   ============================================================ */
+.wbam-settings-layout {
+	display:               grid;
+	grid-template-columns: 200px 1fr;
+	gap:                   var(--wbam-space-6);
+	align-items:           start;
+}
+
+.wbam-settings-nav__select {
+	display: none;
+	width:   100%;
+}
+
+.wbam-settings-nav__list {
+	display:    flex;
+	flex-direction: column;
+	gap:        var(--wbam-space-1);
+	margin:     0;
+	padding:    0;
+	list-style: none;
+	position:   sticky;
+	top:        var(--wbam-space-4);
+}
+
+.wbam-settings-nav__link {
+	display:       block;
+	padding:       var(--wbam-space-2) var(--wbam-space-3);
+	border-radius: var(--wbam-r-md);
+	color:         var(--wbam-text);
+	text-decoration: none;
+}
+
+.wbam-settings-nav__link:hover {
+	background: var(--wbam-bg-subtle);
+}
+
+.wbam-settings-nav__link.is-active {
+	background:  var(--wbam-primary-subtle, var(--wbam-bg-subtle));
+	color:       var(--wbam-primary);
+	font-weight: 600;
+}
+
+.wbam-settings-content .wbam-card:last-child {
+	margin-bottom: 0;
+}
+
+/* Ad Display leaf: sub-nav pills that toggle .wbam-ad-display-subsection via
+   JS (admin-settings-nav.js). Every subsection stays in the DOM either way,
+   so the whole form still posts on save regardless of which pill is active. */
+.wbam-ad-display-subnav {
+	display:  flex;
+	flex-wrap: wrap;
+	gap:      var(--wbam-space-2);
+	margin:   0 0 var(--wbam-space-4);
+}
+
+.wbam-ad-display-subnav__item {
+	padding:       var(--wbam-space-1) var(--wbam-space-3);
+	border:        1px solid var(--wbam-border);
+	border-radius: var(--wbam-r-pill);
+	background:    var(--wbam-bg);
+	color:         var(--wbam-text);
+	cursor:        pointer;
+	font-size:     var(--wbam-font-size-xs);
+}
+
+.wbam-ad-display-subnav__item.is-active {
+	background:  var(--wbam-primary);
+	border-color: var(--wbam-primary);
+	color:       #fff;
+}
+
+#wbam-ad-display-sections.wbam-js-enhanced .wbam-ad-display-subsection {
+	display: none;
+}
+
+#wbam-ad-display-sections.wbam-js-enhanced .wbam-ad-display-subsection.is-active {
+	display: block;
+}
+
+@media screen and (max-width: 390px) {
+	.wbam-settings-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.wbam-settings-nav__select {
+		display: block;
+	}
+
+	.wbam-settings-nav__list {
+		display:  none;
+	}
+
+	.wbam-ad-display-subnav {
+		flex-direction: column;
+	}
+}
