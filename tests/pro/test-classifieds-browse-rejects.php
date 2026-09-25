@@ -203,6 +203,30 @@ class Test_Classifieds_Browse_Rejects extends Pro_Test_Case {
 		$this->assertCount( 1, $ids, 'Listings without a saved location must never appear regardless of radius.' );
 	}
 
+	/**
+	 * The IDs feed a WHERE IN on the browse query, so a dense area returns
+	 * the nearest N only, not every match in the radius.
+	 */
+	public function test_find_nearby_returns_the_nearest_up_to_the_limit(): void {
+		$geo = Geolocation_Manager::get_instance();
+		$ids = array();
+		foreach ( array( 0.001, 0.002, 0.003 ) as $offset ) {
+			$classified = $this->make_active_classified( array( 'title' => 'Listing ' . $offset ) );
+			$geo->save_location(
+				$classified->id,
+				array(
+					'latitude'  => 39.781 + $offset,
+					'longitude' => -89.650,
+				)
+			);
+			$ids[] = (int) $classified->id;
+		}
+
+		$found = array_map( 'intval', wp_list_pluck( $geo->find_nearby( 39.781, -89.650, 25, 2 ), 'classified_id' ) );
+
+		$this->assertSame( array( $ids[0], $ids[1] ), $found );
+	}
+
 	// ------------------------------------------------------------------
 	// Reject 4: server-side geocode helper (mocked Nominatim).
 	// ------------------------------------------------------------------
