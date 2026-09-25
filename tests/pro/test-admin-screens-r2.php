@@ -212,4 +212,72 @@ class Test_Admin_Screens_R2 extends Pro_Test_Case {
 		$reloaded_after_clear = Campaign_Manager::get_instance()->get( $campaign->id );
 		$this->assertSame( 0, (int) $reloaded_after_clear->ad_id, 'Explicitly posting ad_id=0 must still clear the link.' );
 	}
+
+	/** Posts the campaign form as an admin; returns the refusal notice, or 'saved' when it redirected. */
+	private function post_campaign_form( array $fields ): string {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$_POST    = array_merge(
+			array(
+				'wbam_save_campaign'  => '1',
+				'wbam_campaign_nonce' => wp_create_nonce( 'wbam_save_campaign' ),
+				'advertiser_id'       => (string) $this->advertiser->id,
+				'status'              => 'draft',
+			),
+			$fields
+		);
+		$_REQUEST = $_POST;
+		$redirect = static function () {
+			throw new \RuntimeException( 'saved' );
+		};
+		add_filter( 'wp_redirect', $redirect );
+
+		$method = new \ReflectionMethod( Pro_Admin::class, 'handle_campaign_form_save' );
+		$method->setAccessible( true );
+		ob_start();
+		try {
+			$method->invoke( new Pro_Admin() );
+			$out = ob_get_clean();
+		} catch ( \RuntimeException $e ) {
+			ob_end_clean();
+			$out = $e->getMessage();
+		}
+		remove_filter( 'wp_redirect', $redirect );
+		$_POST    = array();
+		$_REQUEST = array();
+		return $out;
+	}
+
+	/** Round 2: a package campaign is flat with budget = price paid; saving it unchanged must work. */
+	public function test_flat_package_campaign_with_budget_saves(): void {
+		$campaign = Campaign_Manager::get_instance()->create(
+			array(
+				'advertiser_id' => $this->advertiser->id,
+				'name'          => 'Starter campaign',
+			)
+		);
+		$result = $this->post_campaign_form(
+			array(
+				'campaign_id'       => (string) $campaign->id,
+				'name'              => 'Starter campaign',
+				'pricing_model'     => 'flat',
+				'price_per_unit'    => '0',
+				'budget'            => '49',
+				'impressions_limit' => '10000',
+			)
+		);
+		$this->assertSame( 'saved', $result );
+	}
+
+	/** The guard still refuses a hand-made metered campaign that can never spend. */
+	public function test_zero_rate_cpm_campaign_with_budget_is_refused(): void {
+		$result = $this->post_campaign_form(
+			array(
+				'name'           => 'Broken CPM',
+				'pricing_model'  => 'cpm',
+				'price_per_unit' => '0',
+				'budget'         => '50',
+			)
+		);
+		$this->assertStringContainsString( 'rate is zero', $result );
+	}
 }
