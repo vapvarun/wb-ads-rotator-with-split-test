@@ -2815,19 +2815,7 @@ class Admin {
 		);
 
 		if ( $this->table_exists( $wpdb->prefix . 'wbam_analytics' ) ) {
-			$in = implode( ',', array_fill( 0, count( $todo ), '%d' ) );
-			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- plugin tables; IDs bound via prepare() through the %d list in $in; cached below.
-			$raw   = $wpdb->get_results( $wpdb->prepare( "SELECT ad_id, event_type, COUNT(*) AS total FROM {$wpdb->prefix}wbam_analytics WHERE ad_id IN ({$in}) AND event_type IN ('impression','click') GROUP BY ad_id, event_type", $todo ) );
-			$daily = $wpdb->get_results( $wpdb->prepare( "SELECT ad_id, SUM(impressions) AS impression, SUM(clicks) AS click FROM {$wpdb->prefix}wbam_analytics_daily WHERE ad_id IN ({$in}) GROUP BY ad_id", $todo ) );
-			// phpcs:enable
-
-			foreach ( (array) $raw as $row ) {
-				$totals[ (int) $row->ad_id ][ $row->event_type ] += (int) $row->total;
-			}
-			foreach ( (array) $daily as $row ) {
-				$totals[ (int) $row->ad_id ]['impression'] += (int) $row->impression;
-				$totals[ (int) $row->ad_id ]['click']      += (int) $row->click;
-			}
+			$totals = \WBAM\Core\Analytics_Rollup::event_totals( $todo ) + $totals;
 		}
 
 		/**

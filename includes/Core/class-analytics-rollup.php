@@ -77,6 +77,187 @@ class Analytics_Rollup {
 	}
 
 	/**
+	 * Impressions and clicks per ad: raw events plus the rolled-up daily
+	 * totals, so a range past the raw retention still counts.
+	 *
+	 * The one reader of both tables for per-ad totals: the ads list, the
+	 * comparison box, the stats REST endpoints and the analytics abilities
+	 * all go through it.
+	 *
+	 * @since 3.2.0
+	 *
+	 * @param int[]  $ad_ids Ad IDs; empty for every ad.
+	 * @param string $start  First day (Y-m-d), or '' for no lower bound.
+	 * @param string $end    Last day (Y-m-d), or '' for no upper bound.
+	 * @return array<int, array<string, int>> Keyed by ad ID (impression, click); ads with no events are absent.
+	 */
+	public static function event_totals( array $ad_ids = array(), $start = '', $end = '' ) {
+		global $wpdb;
+
+		list( $raw_where, $raw_args )     = self::range_where( $ad_ids, 'created_at', $start ? $start . ' 00:00:00' : '', $end ? $end . ' 23:59:59' : '' );
+		list( $daily_where, $daily_args ) = self::range_where( $ad_ids, 'date', $start, $end );
+
+		$raw_sql   = "SELECT ad_id, event_type, COUNT(*) AS total FROM {$wpdb->prefix}wbam_analytics WHERE event_type IN ('impression','click'){$raw_where} GROUP BY ad_id, event_type";
+		$daily_sql = "SELECT ad_id, SUM(impressions) AS impression, SUM(clicks) AS click FROM {$wpdb->prefix}wbam_analytics_daily WHERE 1=1{$daily_where} GROUP BY ad_id";
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- plugin tables; every value bound through prepare(); callers cache.
+		$raw   = $wpdb->get_results( $raw_args ? $wpdb->prepare( $raw_sql, $raw_args ) : $raw_sql );
+		$daily = $wpdb->get_results( $daily_args ? $wpdb->prepare( $daily_sql, $daily_args ) : $daily_sql );
+		// phpcs:enable
+
+		$zero   = array(
+			'impression' => 0,
+			'click'      => 0,
+		);
+		$totals = array();
+		foreach ( (array) $raw as $row ) {
+			$id = (int) $row->ad_id;
+			if ( ! isset( $totals[ $id ] ) ) {
+				$totals[ $id ] = $zero;
+			}
+			$totals[ $id ][ $row->event_type ] += (int) $row->total;
+		}
+		foreach ( (array) $daily as $row ) {
+			$id = (int) $row->ad_id;
+			if ( ! isset( $totals[ $id ] ) ) {
+				$totals[ $id ] = $zero;
+			}
+			$totals[ $id ]['impression'] += (int) $row->impression;
+			$totals[ $id ]['click']      += (int) $row->click;
+		}
+
+		return $totals;
+	}
+
+	/**
+	 * Site-wide totals and the top ads by impressions for a date range.
+	 *
+	 * @since 3.2.0
+	 *
+	 * @param string $start First day (Y-m-d), or ''.
+	 * @param string $end   Last day (Y-m-d), or ''.
+	 * @param int    $limit Top ads to return.
+	 * @return array{impressions:int, clicks:int, ctr:float, top_ads:array<int, array{ad_id:int, title:string, impressions:int}>}
+	 */
+	public static function overview( $start = '', $end = '', $limit = 10 ) {
+		$totals = self::event_totals( array(), $start, $end );
+		$views  = wp_list_pluck( $totals, 'impression' );
+		$clicks = array_sum( wp_list_pluck( $totals, 'click' ) );
+
+		arsort( $views );
+		$top_ads = array();
+		foreach ( array_slice( $views, 0, max( 1, (int) $limit ), true ) as $ad_id => $impressions ) {
+			if ( $impressions > 0 ) {
+				$top_ads[] = array(
+					'ad_id'       => (int) $ad_id,
+					'title'       => get_the_title( (int) $ad_id ),
+					'impressions' => (int) $impressions,
+				);
+			}
+		}
+
+		return array(
+			'impressions' => (int) array_sum( $views ),
+			'clicks'      => (int) $clicks,
+			'ctr'         => self::ctr( (int) array_sum( $views ), (int) $clicks ),
+			'top_ads'     => $top_ads,
+		);
+	}
+
+	/**
+	 * One ad's totals for a date range, with the placement breakdown.
+	 *
+	 * The breakdown reads raw events only: rolled-up days keep no placement,
+	 * so on a range past the raw retention it covers the recent days alone.
+	 *
+	 * @since 3.2.0
+	 *
+	 * @param int    $ad_id Ad ID.
+	 * @param string $start First day (Y-m-d), or ''.
+	 * @param string $end   Last day (Y-m-d), or ''.
+	 * @return array{impressions:int, clicks:int, ctr:float, by_placement:array<int, array{placement:string, impressions:int, clicks:int, ctr:float}>}
+	 */
+	public static function ad_stats( $ad_id, $start = '', $end = '' ) {
+		global $wpdb;
+
+		$ad_id  = (int) $ad_id;
+		$totals = self::event_totals( array( $ad_id ), $start, $end );
+		$totals = $totals[ $ad_id ] ?? array(
+			'impression' => 0,
+			'click'      => 0,
+		);
+
+		list( $where, $args ) = self::range_where( array( $ad_id ), 'created_at', $start ? $start . ' 00:00:00' : '', $end ? $end . ' 23:59:59' : '' );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- plugin table; every value bound through prepare().
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT placement, event_type, COUNT(*) AS total FROM {$wpdb->prefix}wbam_analytics WHERE event_type IN ('impression','click'){$where} GROUP BY placement, event_type", $args ) );
+		// phpcs:enable
+
+		$placements = array();
+		foreach ( (array) $rows as $row ) {
+			$key = ! empty( $row->placement ) ? (string) $row->placement : 'unknown';
+			if ( ! isset( $placements[ $key ] ) ) {
+				$placements[ $key ] = array(
+					'placement'   => $key,
+					'impressions' => 0,
+					'clicks'      => 0,
+					'ctr'         => 0.0,
+				);
+			}
+			$placements[ $key ][ 'click' === $row->event_type ? 'clicks' : 'impressions' ] += (int) $row->total;
+			$placements[ $key ]['ctr'] = self::ctr( $placements[ $key ]['impressions'], $placements[ $key ]['clicks'] );
+		}
+
+		return array(
+			'impressions'  => $totals['impression'],
+			'clicks'       => $totals['click'],
+			'ctr'          => self::ctr( $totals['impression'], $totals['click'] ),
+			'by_placement' => array_values( $placements ),
+		);
+	}
+
+	/**
+	 * Click-through rate as a percentage, two decimals.
+	 *
+	 * @param int $impressions Impressions.
+	 * @param int $clicks      Clicks.
+	 * @return float
+	 */
+	private static function ctr( $impressions, $clicks ) {
+		return $impressions > 0 ? round( $clicks / $impressions * 100, 2 ) : 0.0;
+	}
+
+	/**
+	 * WHERE fragment (starting " AND ") and its bound values for an ad set
+	 * and an inclusive range on one column.
+	 *
+	 * @param int[]  $ad_ids Ad IDs; empty for every ad.
+	 * @param string $column Date column.
+	 * @param string $from   Lower bound, or ''.
+	 * @param string $to     Upper bound, or ''.
+	 * @return array{0:string, 1:array<int, int|string>}
+	 */
+	private static function range_where( array $ad_ids, $column, $from, $to ) {
+		$sql  = '';
+		$args = array();
+
+		$ad_ids = array_values( array_filter( array_map( 'absint', $ad_ids ) ) );
+		if ( $ad_ids ) {
+			$sql .= ' AND ad_id IN (' . implode( ',', array_fill( 0, count( $ad_ids ), '%d' ) ) . ')';
+			$args = $ad_ids;
+		}
+		if ( '' !== $from ) {
+			$sql   .= " AND {$column} >= %s";
+			$args[] = $from;
+		}
+		if ( '' !== $to ) {
+			$sql   .= " AND {$column} <= %s";
+			$args[] = $to;
+		}
+
+		return array( $sql, $args );
+	}
+
+	/**
 	 * Cron callback.
 	 *
 	 * @return void

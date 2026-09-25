@@ -554,48 +554,14 @@ class Ads_API {
 			);
 		}
 
-		global $wpdb;
-		$table = $wpdb->prefix . 'wbam_analytics';
-
-		$where  = 'WHERE ad_id = %d';
-		$values = array( $id );
-
-		if ( ! empty( $request['start_date'] ) ) {
-			$where   .= ' AND timestamp >= %s';
-			$values[] = sanitize_text_field( $request['start_date'] ) . ' 00:00:00';
-		}
-
-		if ( ! empty( $request['end_date'] ) ) {
-			$where   .= ' AND timestamp <= %s';
-			$values[] = sanitize_text_field( $request['end_date'] ) . ' 23:59:59';
-		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-		$impressions = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-				"SELECT COUNT(*) FROM {$table} {$where} AND type = 'impression'",
-				$values
-			)
-		);
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-		$clicks = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-				"SELECT COUNT(*) FROM {$table} {$where} AND type = 'click'",
-				$values
-			)
-		);
-
-		$ctr = $impressions > 0 ? round( ( $clicks / $impressions ) * 100, 2 ) : 0;
+		$stats = \WBAM\Core\Analytics_Rollup::ad_stats( $id, (string) $request['start_date'], (string) $request['end_date'] );
 
 		return rest_ensure_response(
 			array(
 				'ad_id'       => $id,
-				'impressions' => $impressions,
-				'clicks'      => $clicks,
-				'ctr'         => $ctr,
+				'impressions' => $stats['impressions'],
+				'clicks'      => $stats['clicks'],
+				'ctr'         => $stats['ctr'],
 			)
 		);
 	}

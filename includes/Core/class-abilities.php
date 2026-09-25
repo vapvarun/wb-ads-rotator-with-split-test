@@ -1188,7 +1188,7 @@ class Abilities {
 	/**
 	 * Execute wbam/get-analytics-overview.
 	 *
-	 * Delegates to the Analytics_API logic directly against the DB.
+	 * Raw events plus rolled-up daily totals, through Analytics_Rollup.
 	 *
 	 * @since 2.8.0
 	 *
@@ -1196,83 +1196,18 @@ class Abilities {
 	 * @return array|\WP_Error
 	 */
 	public function execute_get_analytics_overview( $input ) {
-		$input = is_array( $input ) ? $input : array();
-
-		global $wpdb;
-		$table = $wpdb->prefix . 'wbam_analytics';
-
-		$where  = array( '1=1' );
-		$values = array();
-
-		if ( ! empty( $input['start_date'] ) ) {
-			$where[]  = 'timestamp >= %s';
-			$values[] = sanitize_text_field( $input['start_date'] ) . ' 00:00:00';
-		}
-
-		if ( ! empty( $input['end_date'] ) ) {
-			$where[]  = 'timestamp <= %s';
-			$values[] = sanitize_text_field( $input['end_date'] ) . ' 23:59:59';
-		}
-
-		$where_sql = implode( ' AND ', $where );
-		$limit     = isset( $input['limit'] ) ? absint( $input['limit'] ) : 10;
-
-		if ( ! empty( $values ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-			$impressions = (int) $wpdb->get_var(
-				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-					"SELECT COUNT(*) FROM {$table} WHERE {$where_sql} AND type = 'impression'",
-					$values
-				)
-			);
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-			$clicks = (int) $wpdb->get_var(
-				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-					"SELECT COUNT(*) FROM {$table} WHERE {$where_sql} AND type = 'click'",
-					$values
-				)
-			);
-			$top_values = array_merge( $values, array( $limit ) );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-			$top_ads_raw = $wpdb->get_results(
-				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-					"SELECT ad_id, COUNT(*) as impressions FROM {$table} WHERE {$where_sql} AND type = 'impression' GROUP BY ad_id ORDER BY impressions DESC LIMIT %d",
-					$top_values
-				)
-			);
-		} else {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-			$impressions = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE type = 'impression'" );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-			$clicks = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE type = 'click'" );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-			$top_ads_raw = $wpdb->get_results(
-				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-					"SELECT ad_id, COUNT(*) as impressions FROM {$table} WHERE type = 'impression' GROUP BY ad_id ORDER BY impressions DESC LIMIT %d",
-					array( $limit )
-				)
-			);
-		}
-
-		$ctr     = $impressions > 0 ? round( ( $clicks / $impressions ) * 100, 2 ) : 0.0;
-		$top_ads = array();
-		foreach ( $top_ads_raw as $row ) {
-			$top_ads[] = array(
-				'ad_id'       => (int) $row->ad_id,
-				'title'       => get_the_title( (int) $row->ad_id ),
-				'impressions' => (int) $row->impressions,
-			);
-		}
+		$input    = is_array( $input ) ? $input : array();
+		$overview = Analytics_Rollup::overview(
+			sanitize_text_field( $input['start_date'] ?? '' ),
+			sanitize_text_field( $input['end_date'] ?? '' ),
+			isset( $input['limit'] ) ? absint( $input['limit'] ) : 10
+		);
 
 		return array(
-			'total_impressions' => $impressions,
-			'total_clicks'      => $clicks,
-			'ctr'               => $ctr,
-			'top_ads'           => $top_ads,
+			'total_impressions' => $overview['impressions'],
+			'total_clicks'      => $overview['clicks'],
+			'ctr'               => $overview['ctr'],
+			'top_ads'           => $overview['top_ads'],
 		);
 	}
 
@@ -1298,82 +1233,7 @@ class Abilities {
 			return new \WP_Error( 'ad_not_found', __( 'Ad not found.', 'wb-ads-rotator-with-split-test' ) );
 		}
 
-		global $wpdb;
-		$table = $wpdb->prefix . 'wbam_analytics';
-
-		$where  = array( 'ad_id = %d' );
-		$values = array( $id );
-
-		if ( ! empty( $input['start_date'] ) ) {
-			$where[]  = 'timestamp >= %s';
-			$values[] = sanitize_text_field( $input['start_date'] ) . ' 00:00:00';
-		}
-
-		if ( ! empty( $input['end_date'] ) ) {
-			$where[]  = 'timestamp <= %s';
-			$values[] = sanitize_text_field( $input['end_date'] ) . ' 23:59:59';
-		}
-
-		$where_sql = implode( ' AND ', $where );
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-		$impressions = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-				"SELECT COUNT(*) FROM {$table} WHERE {$where_sql} AND type = 'impression'",
-				$values
-			)
-		);
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-		$clicks = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-				"SELECT COUNT(*) FROM {$table} WHERE {$where_sql} AND type = 'click'",
-				$values
-			)
-		);
-
-		$ctr = $impressions > 0 ? round( ( $clicks / $impressions ) * 100, 2 ) : 0.0;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
-		$by_placement_raw = $wpdb->get_results(
-			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-				"SELECT placement, type, COUNT(*) as count FROM {$table} WHERE {$where_sql} GROUP BY placement, type",
-				$values
-			)
-		);
-
-		$placements = array();
-		foreach ( $by_placement_raw as $row ) {
-			$key = ! empty( $row->placement ) ? $row->placement : 'unknown';
-			if ( ! isset( $placements[ $key ] ) ) {
-				$placements[ $key ] = array(
-					'placement'   => $key,
-					'impressions' => 0,
-					'clicks'      => 0,
-					'ctr'         => 0.0,
-				);
-			}
-			if ( 'impression' === $row->type ) {
-				$placements[ $key ]['impressions'] = (int) $row->count;
-			} elseif ( 'click' === $row->type ) {
-				$placements[ $key ]['clicks'] = (int) $row->count;
-			}
-		}
-
-		foreach ( $placements as &$p ) {
-			$p['ctr'] = $p['impressions'] > 0 ? round( ( $p['clicks'] / $p['impressions'] ) * 100, 2 ) : 0.0;
-		}
-		unset( $p );
-
-		return array(
-			'impressions'  => $impressions,
-			'clicks'       => $clicks,
-			'ctr'          => $ctr,
-			'by_placement' => array_values( $placements ),
-		);
+		return Analytics_Rollup::ad_stats( $id, sanitize_text_field( $input['start_date'] ?? '' ), sanitize_text_field( $input['end_date'] ?? '' ) );
 	}
 
 	// -------------------------------------------------------------------------
