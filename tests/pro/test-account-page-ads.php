@@ -52,4 +52,39 @@ class Test_Account_Page_Ads extends Pro_Test_Case {
 		$this->visit_page_with( '[wbam_browse_classifieds]' );
 		$this->assertTrue( apply_filters( 'wbam_should_display_ad', true, 1 ) );
 	}
+
+	/**
+	 * `wbam_should_display_ad` above governs whole display slots (header,
+	 * sidebar); `wbam_skip_content_injection` is the separate gate for the
+	 * after-paragraph in-content ad, which landed inside chat bubbles on a
+	 * single listing and inside the browse results grid.
+	 */
+	public function test_skip_content_injection_on_browse_page(): void {
+		$this->visit_page_with( '[wbam_browse_classifieds]' );
+		$this->assertTrue( apply_filters( 'wbam_skip_content_injection', false ) );
+	}
+
+	public function test_skip_content_injection_on_single_classified(): void {
+		$classified = self::factory()->post->create(
+			array(
+				'post_type'   => \WBAM_Pro\Modules\Classifieds\Classified_Manager::POST_TYPE,
+				'post_status' => 'publish',
+			)
+		);
+		$this->go_to( get_permalink( $classified ) );
+
+		$this->assertTrue( apply_filters( 'wbam_skip_content_injection', false ) );
+	}
+
+	public function test_skip_content_injection_leaves_plain_post_alone(): void {
+		$post = self::factory()->post->create(
+			array(
+				'post_type'   => 'post',
+				'post_status' => 'publish',
+			)
+		);
+		$this->go_to( get_permalink( $post ) );
+
+		$this->assertFalse( apply_filters( 'wbam_skip_content_injection', false ) );
+	}
 }
