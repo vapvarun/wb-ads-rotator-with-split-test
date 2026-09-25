@@ -178,8 +178,9 @@
  * The markup always asked for Select2, which neither plugin ships, so the
  * pickers rendered as bare Ctrl-click lists. This keeps the original select
  * as the form field (same POST shape) and drives it from a filterable
- * checkbox list. A select with data-rest="wp/v2/pages" also searches the
- * REST API, so a site with thousands of pages only renders a first page.
+ * checkbox list. A select with data-rest (wp/v2/pages, wp/v2/categories,
+ * wp/v2/tags) also searches the REST API, so a site with thousands of pages
+ * or tags only renders a first page.
  */
 (function($) {
 	'use strict';
@@ -257,11 +258,13 @@
 			timer = setTimeout(function() {
 				$.ajax({
 					url: cfg.restUrl + route,
-					data: { search: q, per_page: 20, _fields: 'id,title' },
+					data: { search: q, per_page: 20, _fields: 'id,title,name' },
 					headers: { 'X-WP-Nonce': cfg.restNonce }
 				}).done(function(items) {
 					$.each(items || [], function(_, item) {
-						var title = item.title && item.title.rendered ? $('<div>').html(item.title.rendered).text() : '#' + item.id;
+						// Posts carry title.rendered, terms carry name.
+						var raw = item.title && item.title.rendered ? item.title.rendered : item.name;
+						var title = raw ? $('<div>').html(raw).text() : '#' + item.id;
 						addChoice($list, $select, String(item.id), title, false);
 					});
 					applyFilter();

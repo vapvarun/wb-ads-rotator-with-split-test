@@ -130,7 +130,17 @@ class Display_Options {
 								'number'      => 50,
 							)
 						);
-						$selected_pages = $specific_posts ? get_pages( array( 'include' => array_map( 'absint', $specific_posts ) ) ) : array();
+						// Any status: get_pages() defaults to published, which dropped a
+						// saved private or draft page from the select, so the next save
+						// removed it from the rules.
+						$selected_pages = $specific_posts
+							? get_pages(
+								array(
+									'include'     => array_map( 'absint', $specific_posts ),
+									'post_status' => array( 'publish', 'private', 'draft', 'pending', 'future' ),
+								)
+							)
+							: array();
 						$all_pages      = array();
 						// get_pages() returns false on DB error.
 						foreach ( array_merge( is_array( $selected_pages ) ? $selected_pages : array(), is_array( $first_pages ) ? $first_pages : array() ) as $page_item ) {
@@ -191,11 +201,9 @@ class Display_Options {
 				<?php // Categories. ?>
 				<div class="wbam-rule-row">
 					<label for="wbam_rules_categories"><?php esc_html_e( 'Categories', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<select id="wbam_rules_categories" name="wbam_display_rules[categories][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select categories...', 'wb-ads-rotator-with-split-test' ); ?>">
+					<select id="wbam_rules_categories" name="wbam_display_rules[categories][]" multiple class="wbam-select2" data-rest="wp/v2/categories" data-placeholder="<?php esc_attr_e( 'Select categories...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php
-						$all_categories = get_categories( array( 'hide_empty' => false ) );
-						// get_categories() returns WP_Error if taxonomy missing.
-						$all_categories = is_array( $all_categories ) ? $all_categories : array();
+						$all_categories = self::term_choices( 'category', array_merge( $categories, $exclude_cats ) );
 						foreach ( $all_categories as $cat ) :
 							?>
 							<option value="<?php echo esc_attr( $cat->term_id ); ?>" <?php selected( in_array( $cat->term_id, $categories, true ) ); ?>>
@@ -208,11 +216,9 @@ class Display_Options {
 				<?php // Tags. ?>
 				<div class="wbam-rule-row">
 					<label for="wbam_rules_tags"><?php esc_html_e( 'Tags', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<select id="wbam_rules_tags" name="wbam_display_rules[tags][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select tags...', 'wb-ads-rotator-with-split-test' ); ?>">
+					<select id="wbam_rules_tags" name="wbam_display_rules[tags][]" multiple class="wbam-select2" data-rest="wp/v2/tags" data-placeholder="<?php esc_attr_e( 'Select tags...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php
-						$all_tags = get_tags( array( 'hide_empty' => false ) );
-						// get_tags() returns WP_Error if taxonomy missing.
-						$all_tags = is_array( $all_tags ) ? $all_tags : array();
+						$all_tags = self::term_choices( 'post_tag', array_merge( $tags, $exclude_tags ) );
 						foreach ( $all_tags as $tag ) :
 							?>
 							<option value="<?php echo esc_attr( $tag->term_id ); ?>" <?php selected( in_array( $tag->term_id, $tags, true ) ); ?>>
@@ -240,7 +246,7 @@ class Display_Options {
 
 				<div class="wbam-rule-row">
 					<label for="wbam_rules_exclude_categories"><?php esc_html_e( 'Categories', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<select id="wbam_rules_exclude_categories" name="wbam_display_rules[exclude_categories][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select categories to exclude...', 'wb-ads-rotator-with-split-test' ); ?>">
+					<select id="wbam_rules_exclude_categories" name="wbam_display_rules[exclude_categories][]" multiple class="wbam-select2" data-rest="wp/v2/categories" data-placeholder="<?php esc_attr_e( 'Select categories to exclude...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php foreach ( $all_categories as $cat ) : ?>
 							<option value="<?php echo esc_attr( $cat->term_id ); ?>" <?php selected( in_array( $cat->term_id, $exclude_cats, true ) ); ?>>
 								<?php echo esc_html( $cat->name ); ?>
@@ -251,7 +257,7 @@ class Display_Options {
 
 				<div class="wbam-rule-row">
 					<label for="wbam_rules_exclude_tags"><?php esc_html_e( 'Tags', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<select id="wbam_rules_exclude_tags" name="wbam_display_rules[exclude_tags][]" multiple class="wbam-select2" data-placeholder="<?php esc_attr_e( 'Select tags to exclude...', 'wb-ads-rotator-with-split-test' ); ?>">
+					<select id="wbam_rules_exclude_tags" name="wbam_display_rules[exclude_tags][]" multiple class="wbam-select2" data-rest="wp/v2/tags" data-placeholder="<?php esc_attr_e( 'Select tags to exclude...', 'wb-ads-rotator-with-split-test' ); ?>">
 						<?php foreach ( $all_tags as $tag ) : ?>
 							<option value="<?php echo esc_attr( $tag->term_id ); ?>" <?php selected( in_array( $tag->term_id, $exclude_tags, true ) ); ?>>
 								<?php echo esc_html( $tag->name ); ?>
@@ -262,6 +268,54 @@ class Display_Options {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Terms for a rules picker: the 50 most used plus every saved one. The
+	 * picker searches the rest over REST, so a site with thousands of tags
+	 * does not print them all into the edit screen.
+	 *
+	 * @param string $taxonomy Taxonomy.
+	 * @param int[]  $selected Saved term IDs.
+	 * @return \WP_Term[]
+	 */
+	private static function term_choices( $taxonomy, array $selected ) {
+		$terms = array();
+		$sets  = array(
+			array(
+				'number'  => 50,
+				'orderby' => 'count',
+				'order'   => 'DESC',
+			),
+		);
+		if ( $selected ) {
+			$sets[] = array( 'include' => array_values( array_unique( $selected ) ) );
+		}
+
+		foreach ( $sets as $args ) {
+			$found = get_terms(
+				array_merge(
+					array(
+						'taxonomy'   => $taxonomy,
+						'hide_empty' => false,
+					),
+					$args
+				)
+			);
+			// get_terms() returns WP_Error if the taxonomy is missing.
+			foreach ( is_array( $found ) ? $found : array() as $term ) {
+				$terms[ $term->term_id ] = $term;
+			}
+		}
+
+		uasort(
+			$terms,
+			static function ( $a, $b ) {
+				return strcasecmp( $a->name, $b->name );
+			}
+		);
+
+		return array_values( $terms );
 	}
 
 	/**
