@@ -1757,6 +1757,13 @@
       "args": 2,
       "where": "includes/Modules/Targeting/class-frequency-manager.php",
       "purpose": "Whether visitor views of an ad are counted in the wbam_ad_views cookie (Pro advertiser/campaign caps)"
+    },
+    {
+      "name": "wbam_ad_event_totals",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-admin.php",
+      "purpose": "Lifetime impression/click totals for a page of ads in the All Ads list, keyed by ad ID (3.2.0)"
     }
   ],
   "buddypress_integration": {
