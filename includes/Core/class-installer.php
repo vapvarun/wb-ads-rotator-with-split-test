@@ -37,14 +37,38 @@ class Installer {
 
 	/**
 	 * Run installer.
+	 *
+	 * A fresh install has no schema and no rows to migrate, so it goes
+	 * straight to the current tables and is stamped immediately - cheap and
+	 * safe on an empty database. An existing site being reactivated is a
+	 * different case: its tables can be large, so table-altering DDL must
+	 * not run inside the activation request. `$run_upgrades = false` (the
+	 * activation hook's call) leaves an existing site's version untouched;
+	 * Plugin::maybe_update_database() picks it up, locked, on the next
+	 * admin_init.
+	 *
+	 * @param bool $run_upgrades Run pending migrations on an existing
+	 *                           install. The activation hook passes false.
 	 */
-	public function install() {
+	public function install( $run_upgrades = true ) {
 		// Detect fresh install vs. upgrade BEFORE we touch DB_VERSION.
 		// Fresh install = DB version option has never been set (get_option
 		// returns the default we pass in, not a stored value). Upgrade =
 		// any stored value exists, even '0'.
+		$is_fresh_install = ( null === get_option( self::DB_VERSION_OPTION, null ) );
+
 		$this->maybe_set_onboarding_pointers_default();
 		$this->maybe_set_geo_enabled_default();
+
+		if ( $is_fresh_install ) {
+			$this->create_tables();
+			$this->update_db_version();
+			return;
+		}
+
+		if ( ! $run_upgrades ) {
+			return;
+		}
 
 		$this->create_tables();
 		$this->run_migrations();

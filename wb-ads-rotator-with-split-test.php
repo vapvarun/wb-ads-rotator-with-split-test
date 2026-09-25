@@ -95,11 +95,15 @@ function wbam_activate() {
 		add_option( 'wbam_settings', array() );
 	}
 
-	// Run installer to create database tables.
+	// Run installer to create database tables. A fresh install gets the
+	// current schema immediately (nothing to lose, cheap on an empty
+	// database); an existing site being reactivated defers its migrations
+	// to the next admin_init instead of running table-altering DDL inside
+	// this activation request (see Installer::install()).
 	require_once WBAM_PATH . 'includes/Core/trait-singleton.php';
 	require_once WBAM_PATH . 'includes/Core/class-installer.php';
 	$installer = WBAM\Core\Installer::get_instance();
-	$installer->install();
+	$installer->install( false );
 
 	set_transient( '_wbam_activation_redirect', true, 30 );
 }
