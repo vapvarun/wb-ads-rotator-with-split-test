@@ -92,4 +92,87 @@ class Test_UX extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Live', $html );
 		$this->assertStringNotContainsString( 'Active', $html );
 	}
+
+	public function test_page_header_renders_a_back_link_in_the_header_not_a_bare_link(): void {
+		$html = UX::page_header(
+			array(
+				'title'    => 'Reject listing',
+				'back_url' => 'https://example.test/wp-admin/admin.php?page=wbam-classifieds',
+				'echo'     => false,
+			)
+		);
+
+		$this->assertStringContainsString( 'wbam-page-header__back', $html );
+		$this->assertStringContainsString( 'https://example.test/wp-admin/admin.php?page=wbam-classifieds', $html );
+	}
+
+	public function test_page_header_omits_the_back_link_when_no_url_given(): void {
+		$html = UX::page_header( array( 'title' => 'Ads', 'echo' => false ) );
+
+		$this->assertStringNotContainsString( 'wbam-page-header__back', $html );
+	}
+
+	public function test_action_summary_bulk_mode_lists_first_five_and_counts_the_rest(): void {
+		$html = UX::action_summary(
+			array(
+				'items' => array( 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven' ),
+			)
+		);
+
+		$this->assertStringContainsString( 'One', $html );
+		$this->assertStringContainsString( 'Five', $html );
+		$this->assertStringNotContainsString( 'Six', $html );
+		$this->assertStringContainsString( 'and 2 more', $html );
+	}
+
+	public function test_action_summary_bulk_mode_hides_the_more_line_at_five_or_fewer(): void {
+		$html = UX::action_summary( array( 'items' => array( 'One', 'Two' ) ) );
+
+		$this->assertStringNotContainsString( 'more', $html );
+	}
+
+	public function test_action_summary_single_mode_shows_title_meta_and_status(): void {
+		$html = UX::action_summary(
+			array(
+				'title'  => 'Vintage bicycle',
+				'meta'   => 'Seller: Jane Doe',
+				'status' => 'pending',
+			)
+		);
+
+		$this->assertStringContainsString( 'Vintage bicycle', $html );
+		$this->assertStringContainsString( 'Seller: Jane Doe', $html );
+		$this->assertStringContainsString( 'wbam-status-badge--warning', $html );
+	}
+
+	public function test_action_summary_returns_empty_string_with_no_items_or_title(): void {
+		$this->assertSame( '', UX::action_summary() );
+	}
+
+	public function test_action_bar_default_variant_is_primary(): void {
+		$html = UX::action_bar(
+			array(
+				'submit_label' => 'Save changes',
+				'cancel_url'   => 'https://example.test/list',
+			)
+		);
+
+		$this->assertStringContainsString( 'wbam-admin-btn--primary', $html );
+		$this->assertStringNotContainsString( 'wbam-admin-btn--danger', $html );
+		$this->assertStringContainsString( 'Save changes', $html );
+		$this->assertStringContainsString( 'https://example.test/list', $html );
+	}
+
+	public function test_action_bar_danger_variant_for_destructive_actions(): void {
+		$html = UX::action_bar(
+			array(
+				'submit_label' => 'Reject listing',
+				'variant'      => 'danger',
+				'cancel_url'   => 'https://example.test/list',
+			)
+		);
+
+		$this->assertStringContainsString( 'wbam-admin-btn--danger', $html );
+		$this->assertStringNotContainsString( 'wbam-admin-btn--primary', $html );
+	}
 }

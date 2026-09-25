@@ -252,17 +252,25 @@ class Links_Admin {
 		do_action( 'wbam_link_form_before', $link, $is_edit );
 
 		?>
-		<h1><?php echo esc_html( $title ); ?></h1>
+		<?php
+		\WBAM\Admin\UX::page_header(
+			array(
+				'title'      => $title,
+				'back_url'   => admin_url( 'admin.php?page=wbam-links' ),
+				'back_label' => __( 'Back to links', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+		?>
 
 		<?php $this->show_notices(); ?>
 
 		<?php if ( ! $is_edit ) : ?>
-		<div class="notice notice-info wbam-link-intro" style="padding:14px 16px;border-left-width:4px;">
-			<h3 style="margin:0 0 6px;"><?php esc_html_e( 'What a cloaked link does', 'wb-ads-rotator-with-split-test' ); ?></h3>
-			<p style="margin:0 0 8px;">
+		<div class="notice notice-info wbam-link-intro">
+			<h3><?php esc_html_e( 'What a cloaked link does', 'wb-ads-rotator-with-split-test' ); ?></h3>
+			<p>
 				<?php esc_html_e( 'Turn a long or ugly destination URL into a clean, branded one on your domain. Visitors click the short URL on your site and are redirected to the destination. You see every click in the stats column.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
-			<p style="margin:0;font-size:13px;color:#50575e;">
+			<p class="wbam-link-intro__example">
 				<?php
 				printf(
 					/* translators: 1: raw affiliate URL example, 2: cloaked URL example */
@@ -899,7 +907,15 @@ class Links_Admin {
 		do_action( 'wbam_link_category_form_before', $category, $is_edit );
 
 		?>
-		<h1><?php echo esc_html( $title ); ?></h1>
+		<?php
+		\WBAM\Admin\UX::page_header(
+			array(
+				'title'      => $title,
+				'back_url'   => admin_url( 'admin.php?page=wbam-link-categories' ),
+				'back_label' => __( 'Back to categories', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+		?>
 
 		<?php $this->show_notices(); ?>
 

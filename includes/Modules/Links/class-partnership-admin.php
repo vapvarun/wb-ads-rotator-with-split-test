@@ -476,13 +476,15 @@ class Partnership_Admin {
 		}
 		?>
 		<div class="wrap wbam-admin wbam-partnerships-wrap wbam-partnership-view">
-			<h1>
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships' ) ); ?>" class="page-title-action">
-					<?php echo wbam_icon( 'arrow-left', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?>
-					<?php esc_html_e( 'Back to List', 'wb-ads-rotator-with-split-test' ); ?>
-				</a>
-				<?php esc_html_e( 'Partnership Inquiry Details', 'wb-ads-rotator-with-split-test' ); ?>
-			</h1>
+			<?php
+			\WBAM\Admin\UX::page_header(
+				array(
+					'title'      => __( 'Partnership inquiry details', 'wb-ads-rotator-with-split-test' ),
+					'back_url'   => admin_url( 'admin.php?page=wbam-partnerships' ),
+					'back_label' => __( 'Back to list', 'wb-ads-rotator-with-split-test' ),
+				)
+			);
+			?>
 
 			<div class="wbam-partnership-details">
 				<div class="wbam-settings-card">

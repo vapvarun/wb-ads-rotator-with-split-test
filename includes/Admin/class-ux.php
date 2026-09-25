@@ -38,11 +38,19 @@ class UX {
 	 *
 	 * @since 2.9.2
 	 * @param array $args {
-	 *     @type string $title   Required. Page title (escaped here).
-	 *     @type string $desc    Optional. One-line subtitle.
-	 *     @type string $actions Optional. Pre-escaped HTML for the right side
-	 *                           (e.g. an "Add New" button). Caller escapes.
-	 *     @type bool   $echo    Optional. Echo (default true) or return.
+	 *     @type string $title    Required. Page title (escaped here).
+	 *     @type string $desc     Optional. One-line subtitle.
+	 *     @type string $actions  Optional. Pre-escaped HTML for the right side
+	 *                            (e.g. an "Add New" button). Caller escapes.
+	 *     @type string $back_url   Optional. When set, renders a "back to list"
+	 *                              link above the title instead of a bare link
+	 *                              at the bottom of the page — the action-screen
+	 *                              pattern (single-purpose forms: reject,
+	 *                              decline, adjust balance, add/edit) always
+	 *                              sets this instead of hand-rolling its own.
+	 *     @type string $back_label Optional. Back link text; defaults to
+	 *                              "Back to list".
+	 *     @type bool   $echo     Optional. Echo (default true) or return.
 	 * }
 	 * @return string HTML when $echo is false, else empty string.
 	 */
@@ -50,10 +58,12 @@ class UX {
 		$args = wp_parse_args(
 			$args,
 			array(
-				'title'   => '',
-				'desc'    => '',
-				'actions' => '',
-				'echo'    => true,
+				'title'      => '',
+				'desc'       => '',
+				'actions'    => '',
+				'back_url'   => '',
+				'back_label' => __( 'Back to list', 'wb-ads-rotator-with-split-test' ),
+				'echo'       => true,
 			)
 		);
 
@@ -61,6 +71,12 @@ class UX {
 		?>
 		<div class="wbam-page-header">
 			<div class="wbam-page-header__left">
+				<?php if ( '' !== $args['back_url'] ) : ?>
+					<a href="<?php echo esc_url( $args['back_url'] ); ?>" class="wbam-page-header__back">
+						<?php echo wbam_icon( 'arrow-left', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?>
+						<?php echo esc_html( $args['back_label'] ); ?>
+					</a>
+				<?php endif; ?>
 				<h1 class="wbam-page-header__title"><?php echo esc_html( $args['title'] ); ?></h1>
 				<?php if ( '' !== $args['desc'] ) : ?>
 					<p class="wbam-page-header__desc"><?php echo esc_html( $args['desc'] ); ?></p>
@@ -278,6 +294,128 @@ class UX {
 			<?php endif; ?>
 			<?php if ( '' !== $args['actions'] ) : ?>
 				<div class="wbam-page-header__actions"><?php echo wp_kses( $args['actions'], self::actions_allowed_html() ); ?></div>
+			<?php endif; ?>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render the "what this affects" summary at the top of an action-screen
+	 * card — a bulk action lists the selected item titles (first five, then
+	 * "and N more"); a single-item action shows the item title, an optional
+	 * secondary line (seller, advertiser, …) and an optional status badge.
+	 *
+	 * @since 3.2.0
+	 * @param array $args {
+	 *     @type string[] $items  Bulk mode: selected item titles, in order.
+	 *                             Non-empty triggers bulk mode; single-mode
+	 *                             args are ignored when this is set.
+	 *     @type string   $title  Single mode: the item's title/name.
+	 *     @type string   $meta   Single mode: a secondary line (e.g. the
+	 *                            seller or advertiser name).
+	 *     @type string   $status Single mode: a status slug rendered as a
+	 *                            status_badge().
+	 * }
+	 * @return string Escaped summary HTML, or '' when there is nothing to summarise.
+	 */
+	public static function action_summary( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'items'  => array(),
+				'title'  => '',
+				'meta'   => '',
+				'status' => '',
+			)
+		);
+
+		ob_start();
+
+		if ( ! empty( $args['items'] ) ) {
+			$items     = array_values( $args['items'] );
+			$total     = count( $items );
+			$shown     = array_slice( $items, 0, 5 );
+			$remaining = $total - count( $shown );
+			?>
+			<div class="wbam-action-summary">
+				<ul class="wbam-action-summary__list">
+					<?php foreach ( $shown as $item ) : ?>
+						<li><?php echo esc_html( $item ); ?></li>
+					<?php endforeach; ?>
+				</ul>
+				<?php if ( $remaining > 0 ) : ?>
+					<p class="wbam-action-summary__more">
+						<?php
+						printf(
+							/* translators: %d: number of additional selected items not listed above */
+							esc_html(
+								/* translators: %d: number of additional selected items not listed above */
+								_n( 'and %d more', 'and %d more', $remaining, 'wb-ads-rotator-with-split-test' )
+							),
+							(int) $remaining
+						);
+						?>
+					</p>
+				<?php endif; ?>
+			</div>
+			<?php
+		} elseif ( '' !== $args['title'] ) {
+			?>
+			<div class="wbam-action-summary">
+				<p class="wbam-action-summary__title"><?php echo esc_html( $args['title'] ); ?></p>
+				<?php if ( '' !== $args['meta'] || '' !== $args['status'] ) : ?>
+					<p class="wbam-action-summary__meta">
+						<?php echo '' !== $args['meta'] ? esc_html( $args['meta'] ) : ''; ?>
+						<?php echo '' !== $args['status'] ? wp_kses_post( self::status_badge( $args['status'] ) ) : ''; ?>
+					</p>
+				<?php endif; ?>
+			</div>
+			<?php
+		}
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render the action bar at the bottom of an action-screen card: a submit
+	 * button (primary or danger) plus a Cancel link back to the list.
+	 *
+	 * @since 3.2.0
+	 * @param array $args {
+	 *     @type string $submit_label Required. Button text.
+	 *     @type string $submit_name  Optional. Button `name` attribute.
+	 *     @type string $variant      Optional. 'primary' (default) or 'danger'
+	 *                                — reject/decline/delete actions use danger.
+	 *     @type string $cancel_url   Required. Where Cancel goes (the list screen).
+	 *     @type string $cancel_label Optional. Defaults to "Cancel".
+	 * }
+	 * @return string Escaped action-bar HTML.
+	 */
+	public static function action_bar( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'submit_label' => __( 'Save', 'wb-ads-rotator-with-split-test' ),
+				'submit_name'  => '',
+				'variant'      => 'primary',
+				'cancel_url'   => '',
+				'cancel_label' => __( 'Cancel', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+
+		$btn_variant = 'danger' === $args['variant'] ? 'danger' : 'primary';
+
+		ob_start();
+		?>
+		<div class="wbam-action-bar">
+			<button
+				type="submit"
+				<?php echo '' !== $args['submit_name'] ? 'name="' . esc_attr( $args['submit_name'] ) . '"' : ''; ?>
+				class="wbam-admin-btn wbam-admin-btn--<?php echo esc_attr( $btn_variant ); ?>"
+			><?php echo esc_html( $args['submit_label'] ); ?></button>
+			<?php if ( '' !== $args['cancel_url'] ) : ?>
+				<a href="<?php echo esc_url( $args['cancel_url'] ); ?>" class="wbam-action-bar__cancel"><?php echo esc_html( $args['cancel_label'] ); ?></a>
 			<?php endif; ?>
 		</div>
 		<?php

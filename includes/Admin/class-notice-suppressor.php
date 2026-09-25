@@ -69,8 +69,20 @@ class Notice_Suppressor {
 			return false;
 		}
 
-		// The wbam-ad CPT edit list, add-new, and single-post edit screens.
-		if ( 'wbam-ad' === $screen->post_type ) {
+		// The wbam-ad and wbam-classified CPT edit list, add-new, and
+		// single-post edit screens. Pro's Classifieds CPT sits under its own
+		// top-level menu, not the wbam-ad one, so it needs its own check —
+		// without it, the classified category/location taxonomy screens (and
+		// the CPT list/edit screens) fell through to the generic `?page=`
+		// fallback below, which only catches admin.php subpages, not
+		// edit.php/edit-tags.php screens.
+		if ( in_array( $screen->post_type, array( 'wbam-ad', 'wbam-classified' ), true ) ) {
+			return true;
+		}
+
+		// Classified category/location taxonomy screens (edit-tags.php),
+		// where post_type is empty but taxonomy is set.
+		if ( ! empty( $screen->taxonomy ) && in_array( $screen->taxonomy, array( 'wbam-classified-cat', 'wbam-classified-loc' ), true ) ) {
 			return true;
 		}
 

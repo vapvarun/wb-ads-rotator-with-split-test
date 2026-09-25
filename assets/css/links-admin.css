@@ -8,6 +8,25 @@
 /* Status renders the shared .wbam-status-badge component (UX::status_badge()) —
    no per-screen colour rules needed here any more. */
 
+/* "What a cloaked link does" intro notice on the empty Add Link form. */
+.wbam-link-intro {
+	padding: var(--wbam-space-4);
+}
+
+.wbam-link-intro h3 {
+	margin: 0 0 var(--wbam-space-2);
+}
+
+.wbam-link-intro p {
+	margin: 0 0 var(--wbam-space-2);
+}
+
+.wbam-link-intro__example {
+	margin: 0 !important;
+	font-size: var(--wbam-font-size-sm);
+	color: var(--wbam-text-muted);
+}
+
 /* Link type badges */
 .wbam-link-type {
 	display: inline-block;

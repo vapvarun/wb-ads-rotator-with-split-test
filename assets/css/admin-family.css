@@ -65,6 +65,95 @@
 	gap:         var(--wbam-space-2);
 }
 
+/* Action-screen pattern: breadcrumb/back lives in the header, not a bare
+   link at the bottom of the page. */
+.wbam-page-header__back {
+	display:         inline-flex;
+	align-items:     center;
+	gap:             var(--wbam-space-1);
+	margin-bottom:   var(--wbam-space-1);
+	font-size:       var(--wbam-font-size-sm);
+	color:           var(--wbam-text-muted);
+	text-decoration: none;
+}
+
+.wbam-page-header__back:hover {
+	color: var(--wbam-accent);
+}
+
+.wbam-page-header__back [data-lucide] {
+	width:  14px;
+	height: 14px;
+}
+
+/* ── Action screen: summary + action bar ────────────────────────────────── */
+
+/*
+ * The pattern every single-purpose form (reject, decline, request changes,
+ * adjust balance, add/edit) shares: the form sits in a .wbam-card capped to
+ * --wbam-form-max, a summary of what's affected sits at the top, and an
+ * action bar with the primary/destructive submit plus a Cancel link sits at
+ * the bottom.
+ */
+.wbam-action-summary {
+	margin-bottom: var(--wbam-space-5);
+	padding:       var(--wbam-space-4);
+	background:    var(--wbam-surface);
+	border:        1px solid var(--wbam-border);
+	border-radius: var(--wbam-r-md);
+}
+
+.wbam-action-summary__title {
+	margin:      0;
+	font-weight: var(--wbam-weight-semibold);
+	color:       var(--wbam-text);
+}
+
+.wbam-action-summary__meta {
+	display:     flex;
+	align-items: center;
+	gap:         var(--wbam-space-2);
+	margin:      var(--wbam-space-1) 0 0;
+	font-size:   var(--wbam-font-size-sm);
+	color:       var(--wbam-text-muted);
+}
+
+.wbam-action-summary__list {
+	margin:  0;
+	padding-inline-start: var(--wbam-space-5);
+	color:   var(--wbam-text);
+}
+
+.wbam-action-summary__list li {
+	margin-bottom: var(--wbam-space-1);
+}
+
+.wbam-action-summary__more {
+	margin:    var(--wbam-space-1) 0 0;
+	font-size: var(--wbam-font-size-sm);
+	color:     var(--wbam-text-muted);
+}
+
+.wbam-action-bar {
+	display:         flex;
+	align-items:     center;
+	gap:             var(--wbam-space-3);
+	margin-top:      var(--wbam-space-5);
+	padding-top:     var(--wbam-space-5);
+	border-top:      1px solid var(--wbam-border);
+}
+
+.wbam-action-bar__cancel {
+	font-size:       var(--wbam-font-size-sm);
+	color:           var(--wbam-text-muted);
+	text-decoration: none;
+}
+
+.wbam-action-bar__cancel:hover {
+	color:           var(--wbam-text);
+	text-decoration: underline;
+}
+
 /* ── Card ────────────────────────────────────────────────────────────────── */
 
 /*
@@ -485,6 +574,19 @@
 
 	.wbam-settings-page .form-table tr:last-child {
 		border-bottom: 0;
+	}
+
+	.wbam-action-bar {
+		flex-direction: column;
+		align-items:    stretch;
+	}
+
+	.wbam-action-bar .wbam-admin-btn {
+		justify-content: center;
+	}
+
+	.wbam-action-bar__cancel {
+		text-align: center;
 	}
 }
 
