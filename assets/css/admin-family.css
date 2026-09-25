@@ -637,7 +637,10 @@
    ============================================================ */
 .wbam-settings-layout {
 	display:               grid;
-	grid-template-columns: 200px 1fr;
+	/* minmax(0, 1fr), not 1fr: a bare 1fr track grows to its content's
+	   min-content width, so one wide row (e.g. License's button row) pushed
+	   the whole screen past a 390px viewport. */
+	grid-template-columns: 200px minmax(0, 1fr);
 	gap:                   var(--wbam-space-6);
 	align-items:           start;
 }
@@ -716,7 +719,7 @@
 
 @media screen and (max-width: 390px) {
 	.wbam-settings-layout {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 	}
 
 	.wbam-settings-nav__select {

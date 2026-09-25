@@ -235,8 +235,8 @@ class Help_Docs {
 							<?php
 							printf(
 								/* translators: 1: opening anchor tag, 2: closing anchor tag */
-								esc_html__( 'Turn modules on or off in %1$sPro Settings → Modules%2$s (Classifieds, Campaigns, Wallet, A/B Testing, etc.). Each module adds its own submenu under WB Ad Manager.', 'wb-ads-rotator-with-split-test' ),
-								'<a href="' . esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-pro-settings&tab=modules' ) ) . '">',
+								esc_html__( 'Turn modules on or off in %1$sSettings > Advertising%2$s (Classifieds, Campaigns, Wallet, A/B Testing, etc.). Each module adds its own submenu under WB Ad Manager.', 'wb-ads-rotator-with-split-test' ),
+								'<a href="' . esc_url( \WBAM\Core\Admin_Links::settings( 'advertising' ) ) . '">',
 								'</a>'
 							);
 							?>
@@ -618,14 +618,14 @@ class Help_Docs {
 
 			<div class="wbam-faq-item">
 				<h4><?php esc_html_e( 'How does the credit/wallet system work?', 'wb-ads-rotator-with-split-test' ); ?></h4>
-				<p><?php esc_html_e( 'Advertisers purchase credits which are used to pay for ad submissions, classified listings, and upgrades. Credits are held when a listing is submitted and deducted when approved (or refunded if rejected). Configure payment methods in Pro Settings > Credits.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p><?php esc_html_e( 'Advertisers purchase credits which are used to pay for ad submissions, classified listings, and upgrades. Credits are held when a listing is submitted and deducted when approved (or refunded if rejected). Configure payment methods in Settings > Credits.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 
 			<div class="wbam-faq-item">
 				<h4><?php esc_html_e( 'Where is the Advertiser Dashboard?', 'wb-ads-rotator-with-split-test' ); ?></h4>
 				<p>
 					<?php esc_html_e( 'The dashboard is created automatically on plugin activation. You can find or reassign it in', 'wb-ads-rotator-with-split-test' ); ?>
-					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-pro-settings&tab=pages' ) ); ?>"><?php esc_html_e( 'Pro Settings > Pages', 'wb-ads-rotator-with-split-test' ); ?></a>.
+					<a href="<?php echo esc_url( \WBAM\Core\Admin_Links::settings( 'advertising' ) ); ?>"><?php esc_html_e( 'Settings > Advertising > Pages', 'wb-ads-rotator-with-split-test' ); ?></a>.
 				</p>
 			</div>
 
