@@ -278,7 +278,7 @@ class Help_Docs {
 				<h3><?php esc_html_e( 'Ad Management', 'wb-ads-rotator-with-split-test' ); ?></h3>
 				<ul>
 					<li><strong><?php esc_html_e( '5 ad types:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Image, Rich Content (HTML editor), HTML/JS Code, Google AdSense, and Email Capture (inline subscribe form).', 'wb-ads-rotator-with-split-test' ); ?></li>
-					<li><strong><?php esc_html_e( 'Weighted rotation:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Assign each ad a 1–10 priority slider; higher priorities win more often in the same placement.', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><strong><?php esc_html_e( 'Weighted rotation:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Assign each ad a 1-10 priority slider; higher priorities win more often in the same placement.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><strong><?php esc_html_e( 'A/B comparison metabox:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Side-by-side impressions / clicks / CTR across ads sharing a placement, with an automatic "winner" badge at 100+ impressions.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><strong><?php esc_html_e( 'Frequency control:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Per-ad session impression cap + global max-ads-per-page, plus lazy loading for below-the-fold ads.', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>

@@ -1167,7 +1167,7 @@ class Admin {
 		?>
 		<div class="wbam-metabox wbam-placements-metabox" data-no-placement-types="<?php echo esc_attr( (string) wp_json_encode( array_values( $no_placement_types ) ) ); ?>">
 			<p class="wbam-placements-unavailable-notice"<?php echo $placements_hidden ? '' : ' hidden'; ?>>
-				<?php esc_html_e( 'This ad type is not assigned to a placement. It plays inside protected lesson videos (pre-roll, mid-roll, post-roll) or as a standalone player, delivered by the video engine — ticking boxes below has no effect.', 'wb-ads-rotator-with-split-test' ); ?>
+				<?php esc_html_e( 'This ad type is not assigned to a placement. It plays inside protected lesson videos (pre-roll, mid-roll, post-roll) or as a standalone player, delivered by the video engine. Ticking boxes below has no effect.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 
 			<div class="wbam-placements-fields"<?php echo $placements_hidden ? ' hidden' : ''; ?>>
@@ -1348,7 +1348,7 @@ class Admin {
 			</div>
 
 			<p class="wbam-sizing-unavailable-notice"<?php echo $sizing_hidden ? '' : ' hidden'; ?>>
-				<?php esc_html_e( 'This ad type has no fixed size — it plays inside protected lesson videos or as a standalone player, not in a sized slot.', 'wb-ads-rotator-with-split-test' ); ?>
+				<?php esc_html_e( 'This ad type has no fixed size. It plays inside protected lesson videos or as a standalone player, not in a sized slot.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 
 			<div class="wbam-sizing-section" data-no-sizing-types="<?php echo esc_attr( (string) wp_json_encode( array_values( self::ad_types_without_sizing() ) ) ); ?>"<?php echo $sizing_hidden ? ' hidden' : ''; ?>>
