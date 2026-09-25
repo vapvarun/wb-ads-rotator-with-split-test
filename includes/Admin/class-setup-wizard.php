@@ -53,6 +53,10 @@ class Setup_Wizard {
 	 */
 	public function add_wizard_page() {
 		add_dashboard_page( '', '', 'manage_options', 'wbam-setup', '' );
+
+		// Registered so index.php?page=wbam-setup resolves, then taken out of
+		// the Dashboard submenu, where it showed as an item with no text.
+		remove_submenu_page( 'index.php', 'wbam-setup' );
 	}
 
 	/**
