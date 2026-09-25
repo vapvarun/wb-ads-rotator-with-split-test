@@ -69,7 +69,7 @@ class Test_Classified_Single_Sold_Contact extends Pro_Test_Case {
 		ob_start();
 		Template_Loader::load_template(
 			'classifieds/single',
-			array( 'classified' => new Classified( (int) $classified->post_id ) )
+			array( 'classified' => new Classified( (int) $classified->id ) )
 		);
 		$html = (string) ob_get_clean();
 
@@ -87,7 +87,7 @@ class Test_Classified_Single_Sold_Contact extends Pro_Test_Case {
 		ob_start();
 		Template_Loader::load_template(
 			'classifieds/single',
-			array( 'classified' => new Classified( (int) $classified->post_id ) )
+			array( 'classified' => new Classified( (int) $classified->id ) )
 		);
 		$html = (string) ob_get_clean();
 

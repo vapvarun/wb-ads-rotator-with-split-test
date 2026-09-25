@@ -56,7 +56,7 @@ class Test_Classified_Single_Meta_Actions extends Pro_Test_Case {
 		ob_start();
 		Template_Loader::load_template(
 			'classifieds/single',
-			array( 'classified' => new Classified( (int) $this->classified->post_id ) )
+			array( 'classified' => new Classified( (int) $this->classified->id ) )
 		);
 
 		return (string) ob_get_clean();
