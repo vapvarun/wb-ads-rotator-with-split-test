@@ -33,6 +33,21 @@ class Test_Account_Page_Ads extends Pro_Test_Case {
 		$this->assertTrue( apply_filters( 'wbam_should_display_ad', true, 1 ) );
 	}
 
+	public function test_configured_account_page_without_shortcode_hides_ads(): void {
+		// Page builders keep the shortcode out of post_content; the page id is the signal.
+		$page = self::factory()->post->create(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_content' => 'Built with a page builder',
+			)
+		);
+		update_option( 'wbam_page_my_favorites', $page );
+		$this->go_to( get_permalink( $page ) );
+
+		$this->assertFalse( apply_filters( 'wbam_should_display_ad', true, 1 ) );
+	}
+
 	public function test_public_browse_page_keeps_ads(): void {
 		$this->visit_page_with( '[wbam_browse_classifieds]' );
 		$this->assertTrue( apply_filters( 'wbam_should_display_ad', true, 1 ) );
