@@ -167,14 +167,10 @@ class Test_Ad_Folders_Page extends Pro_Test_Case {
 		$this->make_ad( 77, 502 );
 		$this->make_ad( 88 );
 
-		// A draft never counts.
-		$draft = $this->make_ad( 77 );
-		wp_update_post(
-			array(
-				'ID'          => $draft,
-				'post_status' => 'draft',
-			)
-		);
+		// A trashed ad never counts (drafts and pending ads do: folders list
+		// unpublished submissions on purpose, see LISTED_STATUSES).
+		$trashed = $this->make_ad( 77 );
+		wp_trash_post( $trashed );
 
 		$adv_counts = $this->call_private( 'get_advertiser_ad_counts' );
 		$this->assertSame( 3, $adv_counts[77] );
@@ -220,5 +216,28 @@ class Test_Ad_Folders_Page extends Pro_Test_Case {
 		$this->assertTrue( (bool) $this->call_private( 'has_folder_scope', array( $this->selection( array( 'adv' => 77 ) ) ) ) );
 		$this->assertTrue( (bool) $this->call_private( 'has_folder_scope', array( $this->selection( array( 'tag' => 'sidebar' ) ) ) ) );
 		$this->assertTrue( (bool) $this->call_private( 'has_folder_scope', array( $this->selection( array( 'house' => true ) ) ) ) );
+	}
+
+	/**
+	 * The rail holds the newest RAIL_LIMIT advertisers; an ad owned by an
+	 * older one still shows its advertiser in the list, not "-".
+	 */
+	public function test_row_advertiser_named_beyond_the_rail_limit() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$manager = \WBAM_Pro\Modules\Advertisers\Advertiser_Manager::get_instance();
+		$oldest  = $manager->get_or_create( self::factory()->user->create() );
+		$manager->update( $oldest->id, array( 'company_name' => 'Oldest Co' ) );
+		$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->prefix . 'wbam_advertisers', array( 'created_at' => '2001-01-01 00:00:00' ), array( 'id' => $oldest->id ) );
+		foreach ( range( 1, Ad_Folders_Page::RAIL_LIMIT + 1 ) as $i ) {
+			$manager->get_or_create( self::factory()->user->create() );
+		}
+		$this->make_ad( (int) $oldest->id );
+
+		ob_start();
+		Ad_Folders_Page::get_instance()->render();
+		$html = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'Oldest Co', $html );
 	}
 }
