@@ -277,7 +277,10 @@ class Test_Lifecycle_3_2 extends Pro_Test_Case {
 		$this->assertNotWPError( $members->subscribe( $this->advertiser->id, $plan->id ) );
 
 		$this->assertSame( 1, $members->featured_credits_left( $this->advertiser->id ) );
-		$this->assertTrue( $members->use_featured_credit( $this->advertiser->id ) );
+		// use_featured_credit() now returns the usage-counter key (string) on
+		// success, not bare true, so release_featured_credit() has something
+		// to hand back on reject() - see Test_Moderation_Rejects_3_2.
+		$this->assertNotFalse( $members->use_featured_credit( $this->advertiser->id ) );
 		$this->assertSame( 0, $members->featured_credits_left( $this->advertiser->id ) );
 		$this->assertFalse( $members->use_featured_credit( $this->advertiser->id ) );
 	}

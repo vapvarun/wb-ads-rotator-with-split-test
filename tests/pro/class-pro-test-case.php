@@ -29,6 +29,7 @@ abstract class Pro_Test_Case extends WP_UnitTestCase {
 		parent::set_up();
 		self::flush_credits_balance_cache();
 		self::truncate_credits_ledger();
+		self::truncate_membership_tables();
 	}
 
 	public function tear_down(): void {
@@ -55,6 +56,33 @@ abstract class Pro_Test_Case extends WP_UnitTestCase {
 
 		foreach ( array( '_credit_ledger', '_credit_gateway_log', '_credit_processed_events' ) as $suffix ) {
 			$table = $wpdb->prefix . 'wbam' . $suffix;
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- test teardown on a known table name.
+			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table ) {
+				// DELETE rather than TRUNCATE: TRUNCATE is DDL and would itself
+				// commit the surrounding transaction.
+				$wpdb->query( "DELETE FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			}
+		}
+	}
+
+	/**
+	 * Empty the membership plan/subscription tables before each test.
+	 *
+	 * Same DDL-implicit-commit gotcha as truncate_credits_ledger(): both
+	 * tables are created lazily via dbDelta on first use, and that CREATE
+	 * TABLE commits the surrounding transaction, so a plan/subscription row
+	 * written from that point on survives the test's own rollback. A test
+	 * later in the same run (fresh advertiser, no subscription of its own)
+	 * then inherits a leftover plan's cap - e.g. "You have reached your
+	 * limit of 1 listings on the Capped plan plan" on an advertiser that
+	 * never subscribed to anything.
+	 */
+	protected static function truncate_membership_tables(): void {
+		global $wpdb;
+
+		foreach ( array( 'wbam_subscriptions', 'wbam_membership_plans' ) as $table_name ) {
+			$table = $wpdb->prefix . $table_name;
 
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- test teardown on a known table name.
 			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table ) {
