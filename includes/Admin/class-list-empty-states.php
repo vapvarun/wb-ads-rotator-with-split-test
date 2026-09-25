@@ -59,19 +59,72 @@ class List_Empty_States {
 	 * empty list chrome to keep the screen focused on the CTA.
 	 */
 	public function maybe_render_ads_empty_state() {
-		if ( ! $this->is_empty_ads_list_screen() ) {
+		if ( $this->is_empty_ads_list_screen() ) {
+			$this->render_empty_state(
+				array(
+					'icon'      => 'megaphone',
+					'title'     => __( 'No ads yet', 'wb-ads-rotator-with-split-test' ),
+					'body'      => __( 'Ads are the creatives your visitors will see. Create your first ad to choose where and how it displays.', 'wb-ads-rotator-with-split-test' ),
+					'cta_label' => __( 'Create your first ad', 'wb-ads-rotator-with-split-test' ),
+					'cta_url'   => admin_url( 'post-new.php?post_type=' . self::POST_TYPE_AD ),
+				)
+			);
 			return;
 		}
 
-		$this->render_empty_state(
+		// A search that matches nothing is a different situation from having
+		// no ads at all — the site has ads, this search just didn't find
+		// any, so the copy and CTA (adjust the search) must say so instead
+		// of "No ads yet".
+		if ( $this->is_filtered_empty_ads_list_screen() ) {
+			$this->render_empty_state(
+				array(
+					'icon'  => 'search',
+					'title' => __( 'No results match', 'wb-ads-rotator-with-split-test' ),
+					'body'  => __( 'Try a different search term, or clear the search to see every ad.', 'wb-ads-rotator-with-split-test' ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Determine whether the current request is the Ads edit list with an
+	 * active search term ('s') that matches zero ads. Runs a bare, capped
+	 * query mirroring the list table's search so the check works whether
+	 * or not the site has ads overall — is_empty_ads_list_screen() only
+	 * catches the zero-ads-total case.
+	 *
+	 * @return bool
+	 */
+	private function is_filtered_empty_ads_list_screen() {
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
+
+		$screen = get_current_screen();
+		if ( ! $screen || 'edit' !== $screen->base || self::POST_TYPE_AD !== $screen->post_type ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display routing, no state change.
+		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+		if ( '' === $search ) {
+			return false;
+		}
+
+		$query = new \WP_Query(
 			array(
-				'icon'      => 'megaphone',
-				'title'     => __( 'No ads yet', 'wb-ads-rotator-with-split-test' ),
-				'body'      => __( 'Ads are the creatives your visitors will see. Create your first ad to choose where and how it displays.', 'wb-ads-rotator-with-split-test' ),
-				'cta_label' => __( 'Create your first ad', 'wb-ads-rotator-with-split-test' ),
-				'cta_url'   => admin_url( 'post-new.php?post_type=' . self::POST_TYPE_AD ),
+				'post_type'              => self::POST_TYPE_AD,
+				's'                      => $search,
+				'post_status'            => 'any',
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
 			)
 		);
+
+		return 0 === (int) $query->found_posts;
 	}
 
 	/**
@@ -80,16 +133,23 @@ class List_Empty_States {
 	 * floating above a half-empty table skeleton.
 	 */
 	public function maybe_print_ads_empty_state_style() {
-		if ( ! $this->is_empty_ads_list_screen() ) {
+		if ( $this->is_empty_ads_list_screen() ) {
+			echo '<style>'
+				. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .subsubsub,'
+				. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .search-box,'
+				. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .tablenav,'
+				. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap #posts-filter{display:none;}'
+				. '</style>';
 			return;
 		}
 
-		echo '<style>'
-			. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .subsubsub,'
-			. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .search-box,'
-			. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .tablenav,'
-			. '.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap #posts-filter{display:none;}'
-			. '</style>';
+		// Filtered-empty: keep the search box, status tabs and tablenav so
+		// the owner can see/adjust what they searched for — only the
+		// native "Not found" row (WP_List_Table's own `.no-items` row)
+		// is replaced by the callout above it.
+		if ( $this->is_filtered_empty_ads_list_screen() ) {
+			echo '<style>.post-type-' . esc_attr( self::POST_TYPE_AD ) . ' .wrap .wp-list-table .no-items{display:none;}</style>';
+		}
 	}
 
 	/**

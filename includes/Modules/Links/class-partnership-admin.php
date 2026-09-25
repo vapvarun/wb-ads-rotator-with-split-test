@@ -307,7 +307,15 @@ class Partnership_Admin {
 				<tbody>
 					<?php if ( empty( $partnerships ) ) : ?>
 						<tr>
-							<td colspan="7" class="no-items"><?php esc_html_e( 'No partnership inquiries found.', 'wb-ads-rotator-with-split-test' ); ?></td>
+							<td colspan="7" class="no-items">
+								<?php
+								echo wp_kses_post(
+									\WBAM\Admin\UX::empty_state(
+										$this->partnerships_empty_state_args( $current_status, $search, (int) $counts['all'] )
+									)
+								);
+								?>
+							</td>
 						</tr>
 					<?php else : ?>
 						<?php foreach ( $partnerships as $partnership ) : ?>
@@ -406,6 +414,48 @@ class Partnership_Admin {
 			<?php endif; ?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Build the UX::empty_state() args for the partnerships table — wording
+	 * depends on whether the table is truly empty or just filtered down to
+	 * nothing, per the design-system empty-state rule: a filtered-empty
+	 * result says "No results match" / "No <status> partnerships", never
+	 * "No … yet" (that phrasing implies the site has none at all).
+	 *
+	 * @param string $status    Active status filter ('' for All).
+	 * @param string $search    Active search term ('' when none).
+	 * @param int    $total_all Total partnerships regardless of filter.
+	 * @return array
+	 */
+	private function partnerships_empty_state_args( $status, $search, $total_all ) {
+		if ( 0 === $total_all ) {
+			return array(
+				'icon'    => 'handshake',
+				'title'   => __( 'No partnership inquiries yet', 'wb-ads-rotator-with-split-test' ),
+				'message' => __( 'Requests submitted through your partnership form will show up here.', 'wb-ads-rotator-with-split-test' ),
+			);
+		}
+
+		if ( '' !== $search ) {
+			return array(
+				'icon'    => 'search',
+				'title'   => __( 'No results match', 'wb-ads-rotator-with-split-test' ),
+				'message' => __( 'Try a different search term.', 'wb-ads-rotator-with-split-test' ),
+			);
+		}
+
+		$status_titles = array(
+			'pending'  => __( 'No pending partnerships', 'wb-ads-rotator-with-split-test' ),
+			'accepted' => __( 'No accepted partnerships', 'wb-ads-rotator-with-split-test' ),
+			'rejected' => __( 'No rejected partnerships', 'wb-ads-rotator-with-split-test' ),
+			'spam'     => __( 'No spam partnerships', 'wb-ads-rotator-with-split-test' ),
+		);
+
+		return array(
+			'icon'  => 'handshake',
+			'title' => isset( $status_titles[ $status ] ) ? $status_titles[ $status ] : __( 'No results match', 'wb-ads-rotator-with-split-test' ),
+		);
 	}
 
 	/**
