@@ -668,12 +668,15 @@
 	top: 50px;
 }
 
+/* Outer surface matches the shared .wbam-card (admin-family.css); only
+   the sidebar's own inner spacing/heading rules stay here. */
 .wbam-sidebar-box {
 	background: var(--wbam-bg);
-	border: 1px solid var(--wbam-border-strong);
+	border: 1px solid var(--wbam-border);
 	border-radius: var(--wbam-r-lg);
-	padding: 15px 20px;
-	margin-bottom: 20px;
+	box-shadow: var(--wbam-shadow-sm);
+	padding: var(--wbam-space-5);
+	margin-bottom: var(--wbam-space-5);
 }
 
 .wbam-sidebar-box h3 {
