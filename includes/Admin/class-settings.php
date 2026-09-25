@@ -491,12 +491,29 @@ class Settings {
 	 * @return array
 	 */
 	public function sanitize_settings( $input ) {
+		$input = is_array( $input ) ? $input : array();
+
+		// Field contract. A checkbox the admin cleared posts nothing, which
+		// looks exactly like a key this write never meant to touch. The form
+		// renders one `_fields[]` entry per such control (see
+		// render_field_contract()), so a named-but-absent key is a deliberate
+		// "off" and is written as empty. A write with no contract - PRO's
+		// Modules save via Settings_Helper::update(), REST, WP-CLI - leaves
+		// every key it does not carry at its stored value.
+		$contract = isset( $input['_fields'] ) && is_array( $input['_fields'] )
+			? array_filter( array_map( 'sanitize_key', $input['_fields'] ) )
+			: array();
+		unset( $input['_fields'] );
+		foreach ( $contract as $contract_key ) {
+			if ( ! array_key_exists( $contract_key, $input ) ) {
+				$input[ $contract_key ] = '';
+			}
+		}
+
 		$sanitized = array();
 
-		// Module toggles. This method rebuilds the option from scratch, so any
-		// key not written here is dropped on save - modules must be explicit or
-		// the toggle would reset itself every time Settings is saved. An
-		// unchecked box posts nothing, which correctly resolves to false.
+		// Module toggles. An unchecked box posts nothing; the contract above
+		// turns that into an empty value, which resolves every module to false.
 		$sanitized['modules'] = array();
 		$posted_modules       = isset( $input['modules'] ) && is_array( $input['modules'] ) ? $input['modules'] : array();
 		foreach ( array_keys( \WBAM\Core\Settings_Helper::module_defaults() ) as $module_slug ) {
@@ -540,12 +557,13 @@ class Settings {
 		// Advanced settings.
 		$sanitized['delete_data_on_uninstall'] = ! empty( $input['delete_data_on_uninstall'] );
 
-		// Placement gates. sanitize_settings() rebuilds the option from
-		// scratch, so these must be written explicitly or every save on
-		// this screen would wipe them.
-		$sanitized = array_merge( $sanitized, $this->sanitize_placement_gates( $input ) );
+		// Only keys this write carries replace the stored value (stored plus
+		// defaults), so a partial update cannot reset unrelated settings -
+		// e.g. the first Modules save on a fresh install blanking ad_label.
+		$sanitized = array_merge( $this->get_settings(), array_intersect_key( $sanitized, $input ) );
 
-		return $sanitized;
+		// Placement gates resolve their own absent/present rules.
+		return array_merge( $sanitized, $this->sanitize_placement_gates( $input ) );
 	}
 
 	/**
@@ -948,6 +966,7 @@ class Settings {
 	public function render_module_field( $args ) {
 		$slug    = $args['id'];
 		$enabled = \WBAM\Core\Settings_Helper::is_module_enabled( $slug );
+		$this->render_field_contract( 'modules' );
 		?>
 		<label>
 			<input type="checkbox" name="<?php echo esc_attr( self::OPTION_NAME . '[modules][' . $slug . ']' ); ?>" value="1" <?php checked( $enabled ); ?> />
@@ -960,6 +979,21 @@ class Settings {
 	}
 
 	/**
+	 * Declare a field whose control posts nothing when cleared.
+	 *
+	 * sanitize_settings() reads these `_fields[]` entries to tell "the admin
+	 * unchecked it" (named here, absent from the POST: save empty) from "this
+	 * write never drew it" (not named: keep the stored value). Never stored.
+	 *
+	 * @since 3.2.0
+	 * @param string $key Setting key.
+	 * @return void
+	 */
+	private function render_field_contract( $key ) {
+		echo '<input type="hidden" name="' . esc_attr( self::OPTION_NAME . '[_fields][]' ) . '" value="' . esc_attr( $key ) . '" />';
+	}
+
+	/**
 	 * Render checkbox field.
 	 *
 	 * @param array $args Field arguments.
@@ -968,6 +1002,7 @@ class Settings {
 		$settings = $this->get_settings();
 		$id       = $args['id'];
 		$value    = isset( $settings[ $id ] ) ? $settings[ $id ] : false;
+		$this->render_field_contract( $id );
 		?>
 		<label>
 			<input type="checkbox" name="<?php echo esc_attr( self::OPTION_NAME . '[' . $id . ']' ); ?>" value="1" <?php checked( $value ); ?> />
@@ -1043,6 +1078,7 @@ class Settings {
 		$id         = $args['id'];
 		$value      = isset( $settings[ $id ] ) ? (array) $settings[ $id ] : array();
 		$post_types = get_post_types( array( 'public' => true ), 'objects' );
+		$this->render_field_contract( $id );
 		?>
 		<fieldset>
 			<?php foreach ( $post_types as $post_type ) : ?>
