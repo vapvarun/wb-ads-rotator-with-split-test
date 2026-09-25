@@ -19,6 +19,12 @@
  * only so a site that deliberately sets those variables in admin (rare) is
  * honoured; they change nothing on a stock install.
  *
+ * Accent follows the WordPress admin colour scheme (Users > Profile). Core
+ * writes `--wp-admin-theme-color` / `--wp-admin-theme-color-darker-10` on
+ * every admin screen for the scheme the user picked (Fresh, Ocean, Midnight,
+ * …), so this is the one accent WP's own buttons/links and our controls
+ * already share — no second blue to drift from it.
+ *
  * Pro-only tokens (credits SDK aliases, marketplace status colours, etc.) are
  * NOT here — Pro adds those in its own :root block, extending this base. Free
  * owns the base; Pro extends it. Never the reverse.
@@ -36,22 +42,35 @@
 	/* Text */
 	--wbam-text:          var(--text-1, var(--wp--preset--color--contrast, #1d2327));
 	--wbam-text-muted:    var(--text-2, #646970);
-	--wbam-text-subtle:   #8c8f94;
+	--wbam-text-subtle:  #8c8f94;
 	--wbam-text-inverse:  #ffffff;
 
-	/* Accent */
-	--wbam-accent:        var(--brand, var(--wp--preset--color--primary, #2271b1));
-	--wbam-accent-hover:  var(--brand-hover, #135e96);
-	--wbam-accent-fg:     #ffffff;
+	/* Accent — follows the WP admin colour scheme; #2271b1 (the "Fresh"
+	   scheme) is only the fallback for a context somehow missing core's
+	   scheme variables. */
+	--wbam-accent:        var(--wp-admin-theme-color, #2271b1);
+	--wbam-accent-hover:  var(--wp-admin-theme-color-darker-10, #135e96);
+	/* Contrast-aware foreground: near-black text on a light/pastel accent,
+	   white on a dark one. Same formula as the frontend palette
+	   (assets/css/frontend.css) so admin and frontend agree for any scheme. */
+	--wbam-accent-fg:     oklch(from var(--wbam-accent) clamp(0, (0.585 - l) * 1000, 1) 0 0);
+	--wbam-accent-light:  #f0f6fc;
+	--wbam-accent-border: #c5dff7;
 
 	/* Status */
 	--wbam-success:       #00a32a;
+	--wbam-success-bg:    #d4edda;
+	--wbam-success-text:  #155724;
 	--wbam-danger:        #d63638;
+	--wbam-danger-hover:  #b32d2e;
 	--wbam-danger-bg:     #f8d7da;
 	--wbam-danger-text:   #721c24;
 	--wbam-warning:       #dba617;
 	--wbam-warning-bg:    #fff8e5;
 	--wbam-warning-text:  #856404;
+	--wbam-info:          #2271b1;
+	--wbam-info-bg:       #e7f2fa;
+	--wbam-info-text:     #1d4e73;
 
 	/* Borders — a deliberate three-tier gradient, lightest to darkest:
 	   border (#e5e5e5) < border-subtle (#dcdcde) < border-strong (#c3c4c7). */
@@ -64,10 +83,16 @@
 	--wbam-shadow-md:     0 2px 6px rgba(0, 0, 0, 0.08);
 	--wbam-shadow-lg:     0 4px 12px rgba(0, 0, 0, 0.12);
 
-	/* Radius */
+	/* Radius — 8px controls (buttons, inputs, selects), 12px surfaces
+	   (cards, panels, dialogs, empty states), pill badges. */
 	--wbam-r-sm:          4px;
 	--wbam-r-md:          8px;
 	--wbam-r-lg:          12px;
+	--wbam-r-pill:        999px;
+
+	/* Form width — single-purpose action/edit forms share one max width;
+	   list and report pages stay full width. */
+	--wbam-form-max:      960px;
 
 	/* Type scale */
 	--wbam-font-size-xs:  0.75rem;

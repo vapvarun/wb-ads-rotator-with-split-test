@@ -103,7 +103,7 @@ class Links_Admin {
 		wp_enqueue_style(
 			'wbam-links-admin',
 			WBAM_URL . 'assets/css/links-admin.css',
-			array(),
+			array( 'wbam-admin-tokens' ),
 			WBAM_VERSION
 		);
 

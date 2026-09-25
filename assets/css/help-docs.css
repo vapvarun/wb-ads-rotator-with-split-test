@@ -172,7 +172,7 @@
 	background: var(--wbam-accent);
 	color: var(--wbam-bg);
 	font-size: 10px;
-	border-radius: 2px;
+	border-radius: var(--wbam-r-pill);
 	margin-right: 5px;
 	vertical-align: middle;
 }

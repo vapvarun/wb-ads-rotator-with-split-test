@@ -110,7 +110,7 @@ class Partnership_Admin {
 		wp_enqueue_style(
 			'wbam-partnership-admin',
 			WBAM_URL . 'assets/css/partnership-admin.css',
-			array(),
+			array( 'wbam-admin-tokens' ),
 			WBAM_VERSION
 		);
 	}
@@ -487,14 +487,14 @@ class Partnership_Admin {
 			</h1>
 
 			<div class="wbam-partnership-details">
-				<div class="wbam-card">
-					<div class="wbam-card-header">
-						<h2><?php esc_html_e( 'Contact Information', 'wb-ads-rotator-with-split-test' ); ?></h2>
+				<div class="wbam-settings-card">
+					<div class="wbam-settings-card__head">
+						<h2 class="wbam-settings-card__title"><?php esc_html_e( 'Contact Information', 'wb-ads-rotator-with-split-test' ); ?></h2>
 						<span class="wbam-status-badge wbam-status-<?php echo esc_attr( $partnership->status ); ?>">
 							<?php echo esc_html( $partnership->get_status_label() ); ?>
 						</span>
 					</div>
-					<div class="wbam-card-body">
+					<div class="wbam-settings-card__body">
 						<table class="wbam-details-table">
 							<tr>
 								<th><?php esc_html_e( 'Name', 'wb-ads-rotator-with-split-test' ); ?></th>
@@ -521,11 +521,11 @@ class Partnership_Admin {
 					</div>
 				</div>
 
-				<div class="wbam-card">
-					<div class="wbam-card-header">
-						<h2><?php esc_html_e( 'Partnership Details', 'wb-ads-rotator-with-split-test' ); ?></h2>
+				<div class="wbam-settings-card">
+					<div class="wbam-settings-card__head">
+						<h2 class="wbam-settings-card__title"><?php esc_html_e( 'Partnership Details', 'wb-ads-rotator-with-split-test' ); ?></h2>
 					</div>
-					<div class="wbam-card-body">
+					<div class="wbam-settings-card__body">
 						<table class="wbam-details-table">
 							<tr>
 								<th><?php esc_html_e( 'Type', 'wb-ads-rotator-with-split-test' ); ?></th>
@@ -570,11 +570,11 @@ class Partnership_Admin {
 				</div>
 
 				<?php if ( $partnership->message ) : ?>
-				<div class="wbam-card">
-					<div class="wbam-card-header">
-						<h2><?php esc_html_e( 'Message', 'wb-ads-rotator-with-split-test' ); ?></h2>
+				<div class="wbam-settings-card">
+					<div class="wbam-settings-card__head">
+						<h2 class="wbam-settings-card__title"><?php esc_html_e( 'Message', 'wb-ads-rotator-with-split-test' ); ?></h2>
 					</div>
-					<div class="wbam-card-body">
+					<div class="wbam-settings-card__body">
 						<div class="wbam-message-content">
 							<?php echo nl2br( esc_html( $partnership->message ) ); ?>
 						</div>
@@ -582,11 +582,11 @@ class Partnership_Admin {
 				</div>
 				<?php endif; ?>
 
-				<div class="wbam-card">
-					<div class="wbam-card-header">
-						<h2><?php esc_html_e( 'Admin Notes & Actions', 'wb-ads-rotator-with-split-test' ); ?></h2>
+				<div class="wbam-settings-card">
+					<div class="wbam-settings-card__head">
+						<h2 class="wbam-settings-card__title"><?php esc_html_e( 'Admin Notes & Actions', 'wb-ads-rotator-with-split-test' ); ?></h2>
 					</div>
-					<div class="wbam-card-body">
+					<div class="wbam-settings-card__body">
 						<form method="post">
 							<?php wp_nonce_field( 'wbam_update_partnership', 'wbam_partnership_nonce' ); ?>
 							<input type="hidden" name="partnership_id" value="<?php echo esc_attr( $partnership->id ); ?>">

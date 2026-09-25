@@ -9,6 +9,7 @@
  *
  * The parts, mirroring Learnomy:
  *   .wbam-page-header            page chrome: icon + title + subtitle + actions
+ *   .wbam-card                   a plain white surface (12px radius) for any block
  *   .wbam-settings-card          a titled white box for a group of settings
  *   .wbam-admin-table(-wrap)     a list table that scrolls on narrow screens
  *   .wbam-admin-btn              buttons (+ --primary / --danger / --ghost / --sm)
@@ -65,6 +66,27 @@
 }
 
 /* ── Card ────────────────────────────────────────────────────────────────── */
+
+/*
+ * The one card every surface uses: settings groups, detail panels, sidebar
+ * boxes, stat tiles, and the "action screen" pattern (a single-purpose
+ * form — reject, decline, adjust balance, add/edit) all wear this class.
+ * `.wbam-settings-card` (titled, with a head/body split) and
+ * `.wbam-card--form` (capped to --wbam-form-max, for a single-purpose form)
+ * build on top of it.
+ */
+.wbam-card {
+	margin-bottom: var(--wbam-space-5);
+	padding:       var(--wbam-space-5);
+	background:    var(--wbam-bg);
+	border:        1px solid var(--wbam-border);
+	border-radius: var(--wbam-r-lg);
+	box-shadow:    var(--wbam-shadow-sm);
+}
+
+.wbam-card--form {
+	max-width: var(--wbam-form-max);
+}
 
 .wbam-settings-card {
 	margin-bottom: var(--wbam-space-5);
@@ -262,7 +284,7 @@
 	color:          var(--wbam-text);
 	background:     var(--wbam-bg);
 	border:         1px solid var(--wbam-border-strong);
-	border-radius:  var(--wbam-r-sm);
+	border-radius:  var(--wbam-r-md);
 	cursor:         pointer;
 	text-decoration: none;
 	transition:     background var(--wbam-transition), border-color var(--wbam-transition);
@@ -270,6 +292,17 @@
 
 .wbam-admin-btn:hover {
 	background: var(--wbam-surface);
+}
+
+/*
+ * Inside a WB Ad Manager admin screen, a plain WP `.button` sits next to our
+ * own `.wbam-admin-btn` (bulk-action bars, action-screen Cancel links, etc.)
+ * — give it the same 8px so mixed pages don't show two button shapes.
+ */
+.wbam-admin .button,
+.wbam-admin .button-primary,
+.wbam-admin .button-secondary {
+	border-radius: var(--wbam-r-md);
 }
 
 .wbam-admin-btn--primary {
@@ -312,13 +345,13 @@
 	font-size:      var(--wbam-font-size-xs);
 	font-weight:    var(--wbam-weight-medium);
 	line-height:    1.5;
-	border-radius:  var(--wbam-r-sm);
+	border-radius:  var(--wbam-r-pill);
 	white-space:    nowrap;
 }
 
 .wbam-status-badge--success {
-	color:      var(--wbam-success);
-	background: var(--wbam-success-bg, rgba(0, 163, 42, 0.12));
+	color:      var(--wbam-success-text);
+	background: var(--wbam-success-bg);
 }
 
 .wbam-status-badge--danger {
@@ -326,14 +359,18 @@
 	background: var(--wbam-danger-bg);
 }
 
-.wbam-status-badge--warn {
+/* --warn is the historical name; --warning is the plan's canonical tone
+   name (Admin::UX status map). Kept as aliases of each other so nothing
+   that already rendered --warn goes unstyled while call sites migrate. */
+.wbam-status-badge--warn,
+.wbam-status-badge--warning {
 	color:      var(--wbam-warning-text);
 	background: var(--wbam-warning-bg);
 }
 
 .wbam-status-badge--info {
-	color:      var(--wbam-info-text, #1d4e73);
-	background: var(--wbam-info-bg, #e7f2fa);
+	color:      var(--wbam-info-text);
+	background: var(--wbam-info-bg);
 }
 
 .wbam-status-badge--muted {

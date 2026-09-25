@@ -46,14 +46,14 @@
 	justify-content: center;
 	width: 32px;
 	height: 32px;
-	border-radius: var(--wbam-r-md, 8px);
+	border-radius: var(--wbam-r-md);
 	text-decoration: none;
 	color: var(--wbam-accent);
 }
 
 .wbam-actions-cell a:hover,
 .wbam-actions-cell a:focus-visible {
-	background: var(--wbam-surface-alt, #f0f0f1);
+	background: var(--wbam-surface-alt);
 }
 
 .wbam-actions-cell a:hover {
@@ -162,29 +162,18 @@
 	max-width: 900px;
 }
 
-.wbam-card {
-	background: var(--wbam-bg);
-	border: 1px solid var(--wbam-border-strong);
-	border-radius: 4px;
-}
-
-.wbam-card-header {
+/* The card chrome itself is the shared .wbam-settings-card component
+   (admin-family.css). Only the layout this screen needs on top of it lives
+   here: a status badge sitting beside the title in the head. */
+.wbam-partnership-view .wbam-settings-card__head {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 12px 15px;
-	background: var(--wbam-surface);
-	border-bottom: 1px solid var(--wbam-border-strong);
+	gap: var(--wbam-space-3);
 }
 
-.wbam-card-header h2 {
+.wbam-partnership-view .wbam-settings-card__title {
 	margin: 0;
-	font-size: 14px;
-	font-weight: 600;
-}
-
-.wbam-card-body {
-	padding: 15px;
 }
 
 .wbam-details-table {
@@ -195,7 +184,7 @@
 .wbam-details-table th,
 .wbam-details-table td {
 	padding: 10px 0;
-	border-bottom: 1px solid #f0f0f0;
+	border-bottom: 1px solid var(--wbam-border-subtle);
 	vertical-align: top;
 }
 
@@ -213,8 +202,8 @@
 
 .wbam-message-content {
 	padding: 15px;
-	background: #f9f9f9;
-	border-radius: 4px;
+	background: var(--wbam-surface);
+	border-radius: var(--wbam-r-md);
 	line-height: 1.6;
 }
 

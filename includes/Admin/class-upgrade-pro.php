@@ -78,7 +78,7 @@ class Upgrade_Pro {
 		wp_enqueue_style(
 			'wbam-upgrade-pro',
 			WBAM_URL . 'assets/css/upgrade-pro.css',
-			array(),
+			array( 'wbam-admin-tokens' ),
 			WBAM_VERSION
 		);
 	}
