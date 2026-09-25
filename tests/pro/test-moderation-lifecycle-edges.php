@@ -256,4 +256,160 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 		$source = (string) file_get_contents( WBAM_PRO_PATH . 'includes/Modules/AdSubmissions/class-ad-submission-manager.php' );
 		$this->assertStringNotContainsString( "do_action( 'wbam_ad_submission_changes_requested'", $source );
 	}
+
+	// ---------------------------------------------------------------------
+	// Advertisers.
+	// ---------------------------------------------------------------------
+
+	/**
+	 * Step "Suspending or banning an advertiser does not pause their
+	 * campaigns or disable their ads".
+	 */
+	public function test_suspending_an_advertiser_pauses_campaigns_and_switches_ads_off(): void {
+		$ad_id = (int) self::factory()->post->create(
+			array(
+				'post_type'   => 'wbam-ad',
+				'post_status' => 'publish',
+			)
+		);
+		update_post_meta( $ad_id, '_wbam_advertiser_id', (int) $this->advertiser->id );
+		update_post_meta( $ad_id, '_wbam_enabled', '1' );
+
+		$campaign = Campaign_Manager::get_instance()->create(
+			array(
+				'advertiser_id' => $this->advertiser->id,
+				'ad_id'         => $ad_id,
+				'name'          => 'Suspend me',
+				'pricing_model' => 'flat',
+				'status'        => 'draft',
+			)
+		);
+		$this->assertNotWPError( $campaign );
+		$this->assertTrue( Campaign_Manager::get_instance()->activate( (int) $campaign->id ) );
+
+		$this->assertTrue( Advertiser_Manager::get_instance()->update_status( (int) $this->advertiser->id, 'suspended' ) );
+
+		$this->assertSame( 'paused', Campaign_Manager::get_instance()->get( (int) $campaign->id )->status );
+		$this->assertSame( '0', get_post_meta( $ad_id, '_wbam_enabled', true ), 'A suspended advertiser\'s ads must stop serving.' );
+		$this->assertSame( 'paused', get_post_meta( $ad_id, '_wbam_status', true ) );
+	}
+
+	/**
+	 * Same step: the portal Resume button must not undo the suspension.
+	 */
+	public function test_suspended_advertiser_cannot_resume_ads_from_the_portal(): void {
+		$source = (string) file_get_contents( WBAM_PRO_PATH . 'includes/Modules/AdSubmissions/class-ad-submission-shortcodes.php' );
+		$start  = strpos( $source, 'public function handle_toggle_ad_status()' );
+		$body   = substr( $source, $start, strpos( $source, 'public function handle_delete_ad()' ) - $start );
+		$this->assertStringContainsString( '! $advertiser->can_sell()', $body );
+	}
+
+	/**
+	 * Step "Setting an advertiser back to Pending keeps the wbam_advertiser
+	 * role added by Approve".
+	 */
+	public function test_back_to_pending_removes_the_advertiser_role(): void {
+		$this->assertContains( 'wbam_advertiser', get_userdata( $this->user )->roles );
+
+		Advertiser_Manager::get_instance()->update_status( (int) $this->advertiser->id, 'pending' );
+
+		clean_user_cache( $this->user );
+		$this->assertNotContains( 'wbam_advertiser', get_userdata( $this->user )->roles );
+	}
+
+	/**
+	 * Step "REST GET advertiser/profile and POST /campaigns call
+	 * get_or_create(): any logged-in subscriber becomes an advertiser".
+	 */
+	public function test_rest_profile_and_campaign_create_do_not_enrol_a_subscriber(): void {
+		$enabled                = Settings_Helper::get( 'enabled_modules', array() );
+		$enabled['classifieds'] = false;
+		Settings_Helper::update( 'enabled_modules', $enabled );
+
+		global $wp_rest_server;
+		$wp_rest_server = new \WP_REST_Server();
+		do_action( 'rest_api_init' );
+
+		global $wpdb;
+		$visitor = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		// User IDs are reused after rollback; drop a row an earlier test's
+		// DDL-committed transaction may have left for this ID.
+		$wpdb->delete( $wpdb->prefix . 'wbam_advertisers', array( 'user_id' => $visitor ) );
+		wp_set_current_user( $visitor );
+
+		$profile = rest_do_request( new \WP_REST_Request( 'GET', '/wbam-pro/v1/advertiser/profile' ) );
+		$this->assertSame( 404, $profile->get_status() );
+
+		$request = new \WP_REST_Request( 'POST', '/wbam-pro/v1/campaigns' );
+		$request->set_param( 'name', 'Sneaky' );
+		$created = rest_do_request( $request );
+		$this->assertSame( 403, $created->get_status() );
+
+		$this->assertNull( Advertiser_Manager::get_instance()->get_by_user( $visitor ), 'Neither call may create an advertiser record.' );
+	}
+
+	/**
+	 * Step "user_register auto-create runs before registration's
+	 * create(status=...), so the chosen status and company/website/phone are
+	 * ignored when auto_create_advertisers is on".
+	 */
+	public function test_registration_keeps_its_own_profile_fields_with_auto_create_on(): void {
+		$enabled                = Settings_Helper::get( 'enabled_modules', array() );
+		$enabled['classifieds'] = false;
+		Settings_Helper::update( 'enabled_modules', $enabled );
+		Settings_Helper::update( 'auto_create_advertisers', true );
+		Settings_Helper::update( 'auto_approve_advertisers', false );
+
+		$_POST = array(
+			'reg_username' => 'edge_registrant',
+			'reg_email'    => 'edge_registrant@example.com',
+			'reg_company'  => 'Edge Co',
+			'reg_website'  => 'https://edge.example.com',
+			'reg_phone'    => '555-0100',
+		);
+		// Reused user ID: clear a leftover row before any profile is made.
+		add_action(
+			'user_register',
+			static function ( $user_id ) {
+				global $wpdb;
+				$wpdb->delete( $wpdb->prefix . 'wbam_advertisers', array( 'user_id' => $user_id ) );
+			},
+			1
+		);
+		$shortcodes = ( new \ReflectionClass( \WBAM_Pro\Modules\Advertisers\Advertiser_Shortcodes::class ) )->newInstanceWithoutConstructor();
+		$method     = new \ReflectionMethod( $shortcodes, 'process_advertiser_registration' );
+		$user_id    = $method->invoke( $shortcodes );
+		$_POST      = array();
+
+		$this->assertIsInt( $user_id );
+		$profile = Advertiser_Manager::get_instance()->get_by_user( $user_id );
+		$this->assertSame( 'Edge Co', $profile->company_name );
+		$this->assertSame( '555-0100', $profile->phone );
+		$this->assertSame( 'pending', $profile->status );
+	}
+
+	/**
+	 * Step "Decline asks no reason": the reason reaches the application
+	 * status email hook, and Approve on an advertiser says so.
+	 */
+	public function test_decline_reason_reaches_the_applicant_and_approve_names_the_advertiser(): void {
+		$applicant = Advertiser_Manager::get_instance()->get_or_create( (int) self::factory()->user->create() );
+		Advertiser_Manager::get_instance()->update_status( (int) $applicant->id, 'pending' );
+
+		$reason = null;
+		add_action(
+			'wbam_advertiser_rejected',
+			function ( $advertiser, $why ) use ( &$reason ) {
+				$reason = $why;
+			},
+			10,
+			2
+		);
+		Advertiser_Manager::get_instance()->update_status( (int) $applicant->id, 'member', 'Website does not match the company.' );
+		$this->assertSame( 'Website does not match the company.', $reason );
+
+		$source = (string) file_get_contents( WBAM_PRO_PATH . 'includes/Core/class-pro-admin.php' );
+		$this->assertStringContainsString( "'decline_form' === \$action", $source );
+		$this->assertStringContainsString( "\$redirect_args['message'] = 'advertiser_approved';", $source );
+	}
 }
