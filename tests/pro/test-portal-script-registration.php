@@ -58,4 +58,27 @@ class Test_Portal_Script_Registration extends Pro_Test_Case {
 		$this->assertSame( 1, substr_count( $config, 'var wbamPortal' ), 'One wbamPortal config, not a short copy printed over the full one.' );
 		$this->assertStringContainsString( 'chartEmptyEver', $config );
 	}
+
+	/**
+	 * Visitors get the minified portal and classified scripts unless
+	 * SCRIPT_DEBUG is on, like the stylesheets. classified.js is registered
+	 * once, whichever of its four callers runs first, with every dependency
+	 * any caller needs.
+	 */
+	public function test_portal_and_classified_scripts_are_minified_and_registered_once(): void {
+		global $wp_scripts;
+		$wp_scripts = null;
+
+		// The classifieds shortcode path enqueues first.
+		$enqueue = new \ReflectionMethod( Classified_Shortcodes::class, 'enqueue_portal_assets' );
+		$enqueue->invoke( Classified_Shortcodes::get_instance() );
+		\WBAM_Pro\Core\Pro_Plugin::register_classified_script();
+		\WBAM_Pro\Core\Pro_Plugin::register_portal_script();
+
+		$scripts = wp_scripts()->registered;
+		$this->assertStringEndsWith( 'assets/js/portal.min.js', $scripts['wbam-pro-portal']->src );
+		$this->assertStringEndsWith( 'assets/js/classified.min.js', $scripts['wbam-pro-classified']->src );
+		$this->assertContains( 'wbam-lucide', $scripts['wbam-pro-classified']->deps );
+		$this->assertContains( 'wbam-toast', $scripts['wbam-pro-classified']->deps );
+	}
 }
