@@ -973,7 +973,12 @@ class Settings {
 			\WBAM\Admin\UX::page_header(
 				array(
 					'title' => __( 'Settings', 'wb-ads-rotator-with-split-test' ),
-					'desc'  => __( 'Ad display, billing, notifications and modules for this site.', 'wb-ads-rotator-with-split-test' ),
+					// Billing, notifications and modules only exist once Pro
+					// is active - don't describe screens a Free-only site
+					// doesn't have.
+					'desc'  => defined( 'WBAM_PRO_VERSION' )
+						? __( 'Ad display, billing, notifications and modules for this site.', 'wb-ads-rotator-with-split-test' )
+						: __( 'Ad display and general settings for this site.', 'wb-ads-rotator-with-split-test' ),
 				)
 			);
 			settings_errors( 'wbam_messages' );
@@ -1180,10 +1185,14 @@ class Settings {
 	 * gives it the full content width and no label column.
 	 */
 	public function render_placements_section(): void {
-		echo '<p>' . esc_html__(
-			'Choose which slots this site uses, and which of those advertisers may buy. Unticking Site stops ads rendering in that slot. Unticking Advertisers only removes it from the advertiser portal — creatives already assigned keep running.',
-			'wb-ads-rotator-with-split-test'
-		) . '</p>';
+		// The Advertisers column (letting advertisers buy a slot) only exists
+		// once Pro's advertiser portal is active - Free-only sites just pick
+		// which slots this site itself uses.
+		$copy = defined( 'WBAM_PRO_VERSION' )
+			? __( 'Choose which slots this site uses, and which of those advertisers may buy. Unticking Site stops ads rendering in that slot. Unticking Advertisers only removes it from the advertiser portal - creatives already assigned keep running.', 'wb-ads-rotator-with-split-test' )
+			: __( 'Choose which slots this site uses. Unticking a slot stops ads rendering there.', 'wb-ads-rotator-with-split-test' );
+
+		echo '<p>' . esc_html( $copy ) . '</p>';
 
 		\WBAM\Admin\Placement_Settings::render_table();
 	}
