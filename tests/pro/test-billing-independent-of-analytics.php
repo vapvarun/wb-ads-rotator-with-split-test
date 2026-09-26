@@ -310,6 +310,20 @@ class Test_Billing_Independent_Of_Analytics extends Pro_Test_Case {
 		$this->assert_billed_once();
 	}
 
+	/**
+	 * An ad whose handler rendered nothing (missing image, empty code) was
+	 * never seen, so it must not be billed or get a tracking pixel.
+	 */
+	public function test_empty_render_is_not_billed(): void {
+		Settings_Helper::update( 'enable_analytics', true );
+
+		$out = \WBAM_Pro\Core\Pro_Plugin::get_instance()->track_impression( '', $this->ad_id, 'header' );
+
+		$this->assertSame( '', $out, 'No pixel is appended to an empty render.' );
+		$this->assert_not_billed();
+		$this->assertSame( 0, $this->rows() );
+	}
+
 	public function test_analytics_on_writes_one_row_and_bills_once(): void {
 		Settings_Helper::update( 'enable_analytics', true );
 
