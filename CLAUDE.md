@@ -171,6 +171,15 @@ Code quality checks (WPCS/PHPStan/PHPUnit) passing ≠ feature done.
 
 Use `/wp-plugin-release` when ready to ship. Build output goes to `build/` (gitignored; `distignore` controls what ships).
 
+**`npm run release`** (`scripts/build-release.mjs`) is the one release command. It runs, in order:
+1. Regenerates every `*-rtl.css` from its LTR source (`rtlcss`) — only stylesheets that already have an `-rtl.css` sibling.
+2. Rebuilds every `.min.css`/`.min.js` from current source (`grunt minify` — `cssmin` + `uglify`, covers `assets/css`, `assets/js`, `blocks/`).
+3. Regenerates `languages/wb-ads-rotator-with-split-test.pot` with `wp i18n make-pot` (PHP + JS + `block.json` in one pass — this is the ONLY .pot generator; there is no `grunt makepot` any more, because it read PHP only and would silently drop every block-editor string).
+4. Fails the build if any of the above changed a file that isn't committed (`git status --porcelain` on `assets/`, `blocks/`, `languages/`). Commit the regenerated files, then run `npm run release` again.
+5. Packages via `.distignore` (the one exclude list — read the same way by `bin/build-zips.sh`) and runs the completeness checks (every CSS/JS/PHP file present, every `require`/`include` target resolvable, PHP-lints the shipped tree).
+
+Requires `npm install` once (grunt + rtlcss) and WP-CLI (`wp`) on `PATH`.
+
 **Release discipline** (from global memory):
 - `distignore` is plugin-root-relative
 - The builder's runtime-reference scanner catches forgot-to-ship bugs

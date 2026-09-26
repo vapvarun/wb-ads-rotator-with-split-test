@@ -21,7 +21,7 @@
     "grunt-contrib-cssmin": "^5.0.0",
     "grunt-contrib-uglify": "^5.2.2",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-wp-i18n": "^1.0.3",
-    "load-grunt-tasks": "^5.1.0"
+    "load-grunt-tasks": "^5.1.0",
+    "rtlcss": "^4.3.0"
   }
 }

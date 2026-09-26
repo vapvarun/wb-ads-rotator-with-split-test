@@ -4,26 +4,37 @@
  *
  * What it does:
  *   1. Reads the plugin slug + version from the main PHP header.
- *   2. git archive HEAD -> temp tree.
- *   3. Copies it through .distignore (rsync --exclude-from, same as
+ *   2. Regenerates every *-rtl.css from its LTR source (rtlcss), then
+ *      rebuilds every .min.css/.min.js from current source (grunt).
+ *   3. Regenerates languages/{domain}.pot (wp i18n make-pot: PHP + JS +
+ *      block.json). This is the ONLY .pot generator - the old Gruntfile
+ *      `makepot` task read PHP only and would have silently dropped every
+ *      block-editor string.
+ *   4. Fails the build if step 2 or 3 produced a change nobody committed
+ *      (`git status --porcelain` on assets/, blocks/, languages/).
+ *   5. git archive HEAD -> temp tree.
+ *   6. Copies it through .distignore (rsync --exclude-from, same as
  *      bin/build-zips.sh) into the staging tree.
- *   4. Verifies every CSS file under assets/css/ is in the zip tree.
- *   5. Verifies every JS file under assets/js/ is in the zip tree.
- *   6. Verifies every PHP file under includes/ is in the zip tree.
- *   7. Parses require / require_once / include / include_once across EVERY
+ *   7. Verifies every CSS file under assets/css/ is in the zip tree.
+ *   8. Verifies every JS file under assets/js/ is in the zip tree.
+ *   9. Verifies every PHP file under includes/ is in the zip tree.
+ *   10. Parses require / require_once / include / include_once across EVERY
  *      PHP file under includes/ + the main plugin file, resolves __DIR__
  *      relative paths, skips WP core paths, and asserts every remaining
  *      target exists in the zip. Catches "forgot to ship this class" and
  *      bundled-dep bugs (e.g. vendor/wbcom-credits-sdk stripped by
  *      .distignore).
- *   8. Writes dist/{releaseName}-{version}.zip and prints a summary.
+ *   11. Writes dist/{releaseName}-{version}.zip and prints a summary.
  *
  * Exit codes:
  *   0 = zip built, all checks passed
  *   1 = missing file (CSS/JS/PHP) or broken require target
- *   2 = configuration problem (missing .distignore, bad version, etc.)
+ *   2 = configuration problem, build/generator failure, or uncommitted
+ *       generated files (missing .distignore, bad version, grunt/rtlcss/
+ *       make-pot failed, stale .min/.pot/-rtl.css, etc.)
  *
- * Pure Node 20+ (no third-party deps), run from the plugin root:
+ * Requires Node 20+, WP-CLI (`wp`) on PATH, and `npm install` run once for
+ * the local grunt/rtlcss devDependencies. Run from the plugin root:
  *   node scripts/build-release.mjs
  *   npm run release
  */
@@ -41,6 +52,11 @@ const BOLD = (s) => `\x1b[1m${s}\x1b[0m`;
 const GREEN = (s) => `\x1b[32m${s}\x1b[0m`;
 const RED = (s) => `\x1b[31m${s}\x1b[0m`;
 const DIM = (s) => `\x1b[2m${s}\x1b[0m`;
+
+// Folders that never carry a translatable string, mirroring .distignore's
+// dev-only directories (node_modules/vendor/*.min.js are excluded by
+// `wp i18n make-pot` itself and don't need to be listed here).
+const MAKEPOT_EXCLUDE = [ 'tests', 'dist', 'build', 'bin', 'scripts', 'docs', 'plan', 'plans', 'audit', 'marketing', 'coverage' ];
 
 function die(code, msg) {
 	console.error(RED('x ' + msg));
@@ -143,9 +159,80 @@ function parseRequires(phpPath) {
 	return [...out];
 }
 
+function execOrDie(cmd, args, failMsg) {
+	try {
+		return run(cmd, args);
+	} catch (err) {
+		if (err.stdout) process.stdout.write(err.stdout);
+		if (err.stderr) process.stderr.write(err.stderr);
+		die(2, failMsg);
+	}
+}
+
+// Regenerates every *-rtl.css from its LTR source with rtlcss. Only pairs
+// that already exist are regenerated - this never creates a new RTL
+// stylesheet a plugin hasn't chosen to ship.
+function regenerateRtlStylesheets() {
+	const rtlFiles = walk('assets/css', [ '.css' ]).filter( ( f ) => f.endsWith( '-rtl.css' ) );
+	if ( rtlFiles.length === 0 ) return;
+	console.log( BOLD( '\nRegenerate RTL stylesheets' ) );
+	for ( const rtlFile of rtlFiles ) {
+		const ltrFile = rtlFile.replace( /-rtl\.css$/, '.css' );
+		if ( ! existsSync( ltrFile ) ) {
+			die( 2, `${ relative( ROOT, rtlFile ) } has no matching LTR source (${ relative( ROOT, ltrFile ) }).` );
+		}
+		execOrDie( 'npx', [ '--no-install', 'rtlcss', ltrFile, rtlFile ], `rtlcss failed on ${ relative( ROOT, ltrFile ) }. Run "npm install" first.` );
+		console.log( DIM( `  rtlcss     -> ${ relative( ROOT, rtlFile ) }` ) );
+	}
+}
+
+// Rebuilds every .min.css/.min.js from current source via the existing
+// grunt cssmin/uglify tasks (covers assets/css, assets/js and blocks/ - the
+// only directories that hold plugin-owned CSS/JS).
+function minifyAssets() {
+	console.log( BOLD( '\nMinify CSS/JS' ) );
+	const out = execOrDie( 'npx', [ '--no-install', 'grunt', 'minify' ], 'grunt minify failed. Run "npm install" first.' );
+	console.log( DIM( out.trim().split( '\n' ).map( ( l ) => '  ' + l ).join( '\n' ) ) );
+}
+
+// Regenerates languages/{domain}.pot with WP-CLI. This is the ONLY .pot
+// generator now - PHP + JS + block.json in one pass, so block-editor
+// strings never silently disappear the way the old grunt-wp-i18n
+// (PHP-only) task would have dropped them.
+function regeneratePot( domain ) {
+	console.log( BOLD( '\nRegenerate .pot' ) );
+	mkdirSync( 'languages', { recursive: true } );
+	const potFile = `languages/${ domain }.pot`;
+	execOrDie(
+		'wp',
+		[ 'i18n', 'make-pot', '.', potFile, `--slug=${ domain }`, `--domain=${ domain }`, `--exclude=${ MAKEPOT_EXCLUDE.join( ',' ) }` ],
+		'wp i18n make-pot failed. Is WP-CLI ("wp") installed and on PATH?'
+	);
+	console.log( DIM( `  make-pot   -> ${ potFile }` ) );
+}
+
+// A release must never ship a regenerated .min/.pot/-rtl.css that nobody
+// reviewed and committed - that is exactly how the .pot went stale before
+// (grunt build was the only thing that regenerated it, and nobody ran it).
+function requireCleanGeneratedFiles() {
+	const status = run( 'git', [ 'status', '--porcelain', '--', 'assets', 'blocks', 'languages' ] );
+	const dirty = status.split( '\n' ).filter( ( l ) => l.trim() !== '' );
+	if ( dirty.length === 0 ) return;
+	console.log( '' );
+	console.error( RED( '  x The build regenerated files that are not committed:' ) );
+	for ( const line of dirty ) console.error( '    ' + line );
+	console.log( '' );
+	die( 2, 'Review the diff, commit the regenerated .min/.pot/-rtl files, then run npm run release again.' );
+}
+
 function main() {
 	const { mainFile, slug, releaseName, version } = parseMainPlugin();
 	console.log(BOLD(`\nBuilding release: ${releaseName} ${version}`));
+
+	regenerateRtlStylesheets();
+	minifyAssets();
+	regeneratePot( slug );
+	requireCleanGeneratedFiles();
 
 	requireDistignore();
 	const DIST = resolve(ROOT, 'dist');

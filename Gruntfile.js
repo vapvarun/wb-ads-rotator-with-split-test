@@ -71,31 +71,9 @@ module.exports = function( grunt ) {
 			}
 		},
 
-		// Generate POT file.
-		makepot: {
-			target: {
-				options: {
-					domainPath: '/languages',
-					exclude: [
-						'node_modules/.*',
-						'vendor/.*',
-						'dist/.*',
-						'tests/.*'
-					],
-					mainFile: 'wb-ads-rotator-with-split-test.php',
-					potFilename: 'wb-ads-rotator-with-split-test.pot',
-					potHeaders: {
-						poedit: true,
-						'x-poedit-keywordslist': true,
-						'Report-Msgid-Bugs-To': 'https://wbcomdesigns.com/support/',
-						'Last-Translator': 'Wbcom Designs <developer@wbcomdesigns.com>',
-						'Language-Team': 'Wbcom Designs <developer@wbcomdesigns.com>'
-					},
-					type: 'wp-plugin',
-					updateTimestamp: true
-				}
-			}
-		},
+		// No makepot task. wp i18n make-pot (run by scripts/build-release.mjs /
+		// npm run release) is the ONLY .pot generator - grunt-wp-i18n scanned
+		// PHP only and would silently drop every block-editor string.
 
 		// No copy/compress dist task on purpose. The release zip is built by
 		// npm run release (scripts/build-release.mjs) or the free plugin's
@@ -121,7 +99,6 @@ module.exports = function( grunt ) {
 
 	// Register tasks.
 	grunt.registerTask( 'minify', [ 'cssmin', 'uglify' ] );
-	grunt.registerTask( 'i18n', [ 'makepot' ] );
-	grunt.registerTask( 'build', [ 'clean:build', 'minify', 'makepot' ] );
+	grunt.registerTask( 'build', [ 'clean:build', 'minify' ] );
 	grunt.registerTask( 'default', [ 'build' ] );
 };
