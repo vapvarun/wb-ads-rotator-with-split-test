@@ -71,7 +71,7 @@ class Test_Settings_One_Page_Rejects extends Pro_Test_Case {
 		}
 	}
 
-	/** The terms page chosen under Settings > Advertising > Pages drives the registration checkbox. */
+	/** The terms page chosen under Settings > General > Pages drives the registration checkbox. */
 	public function test_registration_form_reads_the_saved_terms_page(): void {
 		wp_set_current_user( 0 );
 		update_option( 'users_can_register', 1 );

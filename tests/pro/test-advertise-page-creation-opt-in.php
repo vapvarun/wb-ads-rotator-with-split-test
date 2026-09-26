@@ -1,7 +1,7 @@
 <?php
 /**
  * The public 'Advertise with us' page is never created for free: it is
- * opt-in only, either from Settings > Advertising > Pages' "Create Page"
+ * opt-in only, either from Settings > General > Pages' "Create Page"
  * button or the setup wizard's Ready screen - both write the same
  * `wbam_page_advertise` option Settings_Helper::get_page( 'advertise' )
  * reads, so mapping is a single source of truth either way.

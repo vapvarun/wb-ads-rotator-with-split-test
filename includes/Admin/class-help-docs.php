@@ -251,8 +251,8 @@ class Help_Docs {
 							<?php
 							printf(
 								/* translators: 1: opening anchor tag, 2: closing anchor tag */
-								esc_html__( 'Turn modules on or off in %1$sSettings > Advertising%2$s (Classifieds, Campaigns, Wallet, A/B Testing, etc.). Each module adds its own submenu under WB Ad Manager.', 'wb-ads-rotator-with-split-test' ),
-								'<a href="' . esc_url( \WBAM\Core\Admin_Links::settings( 'advertising' ) ) . '">',
+								esc_html__( 'Turn modules on or off in %1$sSettings > General%2$s (Classifieds, Campaigns, Wallet, A/B Testing, etc.). Each module adds its own submenu under WB Ad Manager.', 'wb-ads-rotator-with-split-test' ),
+								'<a href="' . esc_url( \WBAM\Core\Admin_Links::settings( 'general' ) ) . '">',
 								'</a>'
 							);
 							?>
@@ -662,7 +662,7 @@ class Help_Docs {
 				<h4><?php esc_html_e( 'Where is the Advertiser Dashboard?', 'wb-ads-rotator-with-split-test' ); ?></h4>
 				<p>
 					<?php esc_html_e( 'The dashboard is created automatically on plugin activation. You can find or reassign it in', 'wb-ads-rotator-with-split-test' ); ?>
-					<a href="<?php echo esc_url( \WBAM\Core\Admin_Links::settings( 'advertising' ) ); ?>"><?php esc_html_e( 'Settings > Advertising > Pages', 'wb-ads-rotator-with-split-test' ); ?></a>.
+					<a href="<?php echo esc_url( \WBAM\Core\Admin_Links::settings( 'general' ) ); ?>"><?php esc_html_e( 'Settings > General > Pages', 'wb-ads-rotator-with-split-test' ); ?></a>.
 				</p>
 			</div>
 
