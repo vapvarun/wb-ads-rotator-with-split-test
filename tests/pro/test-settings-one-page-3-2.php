@@ -1,9 +1,11 @@
 <?php
 /**
- * One Settings page (BC#10339963947), PRO side: tabs mapped onto sidebar
- * sections, legacy `wbam-pro-settings&tab=X` / `wbam-tools` redirects, each
- * leaf saving without touching another leaf's option, and the featured
- * listing email toggles now owned by the Emails leaf.
+ * One Settings page (BC#10339963947), PRO side, reorganized into the 10
+ * sections of card 10343706274: tabs mapped onto the new sidebar order,
+ * legacy `wbam-pro-settings&tab=X` / `wbam-settings&section=X` /
+ * `wbam-tools` redirects, each leaf saving without touching another leaf's
+ * option, the single Anonymize IP switch, and the featured listing email
+ * toggles owned by the Emails leaf.
  *
  * @package WBAM\Tests
  */
@@ -33,15 +35,27 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		parent::tear_down();
 	}
 
-	/** map_settings_sections() places FREE's own sections where the card's sidebar order expects them. */
-	public function test_map_settings_sections_order_and_ad_display_passthrough(): void {
+	/** map_settings_sections() places every section exactly where the card's 10-section order expects it. */
+	public function test_map_settings_sections_order_and_free_passthrough(): void {
 		$free_sections = array(
-			'ad-display' => array(
-				'label'  => 'Ad Display',
+			'ads-display' => array(
+				'label'  => 'Ads & Display',
 				'render' => '__return_null',
 			),
-			'tools'      => array(
-				'label'  => 'Tools',
+			'links'       => array(
+				'label'  => 'Links',
+				'render' => '__return_null',
+			),
+			'location'    => array(
+				'label'  => 'Location',
+				'render' => '__return_null',
+			),
+			'privacy'     => array(
+				'label'  => 'Privacy & Data',
+				'render' => '__return_null',
+			),
+			'tools'       => array(
+				'label'  => 'Tools & License',
 				'render' => '__return_null',
 			),
 		);
@@ -49,27 +63,24 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$mapped = $this->admin->map_settings_sections( $free_sections );
 		$keys   = array_keys( $mapped );
 
-		$this->assertSame( 'general', $keys[0], 'General is the first section.' );
-		$this->assertContains( 'ad-display', $keys );
-		$this->assertContains( 'advertising', $keys );
-		$this->assertContains( 'credits', $keys );
-		$this->assertContains( 'emails', $keys );
-		$this->assertContains( 'tools', $keys );
-		$this->assertSame( $free_sections['ad-display'], $mapped['ad-display'], 'FREE\'s Ad Display section passes through untouched.' );
-		$this->assertSame( $free_sections['tools'], $mapped['tools'], 'FREE\'s Tools section passes through untouched.' );
+		$this->assertSame(
+			array( 'general', 'ads-display', 'advertisers-billing', 'credits', 'classifieds', 'links', 'location', 'privacy', 'emails', 'tools' ),
+			$keys,
+			'Sidebar order matches card 10343706274 exactly.'
+		);
 
-		// Analytics renamed to Privacy; Modules/Pages/Rotation folded into Advertising.
-		$this->assertArrayHasKey( 'privacy', $mapped );
+		foreach ( array( 'ads-display', 'links', 'location', 'privacy', 'tools' ) as $slug ) {
+			$this->assertSame( $free_sections[ $slug ], $mapped[ $slug ], "FREE's '{$slug}' section passes through untouched." );
+		}
+
+		// Retired sections gone; General/Advertisers & Billing are new.
+		$this->assertArrayNotHasKey( 'ad-display', $mapped );
+		$this->assertArrayNotHasKey( 'advertising', $mapped );
 		$this->assertArrayNotHasKey( 'analytics', $mapped );
+		$this->assertArrayNotHasKey( 'geolocation', $mapped );
+		$this->assertArrayNotHasKey( 'license', $mapped );
 		$this->assertArrayNotHasKey( 'modules', $mapped );
 		$this->assertArrayNotHasKey( 'pages', $mapped );
-
-		// General comes before ad-display, which comes before advertising.
-		$general_pos     = array_search( 'general', $keys, true );
-		$ad_display_pos  = array_search( 'ad-display', $keys, true );
-		$advertising_pos = array_search( 'advertising', $keys, true );
-		$this->assertLessThan( $ad_display_pos, $general_pos );
-		$this->assertLessThan( $advertising_pos, $ad_display_pos );
 
 		foreach ( $mapped as $slug => $section ) {
 			$this->assertIsCallable( $section['render'], "Section '{$slug}' must have a callable render." );
@@ -81,9 +92,11 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$map = $this->admin->legacy_settings_tab_map( array() );
 
 		$this->assertSame( 'privacy', $map['analytics'] );
-		$this->assertSame( 'advertising', $map['modules'] );
-		$this->assertSame( 'advertising', $map['pages'] );
-		$this->assertSame( 'advertising', $map['rotation'] );
+		$this->assertSame( 'general', $map['modules'] );
+		$this->assertSame( 'general', $map['pages'] );
+		$this->assertSame( 'ads-display', $map['rotation'] );
+		$this->assertSame( 'location', $map['geolocation'] );
+		$this->assertSame( 'tools', $map['license'] );
 	}
 
 	/** Every old `wbam-pro-settings&tab=X` URL redirects to its mapped `wbam-settings&section=Y`. */
@@ -95,12 +108,12 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 			'classifieds' => 'section=classifieds',
 			'credits'     => 'section=credits',
 			'emails'      => 'section=emails',
-			'geolocation' => 'section=geolocation',
+			'geolocation' => 'section=location',
 			'analytics'   => 'section=privacy',
-			'modules'     => 'section=advertising',
-			'pages'       => 'section=advertising',
-			'rotation'    => 'section=advertising',
-			'license'     => 'section=license',
+			'modules'     => 'section=general',
+			'pages'       => 'section=general',
+			'rotation'    => 'section=ads-display',
+			'license'     => 'section=tools',
 		);
 
 		foreach ( $cases as $old_tab => $expected_fragment ) {
@@ -122,6 +135,88 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 				remove_filter( 'wp_redirect', $redirect );
 			}
 		}
+	}
+
+	/** Old `?section=X` slugs PRO used to own on its own land on their new home via the aliases filter. */
+	public function test_settings_section_aliases_remap_retired_slugs(): void {
+		$aliases = $this->admin->settings_section_aliases( array() );
+
+		$this->assertSame( 'general', $aliases['advertising'] );
+		$this->assertSame( 'location', $aliases['geolocation'] );
+		$this->assertSame( 'tools', $aliases['license'] );
+	}
+
+	/**
+	 * Owner decision, card 10343706274: with Pro active, exactly ONE
+	 * Anonymize IP switch shows in Privacy & Data — Pro's own
+	 * `wbam_pro_settings[gdpr_anonymize_ip]` — never FREE's
+	 * `wbam_settings[anonymize_ip]`. FREE's own suite proves FREE's half
+	 * (its switch absent) in isolation; this proves the end-to-end result
+	 * once PRO's card is actually attached — `new Pro_Admin()` in set_up()
+	 * already wires `render_privacy_content_card()` onto FREE's
+	 * `wbam_settings_privacy_content` action, so a single
+	 * render_privacy_page() call renders both halves, same as production.
+	 */
+	public function test_privacy_page_shows_exactly_one_anonymize_switch(): void {
+		$settings = \WBAM\Admin\Settings::get_instance();
+		$settings->register_settings();
+
+		ob_start();
+		$settings->render_privacy_page();
+		$html = ob_get_clean();
+
+		$this->assertStringNotContainsString( 'wbam_settings[anonymize_ip]', $html, 'FREE\'s switch must not render once PRO provides one.' );
+		$this->assertSame( 1, substr_count( $html, 'wbam_pro_settings[gdpr_anonymize_ip]' ), 'Exactly one Anonymize IP switch, ever.' );
+	}
+
+	/** General fully replaces the old Advertising tab's Modules + Currency + Pages, plus Site Mode. */
+	public function test_general_section_renders_site_mode_modules_currency_and_pages(): void {
+		ob_start();
+		$this->admin->render_general_section();
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( 'wbam-site-mode-card', $html, 'Site Mode card' );
+		$this->assertStringContainsString( 'wbam_module_', $html, 'Modules (Features)' );
+		$this->assertStringContainsString( 'wbam_pro_settings[currency]', $html, 'Currency' );
+	}
+
+	/** Advertisers & Billing owns approval/trust, campaign billing defaults and the low-balance warning — one form. */
+	public function test_advertisers_billing_section_renders_every_moved_field(): void {
+		ob_start();
+		$this->admin->render_advertisers_billing_section( Settings_Helper::get() );
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( 'wbam_pro_settings[admin_as_advertiser]', $html );
+		$this->assertStringContainsString( 'wbam_pro_settings[trust_system_enabled]', $html );
+		$this->assertStringContainsString( 'wbam_pro_settings[default_pricing_model]', $html );
+		$this->assertStringContainsString( 'wbam_pro_settings[low_balance_threshold]', $html );
+		$this->assertSame( 1, substr_count( $html, '<form' ) );
+	}
+
+	/** Saving Advertisers & Billing must not touch Currency (a sibling card/form on General). */
+	public function test_advertisers_billing_save_does_not_touch_currency(): void {
+		update_option(
+			'wbam_pro_settings',
+			array(
+				'currency'        => 'eur',
+				'currency_symbol' => '€',
+			)
+		);
+
+		$_POST = array(
+			'_active_tab'                => 'advertisers-billing',
+			'_tab_fields'                => array( 'admin_as_advertiser', 'trust_system_enabled', 'trust_auto_approve_paid', 'trust_always_review_code', 'auto_approve_advertisers', 'advertiser_hide_share_of_voice' ),
+			'admin_as_advertiser'        => '1',
+			'default_pricing_model'      => 'cpc',
+			'low_balance_threshold'      => '25',
+		);
+
+		$sanitized = $this->admin->sanitize_settings( $_POST );
+
+		$this->assertTrue( $sanitized['admin_as_advertiser'] );
+		$this->assertSame( 25.0, $sanitized['low_balance_threshold'] );
+		$this->assertSame( 'eur', $sanitized['currency'], 'Currency must survive a save that never rendered it.' );
+		$this->assertSame( '€', $sanitized['currency_symbol'] );
 	}
 
 	/** Saving Classifieds settings must not reset the featured-email toggles it no longer renders. */

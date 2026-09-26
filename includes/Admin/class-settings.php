@@ -1165,10 +1165,13 @@ class Settings {
 
 	/**
 	 * Render the "Ads & Display" section: who sees ads, label/wrapper,
-	 * placements + format matching, and AdSense.
+	 * placements + format matching, and AdSense. PRO appends its Ad
+	 * Visibility by Role/Member Type and Ad Rotation cards via
+	 * `wbam_settings_ads_display_content` when active — see
+	 * `Pro_Admin::render_ads_display_content_card()`.
 	 *
-	 * One form and one `sanitize_settings()` round-trip for every card here —
-	 * see render_settings_page_sections().
+	 * One form and one `sanitize_settings()` round-trip for every FREE card
+	 * here — see render_settings_page_sections().
 	 *
 	 * @since 3.2.0
 	 */
@@ -1182,6 +1185,16 @@ class Settings {
 			?>
 		</form>
 		<?php
+		/**
+		 * Fires inside the Ads & Display section, after FREE's own cards.
+		 *
+		 * PRO hooks its Ad Visibility by Role/Member Type card and (when the
+		 * rotation module is active) its Ad Rotation card here — see
+		 * `Pro_Admin::render_ads_display_content_card()`.
+		 *
+		 * @since 3.2.0
+		 */
+		do_action( 'wbam_settings_ads_display_content' );
 	}
 
 	/**

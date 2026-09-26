@@ -39,9 +39,16 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 		return (string) ob_get_clean();
 	}
 
-	/** D5: one uninstall switch - FREE's. PRO's checkbox had no reachable reader. */
+	/**
+	 * D5: one uninstall switch - FREE's. PRO's checkbox had no reachable
+	 * reader. render_general_settings() was split (card 10343706274) into
+	 * render_general_section() (Site Mode/Modules/Currency/Pages) and
+	 * render_advertisers_billing_section() (approval/trust/billing) — check
+	 * both, since either would be the wrong place for a second switch.
+	 */
 	public function test_general_has_no_second_uninstall_checkbox(): void {
-		$html = $this->render( 'render_general_settings', Settings_Helper::get() );
+		$html = $this->render( 'render_general_section' )
+			. $this->render( 'render_advertisers_billing_section', Settings_Helper::get() );
 
 		$this->assertStringNotContainsString( 'wbam_pro_settings[delete_data_on_uninstall]', $html );
 		$this->assertStringNotContainsString( 'value="delete_data_on_uninstall"', $html );
@@ -56,9 +63,13 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 		$this->assertArrayNotHasKey( 'wbam_pro_revenue_settings', $registered );
 	}
 
-	/** D8: the low-balance threshold every reader uses can be set from General. */
+	/**
+	 * D8: the low-balance threshold every reader uses can be set. Moved
+	 * (card 10343706274) from General to Advertisers & Billing, alongside
+	 * the rest of the billing defaults it's a threshold for.
+	 */
 	public function test_low_balance_threshold_has_a_field(): void {
-		$html = $this->render( 'render_general_settings', Settings_Helper::get() );
+		$html = $this->render( 'render_advertisers_billing_section', Settings_Helper::get() );
 
 		$this->assertStringContainsString( 'name="wbam_pro_settings[low_balance_threshold]"', $html );
 	}
