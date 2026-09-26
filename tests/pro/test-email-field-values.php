@@ -18,7 +18,6 @@ use WBAM_Pro\Core\Credits_Bridge;
 use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
 use WBAM_Pro\Modules\Classifieds\Classified_Billing;
 use WBAM_Pro\Modules\Classifieds\Classified_Manager;
-use WBAM_Pro\Modules\Notifications\Email_Notifications;
 
 class Test_Email_Field_Values extends Pro_Test_Case {
 
@@ -66,8 +65,7 @@ class Test_Email_Field_Values extends Pro_Test_Case {
 	}
 
 	public function test_inquiry_to_seller_subject_names_the_listing(): void {
-		Email_Notifications::get_instance()->send_inquiry_to_seller(
-			'seller@example.test',
+		Classified_Manager::get_instance()->submit_inquiry(
 			$this->listing(),
 			array(
 				'name'    => 'Gary',
@@ -76,7 +74,7 @@ class Test_Email_Field_Values extends Pro_Test_Case {
 			)
 		);
 
-		$this->assertStringContainsString( 'Inquiry about: Blue bike', $this->mail_about( 'Inquiry about' )['subject'] );
+		$this->assertStringContainsString( 'inquiry about: Blue bike', $this->mail_about( 'inquiry about' )['subject'] );
 	}
 
 	public function test_featured_billing_email_shows_the_real_balance(): void {
