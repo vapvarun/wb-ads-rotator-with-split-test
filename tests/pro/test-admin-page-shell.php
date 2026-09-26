@@ -193,6 +193,9 @@ class Test_Admin_Page_Shell extends Pro_Test_Case {
 		return array(
 			'all ads (edit.php)'        => array( 'edit.php', 'wbam-ad', null ),
 			'add new ad (post-new.php)' => array( 'post-new.php', 'wbam-ad', null ),
+			// QA wave 4 (10343712795): post.php (editing an existing ad) had
+			// no shared header at all - post-new.php got one, edit didn't.
+			'edit ad (post.php)'        => array( 'post.php', 'wbam-ad', null ),
 			'ad tags (edit-tags.php)'   => array( 'edit-tags.php', 'wbam-ad', 'wbam_ad_tag' ),
 		);
 	}

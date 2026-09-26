@@ -151,6 +151,21 @@ class Admin {
 			return;
 		}
 
+		// QA wave 4 (10343712795): post-new.php got the shared shell above;
+		// post.php?action=edit (an existing ad) had none at all.
+		if ( 'wbam-ad' === $screen->id && 'post.php' === $pagenow ) {
+			UX::page_header(
+				array(
+					'title'       => __( 'Edit Ad', 'wb-ads-rotator-with-split-test' ),
+					'desc'        => __( 'Update this ad\'s content, sizing and placements.', 'wb-ads-rotator-with-split-test' ),
+					'core_screen' => true,
+					'back_url'    => \WBAM\Core\Admin_Links::ads_list(),
+					'back_label'  => __( 'Back to list', 'wb-ads-rotator-with-split-test' ),
+				)
+			);
+			return;
+		}
+
 		if ( 'edit-wbam_ad_tag' === $screen->id ) {
 			UX::page_header(
 				array(
