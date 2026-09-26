@@ -68,6 +68,19 @@
 	--wbam-close-size: 44px;
 	--wbam-transition: 0.2s ease;
 
+	/* Shape height caps (owner decision 13): the box a placement reserves
+	   never changes size between reloads, no matter which fitting ad is
+	   rotated in — this is what stops the header jumping between 82px and
+	   219px across page loads. Banner (header, footer, before/after
+	   archive, sticky) reserves only its own tallest size (728x90/970x90);
+	   970x250 "Billboard" is its own shape, sold only where a taller box
+	   is already reserved for Box anyway (the between-content placements),
+	   not in a strip-shaped Banner slot — see class-placement-format-map.php. */
+	--wbam-shape-banner-h: 90px;
+	--wbam-shape-banner-h-mobile: 100px;
+	--wbam-shape-box-h: 280px;
+	--wbam-shape-tower-h: 600px;
+
 	/* ── Legacy aliases — deprecated, mapped onto the chained semantic tokens
 	   above so older selectors inherit host-theme colours and the dark palette
 	   automatically. Do not introduce new usages. ── */
@@ -308,6 +321,75 @@
 
 .wbam-ad-code ins {
 	display: block !important;
+}
+
+/* ==========================================================================
+   Shape height caps (owner decision 13, card 10343726460)
+
+   Banner-only placements (header, footer, before/after archive, sticky's
+   own overlay CSS covers itself further down) reserve just their own
+   tallest size — this is what stops the header jumping between 82px and
+   219px across reloads, without leaving dead space around a 728x90/970x90
+   strip ad. Images already never crop or stretch (object-fit: contain,
+   below); centering keeps a shorter ad (e.g. 320x50) from looking stuck
+   to one edge.
+
+   Between-content placements (before/after content, after paragraph) also
+   accept Box (up to 336x280) and Billboard (970x250) — Box is the taller
+   of the two, so THAT is the reserved height here, not Billboard's 250px;
+   reserving only 250px would clip a legitimate 336x280 Box ad that these
+   slots already sold before Billboard existed.
+
+   The height is reserved on each ad's creative box (.wbam-ad-slot > .wbam-ad),
+   not on the whole placement: the "Advertisement" label keeps its natural,
+   theme-dependent height above it, a stack of several ads reserves one row
+   each, and a taller text/rich/code ("Any" shape) ad grows instead of being
+   clipped. Nothing here ever uses overflow: hidden.
+   ========================================================================== */
+
+.wbam-placement-header .wbam-ad-slot > .wbam-ad,
+.wbam-placement-footer .wbam-ad-slot > .wbam-ad,
+.wbam-placement-before-archive .wbam-ad-slot > .wbam-ad,
+.wbam-placement-after-archive .wbam-ad-slot > .wbam-ad {
+	min-height: var(--wbam-shape-banner-h);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.wbam-placement-before-content .wbam-ad-slot > .wbam-ad,
+.wbam-placement-after-content .wbam-ad-slot > .wbam-ad,
+.wbam-placement-paragraph .wbam-ad-slot > .wbam-ad {
+	min-height: var(--wbam-shape-box-h);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Sidebar takes Box OR Tower (owner decision 13) — a min-height only,
+   not a hard cap: reserving the shorter Box height stops the sidebar
+   collapsing to nothing between ads, without clipping a legitimate
+   600px-tall Tower creative the way a fixed max would. */
+.wbam-placement-widget {
+	min-height: var(--wbam-shape-box-h);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Phone breakpoint matches the rest of this file (480px, see below) — a
+   Banner ad on phones is one of the mobile sizes (320x50/320x100), so the
+   reserved box shrinks to match instead of leaving a 90px-tall gap that
+   still doesn't fit the desktop cap's own reasoning. Between-content
+   placements keep their 280px reserve on phones too — a Box ad is ~300px
+   wide, which already fits a 320-390px viewport without shrinking. */
+@media screen and (max-width: 480px) {
+	.wbam-placement-header .wbam-ad-slot > .wbam-ad,
+	.wbam-placement-footer .wbam-ad-slot > .wbam-ad,
+	.wbam-placement-before-archive .wbam-ad-slot > .wbam-ad,
+	.wbam-placement-after-archive .wbam-ad-slot > .wbam-ad {
+		min-height: var(--wbam-shape-banner-h-mobile);
+	}
 }
 
 /* ==========================================================================
