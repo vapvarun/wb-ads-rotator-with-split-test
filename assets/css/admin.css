@@ -57,9 +57,8 @@
    Docs, Slot Inventory), which are real between-page navigation and are
    deliberately exempt from this override. QA wave 4 (10343712795): at
    390px the nowrap row showed 2 of 6 with no scroll cue; at 1280 the last
-   pill was clipped. An even grid instead — 2 columns under 480px (labels
-   don't all fit at 3-up that narrow), 3 columns from 480px, one row of 6
-   from 640px up. */
+   pill was clipped. An even grid instead, sized by the picker's own box
+   (see the container rules below). */
 .wbam-adtype-tabs {
 	/* The picker sizes to its metabox column, not the viewport: at 1280
 	   the main column is ~750px, where a 6-up row wrapped as 5 + 1. */
