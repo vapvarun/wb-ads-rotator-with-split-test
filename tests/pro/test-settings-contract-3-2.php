@@ -196,15 +196,15 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Shared Page' ) );
 
 		$_POST = array(
-			'wbam_save_pages'            => '1',
-			'_wpnonce'                   => wp_create_nonce( 'wbam_pages_settings' ),
 			'wbam_page_advertiser_dashboard' => (string) $page_id,
 			'wbam_page_advertise'        => (string) $page_id,
 		);
 		$_REQUEST = $_POST;
 
-		$html = $this->render( 'render_pages_settings' );
+		// $saving=true: the one General-section form's nonce (card 10343706274).
+		$html = $this->render( 'render_pages_settings', true );
 
+		$this->assertStringContainsString( 'is used for more than one role', $html );
 		$this->assertStringContainsString( 'Shared Page', $html );
 		$this->assertStringContainsString( 'Advertiser Dashboard', $html );
 		$this->assertStringContainsString( 'Advertise with us', $html );
@@ -218,14 +218,12 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 		$advertise_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
 
 		$_POST = array(
-			'wbam_save_pages'            => '1',
-			'_wpnonce'                   => wp_create_nonce( 'wbam_pages_settings' ),
 			'wbam_page_advertiser_dashboard' => (string) $dashboard_id,
 			'wbam_page_advertise'        => (string) $advertise_id,
 		);
 		$_REQUEST = $_POST;
 
-		$this->render( 'render_pages_settings' );
+		$this->render( 'render_pages_settings', true );
 
 		$this->assertSame( $dashboard_id, (int) get_option( 'wbam_page_advertiser_dashboard' ) );
 		$this->assertSame( $advertise_id, (int) get_option( 'wbam_page_advertise' ) );
