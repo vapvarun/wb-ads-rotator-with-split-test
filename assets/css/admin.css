@@ -48,6 +48,7 @@
 
 .wbam-adtype-nav {
 	display: flex;
+	flex-wrap: wrap;
 	border-bottom: 1px solid var(--wbam-border-strong);
 	margin-bottom: 0;
 }
@@ -1653,10 +1654,6 @@
 .wbam-current-badge {
 	background: var(--wbam-accent-light);
 	color: var(--wbam-accent);
-}
-
-.wbam-disable-btn {
-	color: var(--wbam-danger-hover) !important;
 }
 
 .wbam-comparison-note {

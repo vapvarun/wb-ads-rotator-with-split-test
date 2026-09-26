@@ -54,6 +54,13 @@ final class Pointer_Emitter {
 		wp_enqueue_script( 'wp-pointer' );
 		wp_enqueue_script( 'jquery' );
 
+		// Core's default pointer width (320px) is barely wider than the
+		// sidebar metaboxes these pointers target (Ad Sizing, Package
+		// Allowed Formats), so a couple of sentences of guidance wrap into
+		// a box tall enough to cover the fields underneath it. Widen it so
+		// the same copy needs fewer lines.
+		wp_add_inline_style( 'wp-pointer', '.wp-pointer{width:420px;max-width:90vw;}' );
+
 		$inline  = 'jQuery(function($){';
 		$inline .= 'var pointers = ' . wp_json_encode( $pointers ) . ';';
 		$inline .= 'var ajaxAction = ' . wp_json_encode( $ajax_action ) . ';';

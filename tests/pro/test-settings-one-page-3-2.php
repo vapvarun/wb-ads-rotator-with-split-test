@@ -187,6 +187,43 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$this->assertSame( 'Keep Me', $email_settings['from_name'] );
 	}
 
+	/**
+	 * Card 10339876480: Classified Rejected, Advertiser Approved/Rejected,
+	 * New Review and New Report had no checkbox to switch them off, even
+	 * though the senders already gated on those keys (or, for the
+	 * advertiser ones, didn't gate at all - see class-email-notifications.php).
+	 */
+	public function test_email_settings_form_saves_the_new_toggles(): void {
+		$_POST = array(
+			'wbam_save_email_settings'         => '1',
+			'_wpnonce'                          => wp_create_nonce( 'wbam_email_settings' ),
+			'wbam_email_from_name'              => 'Ad Desk',
+			'wbam_email_from_email'             => 'ads@example.org',
+			// Every other boolean is intentionally left unchecked/absent.
+			'wbam_email_classified_rejected'    => '1',
+			'wbam_email_advertiser_approved'    => '1',
+			'wbam_email_advertiser_rejected'    => '1',
+			'wbam_email_review_submitted'       => '1',
+			'wbam_email_new_report'             => '1',
+		);
+		$_REQUEST = $_POST;
+
+		$method = new \ReflectionMethod( Pro_Admin::class, 'render_emails_settings' );
+		$method->setAccessible( true );
+		ob_start();
+		$method->invoke( $this->admin );
+		ob_end_clean();
+
+		$stored = Settings_Helper::get_email();
+		$this->assertTrue( $stored['classified_rejected'] );
+		$this->assertTrue( $stored['advertiser_approved'] );
+		$this->assertTrue( $stored['advertiser_rejected'] );
+		$this->assertTrue( $stored['review_submitted'] );
+		$this->assertTrue( $stored['new_report'] );
+		// An unchecked box posts nothing at all, so an absent key must save false.
+		$this->assertFalse( $stored['ad_approved'] );
+	}
+
 	/** Posting-without-a-plan moved to the Classifieds leaf, with its own save + redirect there. */
 	public function test_posting_access_save_persists_and_redirects_to_classifieds(): void {
 		$_POST = array(

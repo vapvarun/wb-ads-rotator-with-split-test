@@ -527,7 +527,7 @@ class Settings {
 
 		add_settings_field(
 			'link_cloak_prefix',
-			__( 'Cloak Prefix', 'wb-ads-rotator-with-split-test' ),
+			__( 'Link URL Prefix', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_text_field' ),
 			'wbam-settings',
 			'wbam_links',
@@ -536,7 +536,7 @@ class Settings {
 				'id'          => 'link_cloak_prefix',
 				'placeholder' => 'go',
 				/* translators: %s: example cloaked URL */
-				'description' => sprintf( __( 'URL prefix for cloaked links, e.g. %s. Rewrite rules refresh automatically on change.', 'wb-ads-rotator-with-split-test' ), home_url( '/go/your-link' ) ),
+				'description' => sprintf( __( 'The path segment for your cloaked links, e.g. %s. Changing this updates the URL every cloaked link uses.', 'wb-ads-rotator-with-split-test' ), home_url( '/go/your-link' ) ),
 			)
 		);
 
@@ -577,7 +577,7 @@ class Settings {
 	 * Render the Link Cloaking section intro.
 	 */
 	public function render_links_section() {
-		echo '<p>' . esc_html__( 'Control how cloaked link URLs look and how inactive links behave.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+		echo '<p>' . esc_html__( 'Cloaked links send visitors through your own site (e.g. yoursite.com/go/deal) before redirecting to the real destination, so the long affiliate or tracking URL never shows in your content. Control how that URL looks and how inactive links behave.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 	}
 
 	/**

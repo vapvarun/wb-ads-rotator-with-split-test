@@ -57,8 +57,24 @@ class Test_Email_Settings_Gate extends Pro_Test_Case {
 	public function test_a_notification_left_on_uses_the_configured_from(): void {
 		Email_Notifications::get_instance()->send_advertiser_approved( Advertiser_Manager::get_instance()->get_or_create( $this->user ) );
 
-		$this->assertCount( 1, $this->sent, 'Account approval is always sent.' );
+		$this->assertCount( 1, $this->sent, 'Advertiser Approved defaults to on.' );
 		$this->assertContains( 'From: Ad Desk <ads@example.org>', $this->sent[0]['headers'] );
+	}
+
+	public function test_advertiser_approved_and_rejected_respect_their_own_toggle(): void {
+		update_option(
+			'wbam_pro_email_settings',
+			array(
+				'advertiser_approved' => false,
+				'advertiser_rejected' => false,
+			)
+		);
+		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $this->user );
+
+		Email_Notifications::get_instance()->send_advertiser_approved( $advertiser );
+		Email_Notifications::get_instance()->send_advertiser_rejected( $advertiser, 'Incomplete profile' );
+
+		$this->assertCount( 0, $this->sent, 'Both toggles are off, so neither application-status email goes out.' );
 	}
 
 	public function test_deliver_honours_toggles_and_a_callers_content_type(): void {

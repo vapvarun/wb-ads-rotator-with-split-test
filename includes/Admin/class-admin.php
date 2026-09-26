@@ -1034,6 +1034,8 @@ class Admin {
 	 * Add metaboxes.
 	 */
 	public function add_metaboxes() {
+		$this->maybe_default_closed_metaboxes();
+
 		add_meta_box(
 			'wbam-ad-settings',
 			__( 'Ad Settings', 'wb-ads-rotator-with-split-test' ),
@@ -1077,13 +1079,17 @@ class Admin {
 			);
 		}
 
+		// 'default' (not 'high') so this renders after core's own Publish
+		// box in the side column. 'high' put it first, pushing the Update
+		// button below several screens' worth of Priority/Sizing/Session
+		// Limit fields.
 		add_meta_box(
 			'wbam-ad-status',
 			__( 'Ad Status', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_status_metabox' ),
 			'wbam-ad',
 			'side',
-			'high'
+			'default'
 		);
 
 		// Only show comparison metabox for existing ads with placements.
@@ -1101,6 +1107,32 @@ class Admin {
 				);
 			}
 		}
+	}
+
+	/**
+	 * On a fresh install, collapse the heaviest, least-essential metaboxes
+	 * on the Ad edit screen (Preview and the A/B comparison table) so the
+	 * page doesn't require ~4000px of scrolling before the owner reaches
+	 * the bottom sections. Mirrors First_Install_Pointers' own gate: on for
+	 * new installs, off for upgrades, so nobody's already-arranged screen
+	 * layout is disturbed.
+	 *
+	 * Only takes effect once — the moment a user opens or closes any box on
+	 * this screen via its own toggle, WordPress stores their own choice in
+	 * `closedpostboxes_wbam-ad` user meta and this filter becomes a no-op
+	 * (the `false` check below only matches "never touched it").
+	 */
+	private function maybe_default_closed_metaboxes() {
+		if ( ! (int) get_option( First_Install_Pointers::OPTION_ENABLED, 0 ) ) {
+			return;
+		}
+
+		add_filter(
+			'get_user_option_closedpostboxes_wbam-ad',
+			static function ( $value ) {
+				return false === $value ? array( 'wbam-ad-preview', 'wbam-ad-comparison' ) : $value;
+			}
+		);
 	}
 
 	/**
@@ -1536,7 +1568,7 @@ class Admin {
 			</div>
 
 			<div class="wbam-priority-field">
-				<label for="wbam_priority"><?php esc_html_e( 'Priority', 'wb-ads-rotator-with-split-test' ); ?></label><?php echo Field_Tooltips::tip_for( 'priority' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?>
+				<label for="wbam_priority"><?php esc_html_e( 'Priority', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'priority' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?></label>
 				<input type="range" id="wbam_priority" name="wbam_priority" min="1" max="10" value="<?php echo esc_attr( $priority ); ?>" />
 				<span class="wbam-priority-value"><?php echo esc_html( $priority ); ?></span>
 				<p class="description"><?php esc_html_e( 'Higher priority = bigger share when multiple ads compete for the same slot. Default is 5.', 'wb-ads-rotator-with-split-test' ); ?></p>
@@ -1544,7 +1576,7 @@ class Admin {
 			</div>
 
 			<div class="wbam-session-limit-field">
-				<label for="wbam_session_limit"><?php esc_html_e( 'Max views per visitor per day', 'wb-ads-rotator-with-split-test' ); ?></label><?php echo Field_Tooltips::tip_for( 'session_limit' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?>
+				<label for="wbam_session_limit"><?php esc_html_e( 'Max views per visitor per day', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'session_limit' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?></label>
 				<input type="number" id="wbam_session_limit" name="wbam_session_limit" min="0" value="<?php echo esc_attr( $session_limit ); ?>" placeholder="<?php esc_attr_e( 'Unlimited', 'wb-ads-rotator-with-split-test' ); ?>" />
 				<p class="description"><?php esc_html_e( 'Max views per visitor session. Leave empty for unlimited.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
@@ -2192,10 +2224,10 @@ class Admin {
 						<td>
 							<?php if ( ! $stat['is_current'] && $winner_id !== $stat['id'] ) : ?>
 								<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'post.php?post=' . $stat['id'] . '&action=edit&wbam_disable=1' ), 'wbam_disable_ad_' . $stat['id'] ) ); ?>"
-									class="wbam-disable-btn"
-									data-wbam-confirm="<?php echo esc_attr__( 'Disable this underperforming ad?', 'wb-ads-rotator-with-split-test' ); ?>"
+									class="wbam-admin-btn wbam-admin-btn--sm wbam-admin-btn--danger"
+									data-wbam-confirm="<?php echo esc_attr__( 'Disable this underperforming ad? Visitors will stop seeing it in this placement.', 'wb-ads-rotator-with-split-test' ); ?>"
 									data-wbam-confirm-tone="warning">
-									<?php esc_html_e( 'Disable', 'wb-ads-rotator-with-split-test' ); ?>
+									<?php esc_html_e( 'Disable this ad', 'wb-ads-rotator-with-split-test' ); ?>
 								</a>
 							<?php endif; ?>
 						</td>
