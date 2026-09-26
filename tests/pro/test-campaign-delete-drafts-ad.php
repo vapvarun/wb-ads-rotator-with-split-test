@@ -51,6 +51,42 @@ class Test_Campaign_Delete_Drafts_Ad extends Pro_Test_Case {
 		$this->assertSame( '', (string) get_post_meta( $ad_id, '_wbam_campaign_id', true ), 'The link to the deleted campaign must be gone.' );
 	}
 
+	/**
+	 * QA wave 4: a paused ad whose campaign is deleted still showed Resume,
+	 * which errored - disable_campaign_ad() moved the ad to Draft but left
+	 * the advertiser's earlier _wbam_status = 'paused' meta in place, and
+	 * the portal's My Ads tab prefers that meta over post_status. Clearing
+	 * it lets post_status ('draft') read through, so there is nothing left
+	 * to resume.
+	 */
+	public function test_a_paused_ad_has_no_stale_status_meta_after_its_campaign_is_deleted(): void {
+		$user       = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );
+		Advertiser_Manager::get_instance()->update_status( (int) $advertiser->id, 'active' );
+
+		$ad_id = (int) self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
+		update_post_meta( $ad_id, '_wbam_enabled', '0' );
+		update_post_meta( $ad_id, '_wbam_status', 'paused' );
+
+		$campaign = Campaign_Manager::get_instance()->create(
+			array(
+				'advertiser_id' => $advertiser->id,
+				'name'          => 'Delete guard - paused',
+				'pricing_model' => 'flat',
+				'budget'        => 0,
+				'status'        => 'draft',
+				'ad_id'         => $ad_id,
+			)
+		);
+		$this->assertNotWPError( $campaign );
+		update_post_meta( $ad_id, '_wbam_campaign_id', $campaign->id );
+
+		Campaign_Manager::get_instance()->delete( $campaign->id );
+
+		$this->assertSame( 'draft', get_post_status( $ad_id ) );
+		$this->assertSame( '', get_post_meta( $ad_id, '_wbam_status', true ), 'The stale paused meta must be cleared - post_status draft is now the only source of truth, so Resume has nothing left to show.' );
+	}
+
 	public function test_a_taken_down_rejected_ad_keeps_its_rejected_status_when_its_campaign_is_deleted(): void {
 		$user       = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
 		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );

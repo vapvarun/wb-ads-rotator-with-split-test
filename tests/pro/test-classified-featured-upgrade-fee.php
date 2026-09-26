@@ -1,11 +1,12 @@
 <?php
 /**
- * A Featured upgrade charges what the Promote screen quotes and records the
- * monthly upgrade price on the listing.
+ * A Featured upgrade charges what the Promote screen quotes and records that
+ * same amount as the listing's featured fee. Featured is one-time only
+ * (card 10343726590, owner decision): the charge is a single fixed-period
+ * payment, not divided across billing cycles.
  *
  * can_afford_featured() read a wallet_balance property Advertiser does not
- * have, so every paid upgrade was refused; and a one-time purchase stored the
- * whole upfront total as the listing's monthly featured fee.
+ * have, so every paid upgrade was refused.
  *
  * @package WBAM\Tests
  */
@@ -20,7 +21,7 @@ use WBAM_Pro\Modules\Classifieds\Classified_Manager;
 
 class Test_Classified_Featured_Upgrade_Fee extends Pro_Test_Case {
 
-	public function test_one_time_upgrade_charges_the_total_and_records_the_monthly_fee(): void {
+	public function test_one_time_upgrade_charges_the_total_and_records_the_fee(): void {
 		// Rows left by earlier runs survive the rollback (lazy DDL commits the
 		// test transaction) and collide on the UNIQUE post_id of a reused post ID.
 		global $wpdb;
@@ -48,10 +49,10 @@ class Test_Classified_Featured_Upgrade_Fee extends Pro_Test_Case {
 		$classified = $manager->get( (int) $classified->id );
 
 		$before = (float) Credits_Bridge::get_balance( $advertiser->id );
-		$result = $classified->upgrade_to_featured( 3, 30.0, true, 'one_time' );
+		$result = $classified->upgrade_to_featured( 3, 30.0, true );
 
 		$this->assertTrue( $result, is_wp_error( $result ) ? $result->get_error_message() : '' );
 		$this->assertSame( 30.0, round( $before - (float) Credits_Bridge::get_balance( $advertiser->id ), 2 ) );
-		$this->assertSame( 10.0, (float) $manager->get( (int) $classified->id )->featured_fee, 'The featured record keeps the monthly upgrade price.' );
+		$this->assertSame( 30.0, (float) $manager->get( (int) $classified->id )->featured_fee, 'The featured record keeps the full one-time charge, not a per-cycle fraction of it.' );
 	}
 }

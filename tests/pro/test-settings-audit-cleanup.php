@@ -11,6 +11,8 @@ namespace WBAM\Tests\Pro;
 
 use WBAM_Pro\Core\Installer;
 use WBAM_Pro\Core\Settings_Helper;
+use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
+use WBAM_Pro\Modules\Classifieds\Classified_Manager;
 use WBAM_Pro\Modules\Geolocation\Geolocation_Manager;
 
 class Test_Settings_Audit_Cleanup extends Pro_Test_Case {
@@ -115,20 +117,116 @@ class Test_Settings_Audit_Cleanup extends Pro_Test_Case {
 	}
 
 	/**
-	 * FILTER: featured billing defaults to ONE-TIME for a fresh install
-	 * (nothing stored), but an upgraded site that already saved 'recurring'
-	 * keeps recurring.
+	 * Featured is one-time only (owner decision, follow-up to card
+	 * 10343726590): the recurring billing model and the
+	 * wbam_pro_featured_recurring filter are gone. 4.3.14 caps any
+	 * classified still marked recurring (unlimited or multi-cycle billing)
+	 * to a single cycle and clears its scheduled next billing, so it can
+	 * never be charged again - it keeps its current featured_expires_at
+	 * until that period naturally ends.
 	 */
-	public function test_featured_recurring_defaults_one_time_on_fresh_install(): void {
-		delete_option( 'wbam_pro_classifieds_settings' );
+	public function test_upgrade_to_4_3_14_caps_a_recurring_classified_to_one_cycle(): void {
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}wbam_classifieds" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- test isolation.
 
-		$this->assertFalse( Settings_Helper::is_featured_recurring() );
+		$enabled                = Settings_Helper::get( 'enabled_modules', array() );
+		$enabled['classifieds'] = true;
+		Settings_Helper::update( 'enabled_modules', $enabled );
+
+		$user       = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );
+
+		$manager    = Classified_Manager::get_instance();
+		$classified = $manager->create(
+			array(
+				'title'         => 'Recurring probe',
+				'description'   => 'Was mid-subscription before Featured became one-time only.',
+				'advertiser_id' => $advertiser->id,
+				'price'         => 9.99,
+			)
+		);
+		$this->assertNotWPError( $classified );
+
+		$expires_at = gmdate( 'Y-m-d H:i:s', strtotime( '+10 days' ) );
+
+		// Simulate the pre-fix recurring state the old billing cron left
+		// behind: unlimited cycles (0), a next billing date scheduled.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test setup on a custom table.
+		$wpdb->update(
+			$wpdb->prefix . 'wbam_classifieds',
+			array(
+				'featured_fee_status'   => 'paid',
+				'featured_max_billing'  => 0,
+				'featured_next_billing' => gmdate( 'Y-m-d H:i:s', strtotime( '+3 days' ) ),
+				'featured_expires_at'   => $expires_at,
+			),
+			array( 'id' => (int) $classified->id ),
+			array( '%s', '%d', '%s', '%s' ),
+			array( '%d' )
+		);
+
+		$method = new \ReflectionMethod( Installer::class, 'upgrade_to_4_3_14' );
+		$method->setAccessible( true );
+		$method->invoke( null );
+
+		$row = $manager->get( (int) $classified->id );
+		$this->assertSame( 1, (int) $row->featured_max_billing, 'Recurring listing is capped to a single cycle - it is never charged again.' );
+		$this->assertNull( $row->featured_next_billing, 'No further billing is ever scheduled.' );
+		$this->assertSame( $expires_at, $row->featured_expires_at, 'Its current featured period is untouched - it keeps it until it naturally expires.' );
 	}
 
-	public function test_featured_recurring_honours_an_upgraded_sites_stored_value(): void {
+	/** 4.3.14 also drops the now-dead featured_billing_model settings key. */
+	public function test_upgrade_to_4_3_14_drops_the_dead_billing_model_key(): void {
 		update_option( 'wbam_pro_classifieds_settings', array( 'featured_billing_model' => 'recurring' ) );
 
-		$this->assertTrue( Settings_Helper::is_featured_recurring() );
+		$method = new \ReflectionMethod( Installer::class, 'upgrade_to_4_3_14' );
+		$method->setAccessible( true );
+		$method->invoke( null );
+
+		$this->assertArrayNotHasKey( 'featured_billing_model', get_option( 'wbam_pro_classifieds_settings' ) );
+	}
+
+	/**
+	 * 4.3.12 already drops featured_fee. If it differed from featured_price,
+	 * both are saved to wbam_pro_featured_price_notice first so the one-time
+	 * admin notice (card 10343726590) can tell the site which price is now
+	 * in effect - the old value would otherwise be gone with no trace.
+	 */
+	public function test_upgrade_to_4_3_12_records_a_price_mismatch_for_the_notice(): void {
+		delete_option( 'wbam_pro_featured_price_notice' );
+		update_option(
+			'wbam_pro_classifieds_settings',
+			array(
+				'featured_fee'   => 15.0,
+				'featured_price' => 9.0,
+			)
+		);
+
+		$method = new \ReflectionMethod( Installer::class, 'upgrade_to_4_3_12' );
+		$method->setAccessible( true );
+		$method->invoke( null );
+
+		$notice = get_option( 'wbam_pro_featured_price_notice' );
+		$this->assertSame( 15.0, $notice['old_fee'] );
+		$this->assertSame( 9.0, $notice['new_price'] );
+	}
+
+	/** Matching prices are not a mismatch - no notice is recorded. */
+	public function test_upgrade_to_4_3_12_records_no_notice_when_prices_match(): void {
+		delete_option( 'wbam_pro_featured_price_notice' );
+		update_option(
+			'wbam_pro_classifieds_settings',
+			array(
+				'featured_fee'   => 9.0,
+				'featured_price' => 9.0,
+			)
+		);
+
+		$method = new \ReflectionMethod( Installer::class, 'upgrade_to_4_3_12' );
+		$method->setAccessible( true );
+		$method->invoke( null );
+
+		$this->assertFalse( get_option( 'wbam_pro_featured_price_notice' ) );
 	}
 
 	/** FILTER: the container_class field is gone, but the stored value still applies. */

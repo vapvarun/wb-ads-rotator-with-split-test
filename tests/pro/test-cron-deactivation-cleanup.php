@@ -34,7 +34,6 @@ class Test_Cron_Deactivation_Cleanup extends Pro_Test_Case {
 			// Module-owned hooks the old list did cover — must stay covered.
 			'wbam_scan_posts_cron',
 			'wbam_check_link_health_cron',
-			'wbam_process_classified_billing',
 			'wbam_classified_expiration_warnings',
 		);
 
@@ -48,7 +47,7 @@ class Test_Cron_Deactivation_Cleanup extends Pro_Test_Case {
 		$manager->schedule_all();
 		// Simulate module-owned events being live too.
 		wp_schedule_event( time(), 'daily', 'wbam_scan_posts_cron' );
-		wp_schedule_event( time(), 'hourly', 'wbam_process_classified_billing' );
+		wp_schedule_event( time(), 'daily', 'wbam_classified_expiration_warnings' );
 
 		Cron_Manager::deactivate();
 

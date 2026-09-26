@@ -53,16 +53,18 @@ class Test_Promote_Featured_Durations extends Pro_Test_Case {
 		$this->assertStringContainsString( '$12.50', $html, 'The one Featured price must show.' );
 		$this->assertStringNotContainsString( 'wbam-duration-selector', $html, 'There is no duration to pick any more.' );
 		$this->assertStringNotContainsString( 'name="featured_duration"', $html );
+		$this->assertStringNotContainsString( 'Monthly Recurring', $html, 'Featured is one-time only - there is no recurring option to show.' );
+		$this->assertStringNotContainsString( 'wbam-billing-recurring', $html );
 	}
 
-	public function test_featured_billing_model_and_expiry_warning_are_filters_not_fields(): void {
-		update_option( 'wbam_pro_classifieds_settings', array( 'featured_billing_model' => 'recurring', 'featured_expiration_warning' => 5 ) );
+	/** The expiry-warning/renew-reminder window is a filter, not a Settings field. */
+	public function test_featured_expiry_warning_is_a_filter_not_a_field(): void {
+		update_option( 'wbam_pro_classifieds_settings', array( 'featured_expiration_warning' => 5 ) );
 
-		$this->assertTrue( Settings_Helper::is_featured_recurring() );
 		$this->assertSame( 5, Settings_Helper::featured_expiry_warning_days() );
 
-		add_filter( 'wbam_pro_featured_recurring', '__return_false' );
-		$this->assertFalse( Settings_Helper::is_featured_recurring(), 'The filter must still be able to override the stored value.' );
-		remove_filter( 'wbam_pro_featured_recurring', '__return_false' );
+		add_filter( 'wbam_pro_featured_expiry_warning_days', '__return_zero' );
+		$this->assertSame( 0, Settings_Helper::featured_expiry_warning_days(), 'The filter must still be able to override the stored value.' );
+		remove_filter( 'wbam_pro_featured_expiry_warning_days', '__return_zero' );
 	}
 }

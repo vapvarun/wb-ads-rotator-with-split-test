@@ -1311,6 +1311,13 @@
       "purpose": "Filter the registered ad-format catalog"
     },
     {
+      "name": "wbam_viewable_impressions",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Frontend/class-frontend.php:384",
+      "purpose": "Whether an impression counts only once it scrolls into view (card 10343726590, replaces the removed 'Count Impressions When Seen' Settings field; default = stored viewable_impressions setting)"
+    },
+    {
       "name": "wbam_notice_suppressor_namespaces",
       "type": "filter",
       "args": 1,

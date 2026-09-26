@@ -77,10 +77,15 @@ class Test_Email_Field_Values extends Pro_Test_Case {
 		$this->assertStringContainsString( 'inquiry about: Blue bike', $this->mail_about( 'inquiry about' )['subject'] );
 	}
 
-	public function test_featured_billing_email_shows_the_real_balance(): void {
+	/**
+	 * Featured is one-time only (owner decision, card 10343726590 follow-up):
+	 * restoring featured status is a new purchase, not a wallet top-up, so
+	 * the downgrade email quotes the Featured price to buy it again - it no
+	 * longer shows a wallet balance at all.
+	 */
+	public function test_featured_downgrade_email_quotes_the_real_price_to_buy_again(): void {
 		$classified = $this->listing();
-		Credits_Bridge::topup( (int) $this->advertiser->id, 12.5, 'Seed' );
-		update_option( 'wbam_pro_classifieds_settings', array_merge( get_option( 'wbam_pro_classifieds_settings', array() ), array( 'featured_downgrade_notification' => true ) ) );
+		update_option( 'wbam_pro_classifieds_settings', array_merge( get_option( 'wbam_pro_classifieds_settings', array() ), array( 'featured_downgrade_notification' => true, 'featured_price' => 12.5 ) ) );
 
 		Classified_Billing::notify_featured_downgrade( $classified, 'insufficient_funds' );
 
