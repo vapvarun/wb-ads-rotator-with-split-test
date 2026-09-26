@@ -101,6 +101,23 @@ class Test_Installer extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A pre-3.2.0 site that never saved Settings has no stored provider;
+	 * 3.1.x read that as ip-api (Settings_Helper::get default). Stamping
+	 * geo_enabled on with an empty provider would silently stop every
+	 * country rule, so the upgrade keeps that effective provider.
+	 */
+	public function test_upgrade_without_saved_provider_keeps_previous_effective_provider(): void {
+		update_option( \WBAM\Core\Installer::DB_VERSION_OPTION, '1.8.0' );
+		update_option( 'wbam_settings', array( 'rotation_enabled' => true ) );
+
+		wbam_activate();
+
+		$settings = get_option( 'wbam_settings' );
+		$this->assertTrue( $settings['geo_enabled'] );
+		$this->assertSame( 'ip-api', $settings['geo_primary_provider'], 'The provider 3.1.x actually used must survive the upgrade.' );
+	}
+
+	/**
 	 * Re-running install() (e.g. maybe_update_database() on every
 	 * admin_init) must never re-flip geo_enabled back to true after an
 	 * owner has explicitly turned it off post-upgrade.

@@ -134,6 +134,14 @@ class Installer {
 		}
 
 		$settings['geo_enabled'] = true;
+
+		// 3.1.x read a missing/empty provider as ip-api; keep that
+		// effective provider, or country rules silently stop matching on
+		// a site that never saved Settings.
+		if ( empty( $settings['geo_primary_provider'] ) ) {
+			$settings['geo_primary_provider'] = 'ip-api';
+		}
+
 		update_option( 'wbam_settings', $settings );
 	}
 
