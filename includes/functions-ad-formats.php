@@ -219,6 +219,76 @@ if ( ! function_exists( 'wbam_ad_types_without_placements' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wbam_placement_sizes_label' ) ) {
+	/**
+	 * Build a human-readable, pixel-based description of what a placement
+	 * (slot) accepts.
+	 *
+	 * Single source of truth for "what size does this slot need" — the
+	 * admin ad editor's Placements metabox, the advertiser wizard's slot
+	 * grid, and the package editor all call this so a slot is always
+	 * described the same way. Sizes are always stated in pixels
+	 * ("728×90"), never as format slugs ("leaderboard").
+	 *
+	 * `accepted_formats` empty means the slot is permissive (accepts any
+	 * format) — mirrors Ad_Formats::fits()'s documented
+	 * "unmapped = accept anything" default; not the same as "responsive
+	 * only".
+	 *
+	 * @since 3.2.0
+	 * @param string[] $accepted_formats Format slugs from the placement registry's 'accepted_formats' key.
+	 * @return array{sizes:string[],responsive:bool,permissive:bool,label:string} `sizes` is a de-duplicated list of "WxH" strings for every named format the slot accepts; `responsive` is true when the slot's list includes the literal 'responsive' slug; `permissive` is true when accepted_formats was empty (accepts anything); `label` is the ready-to-echo human sentence.
+	 */
+	function wbam_placement_sizes_label( array $accepted_formats ) {
+		$sizes      = array();
+		$responsive = false;
+
+		foreach ( $accepted_formats as $format_slug ) {
+			$format_slug = (string) $format_slug;
+
+			if ( Ad_Formats::RESPONSIVE === $format_slug ) {
+				$responsive = true;
+				continue;
+			}
+
+			$meta = Ad_Formats::get( $format_slug );
+			if ( $meta && ! empty( $meta['width'] ) && ! empty( $meta['height'] ) ) {
+				$sizes[] = $meta['width'] . '×' . $meta['height'];
+			}
+		}
+
+		$sizes      = array_values( array_unique( $sizes ) );
+		$permissive = empty( $accepted_formats );
+
+		if ( $permissive ) {
+			$label = __( 'Any size (not restricted by this site)', 'wb-ads-rotator-with-split-test' );
+		} elseif ( $sizes && $responsive ) {
+			$label = sprintf(
+				/* translators: %s: comma-separated list of pixel sizes, e.g. "728×90, 970×90" */
+				__( '%s, or responsive', 'wb-ads-rotator-with-split-test' ),
+				implode( ', ', $sizes )
+			);
+		} elseif ( $sizes ) {
+			$label = implode( ', ', $sizes );
+		} elseif ( $responsive ) {
+			$label = __( 'Responsive only', 'wb-ads-rotator-with-split-test' );
+		} else {
+			// accepted_formats was non-empty but none of its slugs resolved to
+			// a displayable size (e.g. a slug the taxonomy filter later
+			// removed). Don't claim false permissiveness for a slot that DID
+			// declare a restriction — say so plainly instead of showing nothing.
+			$label = __( 'Restricted (contact the site owner for accepted sizes)', 'wb-ads-rotator-with-split-test' );
+		}
+
+		return array(
+			'sizes'      => $sizes,
+			'responsive' => $responsive,
+			'permissive' => $permissive,
+			'label'      => $label,
+		);
+	}
+}
+
 if ( ! function_exists( 'wbam_ad_uses_placements' ) ) {
 	/**
 	 * Whether an ad is eligible to be served through a placement at all.

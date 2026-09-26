@@ -289,13 +289,40 @@
 	border-color: var(--wbam-accent);
 }
 
+/* E3: a checked card must look selected the same way a checked Sizing card
+   does (.wbam-sizing-option.is-active) — one selection style across both
+   metaboxes, not the bare title-color change this used to be the only cue
+   for. */
+.wbam-placement-option:has(input:checked) {
+	background: var(--wbam-accent-light);
+	border-color: var(--wbam-accent);
+	box-shadow: inset 0 0 0 1px var(--wbam-accent);
+}
+
 .wbam-placement-option input[type="checkbox"] {
 	margin: 2px 0 0;
 	flex-shrink: 0;
 }
 
-.wbam-placement-option input[type="checkbox"]:checked + .wbam-option-title {
+.wbam-placement-option input[type="checkbox"]:checked + .wbam-option-body .wbam-option-title {
 	color: var(--wbam-accent);
+}
+
+/* Owner decision (card 10343726460): a placement the ad's resolved size
+   doesn't fit is greyed out and can't be ticked — same treatment as the
+   portal wizard's .wbam-disabled slot card. */
+.wbam-placement-option--disabled {
+	cursor: not-allowed;
+	opacity: 0.55;
+}
+
+.wbam-placement-option--disabled:hover {
+	background: var(--wbam-surface);
+	border-color: var(--wbam-border-subtle);
+}
+
+.wbam-placement-option--disabled input[type="checkbox"] {
+	cursor: not-allowed;
 }
 
 .wbam-option-body {
@@ -318,6 +345,18 @@
 	display: block;
 	font-size: var(--wbam-font-size-xs);
 	color: var(--wbam-text-muted);
+	line-height: 1.4;
+}
+
+/* Always-visible note on the pixel size (or shape) a placement accepts —
+   same information the portal wizard's .wbam-placement-size states on
+   every slot card, so the admin editor and the advertiser wizard never
+   disagree about what a slot needs. */
+.wbam-option-size {
+	display: block;
+	font-size: var(--wbam-font-size-xs);
+	color: var(--wbam-text-muted);
+	font-style: italic;
 	line-height: 1.4;
 }
 

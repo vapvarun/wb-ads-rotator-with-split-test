@@ -65,7 +65,6 @@ class Admin {
 		add_filter( 'bulk_actions-edit-wbam-ad', array( $this, 'register_bulk_actions' ) );
 		add_filter( 'handle_bulk_actions-edit-wbam-ad', array( $this, 'handle_bulk_actions' ), 10, 3 );
 		add_action( 'admin_notices', array( $this, 'render_bulk_action_notice' ) );
-		add_action( 'admin_notices', array( $this, 'render_placement_mismatch_notice' ) );
 		// Free-only surface for the one-time "size matching" opt-in notice
 		// (owner decision 13). Pro ships an equivalent CTA on its own
 		// next-step banner (class-next-step-banner.php) with its own action
@@ -308,43 +307,6 @@ class Admin {
 		printf(
 			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
 			esc_html( $message )
-		);
-	}
-
-	/**
-	 * Warn when save_meta() dropped a ticked placement because the ad's
-	 * size doesn't fit it (owner decision 13, card 10343726460). Only
-	 * shows on the ad edit screen the save just happened on — the
-	 * transient is set (and read) per ad ID so two admins editing
-	 * different ads never see each other's notice.
-	 */
-	public function render_placement_mismatch_notice() {
-		$screen = get_current_screen();
-		if ( ! $screen || 'wbam-ad' !== $screen->post_type || 'post' !== $screen->base ) {
-			return;
-		}
-
-		global $post;
-		if ( ! $post ) {
-			return;
-		}
-
-		$rejected = get_transient( 'wbam_placement_mismatch_' . $post->ID );
-		if ( empty( $rejected ) || ! is_array( $rejected ) ) {
-			return;
-		}
-
-		delete_transient( 'wbam_placement_mismatch_' . $post->ID );
-
-		printf(
-			'<div class="notice notice-warning is-dismissible"><p>%s</p></div>',
-			esc_html(
-				sprintf(
-					/* translators: %s: comma-separated list of placement names */
-					__( "This ad's size doesn't fit: %s. It was not saved for those placements.", 'wb-ads-rotator-with-split-test' ),
-					implode( ', ', array_map( 'sanitize_text_field', $rejected ) )
-				)
-			)
 		);
 	}
 
@@ -1538,8 +1500,21 @@ class Admin {
 
 		$engine     = Placement_Engine::get_instance();
 		$all_places = $engine->get_selectable_placements_grouped();
+
+		// Owner decision (card 10343726460, comment 10343765689): with shape
+		// matching on, a placement the ad's resolved size does not fit is
+		// greyed out (disabled, with a note on the size it accepts) instead
+		// of letting the admin tick it and silently dropping it after save.
+		// Same rule the portal wizard already enforces on its slot grid.
+		// Existing sites that have not opted into format_matching keep
+		// every placement tickable, same as today.
+		$enforce_format = (bool) apply_filters(
+			'wbam_enforce_format_matching',
+			\WBAM\Core\Settings_Helper::format_matching_enabled(),
+			$post->ID
+		);
 		?>
-		<div class="wbam-metabox wbam-placements-metabox" data-no-placement-types="<?php echo esc_attr( (string) wp_json_encode( array_values( $no_placement_types ) ) ); ?>">
+		<div class="wbam-metabox wbam-placements-metabox" data-no-placement-types="<?php echo esc_attr( (string) wp_json_encode( array_values( $no_placement_types ) ) ); ?>" data-enforce-format="<?php echo esc_attr( $enforce_format ? '1' : '0' ); ?>">
 			<p class="wbam-placements-unavailable-notice"<?php echo $placements_hidden ? '' : ' hidden'; ?>>
 				<?php esc_html_e( 'This ad type is not assigned to a placement. It plays inside protected lesson videos (pre-roll, mid-roll, post-roll) or as a standalone player, delivered by the video engine. Ticking boxes below has no effect.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
@@ -1549,12 +1524,24 @@ class Admin {
 				<div class="wbam-placement-group">
 					<h4><?php echo esc_html( ucfirst( $group ) ); ?> <?php esc_html_e( 'Placements', 'wb-ads-rotator-with-split-test' ); ?></h4>
 					<div class="wbam-placement-options">
-						<?php foreach ( $group_placements as $placement ) : ?>
-							<label class="wbam-placement-option">
-								<input type="checkbox" name="wbam_placements[]" value="<?php echo esc_attr( $placement->get_id() ); ?>" <?php checked( in_array( $placement->get_id(), $placements, true ) ); ?> />
+						<?php
+						foreach ( $group_placements as $placement ) :
+							$placement_id = $placement->get_id();
+							$is_checked   = in_array( $placement_id, $placements, true );
+							$accepted     = \WBAM\Core\Ad_Formats::get_placement_accepted_formats( $placement_id );
+							$sizes_label  = wbam_placement_sizes_label( $accepted )['label'];
+							// Initial (no-JS) paint: the ad's currently PERSISTED format/
+							// dimensions decide whether the box starts disabled. The
+							// inline script below recomputes this live as the admin
+							// changes the Sizing fields, before anything is saved.
+							$fits = ! $enforce_format || \WBAM\Core\Ad_Formats::fits( $post->ID, $placement_id );
+							?>
+							<label class="wbam-placement-option<?php echo $fits ? '' : ' wbam-placement-option--disabled'; ?>">
+								<input type="checkbox" name="wbam_placements[]" value="<?php echo esc_attr( $placement_id ); ?>" <?php checked( $is_checked && $fits ); ?> <?php disabled( ! $fits ); ?> />
 								<span class="wbam-option-body">
 									<span class="wbam-option-title"><?php echo esc_html( $placement->get_name() ); ?></span>
 									<span class="wbam-option-desc"><?php echo esc_html( $placement->get_description() ); ?></span>
+									<span class="wbam-option-size"><?php echo esc_html( $sizes_label ); ?></span>
 								</span>
 							</label>
 						<?php endforeach; ?>
@@ -1620,6 +1607,114 @@ class Admin {
 			</div>
 			</div>
 		</div>
+		<script>
+		jQuery(function($) {
+			// Owner decision (card 10343726460): grey out a placement the
+			// ad's resolved size doesn't fit, live, as the admin changes the
+			// Sizing fields — same rule the portal wizard's slot grid
+			// already enforces, and the same permissive-on-empty /
+			// responsive-always-fits rules as \WBAM\Core\Ad_Formats::fits()
+			// (PHP). Kept as its own small self-contained recompute rather
+			// than reusing the Status metabox's updateCompat() summary,
+			// which is deliberately NOT permissive on an empty
+			// accepted_formats list (see Ad_Formats::summarize_placement_compat()
+			// docblock) — reusing it here would grey out placements the
+			// server-side backstop would actually allow.
+			var $options = $( '.wbam-placement-option' );
+
+			if ( ! $options.length || typeof window.wbamFormatData === 'undefined' || ! wbamFormatData.enforceMatching ) {
+				return;
+			}
+
+			function detectFormat( w, h ) {
+				var found = 'custom';
+				$.each( wbamFormatData.formats, function( slug, dims ) {
+					if ( dims.w === w && dims.h === h ) {
+						found = slug;
+						return false;
+					}
+				} );
+				return found;
+			}
+
+			// Mirrors Ad_Formats::fits() (PHP): responsive always fits: an
+			// empty accepted list is permissive (accepts anything); a
+			// custom size fits only when its detected dimensions appear in
+			// the placement's accepted list.
+			function fitsPlacement( format, width, height, accepted ) {
+				if ( format === 'responsive' || ! accepted.length ) {
+					return true;
+				}
+				if ( format === 'custom' ) {
+					if ( ! width || ! height ) {
+						return true; // Unresolved — don't block on a guess.
+					}
+					var matched = detectFormat( width, height );
+					return matched !== 'custom' && accepted.indexOf( matched ) !== -1;
+				}
+				return accepted.indexOf( format ) !== -1;
+			}
+
+			// Current Sizing state, read live from the (separate) Status
+			// metabox's fields. 'unresolved' covers Auto-detect pending and
+			// Custom with no dimensions yet — treated as fits-everything,
+			// the same permissive default Ad_Formats::get_ad_format() falls
+			// back to for an ad with no resolved format yet.
+			function currentSizingState() {
+				var mode = $( 'input[name="wbam_sizing_mode"]:checked' ).val() || 'responsive';
+				if ( mode === 'responsive' ) {
+					return { format: 'responsive', width: 0, height: 0 };
+				}
+				var format = $( '#wbam_ad_format' ).val() || '';
+				if ( '' === format ) {
+					return { format: 'responsive', width: 0, height: 0 }; // Auto-detect pending.
+				}
+				if ( 'custom' === format ) {
+					return {
+						format: 'custom',
+						width: parseInt( $( 'input[name="wbam_ad_width"]' ).val(), 10 ) || 0,
+						height: parseInt( $( 'input[name="wbam_ad_height"]' ).val(), 10 ) || 0
+					};
+				}
+				return { format: format, width: 0, height: 0 };
+			}
+
+			function refreshPlacementAvailability() {
+				var state = currentSizingState();
+
+				$options.each( function() {
+					var $option  = $( this );
+					var $checkbox = $option.find( 'input[type="checkbox"]' );
+					var entry    = wbamFormatData.placements[ $checkbox.val() ];
+					if ( ! entry ) {
+						return; // No registry data for this slug — leave it alone.
+					}
+
+					var fits = fitsPlacement( state.format, state.width, state.height, entry.accepted || [] );
+
+					$option.toggleClass( 'wbam-placement-option--disabled', ! fits );
+					$checkbox.prop( 'disabled', ! fits );
+
+					if ( ! fits && $checkbox.is( ':checked' ) ) {
+						$checkbox.prop( 'checked', false );
+					}
+				} );
+			}
+
+			// The Sizing controls live in the Status metabox, outside this
+			// metabox's DOM subtree, and drag-reordering means load order
+			// isn't guaranteed — delegate on document, same pattern the
+			// Status metabox's own script already uses for the reverse
+			// direction (listening to wbam_placements[] changes).
+			$( document ).on(
+				'change input',
+				'input[name="wbam_sizing_mode"], #wbam_ad_format, input[name="wbam_ad_width"], input[name="wbam_ad_height"]',
+				refreshPlacementAvailability
+			);
+
+			refreshPlacementAvailability();
+		});
+		</script>
 		<?php
 	}
 
@@ -2591,12 +2686,20 @@ class Admin {
 
 			// Owner decision 13 (card 10343726460): every placement the admin
 			// ticks must fit the ad's size, the same rule the advertiser
-			// portal enforces on submission. Gated behind the same flag that
-			// turns on render-time and portal enforcement, so an existing
-			// site that hasn't opted in yet keeps today's behavior (any
-			// ticked placement is saved, whether or not it fits). Only
-			// touches placements THIS save offered (the $unoffered slugs
-			// above are never removed here either).
+			// portal enforces on submission. render_placements_metabox()
+			// already greys out (disables) a mismatched placement so it
+			// can't be ticked in the first place — this is the backstop for
+			// any write path that skips that UI (a direct POST, a bulk
+			// action, a future REST/WP-CLI update), so it stays silent
+			// rather than surfacing an after-the-fact notice; the admin
+			// never sees a placement they ticked get dropped, because the
+			// UI never let them tick a mismatched one to begin with. Gated
+			// behind the same flag that turns on render-time and portal
+			// enforcement, so an existing site that hasn't opted in yet
+			// keeps today's behavior (any ticked placement is saved,
+			// whether or not it fits). Only touches placements THIS save
+			// offered (the $unoffered slugs above are never removed here
+			// either).
 			$enforce_format = (bool) apply_filters(
 				'wbam_enforce_format_matching',
 				\WBAM\Core\Settings_Helper::format_matching_enabled(),
@@ -2604,26 +2707,15 @@ class Admin {
 			);
 
 			if ( $enforce_format && class_exists( '\\WBAM\\Core\\Ad_Formats' ) ) {
-				$rejected = array();
-				$fitting  = array();
+				$fitting = array();
 
 				foreach ( $placements as $placement_id ) {
 					if ( in_array( $placement_id, $unoffered, true ) || \WBAM\Core\Ad_Formats::fits( $post_id, $placement_id ) ) {
 						$fitting[] = $placement_id;
-					} else {
-						$rejected[] = $placement_id;
 					}
 				}
 
-				if ( ! empty( $rejected ) ) {
-					$registry       = apply_filters( 'wbam_get_placements', array() );
-					$rejected_names = array();
-					foreach ( $rejected as $slug ) {
-						$rejected_names[] = isset( $registry[ $slug ]['name'] ) ? (string) $registry[ $slug ]['name'] : $slug;
-					}
-					set_transient( 'wbam_placement_mismatch_' . $post_id, $rejected_names, MINUTE_IN_SECONDS );
-					$placements = $fitting;
-				}
+				$placements = $fitting;
 			}
 
 			update_post_meta( $post_id, '_wbam_placements', $placements );
@@ -2718,9 +2810,17 @@ class Admin {
 		}
 
 		return array(
-			'formats'    => $formats_out,
-			'placements' => $placements_out,
-			'i18n'       => self::compat_i18n(),
+			'formats'         => $formats_out,
+			'placements'      => $placements_out,
+			'i18n'            => self::compat_i18n(),
+			// Same live-disable rule the Placements metabox's inline script
+			// reads to decide whether to grey out a mismatched checkbox
+			// (card 10343726460). Off = existing site that hasn't opted in;
+			// every placement stays tickable exactly as it does today.
+			'enforceMatching' => (bool) apply_filters(
+				'wbam_enforce_format_matching',
+				\WBAM\Core\Settings_Helper::format_matching_enabled()
+			),
 		);
 	}
 
