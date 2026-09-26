@@ -48,6 +48,6 @@ class Test_Inquiry_Reply_From extends Pro_Test_Case {
 		$this->assertCount( 1, $sent );
 		$from = array_values( array_filter( $sent[0]['headers'], static fn( $h ) => 0 === stripos( $h, 'From:' ) ) );
 		$this->assertSame( array( 'From: Ad Desk <ads@example.org>' ), $from, 'Exactly one From, the configured one.' );
-		$this->assertContains( 'Reply-To: Sam Seller <sam@seller.test>', $sent[0]['headers'] );
+		$this->assertContains( 'Reply-To: "Sam Seller" <sam@seller.test>', $sent[0]['headers'] );
 	}
 }
