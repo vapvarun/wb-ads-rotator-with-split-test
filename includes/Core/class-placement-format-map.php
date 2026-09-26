@@ -211,7 +211,6 @@ class Placement_Format_Map {
 		$box_tower            = array_merge( self::shape_formats( array( 'box', 'tower' ) ), array( $r ) );
 		$banner_box           = array_merge( self::shape_formats( array( 'banner', 'box' ) ), array( $r ) );
 		$banner_box_billboard = array_merge( self::shape_formats( array( 'banner', 'box', 'billboard' ) ), array( $r ) );
-		$box_billboard        = array_merge( self::shape_formats( array( 'box', 'billboard' ) ), array( $r ) );
 
 		$map = array(
 			// Core placements (free).
@@ -224,7 +223,10 @@ class Placement_Format_Map {
 			// before/after-post strip can run full-width (Banner or
 			// Billboard) or as an in-flow rectangle (Box).
 			'content'                      => $banner_box_billboard,
-			'after_paragraph'              => $box_billboard,
+			// Owner decision (QA wave 4, card 10343726460): a mid-article
+			// slot can run full-width (Banner) or as an in-flow rectangle
+			// (Box/Billboard) - same acceptance as 'content'.
+			'after_paragraph'              => $banner_box_billboard,
 			'widget'                       => $box_tower, // Sidebar: Box or Tower.
 			'before_archive'               => $banner,
 			'after_archive'                => $banner,

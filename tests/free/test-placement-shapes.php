@@ -104,6 +104,16 @@ class Test_Placement_Shapes extends \WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * Owner decision (QA wave 4, card 10343726460): 'after_paragraph' takes
+	 * the same three shapes as 'content' — Banner, Box or Billboard — not
+	 * just Box/Billboard.
+	 */
+	public function test_after_paragraph_accepts_banner_too(): void {
+		$leaderboard_id = $this->ad_with_format( 'leaderboard', 728, 90 );
+		$this->assertTrue( Ad_Formats::fits( $leaderboard_id, 'after_paragraph' ), "'after_paragraph' should accept the Banner shape." );
+	}
+
 	public function test_box_sizes_fit_widget_not_header(): void {
 		$rect_id = $this->ad_with_format( 'medium-rectangle', 300, 250 );
 		$this->assertTrue( Ad_Formats::fits( $rect_id, 'widget' ), 'A 300x250 Box ad fits the sidebar.' );

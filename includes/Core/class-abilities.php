@@ -974,6 +974,9 @@ class Abilities {
 
 		if ( ! empty( $input['placements'] ) && is_array( $input['placements'] ) ) {
 			$placements = array_map( 'sanitize_text_field', $input['placements'] );
+			// QA wave 4 (10343726460): same fit check as every other save
+			// path, routed through the one shared helper.
+			$placements = wbam_filter_placements_to_fitting( $post_id, $placements );
 			update_post_meta( $post_id, '_wbam_placements', $placements );
 		}
 
@@ -1025,6 +1028,9 @@ class Abilities {
 
 		if ( isset( $input['placements'] ) && is_array( $input['placements'] ) ) {
 			$placements = array_map( 'sanitize_text_field', $input['placements'] );
+			// QA wave 4 (10343726460): same fit check as every other save
+			// path, routed through the one shared helper.
+			$placements = wbam_filter_placements_to_fitting( $id, $placements );
 			update_post_meta( $id, '_wbam_placements', $placements );
 		}
 

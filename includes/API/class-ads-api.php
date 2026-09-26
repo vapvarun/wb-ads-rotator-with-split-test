@@ -729,6 +729,10 @@ class Ads_API {
 
 		if ( isset( $request['placements'] ) && is_array( $request['placements'] ) ) {
 			$placements = array_map( 'sanitize_text_field', $request['placements'] );
+			// QA wave 4 (10343726460): the same fit check the admin editor
+			// and the advertiser portal enforce on save, routed through the
+			// one shared helper. A no-op unless format_matching is on.
+			$placements = wbam_filter_placements_to_fitting( $post_id, $placements );
 			update_post_meta( $post_id, '_wbam_placements', $placements );
 		}
 

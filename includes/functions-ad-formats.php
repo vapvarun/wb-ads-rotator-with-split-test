@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WBAM\Core\Ad_Formats;
+use WBAM\Core\Settings_Helper;
 
 if ( ! function_exists( 'wbam_update_ad_data' ) ) {
 	/**
@@ -286,6 +287,56 @@ if ( ! function_exists( 'wbam_placement_sizes_label' ) ) {
 			'permissive' => $permissive,
 			'label'      => $label,
 		);
+	}
+}
+
+if ( ! function_exists( 'wbam_filter_placements_to_fitting' ) ) {
+	/**
+	 * Filter a placements list down to the ones the ad's resolved size
+	 * fits, when shape/format matching is enforced.
+	 *
+	 * Single source of truth for "does every ticked placement fit" on
+	 * SAVE, called from every write path that persists `_wbam_placements`
+	 * for an ad that already exists (own post ID to check dimensions
+	 * against): the admin editor (class-admin.php save_meta — the
+	 * grey-out is the UI-level guard, this is its backstop), the
+	 * advertiser portal's edit path, the FREE REST API, and the
+	 * Abilities executor. Card 10343726460 wave 4: the rule previously
+	 * only ran on the admin editor and the advertiser portal's CREATE
+	 * path (Ad_Submission_Manager::validate_creative_fit(), which runs
+	 * pre-persistence against submitted data and can't call this helper
+	 * — no post ID exists yet).
+	 *
+	 * Existing sites that have not opted into format_matching keep
+	 * every placement exactly as posted (today's behavior).
+	 *
+	 * @since 3.2.0
+	 * @param int      $ad_id     Ad post ID (already has its resolved format/dimensions persisted).
+	 * @param string[] $placements Placement slugs to filter.
+	 * @param string[] $exempt     Slugs to keep regardless of fit — e.g. slugs a caller's own form
+	 *                             didn't offer and so cannot have meaningfully re-validated (see
+	 *                             class-admin.php save_meta()'s $unoffered).
+	 * @return string[] The subset of $placements that fits, plus every slug in $exempt.
+	 */
+	function wbam_filter_placements_to_fitting( $ad_id, array $placements, array $exempt = array() ) {
+		$enforce = (bool) apply_filters(
+			'wbam_enforce_format_matching',
+			Settings_Helper::format_matching_enabled(),
+			$ad_id
+		);
+
+		if ( ! $enforce || ! class_exists( '\\WBAM\\Core\\Ad_Formats' ) ) {
+			return $placements;
+		}
+
+		$fitting = array();
+		foreach ( $placements as $slug ) {
+			if ( in_array( $slug, $exempt, true ) || Ad_Formats::fits( $ad_id, $slug ) ) {
+				$fitting[] = $slug;
+			}
+		}
+
+		return $fitting;
 	}
 }
 

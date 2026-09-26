@@ -2699,24 +2699,11 @@ class Admin {
 			// keeps today's behavior (any ticked placement is saved,
 			// whether or not it fits). Only touches placements THIS save
 			// offered (the $unoffered slugs above are never removed here
-			// either).
-			$enforce_format = (bool) apply_filters(
-				'wbam_enforce_format_matching',
-				\WBAM\Core\Settings_Helper::format_matching_enabled(),
-				$post_id
-			);
-
-			if ( $enforce_format && class_exists( '\\WBAM\\Core\\Ad_Formats' ) ) {
-				$fitting = array();
-
-				foreach ( $placements as $placement_id ) {
-					if ( in_array( $placement_id, $unoffered, true ) || \WBAM\Core\Ad_Formats::fits( $post_id, $placement_id ) ) {
-						$fitting[] = $placement_id;
-					}
-				}
-
-				$placements = $fitting;
-			}
+			// either). wbam_filter_placements_to_fitting() is the one
+			// shared check every save path routes through (QA wave 4,
+			// 10343726460): the admin editor here, the advertiser portal's
+			// edit path, the FREE REST API, and the Abilities executor.
+			$placements = wbam_filter_placements_to_fitting( $post_id, $placements, $unoffered );
 
 			update_post_meta( $post_id, '_wbam_placements', $placements );
 		}
