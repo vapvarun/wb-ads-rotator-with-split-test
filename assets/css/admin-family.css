@@ -138,6 +138,12 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 	justify-content: space-between;
 	gap:             var(--wbam-space-3);
 	margin-block-end: var(--wbam-space-3);
+	/* Block-level by default, but stated explicitly: a hand-rolled toolbar
+	   like this one (Inquiries, Partnerships, Classified Reports) has no
+	   table below it to inherit a width from, unlike the WP_List_Table
+	   screens whose search box sits inside the table's own .tablenav and
+	   naturally matches the table's right edge. */
+	width: 100%;
 }
 
 .wbam-list-toolbar .subsubsub {
@@ -150,6 +156,11 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 	align-items: center;
 	gap:         var(--wbam-space-1);
 	margin:      0;
+	/* Belt-and-braces flush-right: holds even if flex-wrap ever puts this on
+	   its own line, where justify-content has nothing left to distribute
+	   against (card 10339876480 item 10 - ended short of the other lists'
+	   right edge). */
+	margin-inline-start: auto;
 	float:       none;
 	white-space: nowrap;
 }
