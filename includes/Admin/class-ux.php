@@ -412,27 +412,14 @@ class UX {
 	}
 
 	/**
-	 * Render a row of same-page or multi-view tabs — the one tab style
-	 * every admin screen with more than one view uses (Help & Docs, Slot
-	 * Inventory's Overview/Impression Audit, ...). Two visual variants of
-	 * the same `.wbam-tabs` component, and they are two different ARIA
-	 * widgets, not one look with two skins - pick by what the tabs DO,
-	 * never by which one "matches" a neighbouring screen:
-	 *
-	 * - 'underline' (default): PAGE NAVIGATION between separate URLs (Help &
-	 *   Docs, Slot Inventory's Overview/Impression Audit). Each tab is a plain
-	 *   link to a full sub-page, so it's a `<nav aria-label>` of `<a>`s with
-	 *   `aria-current="page"` on the active one - the same pattern as any
-	 *   other in-page nav, per the WAI-ARIA Authoring Practices ("Tabs" is
-	 *   for panels that swap in place under ONE url, not a link list).
-	 * - 'pills': a SAME-PAGE VALUE PICKER sitting inside a metabox or narrow
-	 *   card (the ad-type picker) - this is the actual ARIA Tabs pattern
-	 *   (`role="tablist"`/`role="tab"`/`aria-selected`), because activating
-	 *   one swaps content under the same URL without navigating.
-	 *
-	 * A navigation row must never carry role=tablist/tab; a value picker must
-	 * never be a bare link list. Both scroll horizontally instead of wrapping
-	 * to a ragged second row.
+	 * Render the one page-navigation tab row every admin screen with more
+	 * than one view uses (Help & Docs, Slot Inventory's Overview/Impression
+	 * Audit). Each tab is a plain link to a full sub-page, so it is a
+	 * `<nav aria-label>` of `<a>`s with `aria-current="page"` on the active
+	 * one, never role=tablist/tab (WAI-ARIA "Tabs" is for panels that swap
+	 * in place under ONE url). A same-page value picker is a radiogroup of
+	 * cards instead (see the ad-type picker in Admin::render_settings_metabox()).
+	 * Scrolls horizontally instead of wrapping to a ragged second row.
 	 *
 	 * @since 3.2.0
 	 * @since 3.2.0 'underline' renders as `<nav aria-label>` + `aria-current`
@@ -441,10 +428,8 @@ class UX {
 	 * @param array<string,array{label:string,url:string}> $tabs      Ordered
 	 *        map of tab slug => { label, url }.
 	 * @param string                                        $current   Active tab slug.
-	 * @param string                                        $variant   'underline' (default, page navigation) or
-	 *                                                                  'pills' (same-page value picker).
+	 * @param string                                        $variant   Deprecated, ignored: 'underline' is the only style.
 	 * @param string                                        $aria_label Accessible name for the nav landmark.
-	 *                                                                  Only used by the 'underline' variant.
 	 * @return void
 	 */
 	public static function tabs( array $tabs, $current, $variant = 'underline', $aria_label = '' ) {
@@ -452,24 +437,6 @@ class UX {
 			return;
 		}
 
-		if ( 'pills' === $variant ) {
-			?>
-			<nav class="wbam-tabs wbam-tabs--pills" role="tablist">
-				<?php foreach ( $tabs as $slug => $tab ) : ?>
-					<?php $is_active = ( (string) $slug === (string) $current ); ?>
-					<a
-						href="<?php echo esc_url( $tab['url'] ); ?>"
-						class="wbam-tabs__link<?php echo $is_active ? ' is-active' : ''; ?>"
-						role="tab"
-						<?php echo $is_active ? ' aria-selected="true"' : ' aria-selected="false"'; ?>
-					><?php echo esc_html( $tab['label'] ); ?></a>
-				<?php endforeach; ?>
-			</nav>
-			<?php
-			return;
-		}
-
-		// 'underline': plain page navigation, not a tablist.
 		if ( '' === $aria_label ) {
 			$aria_label = __( 'Section navigation', 'wb-ads-rotator-with-split-test' );
 		}

@@ -1425,19 +1425,22 @@ class Admin {
 			 * the radio's label now, one element, one source of truth.
 			 * Arrow-key movement between options and native focus both
 			 * come from the browser's radio-group behavior for free.
+			 * Owner decision: shown as icon cards (the Sizing card's
+			 * selection style), not pills - it is a one-time choice of
+			 * what the ad is, not a switch between views.
 			 */
 			?>
-			<div class="wbam-tabs wbam-tabs--pills wbam-adtype-tabs__group" role="radiogroup" aria-label="<?php esc_attr_e( 'Ad type', 'wb-ads-rotator-with-split-test' ); ?>">
+			<div class="wbam-adtype-tabs__group" role="radiogroup" aria-label="<?php esc_attr_e( 'Ad type', 'wb-ads-rotator-with-split-test' ); ?>">
 				<?php foreach ( $ad_types as $type ) : ?>
-					<label class="wbam-tabs__link wbam-adtype-tab<?php echo ( $ad_type === $type->get_id() ) ? ' is-active' : ''; ?>">
+					<label class="wbam-adtype-tab<?php echo ( $ad_type === $type->get_id() ) ? ' is-active' : ''; ?>">
 						<input type="radio"
 								name="wbam_data[type]"
 								value="<?php echo esc_attr( $type->get_id() ); ?>"
 								id="wbam-adtype-<?php echo esc_attr( $type->get_id() ); ?>"
 								class="wbam-adtype-radio"
 								<?php checked( $ad_type, $type->get_id() ); ?> />
-						<span class="dashicons <?php echo esc_attr( $type->get_icon() ); ?>"></span>
-						<?php echo esc_html( $type->get_name() ); ?>
+						<span class="dashicons <?php echo esc_attr( $type->get_icon() ); ?>" aria-hidden="true"></span>
+						<span class="wbam-adtype-tab__name"><?php echo esc_html( $type->get_name() ); ?></span>
 					</label>
 				<?php endforeach; ?>
 			</div>

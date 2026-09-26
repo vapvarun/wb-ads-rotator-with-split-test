@@ -522,11 +522,9 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 /*
  * The one tab row every multi-view admin screen uses (Help & Docs, Slot
  * Inventory's Overview/Impression Audit) — plain `.wbam-tabs` for URL
- * navigation between full sub-pages. `.wbam-tabs--pills` is the same
- * component for a same-page picker inside a metabox or narrow card (the ad
- * editor's ad-type picker), where a filled segment reads better than an
- * underline. Both always scroll horizontally instead of wrapping to a
- * ragged second row — see UX::tabs().
+ * navigation between full sub-pages. Always scrolls horizontally instead
+ * of wrapping to a ragged second row - see UX::tabs(). A same-page value
+ * picker is a card grid instead (.wbam-adtype-tabs in admin.css).
  */
 .wbam-tabs {
 	display:               flex;
@@ -563,27 +561,6 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 	color:         var(--wbam-accent);
 	font-weight:   var(--wbam-weight-semibold);
 	border-bottom-color: var(--wbam-accent);
-}
-
-.wbam-tabs--pills {
-	border-bottom: none;
-	gap:           var(--wbam-space-1);
-	padding:       var(--wbam-space-1);
-	background:    var(--wbam-surface);
-	border-radius: var(--wbam-r-md);
-}
-
-.wbam-tabs--pills .wbam-tabs__link {
-	margin-block-end: 0;
-	padding:          var(--wbam-space-2) var(--wbam-space-3);
-	border-bottom:    none;
-	border-radius:    var(--wbam-r-sm);
-}
-
-.wbam-tabs--pills .wbam-tabs__link.is-active {
-	color:      var(--wbam-text);
-	background: var(--wbam-bg);
-	box-shadow: var(--wbam-shadow-sm);
 }
 
 /* ── Status badge ────────────────────────────────────────────────────────── */

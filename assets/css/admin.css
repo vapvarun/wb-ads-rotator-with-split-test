@@ -49,48 +49,73 @@
 	pointer-events: none;
 }
 
-/* Tab nav/pill styling lives in the shared .wbam-tabs / .wbam-tabs--pills
-   component (admin-family.css) — this file only adds the icon sizing the
-   family's generic tab link doesn't know about, plus this instance's own
-   layout: this picker chooses a value (every option must stay reachable,
-   not scroll off), unlike the shared component's other consumers (Help &
-   Docs, Slot Inventory), which are real between-page navigation and are
-   deliberately exempt from this override. QA wave 4 (10343712795): at
-   390px the nowrap row showed 2 of 6 with no scroll cue; at 1280 the last
-   pill was clipped. An even grid instead, sized by the picker's own box
-   (see the container rules below). */
+/* Owner decision: the ad type is picked from a grid of icon cards, not
+   pills - it is a one-time choice of what the ad is. The selected card
+   uses the same selection style as the Sizing and Placement cards. The
+   grid is sized by the picker's own box, not the viewport (at 1280 the
+   main column is ~750px): 3 x 2 by default, 2 x 3 in a narrow box, one
+   row of 6 only when the box truly has room. */
 .wbam-adtype-tabs {
-	/* The picker sizes to its metabox column, not the viewport: at 1280
-	   the main column is ~750px, where a 6-up row wrapped as 5 + 1. */
 	container-type: inline-size;
 }
 
-/* .wbam-tabs (display:flex) is more specific than a lone class, so the
-   grid is declared on both classes. Even rows only: 3 x 2 by default,
-   2 x 3 in a narrow box, one row of 6 only when the box truly has room. */
-.wbam-tabs.wbam-adtype-tabs__group {
+.wbam-adtype-tabs__group {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: var(--wbam-space-1);
-	overflow-x: visible;
+	gap: var(--wbam-space-2);
 }
 
 @container (max-width: 420px) {
-	.wbam-tabs.wbam-adtype-tabs__group {
+	.wbam-adtype-tabs__group {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
 @container (min-width: 900px) {
-	.wbam-tabs.wbam-adtype-tabs__group {
+	.wbam-adtype-tabs__group {
 		grid-template-columns: repeat(6, minmax(0, 1fr));
 	}
 }
 
 .wbam-adtype-tab {
-	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	justify-content: center;
+	gap: var(--wbam-space-1);
+	min-height: 72px;
+	padding: var(--wbam-space-3) var(--wbam-space-2);
+	background: var(--wbam-surface);
+	border: 1px solid var(--wbam-border-subtle);
+	border-radius: var(--wbam-r-md);
+	color: var(--wbam-text);
+	font-weight: 500;
+	line-height: 1.3;
 	text-align: center;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.wbam-adtype-tab .dashicons {
+	width: 24px;
+	height: 24px;
+	font-size: 24px;
+	color: var(--wbam-text-muted);
+}
+
+.wbam-adtype-tab:hover {
+	background: var(--wbam-bg);
+	border-color: var(--wbam-accent);
+}
+
+.wbam-adtype-tab.is-active {
+	background: var(--wbam-accent-light);
+	border-color: var(--wbam-accent);
+	box-shadow: inset 0 0 0 1px var(--wbam-accent);
+}
+
+.wbam-adtype-tab.is-active .dashicons {
+	color: var(--wbam-accent);
 }
 
 .wbam-adtype-tab:focus-within {
