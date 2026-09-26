@@ -80,6 +80,13 @@ final class Pointer_Emitter {
 		$inline .= '$t.first().pointer({';
 		$inline .= 'content: "<h3>" + p.title + "</h3><p>" + p.content + "</p>",';
 		$inline .= 'position: { edge: p.edge || "top", align: p.align || "center" },';
+		// E2 fix: the 420px CSS default (set below for wide content-area
+		// targets like the Sizing section) overflows a narrow sidebar
+		// target sitting close to the viewport's right edge, clipping the
+		// pointer's own Close button off-screen. A definition can opt into
+		// a narrower box via `width`; wp-pointer.js applies `pointerWidth`
+		// as an inline style, which wins over the shared class rule below.
+		$inline .= 'pointerWidth: p.width || 420,';
 		$inline .= 'pointerClass: ' . wp_json_encode( 'wp-pointer ' . $pointer_class ) . ',';
 		$inline .= 'close: function(){';
 		$inline .= '$.post(ajaxUrl, { action: ajaxAction, pointer: slug, _ajax_nonce: nonce });';

@@ -364,11 +364,15 @@
    Extra Settings
    ========================================================================== */
 
+/* E4 fix: this panel holds normal per-placement config (Popup/Modal,
+   Comments, Paragraph, Activity Stream settings) — nothing here is a
+   warning, so it must not borrow the warning colour. Neutral panel,
+   matching .wbam-sizing-fixed-fields' treatment elsewhere on this screen. */
 .wbam-extra-settings {
 	margin-top: 20px;
 	padding: 20px;
-	background: var(--wbam-warning-bg);
-	border: 1px solid var(--wbam-warning);
+	background: var(--wbam-bg);
+	border: 1px solid var(--wbam-border);
 	border-radius: var(--wbam-r-md);
 }
 
@@ -1456,13 +1460,19 @@
 	font-size: 11px;
 }
 
+/* E5 fix: this used to be a full blue "info" panel sitting right below the
+   grey .wbam-sizing-fixed-fields panel — two different nested box styles in
+   the same Sizing group. One neutral panel throughout the Status metabox;
+   the accent lives only in the left border, same language
+   .wbam-sizing-unavailable-notice already uses above. */
 .wbam-sizing-compat {
 	display: flex;
 	align-items: flex-start;
 	gap: 6px;
 	padding: 10px 12px;
-	background: var(--wbam-accent-light);
-	border: 1px solid var(--wbam-accent-border);
+	background: var(--wbam-bg);
+	border: 1px solid var(--wbam-border);
+	border-left: 4px solid var(--wbam-accent);
 	border-radius: var(--wbam-r-md);
 	font-size: var(--wbam-font-size-xs);
 	line-height: 1.5;

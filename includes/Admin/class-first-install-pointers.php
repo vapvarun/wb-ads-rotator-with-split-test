@@ -201,7 +201,14 @@ class First_Install_Pointers {
 				'target'  => '#wbam_priority',
 				'title'   => esc_html__( 'Priority controls your win share', 'wb-ads-rotator-with-split-test' ),
 				'content' => esc_html__( 'When multiple ads compete for the same slot, higher priority wins a bigger share. Default is 5. Live hint below shows the exact win percentage in a three-way tie.', 'wb-ads-rotator-with-split-test' ),
-				'edge'    => 'top',
+				// E2 fix: this target lives in the narrow sidebar column,
+				// close to the viewport's right edge — the shared 420px
+				// width (needed for the wider content-area pointers below)
+				// pushed its Close button past the edge. 'bottom' opens the
+				// box above the slider instead of below it, so it no longer
+				// covers the Max Views field underneath.
+				'width'   => 260,
+				'edge'    => 'bottom',
 				'align'   => 'left',
 			),
 			'placement_cards' => array(
