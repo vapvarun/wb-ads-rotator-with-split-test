@@ -77,6 +77,21 @@ class Test_Advertise_Page_Polish extends Pro_Test_Case {
 		$this->assertStringContainsString( 'redirect_to=', $html );
 	}
 
+	public function test_guest_on_closed_registration_can_ask_for_an_account(): void {
+		update_option( 'users_can_register', 0 );
+
+		$html = $this->render();
+
+		$this->assertStringContainsString( 'Contact us to get an account', $html );
+		$this->assertStringContainsString( 'href="' . wbam_pro_get_invitation_contact_url() . '"', $html, 'Same contact target the old Contact us button used.' );
+	}
+
+	public function test_open_registration_has_no_contact_line(): void {
+		update_option( 'users_can_register', 1 );
+
+		$this->assertStringNotContainsString( 'Contact us to get an account', $this->render() );
+	}
+
 	public function test_all_slots_label_does_not_address_the_visitor(): void {
 		add_filter(
 			'wbam_pro_selectable_placements',
