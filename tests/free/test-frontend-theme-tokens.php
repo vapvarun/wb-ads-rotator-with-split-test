@@ -30,15 +30,14 @@ class Test_Frontend_Theme_Tokens extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 		$this->previous_theme = get_stylesheet();
-		// Registered on init in production; a test that reset the style
-		// registry earlier in the run may have dropped it.
-		\WBAM\Core\Plugin::get_instance()->register_shared_assets();
 	}
 
 	public function tear_down(): void {
 		switch_theme( $this->previous_theme );
 		wp_dequeue_style( 'wbam-frontend' );
 		wp_deregister_style( 'wbam-frontend' );
+		// Its inline theme-button token must not leak into the next test.
+		wp_deregister_style( 'wbam-frontend-tokens' );
 		parent::tear_down();
 	}
 
@@ -68,9 +67,8 @@ class Test_Frontend_Theme_Tokens extends WP_UnitTestCase {
 	 * portal pages without an ad lost every --wbam-* token and dark mode.
 	 */
 	public function test_palette_lives_in_its_own_handle_the_ad_css_depends_on(): void {
-		$this->assertTrue( wp_style_is( 'wbam-frontend-tokens', 'registered' ) );
-
 		Frontend::get_instance()->enqueue_assets();
+		$this->assertTrue( wp_style_is( 'wbam-frontend-tokens', 'registered' ) );
 		$this->assertContains( 'wbam-frontend-tokens', wp_styles()->registered['wbam-frontend']->deps );
 
 		$tokens = file_get_contents( WBAM_PATH . 'assets/css/frontend-tokens.css' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents

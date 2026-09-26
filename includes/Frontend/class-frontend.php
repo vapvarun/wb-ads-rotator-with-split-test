@@ -70,6 +70,12 @@ class Frontend {
 	 * @since 3.2.0 Split from the previous always-on enqueue_assets().
 	 */
 	public function enqueue_assets() {
+		// frontend.css depends on the palette handle registered on init; a
+		// style registry rebuilt after init must not leave it dangling.
+		if ( ! wp_style_is( 'wbam-frontend-tokens', 'registered' ) ) {
+			\WBAM\Core\Plugin::get_instance()->register_shared_assets();
+		}
+
 		$frontend_css_url = wbam_asset_url( 'css/frontend.css' );
 
 		wp_register_style(
