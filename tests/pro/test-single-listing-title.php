@@ -33,14 +33,23 @@ class Test_Single_Listing_Title extends Pro_Test_Case {
 	 */
 	private $previous_theme;
 
+	/**
+	 * Script and style registries before the test; the render enqueues.
+	 *
+	 * @var array
+	 */
+	private $saved_registries;
+
 	public function set_up(): void {
 		parent::set_up();
-		$this->previous_theme = get_stylesheet();
+		$this->previous_theme   = get_stylesheet();
+		$this->saved_registries = array( $GLOBALS['wp_scripts'] ?? null, $GLOBALS['wp_styles'] ?? null );
 		self::unregister_templates();
 	}
 
 	public function tear_down(): void {
 		self::unregister_templates();
+		list( $GLOBALS['wp_scripts'], $GLOBALS['wp_styles'] ) = $this->saved_registries;
 		switch_theme( $this->previous_theme );
 		parent::tear_down();
 	}
@@ -81,6 +90,14 @@ class Test_Single_Listing_Title extends Pro_Test_Case {
 		_register_theme_block_patterns();
 		( new Block_Theme_Templates() )->register();
 
+		// Render against copies of the registries, with the shared toast and
+		// Lucide handles Free registers on init (an earlier test may have
+		// rebuilt the registries without them).
+		$GLOBALS['wp_scripts'] = clone wp_scripts();
+		$GLOBALS['wp_styles']  = clone wp_styles();
+		wbam()->register_shared_assets();
+		wbam_register_lucide();
+
 		$this->go_to( get_permalink( $classified->post_id ) );
 		$this->assertTrue( is_singular( 'wbam-classified' ) );
 		$template = get_query_template( 'single', array( 'single-wbam-classified.php', 'single.php' ) );
@@ -102,6 +119,7 @@ class Test_Single_Listing_Title extends Pro_Test_Case {
 		Classified_Shortcodes::get_instance()->hide_featured_image_css();
 		$css = ob_get_clean();
 
+		$this->assertStringContainsString( '.single-wbam-classified .entry-header', $css, 'Classic theme title stays hidden.' );
 		$this->assertStringNotContainsString( '.wp-block-post-title', $css, 'Must not hide titles in a "More posts" list.' );
 		$this->assertStringContainsString( '.single-wbam-classified .site-sub-header .entry-title', $css, 'BuddyX sub-header title is hidden.' );
 	}
