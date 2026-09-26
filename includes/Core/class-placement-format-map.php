@@ -31,6 +31,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Placement_Format_Map {
 
 	/**
+	 * Per-request memoization for shapes()/map() — see reset_cache().
+	 *
+	 * @var array<string, string[]>|null
+	 */
+	private static $shapes_cache = null;
+
+	/**
+	 * @var array<string, string[]>|null
+	 */
+	private static $map_cache = null;
+
+	/**
 	 * Wire the filters. Called from Plugin::init().
 	 *
 	 * We register two callbacks on wbam_get_placements:
@@ -96,59 +108,133 @@ class Placement_Format_Map {
 	}
 
 	/**
+	 * Shape taxonomy (owner decision 13, card 10343726460, 3.2.0).
+	 *
+	 * Groups the pixel-format taxonomy into the three shapes an advertiser
+	 * actually thinks in: a wide strip (Banner), a squarish box (Box), or a
+	 * tall column (Tower). `map()` below composes each placement's
+	 * accepted_formats from one or more of these lists instead of hand
+	 * -picking format slugs per placement, so every Banner placement gets
+	 * every Banner size (the header used to accept only 3 of the 6 IAB
+	 * banner sizes, which is why a 970x250 "Billboard" ad — a legitimate
+	 * Banner size — warned "No placements match this size yet").
+	 *
+	 * 'square' (250x250) rides along with Box: the QA proposal's Box row
+	 * lists it alongside 300x250/336x280, it is a standard IAB/AdSense
+	 * size, and the plugin's own demo data already sells one in a Box
+	 * placement — narrowing to exactly two sizes would just break that
+	 * demo ad. Override via the `wbam_placement_shapes` filter if a site
+	 * wants the stricter two-size list.
+	 *
+	 * @since 3.2.0
+	 * @return array<string, string[]> Shape name => format slugs.
+	 */
+	public static function shapes() {
+		if ( null !== self::$shapes_cache ) {
+			return self::$shapes_cache;
+		}
+
+		$shapes = array(
+			'banner' => array( 'leaderboard', 'large-leaderboard', 'billboard', 'banner', 'mobile-banner', 'mobile-large-banner' ),
+			'box'    => array( 'medium-rectangle', 'large-rectangle', 'square' ),
+			'tower'  => array( 'skyscraper', 'wide-skyscraper' ),
+		);
+
+		/**
+		 * Filter the shape -> format-slugs map.
+		 *
+		 * @since 3.2.0
+		 * @param array<string, string[]> $shapes
+		 */
+		$shapes = apply_filters( 'wbam_placement_shapes', $shapes );
+
+		self::$shapes_cache = $shapes;
+
+		return $shapes;
+	}
+
+	/**
+	 * Resolve the format slugs for one or more shape names.
+	 *
+	 * @since 3.2.0
+	 * @param string[] $shape_names One or more of 'banner', 'box', 'tower'.
+	 * @return string[] De-duplicated format slugs. Unknown shape names are ignored.
+	 */
+	private static function shape_formats( array $shape_names ) {
+		$shapes = self::shapes();
+		$out    = array();
+
+		foreach ( $shape_names as $name ) {
+			if ( isset( $shapes[ $name ] ) && is_array( $shapes[ $name ] ) ) {
+				$out = array_merge( $out, $shapes[ $name ] );
+			}
+		}
+
+		return array_values( array_unique( $out ) );
+	}
+
+	/**
 	 * The canonical map. Placement slug => list of format slugs.
 	 *
 	 * Every entry should include Ad_Formats::RESPONSIVE so responsive
 	 * ads can always render — a responsive creative by definition fits
 	 * any slot.
 	 *
+	 * Header, footer and between-content placements take the Banner shape;
+	 * the sidebar takes Box or Tower (owner decision 13). Composed from
+	 * shape_formats() rather than hand-picked slugs so a shape's size list
+	 * only needs updating in one place (shapes(), above).
+	 *
 	 * @return array<string, string[]>
 	 */
 	public static function map() {
-		static $map = null;
-
-		if ( null !== $map ) {
-			return $map;
+		if ( null !== self::$map_cache ) {
+			return self::$map_cache;
 		}
 
-		$r = Ad_Formats::RESPONSIVE;
+		$r          = Ad_Formats::RESPONSIVE;
+		$banner     = array_merge( self::shape_formats( array( 'banner' ) ), array( $r ) );
+		$box        = array_merge( self::shape_formats( array( 'box' ) ), array( $r ) );
+		$box_tower  = array_merge( self::shape_formats( array( 'box', 'tower' ) ), array( $r ) );
+		$banner_box = array_merge( self::shape_formats( array( 'banner', 'box' ) ), array( $r ) );
 
 		$map = array(
 			// Core placements (free).
-			'header'                       => array( 'leaderboard', 'large-leaderboard', 'banner', $r ),
-			'footer'                       => array( 'leaderboard', $r ),
+			'header'                       => $banner,
+			'footer'                       => $banner,
 			// Keys must be real placement ids: 'content' (before/after the post)
 			// and 'after_paragraph'. The old before_content / after_content /
 			// paragraph / comment keys matched nothing, so those slots accepted
-			// any size.
-			'content'                      => array( 'leaderboard', 'medium-rectangle', 'large-rectangle', $r ),
-			'after_paragraph'              => array( 'medium-rectangle', 'large-rectangle', $r ),
-			'widget'                       => array( 'medium-rectangle', 'skyscraper', 'wide-skyscraper', 'square', $r ),
-			'before_archive'               => array( 'leaderboard', $r ),
-			'after_archive'                => array( 'leaderboard', $r ),
-			'sticky'                       => array( 'mobile-banner', 'mobile-large-banner', $r ),
-			'popup'                        => array( 'medium-rectangle', 'large-rectangle', $r ),
-			'comments'                     => array( 'medium-rectangle', $r ),
+			// any size. 'content' takes both shapes — a before/after-post strip
+			// can run full-width (Banner) or as an in-flow rectangle (Box).
+			'content'                      => $banner_box,
+			'after_paragraph'              => $box,
+			'widget'                       => $box_tower, // Sidebar: Box or Tower.
+			'before_archive'               => $banner,
+			'after_archive'                => $banner,
+			'sticky'                       => $banner,
+			'popup'                        => $box,
+			'comments'                     => $box,
 			'shortcode'                    => array( $r ), // inline, author controls the container.
 
 			// BuddyPress.
-			'bp_activity'                  => array( 'medium-rectangle', $r ),
-			'bp_before_members'            => array( 'leaderboard', 'medium-rectangle', $r ),
-			'bp_after_members'             => array( 'leaderboard', 'medium-rectangle', $r ),
-			'bp_before_groups'             => array( 'leaderboard', 'medium-rectangle', $r ),
-			'bp_after_groups'              => array( 'leaderboard', 'medium-rectangle', $r ),
+			'bp_activity'                  => $box,
+			'bp_before_members'            => $banner,
+			'bp_after_members'             => $banner,
+			'bp_before_groups'             => $banner,
+			'bp_after_groups'              => $banner,
 
 			// bbPress.
-			'bbpress'                      => array( 'leaderboard', 'medium-rectangle', $r ),
+			'bbpress'                      => $banner_box,
 
 			// Jetonomy.
-			'jetonomy_sidebar_before'      => array( 'medium-rectangle', 'wide-skyscraper', 'skyscraper', $r ),
-			'jetonomy_sidebar_after_about' => array( 'medium-rectangle', 'wide-skyscraper', 'skyscraper', $r ),
-			'jetonomy_sidebar_after'       => array( 'medium-rectangle', 'wide-skyscraper', 'skyscraper', $r ),
-			'jetonomy_after_post_article'  => array( 'leaderboard', 'medium-rectangle', $r ),
-			'jetonomy_before_replies'      => array( 'leaderboard', $r ),
-			'jetonomy_between_replies'     => array( 'leaderboard', 'medium-rectangle', $r ),
-			'jetonomy_after_replies'       => array( 'leaderboard', $r ),
+			'jetonomy_sidebar_before'      => $box_tower,
+			'jetonomy_sidebar_after_about' => $box_tower,
+			'jetonomy_sidebar_after'       => $box_tower,
+			'jetonomy_after_post_article'  => $banner_box,
+			'jetonomy_before_replies'      => $banner,
+			'jetonomy_between_replies'     => $box,
+			'jetonomy_after_replies'       => $banner,
 		);
 
 		/**
@@ -163,7 +249,81 @@ class Placement_Format_Map {
 		 */
 		$map = apply_filters( 'wbam_placement_format_map', $map );
 
+		self::$map_cache = $map;
+
 		return $map;
+	}
+
+	/**
+	 * Clear the per-request memoization of shapes()/map(). Production code
+	 * never needs this — filters are registered once, before either method
+	 * is first called, so the cache is correct for the life of a request.
+	 * It exists for tests that add/remove `wbam_placement_shapes` or
+	 * `wbam_placement_format_map` filters mid-run and need the next call
+	 * to recompute rather than reuse an earlier test's cached result.
+	 *
+	 * @since 3.2.0
+	 */
+	public static function reset_cache() {
+		self::$shapes_cache = null;
+		self::$map_cache    = null;
+	}
+
+	/**
+	 * List existing ads that don't fit at least one of their assigned
+	 * placements under the shape map, for the "existing sites" opt-in
+	 * notice (owner decision 13). Read-only — never changes an ad or its
+	 * placements.
+	 *
+	 * A responsive ad never mismatches (Ad_Formats::fits() short-circuits
+	 * true for it), so this only ever lists ads with a resolved fixed
+	 * shape/size.
+	 *
+	 * @since 3.2.0
+	 * @param int $limit Maximum number of ad titles to return. 0 = count only.
+	 * @return array{count:int, titles:string[]} Total mismatched ads and up to $limit titles.
+	 */
+	public static function get_mismatched_ads( $limit = 20 ) {
+		$ads = get_posts(
+			array(
+				'post_type'              => 'wbam-ad',
+				'post_status'            => array( 'publish', 'draft' ),
+				'posts_per_page'         => -1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$count  = 0;
+		$titles = array();
+
+		foreach ( (array) $ads as $ad_id ) {
+			$placements = get_post_meta( $ad_id, '_wbam_placements', true );
+			if ( ! is_array( $placements ) || empty( $placements ) ) {
+				continue;
+			}
+
+			$mismatched = false;
+			foreach ( $placements as $placement_id ) {
+				if ( ! Ad_Formats::fits( $ad_id, (string) $placement_id ) ) {
+					$mismatched = true;
+					break;
+				}
+			}
+
+			if ( $mismatched ) {
+				++$count;
+				if ( count( $titles ) < $limit ) {
+					$titles[] = get_the_title( $ad_id );
+				}
+			}
+		}
+
+		return array(
+			'count'  => $count,
+			'titles' => $titles,
+		);
 	}
 
 	/**

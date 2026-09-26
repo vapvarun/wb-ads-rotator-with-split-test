@@ -66,6 +66,12 @@ class Ad_Formats {
 				'height'     => 90,
 				'responsive' => false,
 			),
+			'billboard'           => array(
+				'label'      => __( 'Billboard (970x250)', 'wb-ads-rotator-with-split-test' ),
+				'width'      => 970,
+				'height'     => 250,
+				'responsive' => false,
+			),
 			'banner'              => array(
 				'label'      => __( 'Banner (468x60)', 'wb-ads-rotator-with-split-test' ),
 				'width'      => 468,
