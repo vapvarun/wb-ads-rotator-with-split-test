@@ -1566,6 +1566,15 @@ class Admin {
 			\WBAM\Core\Settings_Helper::format_matching_enabled(),
 			$post->ID
 		);
+
+		// Owner decision (card 10343726460, QA wave 5): a stored placement
+		// the ad no longer fits (matching turned on after the ad existed)
+		// renders unticked below, and save drops it. Name it instead of
+		// unticking silently. The inline script adds any it unticks live.
+		$dropped = wbam_split_placements_by_fit(
+			$post->ID,
+			array_values( array_intersect( $placements, array_keys( $engine->get_selectable_placements() ) ) )
+		)['dropped'];
 		?>
 		<div class="wbam-metabox wbam-placements-metabox" data-no-placement-types="<?php echo esc_attr( (string) wp_json_encode( array_values( $no_placement_types ) ) ); ?>" data-enforce-format="<?php echo esc_attr( $enforce_format ? '1' : '0' ); ?>">
 			<p class="wbam-placements-unavailable-notice"<?php echo $placements_hidden ? '' : ' hidden'; ?>>
@@ -1573,6 +1582,9 @@ class Admin {
 			</p>
 
 			<div class="wbam-placements-fields"<?php echo $placements_hidden ? ' hidden' : ''; ?>>
+			<div class="notice notice-warning inline wbam-placements-dropped-notice" data-template="<?php echo esc_attr( wbam_dropped_placements_message( array( array( 'label' => '%s' ) ) ) ); ?>" data-dropped="<?php echo esc_attr( (string) wp_json_encode( wp_list_pluck( $dropped, 'label' ) ) ); ?>"<?php echo $dropped ? '' : ' hidden'; ?>>
+				<p><?php echo esc_html( wbam_dropped_placements_message( $dropped ) ); ?></p>
+			</div>
 			<?php foreach ( $all_places as $group => $group_placements ) : ?>
 				<div class="wbam-placement-group">
 					<h4><?php echo esc_html( ucfirst( $group ) ); ?> <?php esc_html_e( 'Placements', 'wb-ads-rotator-with-split-test' ); ?></h4>
@@ -1590,7 +1602,7 @@ class Admin {
 							$fits = ! $enforce_format || \WBAM\Core\Ad_Formats::fits( $post->ID, $placement_id );
 							?>
 							<label class="wbam-placement-option<?php echo $fits ? '' : ' wbam-placement-option--disabled'; ?>">
-								<input type="checkbox" name="wbam_placements[]" value="<?php echo esc_attr( $placement_id ); ?>" <?php checked( $is_checked && $fits ); ?> <?php disabled( ! $fits ); ?> />
+								<input type="checkbox" name="wbam_placements[]" value="<?php echo esc_attr( $placement_id ); ?>" data-fit-label="<?php echo esc_attr( wbam_placement_fit_label( $placement_id ) ); ?>" <?php checked( $is_checked && $fits ); ?> <?php disabled( ! $fits ); ?> />
 								<span class="wbam-option-body">
 									<span class="wbam-option-title"><?php echo esc_html( $placement->get_name() ); ?></span>
 									<span class="wbam-option-desc"><?php echo esc_html( $placement->get_description() ); ?></span>
@@ -1750,9 +1762,37 @@ class Admin {
 
 					if ( ! fits && $checkbox.is( ':checked' ) ) {
 						$checkbox.prop( 'checked', false );
+						addDropped( $checkbox.data( 'fitLabel' ) );
 					}
 				} );
 			}
+
+			// Name every placement unticked for not fitting (owner decision,
+			// QA wave 5), seeded with the ones PHP already unticked.
+			var $dropNotice = $( '.wbam-placements-dropped-notice' );
+			var dropped     = $dropNotice.data( 'dropped' ) || [];
+
+			function renderDropped() {
+				$dropNotice.prop( 'hidden', ! dropped.length ).find( 'p' ).text(
+					String( $dropNotice.data( 'template' ) ).replace( '%s', dropped.join( '; ' ) )
+				);
+			}
+
+			function addDropped( label ) {
+				if ( label && dropped.indexOf( label ) === -1 ) {
+					dropped.push( label );
+					renderDropped();
+				}
+			}
+
+			// Re-ticking a placement takes it back off the list.
+			$options.find( 'input[type="checkbox"]' ).on( 'change', function() {
+				var at = dropped.indexOf( $( this ).data( 'fitLabel' ) );
+				if ( this.checked && at !== -1 ) {
+					dropped.splice( at, 1 );
+					renderDropped();
+				}
+			} );
 
 			// The Sizing controls live in the Status metabox, outside this
 			// metabox's DOM subtree, and drag-reordering means load order
@@ -2777,10 +2817,9 @@ class Admin {
 			// already greys out (disables) a mismatched placement so it
 			// can't be ticked in the first place — this is the backstop for
 			// any write path that skips that UI (a direct POST, a bulk
-			// action, a future REST/WP-CLI update), so it stays silent
-			// rather than surfacing an after-the-fact notice; the admin
-			// never sees a placement they ticked get dropped, because the
-			// UI never let them tick a mismatched one to begin with. Gated
+			// action, a future REST/WP-CLI update). A stored placement the
+			// ad no longer fits is already named in the metabox's notice
+			// before this save drops it (QA wave 5). Gated
 			// behind the same flag that turns on render-time and portal
 			// enforcement, so an existing site that hasn't opted in yet
 			// keeps today's behavior (any ticked placement is saved,

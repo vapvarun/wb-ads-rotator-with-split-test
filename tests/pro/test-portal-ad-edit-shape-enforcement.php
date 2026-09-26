@@ -79,4 +79,27 @@ class Test_Portal_Ad_Edit_Shape_Enforcement extends Pro_Test_Case {
 
 		$this->assertContains( 'header', $saved, "Existing sites keep today's edit behavior until they opt in." );
 	}
+
+	/** Owner decision (QA wave 5): the edit reports what it dropped. */
+	public function test_editing_returns_the_dropped_placements(): void {
+		Settings_Helper::update( 'format_matching', true );
+
+		$dropped = $this->edit_square_into( array( 'header', 'after_paragraph' ) );
+
+		$this->assertSame( array( 'header' ), wp_list_pluck( (array) $dropped, 'id' ) );
+	}
+
+	/** The dashboard the edit redirects to names the dropped placements. */
+	public function test_dashboard_notice_names_the_dropped_placements(): void {
+		$get = $_GET;
+		wp_set_current_user( $this->user );
+		$_GET['tab']          = 'ads';
+		$_GET['wbam_notice']  = 'ad-updated';
+		$_GET['wbam_dropped'] = 'header';
+
+		$html = do_shortcode( '[wbam_advertiser_dashboard]' );
+		$_GET = $get;
+
+		$this->assertMatchesRegularExpression( '/wbam-notice-warning[^>]*>(?:(?!<\/div>).)*Header/s', $html );
+	}
 }

@@ -245,9 +245,10 @@ class Abilities {
 				'output_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
-						'id'       => array( 'type' => 'integer' ),
-						'title'    => array( 'type' => 'string' ),
-						'edit_url' => array( 'type' => 'string' ),
+						'id'                 => array( 'type' => 'integer' ),
+						'title'              => array( 'type' => 'string' ),
+						'edit_url'           => array( 'type' => 'string' ),
+						'dropped_placements' => self::dropped_placements_schema(),
 					),
 				),
 				'execute_callback'    => array( $this, 'execute_create_ad' ),
@@ -298,8 +299,9 @@ class Abilities {
 				'output_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
-						'id'      => array( 'type' => 'integer' ),
-						'updated' => array( 'type' => 'boolean' ),
+						'id'                 => array( 'type' => 'integer' ),
+						'updated'            => array( 'type' => 'boolean' ),
+						'dropped_placements' => self::dropped_placements_schema(),
 					),
 				),
 				'execute_callback'    => array( $this, 'execute_update_ad' ),
@@ -972,20 +974,43 @@ class Abilities {
 		update_post_meta( $post_id, '_wbam_ad_data', $ad_data );
 		update_post_meta( $post_id, '_wbam_enabled', $enabled ? '1' : '0' );
 
+		$dropped = array();
 		if ( ! empty( $input['placements'] ) && is_array( $input['placements'] ) ) {
 			$placements = array_map( 'sanitize_text_field', $input['placements'] );
 			// QA wave 4 (10343726460): same fit check as every other save
 			// path, routed through the one shared helper.
-			$placements = wbam_filter_placements_to_fitting( $post_id, $placements );
-			update_post_meta( $post_id, '_wbam_placements', $placements );
+			$split   = wbam_split_placements_by_fit( $post_id, $placements );
+			$dropped = $split['dropped'];
+			update_post_meta( $post_id, '_wbam_placements', $split['kept'] );
 		}
 
 		do_action( 'wbam_save_ad_meta', $post_id );
 
 		return array(
-			'id'       => $post_id,
-			'title'    => $title,
-			'edit_url' => get_edit_post_link( $post_id, 'raw' ),
+			'id'                 => $post_id,
+			'title'              => $title,
+			'edit_url'           => get_edit_post_link( $post_id, 'raw' ),
+			'dropped_placements' => $dropped,
+		);
+	}
+
+	/**
+	 * Output schema for `dropped_placements`, shared by create-ad and update-ad.
+	 *
+	 * @since 3.2.0
+	 * @return array
+	 */
+	private static function dropped_placements_schema() {
+		return array(
+			'type'        => 'array',
+			'description' => __( 'Placements removed because the ad\'s size does not fit them.', 'wb-ads-rotator-with-split-test' ),
+			'items'       => array(
+				'type'       => 'object',
+				'properties' => array(
+					'id'    => array( 'type' => 'string' ),
+					'label' => array( 'type' => 'string' ),
+				),
+			),
 		);
 	}
 
@@ -1026,19 +1051,22 @@ class Abilities {
 			update_post_meta( $id, '_wbam_enabled', (bool) $input['enabled'] ? '1' : '0' );
 		}
 
+		$dropped = array();
 		if ( isset( $input['placements'] ) && is_array( $input['placements'] ) ) {
 			$placements = array_map( 'sanitize_text_field', $input['placements'] );
 			// QA wave 4 (10343726460): same fit check as every other save
 			// path, routed through the one shared helper.
-			$placements = wbam_filter_placements_to_fitting( $id, $placements );
-			update_post_meta( $id, '_wbam_placements', $placements );
+			$split   = wbam_split_placements_by_fit( $id, $placements );
+			$dropped = $split['dropped'];
+			update_post_meta( $id, '_wbam_placements', $split['kept'] );
 		}
 
 		do_action( 'wbam_save_ad_meta', $id );
 
 		return array(
-			'id'      => $id,
-			'updated' => true,
+			'id'                 => $id,
+			'updated'            => true,
+			'dropped_placements' => $dropped,
 		);
 	}
 

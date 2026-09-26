@@ -342,10 +342,11 @@ class Ads_API {
 			);
 		}
 
-		$this->save_ad_meta( $post_id, $request );
+		$dropped = $this->save_ad_meta( $post_id, $request );
 
-		$post = get_post( $post_id );
-		return rest_ensure_response( $this->prepare_ad_for_response( $post, true ) );
+		$data                       = $this->prepare_ad_for_response( get_post( $post_id ), true );
+		$data['dropped_placements'] = $dropped;
+		return rest_ensure_response( $data );
 	}
 
 	/**
@@ -391,10 +392,11 @@ class Ads_API {
 			);
 		}
 
-		$this->save_ad_meta( $id, $request );
+		$dropped = $this->save_ad_meta( $id, $request );
 
-		$post = get_post( $id );
-		return rest_ensure_response( $this->prepare_ad_for_response( $post, true ) );
+		$data                       = $this->prepare_ad_for_response( get_post( $id ), true );
+		$data['dropped_placements'] = $dropped;
+		return rest_ensure_response( $data );
 	}
 
 	/**
@@ -717,8 +719,11 @@ class Ads_API {
 	 *
 	 * @param int              $post_id Post ID.
 	 * @param \WP_REST_Request $request REST request.
+	 * @return array<int,array{id:string,label:string}> Placements dropped because the ad's size does not fit them.
 	 */
 	private function save_ad_meta( $post_id, $request ) {
+		$dropped = array();
+
 		if ( isset( $request['ad_data'] ) && is_array( $request['ad_data'] ) ) {
 			wbam_update_ad_data( $post_id, $this->sanitize_ad_data( $request['ad_data'] ) );
 		}
@@ -732,8 +737,9 @@ class Ads_API {
 			// QA wave 4 (10343726460): the same fit check the admin editor
 			// and the advertiser portal enforce on save, routed through the
 			// one shared helper. A no-op unless format_matching is on.
-			$placements = wbam_filter_placements_to_fitting( $post_id, $placements );
-			update_post_meta( $post_id, '_wbam_placements', $placements );
+			$split   = wbam_split_placements_by_fit( $post_id, $placements );
+			$dropped = $split['dropped'];
+			update_post_meta( $post_id, '_wbam_placements', $split['kept'] );
 		}
 
 		if ( isset( $request['priority'] ) ) {
@@ -741,6 +747,8 @@ class Ads_API {
 		}
 
 		do_action( 'wbam_save_ad_meta', $post_id );
+
+		return $dropped;
 	}
 
 	/**

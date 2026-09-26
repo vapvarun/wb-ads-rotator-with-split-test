@@ -411,24 +411,99 @@ if ( ! function_exists( 'wbam_filter_placements_to_fitting' ) ) {
 	 * @return string[] The subset of $placements that fits, plus every slug in $exempt.
 	 */
 	function wbam_filter_placements_to_fitting( $ad_id, array $placements, array $exempt = array() ) {
+		return wbam_split_placements_by_fit( $ad_id, $placements, $exempt )['kept'];
+	}
+}
+
+if ( ! function_exists( 'wbam_split_placements_by_fit' ) ) {
+	/**
+	 * Split a placements list into the ones the ad's size fits and the ones
+	 * it doesn't, when shape/format matching is enforced.
+	 *
+	 * The one fit computation behind every save path. Callers that can tell
+	 * the person saving what was removed (REST, Abilities, the portal edit,
+	 * the admin editor) read `dropped`; the rest use
+	 * wbam_filter_placements_to_fitting().
+	 *
+	 * @since 3.2.0
+	 * @param int      $ad_id      Ad post ID.
+	 * @param string[] $placements Placement slugs.
+	 * @param string[] $exempt     Slugs kept regardless of fit.
+	 * @return array{kept:string[],dropped:array<int,array{id:string,label:string}>}
+	 */
+	function wbam_split_placements_by_fit( $ad_id, array $placements, array $exempt = array() ) {
 		$enforce = (bool) apply_filters(
 			'wbam_enforce_format_matching',
 			Settings_Helper::format_matching_enabled(),
 			$ad_id
 		);
 
+		$split = array(
+			'kept'    => $placements,
+			'dropped' => array(),
+		);
+
 		if ( ! $enforce || ! class_exists( '\\WBAM\\Core\\Ad_Formats' ) ) {
-			return $placements;
+			return $split;
 		}
 
-		$fitting = array();
+		$split['kept'] = array();
 		foreach ( $placements as $slug ) {
 			if ( in_array( $slug, $exempt, true ) || Ad_Formats::fits( $ad_id, $slug ) ) {
-				$fitting[] = $slug;
+				$split['kept'][] = $slug;
+			} else {
+				$split['dropped'][] = array(
+					'id'    => (string) $slug,
+					'label' => wbam_placement_fit_label( $slug ),
+				);
 			}
 		}
 
-		return $fitting;
+		return $split;
+	}
+}
+
+if ( ! function_exists( 'wbam_placement_fit_label' ) ) {
+	/**
+	 * A placement's name plus the sizes it accepts, e.g. "Header (728×90, 970×90)".
+	 *
+	 * @since 3.2.0
+	 * @param string $slug Placement slug.
+	 * @return string Plain text; escape on output.
+	 */
+	function wbam_placement_fit_label( $slug ) {
+		$slug      = (string) $slug;
+		$placement = \WBAM\Modules\Placements\Placement_Engine::get_instance()->get_placement( $slug );
+		$name      = $placement ? $placement->get_name() : $slug;
+
+		return sprintf(
+			/* translators: 1: placement name, e.g. "Header". 2: the sizes it accepts, e.g. "728×90, 970×90". */
+			__( '%1$s (accepts %2$s)', 'wb-ads-rotator-with-split-test' ),
+			$name,
+			wbam_placement_sizes_label( Ad_Formats::get_placement_accepted_formats( $slug ) )['label']
+		);
+	}
+}
+
+if ( ! function_exists( 'wbam_dropped_placements_message' ) ) {
+	/**
+	 * The sentence that tells the person saving which placements were
+	 * removed because the ad's size does not fit them.
+	 *
+	 * @since 3.2.0
+	 * @param array<int,array{label:string}> $dropped `dropped` from wbam_split_placements_by_fit().
+	 * @return string Plain text, or '' when nothing was dropped.
+	 */
+	function wbam_dropped_placements_message( array $dropped ) {
+		if ( ! $dropped ) {
+			return '';
+		}
+
+		return sprintf(
+			/* translators: %s: comma-separated placement names with their sizes, e.g. "Header (accepts 728×90)". */
+			__( 'Removed from %s: this ad\'s size does not fit there.', 'wb-ads-rotator-with-split-test' ),
+			implode( '; ', wp_list_pluck( $dropped, 'label' ) )
+		);
 	}
 }
 
