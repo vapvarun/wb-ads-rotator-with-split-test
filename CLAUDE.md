@@ -171,7 +171,7 @@ Code quality checks (WPCS/PHPStan/PHPUnit) passing ≠ feature done.
 
 Use `/wp-plugin-release` when ready to ship. Build output goes to `build/` (gitignored; `distignore` controls what ships).
 
-**`npm run release`** (`scripts/build-release.mjs`) is the one release command. It runs, in order:
+**`npm run release`** (`scripts/build-release.mjs`) is the one release command. It first runs the hooks gate (`bash bin/check-hooks-documented.sh`: every `wbam_` hook needs a docblock and an `audit/manifest.json` entry; regenerate the reference with `php bin/generate-hooks-reference.php`), then, in order:
 1. Regenerates every `*-rtl.css` from its LTR source (`rtlcss`) — only stylesheets that already have an `-rtl.css` sibling.
 2. Rebuilds every `.min.css`/`.min.js` from current source (`grunt minify` — `cssmin` + `uglify`, covers `assets/css`, `assets/js`, `blocks/`).
 3. Regenerates `languages/wb-ads-rotator-with-split-test.pot` with `wp i18n make-pot` (PHP + JS + `block.json` in one pass — this is the ONLY .pot generator; there is no `grunt makepot` any more, because it read PHP only and would silently drop every block-editor string).

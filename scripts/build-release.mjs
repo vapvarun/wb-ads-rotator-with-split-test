@@ -239,10 +239,20 @@ function requireCleanGeneratedFiles() {
 	die( 2, 'Review the diff, commit the regenerated .min/.pot/-rtl files, then run npm run release again.' );
 }
 
+// Every wbam_ hook has a docblock and a manifest entry (card 10344031466).
+function requireHooksDocumented() {
+	try {
+		run('bash', ['bin/check-hooks-documented.sh'], { stdio: 'inherit' });
+	} catch (e) {
+		die(1, 'Undocumented or unlisted hooks - see above. Document them, run php bin/generate-hooks-reference.php, commit, then release.');
+	}
+}
+
 function main() {
 	const { mainFile, slug, releaseName, version } = parseMainPlugin();
 	console.log(BOLD(`\nBuilding release: ${releaseName} ${version}`));
 
+	requireHooksDocumented();
 	regenerateRtlStylesheets();
 	minifyAssets();
 	regeneratePot( slug );
