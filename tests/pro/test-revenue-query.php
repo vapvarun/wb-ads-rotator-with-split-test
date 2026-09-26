@@ -42,11 +42,12 @@ class Test_Revenue_Query extends Pro_Test_Case {
 		$this->assertCount( 5, $series, 'series() must zero-fill every day in the range, not just days with rows.' );
 
 		$today_bucket = end( $series );
-		$this->assertSame( 10.0, $today_bucket['net'] );
+		$this->assertSame( 10.0, $today_bucket['used'], 'A charge is credits used.' );
+		$this->assertSame( 0.0, $today_bucket['net'], 'A charge is not revenue: revenue was counted at top-up.' );
 
 		$empty_days = array_slice( $series, 0, 4 );
 		foreach ( $empty_days as $bucket ) {
-			$this->assertSame( 0.0, $bucket['net'], 'An empty day must report net 0.0, not be omitted.' );
+			$this->assertSame( 0.0, $bucket['used'], 'An empty day must report 0.0, not be omitted.' );
 		}
 	}
 
@@ -54,8 +55,8 @@ class Test_Revenue_Query extends Pro_Test_Case {
 		$today     = gmdate( 'Y-m-d' );
 		$yesterday = gmdate( 'Y-m-d', strtotime( '-1 day' ) );
 
-		// Previous period (yesterday): $10 net.
-		$prev_charge = Credits_Bridge::charge( $this->advertiser->id, 10.00, 1, 'prev', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		// Previous period (yesterday): $10 paid in.
+		$prev_charge = Credits_Bridge::adjust( $this->advertiser->id, 10.00, 'prev', Revenue_Ledger::SOURCE_OFFLINE_PAYMENT );
 		$this->assertNotWPError( $prev_charge );
 
 		global $wpdb;
@@ -65,8 +66,8 @@ class Test_Revenue_Query extends Pro_Test_Case {
 			array( 'ledger_id' => (int) $prev_charge )
 		);
 
-		// Current period (today): $15 net — a 50% increase.
-		$current_charge = Credits_Bridge::charge( $this->advertiser->id, 15.00, 2, 'current', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		// Current period (today): $15 paid in — a 50% increase.
+		$current_charge = Credits_Bridge::adjust( $this->advertiser->id, 15.00, 'current', Revenue_Ledger::SOURCE_OFFLINE_PAYMENT );
 		$this->assertNotWPError( $current_charge );
 
 		$report = Revenue_Query::report( $today, $today, $yesterday, $yesterday );
@@ -120,12 +121,12 @@ class Test_Revenue_Query extends Pro_Test_Case {
 		$end   = gmdate( 'Y-m-d', strtotime( '+1 day' ) );
 
 		$first = Revenue_Query::totals( $start, $end, (int) $this->advertiser->id );
-		$this->assertSame( 0.0, $first['net'] );
+		$this->assertSame( 0.0, $first['credits_used'] );
 
 		$charge = Credits_Bridge::charge( $this->advertiser->id, 25.00, 1, 'x', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
 		$this->assertNotWPError( $charge );
 
 		$second = Revenue_Query::totals( $start, $end, (int) $this->advertiser->id );
-		$this->assertSame( 25.0, $second['net'], 'A new charge must bump wp_cache_get_last_changed() and invalidate the previous totals() cache entry.' );
+		$this->assertSame( 25.0, $second['credits_used'], 'A new charge must bump wp_cache_get_last_changed() and invalidate the previous totals() cache entry.' );
 	}
 }

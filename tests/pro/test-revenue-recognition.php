@@ -1,8 +1,9 @@
 <?php
 /**
- * Revenue recognition — cash basis: net = sum(amount) in period. A closed
- * (completed) reserved campaign's net revenue equals what the campaign
- * actually spent, never campaigns.spent added on top of the reservation.
+ * Credits used — a closed (completed) reserved campaign's credits used equal
+ * what the campaign actually spent, never campaigns.spent added on top of
+ * the reservation. (Revenue itself is counted at top-up: see
+ * test-revenue-at-topup.php.)
  *
  * @package WBAM\Tests
  */
@@ -41,7 +42,7 @@ class Test_Revenue_Recognition extends Pro_Test_Case {
 
 	private function net_for_advertiser(): float {
 		$totals = Revenue_Query::totals( gmdate( 'Y-m-d', strtotime( '-1 day' ) ), gmdate( 'Y-m-d', strtotime( '+1 day' ) ), (int) $this->advertiser->id );
-		return (float) $totals['net'];
+		return (float) $totals['credits_used'];
 	}
 
 	/**
