@@ -1738,6 +1738,13 @@
       "purpose": "Filter render mode (single/rotation)"
     },
     {
+      "name": "wbam_placement_ad_count",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Ads a rotating placement shows per load (default 1, 0 = all); paid first, house/sample fill"
+    },
+    {
       "name": "wbam_send_partnership_accepted_notification",
       "type": "filter",
       "args": 2,

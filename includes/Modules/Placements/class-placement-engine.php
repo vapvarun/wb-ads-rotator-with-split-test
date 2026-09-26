@@ -408,22 +408,27 @@ class Placement_Engine {
 			}
 		);
 
-		// Slot policy: fixed-inventory placements render AT MOST ONE ad
-		// per hook invocation. When multiple advertisers target the same
-		// slot, we pick one winner rather than stacking every creative
-		// (which would give one advertiser visibility and the other a pixel
-		// below them - not what either of them paid for).
-		//
-		// Placements that legitimately render multiple ads per page
-		// (widget areas, between_replies with frequency counters) can
-		// opt out per-placement via the wbam_placement_render_mode filter
+		// Slot policy: a rotating placement shows `wbam_placement_ad_count`
+		// ads per load (one by default), never every creative that targets
+		// it. Placements that legitimately render every eligible ad can opt
+		// out per-placement via the wbam_placement_render_mode filter
 		// returning 'stack' for their slug.
 		$render_mode = apply_filters( 'wbam_placement_render_mode', 'rotate', $placement_id );
 
+		/**
+		 * Filter how many ads a rotating placement shows per page load.
+		 * Pro's "Ads shown" column on the Placements matrix sets it.
+		 *
+		 * @since 3.2.0
+		 * @param int    $count        Ads to show; 0 shows every eligible ad.
+		 * @param string $placement_id Placement ID.
+		 */
+		$count = max( 0, (int) apply_filters( 'wbam_placement_ad_count', 1, $placement_id ) );
+
 		if ( count( $filtered ) > 1 ) {
-			// The highest tier with a renderable ad wins the slot; a lower
-			// tier only fills it when nothing above can serve. Rotate picks
-			// one winner from that tier, stack keeps all of its ads.
+			// Higher tiers take the places first; a lower tier only fills
+			// places nothing above can serve. Rotate draws up to $count
+			// winners, stack keeps every ad of the top tier that can serve.
 			$pools = array();
 			foreach ( $filtered as $ad_id ) {
 				$pools[ $tiers[ $ad_id ] ][] = (int) $ad_id;
@@ -432,16 +437,32 @@ class Placement_Engine {
 
 			$winners = array();
 			foreach ( $pools as $tier => $pool ) {
-				$pool    = array_values( array_unique( $pool ) );
-				$winners = 'rotate' === $render_mode
-					? array_filter( array( $this->pick_winner( $pool, $placement_id, (int) $tier ) ) )
-					: array_values( array_filter( $pool, array( $this, 'ad_is_renderable' ) ) );
-				if ( $winners ) {
+				$pool = array_values( array_unique( $pool ) );
+
+				if ( 'rotate' !== $render_mode ) {
+					$winners = array_values( array_filter( $pool, array( $this, 'ad_is_renderable' ) ) );
+					if ( $winners ) {
+						break;
+					}
+					continue;
+				}
+
+				$open = $count ? $count - count( $winners ) : -1;
+				while ( $pool && 0 !== $open ) {
+					$pick = $this->pick_winner( $pool, $placement_id, (int) $tier );
+					if ( null === $pick ) {
+						break;
+					}
+					$winners[] = $pick;
+					$pool      = array_values( array_diff( $pool, array( $pick ) ) );
+					--$open;
+				}
+				if ( 0 === $open ) {
 					break;
 				}
 			}
 
-			$filtered = array_values( $winners );
+			$filtered = $winners;
 		}
 
 		/**

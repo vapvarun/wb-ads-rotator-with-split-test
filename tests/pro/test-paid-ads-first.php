@@ -24,6 +24,19 @@ class Test_Paid_Ads_First extends Pro_Test_Case {
 		update_option( \WBAM_Pro\Core\Pro_Plugin::SAMPLES_RETIRED_OPTION, 0 );
 	}
 
+	public function tear_down(): void {
+		$this->reset_rotation_settings_memo();
+		parent::tear_down();
+	}
+
+	/**
+	 * The rotation engine memoises wbam_pro_settings per request.
+	 */
+	private function reset_rotation_settings_memo(): void {
+		$memo = new \ReflectionProperty( \WBAM_Pro\Modules\Rotation\Rotation_Engine::class, 'settings_cache' );
+		$memo->setValue( \WBAM_Pro\Modules\Rotation\Rotation_Engine::get_instance(), null );
+	}
+
 	/**
 	 * A live campaign for a paid ad; paid ads only serve under one.
 	 */
@@ -119,5 +132,29 @@ class Test_Paid_Ads_First extends Pro_Test_Case {
 
 		$this->assertNotEmpty( $won );
 		$this->assertSame( array(), array_diff( $won, array( $paid_a, $paid_b ) ), 'A stacked slot lists paid ads only while they can serve.' );
+	}
+	/**
+	 * "Ads shown" on the Placements matrix (card 10343706274): a slot set
+	 * to 2 shows two ads per load, paid first, a house ad filling the gap.
+	 */
+	public function test_ads_shown_count_fills_the_slot_paid_first(): void {
+		$settings                               = (array) get_option( 'wbam_pro_settings', array() );
+		$settings['rotation_ads_per_placement'] = array( 'footer' => 2 );
+		update_option( 'wbam_pro_settings', $settings );
+		$this->reset_rotation_settings_memo();
+
+		$house_a = $this->make_ad( 'House A' );
+		$house_b = $this->make_ad( 'House B' );
+		$this->make_ad( 'Sample ad', array( '_wbam_is_demo' => 1 ) );
+		$paid = $this->make_ad( 'Paid ad', array( '_wbam_campaign_id' => $this->live_campaign() ) );
+
+		$engine = Placement_Engine::get_instance();
+		$engine->clear_placement_cache( 0 );
+		for ( $i = 0; $i < 10; $i++ ) {
+			$ads = array_map( 'intval', $engine->get_ads_for_placement( 'footer' ) );
+			$this->assertCount( 2, $ads, 'The slot shows as many ads as "Ads shown" says.' );
+			$this->assertSame( $paid, $ads[0], 'The paid ad always takes the first place.' );
+			$this->assertContains( $ads[1], array( $house_a, $house_b ), 'A house ad fills the gap before any sample.' );
+		}
 	}
 }
