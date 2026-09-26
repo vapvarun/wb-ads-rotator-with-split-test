@@ -111,6 +111,19 @@ body.edit-tags-php.taxonomy-wbam-classified-loc hr.wp-header-end {
 }
 
 /*
+ * With the native h1 hidden, the screen's .wrap (and its first dismissible
+ * notice, which is position:relative) rises into the row of the floated
+ * Screen Options button and paints over it. Start the .wrap below it.
+ */
+body.edit-php.post-type-wbam-ad #wpbody-content > .wrap,
+body.post-new-php.post-type-wbam-ad #wpbody-content > .wrap,
+body.edit-tags-php.taxonomy-wbam_ad_tag #wpbody-content > .wrap,
+body.edit-tags-php.taxonomy-wbam-classified-cat #wpbody-content > .wrap,
+body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
+	clear: both;
+}
+
+/*
  * List toolbar: views on the left, search on the right, one row - for the
  * hand-rolled list screens that don't go through WP_List_Table's own
  * views()/search_box() nav (which already floats these correctly inside
