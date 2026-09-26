@@ -31,6 +31,9 @@ class Test_Featured_One_Period_One_Purchase extends Pro_Test_Case {
 	private int $user_id;
 
 	public function set_up(): void {
+		// add_upgrades() commits its own transaction, which would commit
+		// these settings past the test rollback.
+		$this->snapshot_options( array( 'wbam_pro_settings', 'wbam_pro_classifieds_settings', 'wbam_credits_payment_method' ) );
 		parent::set_up();
 
 		global $wpdb;
@@ -47,11 +50,6 @@ class Test_Featured_One_Period_One_Purchase extends Pro_Test_Case {
 		$this->user_id    = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
 		$this->advertiser = Advertiser_Manager::get_instance()->get_or_create( $this->user_id );
 		Factory::topup_user( $this->user_id, 10000 );
-	}
-
-	public function tear_down(): void {
-		delete_option( 'wbam_credits_payment_method' );
-		parent::tear_down();
 	}
 
 	private function active_listing() {

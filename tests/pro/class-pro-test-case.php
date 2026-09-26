@@ -41,7 +41,38 @@ abstract class Pro_Test_Case extends WP_UnitTestCase {
 
 	public function tear_down(): void {
 		self::flush_credits_balance_cache();
+		$this->restore_committed_options();
 		parent::tear_down();
+	}
+
+	/** @var array<string,mixed> Option values snapshotted by snapshot_options(). */
+	private array $option_snapshot = array();
+
+	/**
+	 * Snapshot options a test changes before it runs code that opens its own
+	 * START TRANSACTION/COMMIT (Classified_Manager::add_upgrades(), money
+	 * paths). That COMMIT also commits the test's option changes, so the
+	 * WP_UnitTestCase rollback cannot undo them and they leak into later
+	 * tests. tear_down() writes the snapshot back and commits it.
+	 *
+	 * @param string[] $names Option names.
+	 */
+	protected function snapshot_options( array $names ): void {
+		foreach ( $names as $name ) {
+			$this->option_snapshot[ $name ] = get_option( $name, null );
+		}
+	}
+
+	private function restore_committed_options(): void {
+		if ( ! $this->option_snapshot ) {
+			return;
+		}
+		global $wpdb;
+		foreach ( $this->option_snapshot as $name => $value ) {
+			null === $value ? delete_option( $name ) : update_option( $name, $value );
+		}
+		$wpdb->query( 'COMMIT' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- make the restore survive the rollback.
+		$this->option_snapshot = array();
 	}
 
 	/**

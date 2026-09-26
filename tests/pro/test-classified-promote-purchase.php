@@ -27,6 +27,9 @@ class Test_Classified_Promote_Purchase extends Pro_Test_Case {
 	private array $get;
 
 	public function set_up(): void {
+		// Purchases commit their own transaction (Classified_Manager::add_upgrades()),
+		// which would commit this test's require_approval change past the rollback.
+		$this->snapshot_options( array( 'wbam_pro_classifieds_settings' ) );
 		parent::set_up();
 		$this->post = $_POST;
 		$this->get  = $_GET;
