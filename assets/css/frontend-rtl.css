@@ -340,26 +340,29 @@
    reserving only 250px would clip a legitimate 336x280 Box ad that these
    slots already sold before Billboard existed.
 
-   The height is reserved on each ad's creative box (.wbam-ad-slot > .wbam-ad),
-   not on the whole placement: the "Advertisement" label keeps its natural,
+   The height is reserved on each ad's creative box (.wbam-ad-slot.wbam-ad -
+   Placement_Engine::render_ad() puts both classes on the same wrapper, one
+   per rendered ad; a ">" combinator here never matches, since that would
+   require .wbam-ad-slot and .wbam-ad to be two different elements), not on
+   the whole placement: the "Advertisement" label keeps its natural,
    theme-dependent height above it, a stack of several ads reserves one row
    each, and a taller text/rich/code ("Any" shape) ad grows instead of being
    clipped. Nothing here ever uses overflow: hidden.
    ========================================================================== */
 
-.wbam-placement-header .wbam-ad-slot > .wbam-ad,
-.wbam-placement-footer .wbam-ad-slot > .wbam-ad,
-.wbam-placement-before-archive .wbam-ad-slot > .wbam-ad,
-.wbam-placement-after-archive .wbam-ad-slot > .wbam-ad {
+.wbam-placement-header .wbam-ad-slot.wbam-ad,
+.wbam-placement-footer .wbam-ad-slot.wbam-ad,
+.wbam-placement-before-archive .wbam-ad-slot.wbam-ad,
+.wbam-placement-after-archive .wbam-ad-slot.wbam-ad {
 	min-height: var(--wbam-shape-banner-h);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
-.wbam-placement-before-content .wbam-ad-slot > .wbam-ad,
-.wbam-placement-after-content .wbam-ad-slot > .wbam-ad,
-.wbam-placement-paragraph .wbam-ad-slot > .wbam-ad {
+.wbam-placement-before-content .wbam-ad-slot.wbam-ad,
+.wbam-placement-after-content .wbam-ad-slot.wbam-ad,
+.wbam-placement-paragraph .wbam-ad-slot.wbam-ad {
 	min-height: var(--wbam-shape-box-h);
 	display: flex;
 	align-items: center;
@@ -380,14 +383,27 @@
 /* Phone breakpoint matches the rest of this file (480px, see below) — a
    Banner ad on phones is one of the mobile sizes (320x50/320x100), so the
    reserved box shrinks to match instead of leaving a 90px-tall gap that
-   still doesn't fit the desktop cap's own reasoning. Between-content
-   placements keep their 280px reserve on phones too — a Box ad is ~300px
-   wide, which already fits a 320-390px viewport without shrinking. */
+   still doesn't fit the desktop cap's own reasoning.
+
+   Between-content also drops to the Banner floor here (QA wave 4, card
+   10343726460): after_paragraph/content both accept Banner now, and a
+   728x90-shaped creative scaled to a 390px viewport is ~100px tall, so the
+   desktop 280px (sized for Box/Billboard) left ~190px of dead space around
+   it. min-height is a floor, not a cap - object-fit: contain plus the
+   image's own width/height attributes (native aspect-ratio, see
+   .wbam-ad-image img) still grow a Box or Billboard creative past 100px to
+   its own full, unclipped height; only the common Banner case tightens up. */
 @media screen and (max-width: 480px) {
-	.wbam-placement-header .wbam-ad-slot > .wbam-ad,
-	.wbam-placement-footer .wbam-ad-slot > .wbam-ad,
-	.wbam-placement-before-archive .wbam-ad-slot > .wbam-ad,
-	.wbam-placement-after-archive .wbam-ad-slot > .wbam-ad {
+	.wbam-placement-header .wbam-ad-slot.wbam-ad,
+	.wbam-placement-footer .wbam-ad-slot.wbam-ad,
+	.wbam-placement-before-archive .wbam-ad-slot.wbam-ad,
+	.wbam-placement-after-archive .wbam-ad-slot.wbam-ad {
+		min-height: var(--wbam-shape-banner-h-mobile);
+	}
+
+	.wbam-placement-before-content .wbam-ad-slot.wbam-ad,
+	.wbam-placement-after-content .wbam-ad-slot.wbam-ad,
+	.wbam-placement-paragraph .wbam-ad-slot.wbam-ad {
 		min-height: var(--wbam-shape-banner-h-mobile);
 	}
 }
