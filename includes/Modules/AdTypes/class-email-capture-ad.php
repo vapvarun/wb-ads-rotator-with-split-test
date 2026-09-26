@@ -103,6 +103,8 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		$redirect_url = isset( $data['redirect_url'] ) ? $data['redirect_url'] : '';
 		$privacy_text = isset( $data['privacy_text'] ) ? $data['privacy_text'] : '';
 		$button_color = isset( $data['button_color'] ) ? $data['button_color'] : '#2271b1';
+		$bg_color     = isset( $data['bg_color'] ) ? $data['bg_color'] : '#ffffff';
+		$text_color   = isset( $data['text_color'] ) ? $data['text_color'] : '#1d2327';
 
 		/**
 		 * Filter the button text.
@@ -172,6 +174,20 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		$form_id = 'wbam-email-form-' . $ad_id;
 		$nonce   = wp_create_nonce( 'wbam_email_capture_' . $ad_id );
 
+		// Only emit a custom property for a colour the owner actually chose -
+		// leaving the defaults out keeps the theme's own tokens in charge
+		// when nobody touched these fields.
+		$custom_props = array();
+		if ( $button_color && '#2271b1' !== strtolower( $button_color ) ) {
+			$custom_props[] = '--wbam-accent: ' . $button_color;
+		}
+		if ( $bg_color && '#ffffff' !== strtolower( $bg_color ) ) {
+			$custom_props[] = '--wbam-email-bg: ' . $bg_color;
+		}
+		if ( $text_color && '#1d2327' !== strtolower( $text_color ) ) {
+			$custom_props[] = '--wbam-email-text: ' . $text_color;
+		}
+
 		// Placeholders.
 		$placeholders = array(
 			'name'  => __( 'Your Name', 'wb-ads-rotator-with-split-test' ),
@@ -202,12 +218,8 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 			data-ad-id="<?php echo esc_attr( $ad_id ); ?>"
 			data-placement="<?php echo esc_attr( $placement ); ?>"
 			data-cookie-days="<?php echo esc_attr( $cookie_days ); ?>"
-			<?php
-			// The button follows the theme accent unless the owner picked
-			// their own colour (#2271b1 is the old shipped default).
-			if ( $button_color && '#2271b1' !== strtolower( $button_color ) ) :
-				?>
-				style="--wbam-accent: <?php echo esc_attr( $button_color ); ?>;"
+			<?php if ( ! empty( $custom_props ) ) : ?>
+				style="<?php echo esc_attr( implode( '; ', $custom_props ) . ';' ); ?>"
 			<?php endif; ?>>
 
 			<button type="button" class="wbam-email-close" aria-label="<?php esc_attr_e( 'Close', 'wb-ads-rotator-with-split-test' ); ?>">

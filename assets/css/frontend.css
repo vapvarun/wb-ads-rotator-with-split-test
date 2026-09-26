@@ -944,8 +944,8 @@ html.dark,
 
 .wbam-ad-email-capture {
 	position: relative;
-	background: var(--wbam-bg-white, #ffffff);
-	color: var(--wbam-text-body, #1d2327);
+	background: var(--wbam-email-bg, var(--wbam-bg-white, #ffffff));
+	color: var(--wbam-email-text, var(--wbam-text-body, #1d2327));
 	border-radius: 8px;
 	padding: 30px;
 	box-shadow: 0 4px 20px var(--wbam-shadow-medium, rgba(0, 0, 0, 0.1));
