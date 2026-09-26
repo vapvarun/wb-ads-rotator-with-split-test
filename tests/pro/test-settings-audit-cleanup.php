@@ -186,6 +186,17 @@ class Test_Settings_Audit_Cleanup extends Pro_Test_Case {
 		$this->assertArrayNotHasKey( 'featured_billing_model', get_option( 'wbam_pro_classifieds_settings' ) );
 	}
 
+	/** The retired recurring-billing cron event is unscheduled on upgrade, not left to fire forever. */
+	public function test_upgrade_to_4_3_14_unschedules_the_retired_billing_cron(): void {
+		wp_schedule_event( time() + 3600, 'hourly', 'wbam_process_classified_billing' );
+
+		$method = new \ReflectionMethod( Installer::class, 'upgrade_to_4_3_14' );
+		$method->setAccessible( true );
+		$method->invoke( null );
+
+		$this->assertFalse( wp_next_scheduled( 'wbam_process_classified_billing' ) );
+	}
+
 	/**
 	 * 4.3.12 already drops featured_fee. If it differed from featured_price,
 	 * both are saved to wbam_pro_featured_price_notice first so the one-time
