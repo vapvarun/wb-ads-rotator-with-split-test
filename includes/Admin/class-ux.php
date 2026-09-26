@@ -482,6 +482,58 @@ class UX {
 	}
 
 	/**
+	 * Render an "On this page" jump row for a settings section with 4+
+	 * cards (card 10343706274's own rule) — General, Ads & Display,
+	 * Classifieds, ... Renders nothing for fewer than 4 items, since a jump
+	 * row for 2-3 cards is not a navigation aid, it is clutter.
+	 *
+	 * Desktop: a small row of plain `#anchor` links — no JS required, the
+	 * browser's native in-page navigation does the work.
+	 *
+	 * <=782px (same breakpoint as the sidebar rail): JS swaps the link row
+	 * for a compact `<select>` with a visually-hidden `<label>`. This is
+	 * *not* the rail's GET-form pattern, deliberately — the rail navigates
+	 * to a different URL per option (a real `?section=` request survives a
+	 * GET form's query-string rebuild); this jumps to a fragment on the
+	 * *same* page, and a fragment is not part of a GET form's submitted
+	 * query string, so there is no server round-trip to build a form
+	 * around. The link row (always in the DOM, always functional) is
+	 * therefore the no-JS baseline instead: admin-settings-nav.js adds
+	 * `wbam-js-enhanced` once it runs, and only then does CSS swap to the
+	 * `<select>` at the narrow width — a JS-less visitor keeps seeing the
+	 * (wrapping, still small) link row at every width instead of a dead
+	 * control.
+	 *
+	 * @since 3.2.0
+	 * @param array<string,string> $items Ordered map of card id (no leading
+	 *                                    `#`) => short label.
+	 * @return void
+	 */
+	public static function page_jump_nav( array $items ) {
+		if ( count( $items ) < 4 ) {
+			return;
+		}
+		?>
+		<nav class="wbam-page-jump" aria-label="<?php esc_attr_e( 'On this page', 'wb-ads-rotator-with-split-test' ); ?>">
+			<ul class="wbam-page-jump__list">
+				<?php foreach ( $items as $id => $label ) : ?>
+					<li><a href="#<?php echo esc_attr( $id ); ?>" class="wbam-page-jump__link"><?php echo esc_html( $label ); ?></a></li>
+				<?php endforeach; ?>
+			</ul>
+			<label class="screen-reader-text" for="wbam-page-jump-select">
+				<?php esc_html_e( 'On this page', 'wb-ads-rotator-with-split-test' ); ?>
+			</label>
+			<select id="wbam-page-jump-select" class="wbam-page-jump__select" aria-label="<?php esc_attr_e( 'On this page', 'wb-ads-rotator-with-split-test' ); ?>">
+				<option value=""><?php esc_html_e( 'Jump to a card...', 'wb-ads-rotator-with-split-test' ); ?></option>
+				<?php foreach ( $items as $id => $label ) : ?>
+					<option value="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $label ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</nav>
+		<?php
+	}
+
+	/**
 	 * Render the action bar at the bottom of an action-screen card: a submit
 	 * button (primary or danger) plus a Cancel link back to the list.
 	 *

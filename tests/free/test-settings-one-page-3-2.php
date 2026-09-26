@@ -100,6 +100,11 @@ class Test_Settings_One_Page_3_2 extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'wbam_settings[adsense_publisher_id]', $html, 'AdSense' );
 		$this->assertStringContainsString( 'wbam_settings[require_consent_adsense]', $html, 'AdSense consent, grouped with AdSense not Privacy' );
 		$this->assertSame( 1, substr_count( $html, '<form' ), 'Ads & Display must stay one form.' );
+
+		// 4 cards (General/Display/Placements/AdSense) -> jump row required.
+		$this->assertStringContainsString( 'wbam-page-jump', $html );
+		$this->assertStringContainsString( 'href="#wbam-jump-wbam_general"', $html );
+		$this->assertStringContainsString( 'id="wbam-jump-wbam_adsense"', $html );
 	}
 
 	/** Links: FREE's cloaking fields, one form. */

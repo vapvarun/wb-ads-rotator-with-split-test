@@ -178,6 +178,30 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$this->assertStringContainsString( 'wbam-site-mode-card', $html, 'Site Mode card' );
 		$this->assertStringContainsString( 'wbam_module_', $html, 'Modules (Features)' );
 		$this->assertStringContainsString( 'wbam_pro_settings[currency]', $html, 'Currency' );
+
+		// 4 cards (Site Mode/Modules/Currency/Pages) -> jump row required.
+		$this->assertStringContainsString( 'wbam-page-jump', $html );
+		$this->assertStringContainsString( 'href="#wbam-jump-site-mode"', $html );
+		$this->assertStringContainsString( 'id="wbam-jump-pages"', $html );
+	}
+
+	/**
+	 * Classifieds' 8 cards (posting-access + 7 always-rendered <h3> groups;
+	 * Seller Profile Fields is a 9th only with BuddyPress active) get a
+	 * jump row. Every link must target an anchor this page load actually
+	 * renders.
+	 */
+	public function test_classifieds_section_renders_a_jump_row(): void {
+		$reflection = new \ReflectionMethod( Pro_Admin::class, 'render_classifieds_settings' );
+		$reflection->setAccessible( true );
+		ob_start();
+		$reflection->invoke( $this->admin );
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( 'wbam-page-jump', $html );
+		$this->assertStringContainsString( 'href="#wbam-jump-classifieds-label-url"', $html );
+		$this->assertStringContainsString( 'id="wbam-jump-classifieds-promote-listing"', $html );
+		$this->assertStringNotContainsString( 'wbam-jump-classifieds-seller-profile', $html, 'No BuddyPress in this suite, so that card (and its jump link) must not render.' );
 	}
 
 	/** Advertisers & Billing owns approval/trust, campaign billing defaults and the low-balance warning — one form. */

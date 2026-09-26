@@ -757,6 +757,51 @@
 	margin-bottom: 0;
 }
 
+/* "On this page" jump row (UX::page_jump_nav()) — General, Ads & Display,
+   Classifieds, any section with 4+ cards. Small on purpose: a plain
+   wrapping row of links, not another nav surface competing with the rail. */
+.wbam-page-jump {
+	margin: 0 0 var(--wbam-space-4);
+}
+
+.wbam-page-jump__list {
+	display:    flex;
+	flex-wrap:  wrap;
+	gap:        var(--wbam-space-1) var(--wbam-space-3);
+	margin:     0;
+	padding:    0;
+	list-style: none;
+	font-size:  var(--wbam-font-size-sm);
+}
+
+.wbam-page-jump__link {
+	color:           var(--wbam-accent);
+	text-decoration: none;
+}
+
+.wbam-page-jump__link:hover,
+.wbam-page-jump__link:focus-visible {
+	text-decoration: underline;
+}
+
+.wbam-page-jump__select {
+	display: none;
+	width:   100%;
+}
+
+/* No-JS baseline is the link list at every width; JS confirms it can run
+   the select instead (same reasoning as the sidebar rail's mobile swap,
+   see UX::page_jump_nav()'s docblock for why this can't be a GET form). */
+@media screen and (max-width: 782px) {
+	.wbam-page-jump.wbam-js-enhanced .wbam-page-jump__list {
+		display: none;
+	}
+
+	.wbam-page-jump.wbam-js-enhanced .wbam-page-jump__select {
+		display: block;
+	}
+}
+
 /* Geo Targeting section: provider picker + its per-provider field rows
    (admin-settings-nav.js toggles wbam-geo-is-hidden; every row stays in
    the DOM either way so the form keeps posting stored values). */

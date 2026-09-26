@@ -1171,11 +1171,13 @@ class Settings {
 	 * @since 3.2.0
 	 */
 	public function render_ads_display_page() {
+		$ids = array( 'wbam_general', 'wbam_display', 'wbam_placements', 'wbam_adsense' );
+		\WBAM\Admin\UX::page_jump_nav( $this->get_jump_nav_items( $ids ) );
 		?>
 		<form action="options.php" method="post" class="wbam-settings-form" id="wbam-ads-display-form">
 			<?php
 			settings_fields( 'wbam_settings_group' );
-			$this->render_settings_page_sections( array( 'wbam_general', 'wbam_display', 'wbam_placements', 'wbam_adsense' ) );
+			$this->render_settings_page_sections( $ids );
 			submit_button();
 			?>
 		</form>
@@ -1286,6 +1288,34 @@ class Settings {
 	 *                       array( 'wbam_general', 'wbam_display' ).
 	 * @return void
 	 */
+	/**
+	 * Titles of the given WP Settings API section ids, in registration
+	 * order, for building an "On this page" jump row (UX::page_jump_nav())
+	 * before render_settings_page_sections() renders the matching cards —
+	 * the same `wbam-jump-{id}` anchors that method writes onto each card.
+	 *
+	 * @since 3.2.0
+	 * @param string[] $ids WP Settings API section ids.
+	 * @return array<string,string> Map of `wbam-jump-{id}` => title, only
+	 *                              for ids that are actually registered.
+	 */
+	private function get_jump_nav_items( array $ids ) {
+		global $wp_settings_sections;
+
+		$items = array();
+		if ( empty( $wp_settings_sections['wbam-settings'] ) ) {
+			return $items;
+		}
+
+		foreach ( (array) $wp_settings_sections['wbam-settings'] as $section ) {
+			if ( in_array( $section['id'], $ids, true ) && $section['title'] ) {
+				$items[ 'wbam-jump-' . $section['id'] ] = $section['title'];
+			}
+		}
+
+		return $items;
+	}
+
 	private function render_settings_page_sections( array $ids ) {
 		global $wp_settings_sections, $wp_settings_fields;
 
@@ -1298,7 +1328,7 @@ class Settings {
 				continue;
 			}
 
-			echo '<div class="wbam-card">';
+			echo '<div class="wbam-card" id="' . esc_attr( 'wbam-jump-' . $section['id'] ) . '">';
 			if ( $section['title'] ) {
 				echo '<h2>' . esc_html( $section['title'] ) . '</h2>';
 			}

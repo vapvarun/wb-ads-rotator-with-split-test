@@ -37,6 +37,29 @@
 	}
 
 	/**
+	 * "On this page" jump row (UX::page_jump_nav()). Confirms JS can run
+	 * (CSS only swaps to the <select> at <=782px once this class lands —
+	 * see admin-family.css), then makes that select jump to the chosen
+	 * card's anchor. Not a form/submit — a same-page fragment isn't
+	 * something a GET form can carry per option, see the PHP docblock.
+	 */
+	function initPageJumpNav() {
+		document.querySelectorAll( '.wbam-page-jump' ).forEach( function ( nav ) {
+			var select = nav.querySelector( '.wbam-page-jump__select' );
+			if ( ! select ) {
+				return;
+			}
+
+			nav.classList.add( 'wbam-js-enhanced' );
+			select.addEventListener( 'change', function () {
+				if ( this.value ) {
+					window.location.hash = this.value;
+				}
+			} );
+		} );
+	}
+
+	/**
 	 * Geo Targeting section: hide the provider picker + its two
 	 * provider-specific rows while geolocation is off, and show only the
 	 * row matching whichever provider is selected (owner decision 8).
@@ -90,6 +113,7 @@
 
 	document.addEventListener( 'DOMContentLoaded', function () {
 		initSettingsNavSelect();
+		initPageJumpNav();
 		initGeoProviderToggle();
 	} );
 }() );

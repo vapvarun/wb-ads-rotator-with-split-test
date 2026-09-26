@@ -175,4 +175,36 @@ class Test_UX extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'wbam-admin-btn--danger', $html );
 		$this->assertStringNotContainsString( 'wbam-admin-btn--primary', $html );
 	}
+
+	/**
+	 * Card 10343706274's own rule: an "On this page" jump row only for a
+	 * section with 4+ cards. Fewer than that is clutter, not navigation.
+	 */
+	public function test_page_jump_nav_renders_nothing_under_four_items(): void {
+		ob_start();
+		UX::page_jump_nav( array( 'a' => 'A', 'b' => 'B', 'c' => 'C' ) );
+		$html = ob_get_clean();
+
+		$this->assertSame( '', $html );
+	}
+
+	public function test_page_jump_nav_renders_links_and_a_select_for_four_or_more(): void {
+		ob_start();
+		UX::page_jump_nav(
+			array(
+				'card-one'   => 'Card One',
+				'card-two'   => 'Card Two',
+				'card-three' => 'Card Three',
+				'card-four'  => 'Card Four',
+			)
+		);
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( 'wbam-page-jump', $html );
+		$this->assertStringContainsString( 'href="#card-one"', $html );
+		$this->assertStringContainsString( 'Card One', $html );
+		$this->assertStringContainsString( '<select', $html );
+		$this->assertStringContainsString( 'value="card-two"', $html );
+		$this->assertStringContainsString( 'aria-label=', $html );
+	}
 }
