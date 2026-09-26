@@ -110,14 +110,20 @@ class Placement_Format_Map {
 	/**
 	 * Shape taxonomy (owner decision 13, card 10343726460, 3.2.0).
 	 *
-	 * Groups the pixel-format taxonomy into the three shapes an advertiser
-	 * actually thinks in: a wide strip (Banner), a squarish box (Box), or a
-	 * tall column (Tower). `map()` below composes each placement's
-	 * accepted_formats from one or more of these lists instead of hand
-	 * -picking format slugs per placement, so every Banner placement gets
-	 * every Banner size (the header used to accept only 3 of the 6 IAB
-	 * banner sizes, which is why a 970x250 "Billboard" ad — a legitimate
-	 * Banner size — warned "No placements match this size yet").
+	 * Groups the pixel-format taxonomy into the shapes an advertiser
+	 * actually thinks in: a slim strip (Banner), a tall strip's oversize
+	 * sibling (Billboard), a squarish box (Box), or a tall column (Tower).
+	 * `map()` below composes each placement's accepted_formats from one or
+	 * more of these lists instead of hand-picking format slugs per
+	 * placement, so every Banner placement gets every Banner size (the
+	 * header used to accept only 3 of the 6 IAB banner sizes).
+	 *
+	 * Billboard (970x250) is its OWN shape, split out from Banner on a
+	 * later owner decision: reserving a fixed 250px box for every Banner
+	 * placement (to fit a 970x250) left ~160px of dead space around a
+	 * 728x90 header ad. Banner now reserves only 90px (its own tallest
+	 * size); Billboard is sold only where a taller box is already
+	 * reserved anyway — the between-content placements (see map()).
 	 *
 	 * 'square' (250x250) rides along with Box: the QA proposal's Box row
 	 * lists it alongside 300x250/336x280, it is a standard IAB/AdSense
@@ -135,9 +141,10 @@ class Placement_Format_Map {
 		}
 
 		$shapes = array(
-			'banner' => array( 'leaderboard', 'large-leaderboard', 'billboard', 'banner', 'mobile-banner', 'mobile-large-banner' ),
-			'box'    => array( 'medium-rectangle', 'large-rectangle', 'square' ),
-			'tower'  => array( 'skyscraper', 'wide-skyscraper' ),
+			'banner'    => array( 'leaderboard', 'large-leaderboard', 'banner', 'mobile-banner', 'mobile-large-banner' ),
+			'billboard' => array( 'billboard' ),
+			'box'       => array( 'medium-rectangle', 'large-rectangle', 'square' ),
+			'tower'     => array( 'skyscraper', 'wide-skyscraper' ),
 		);
 
 		/**
@@ -180,10 +187,16 @@ class Placement_Format_Map {
 	 * ads can always render — a responsive creative by definition fits
 	 * any slot.
 	 *
-	 * Header, footer and between-content placements take the Banner shape;
-	 * the sidebar takes Box or Tower (owner decision 13). Composed from
-	 * shape_formats() rather than hand-picked slugs so a shape's size list
-	 * only needs updating in one place (shapes(), above).
+	 * Header, footer, before/after archive and sticky take the Banner
+	 * shape only; the sidebar takes Box or Tower (owner decision 13).
+	 * Billboard (970x250) is sold only through the between-content
+	 * placements — 'content' (before/after the post) and
+	 * 'after_paragraph' — alongside whatever they already accepted
+	 * (Banner+Box for 'content', Box for 'after_paragraph'), because those
+	 * are the only slots where a taller reserved box (see frontend.css)
+	 * doesn't leave dead space around a strip-shaped Banner ad. Composed
+	 * from shape_formats() rather than hand-picked slugs so a shape's size
+	 * list only needs updating in one place (shapes(), above).
 	 *
 	 * @return array<string, string[]>
 	 */
@@ -192,11 +205,13 @@ class Placement_Format_Map {
 			return self::$map_cache;
 		}
 
-		$r          = Ad_Formats::RESPONSIVE;
-		$banner     = array_merge( self::shape_formats( array( 'banner' ) ), array( $r ) );
-		$box        = array_merge( self::shape_formats( array( 'box' ) ), array( $r ) );
-		$box_tower  = array_merge( self::shape_formats( array( 'box', 'tower' ) ), array( $r ) );
-		$banner_box = array_merge( self::shape_formats( array( 'banner', 'box' ) ), array( $r ) );
+		$r                    = Ad_Formats::RESPONSIVE;
+		$banner               = array_merge( self::shape_formats( array( 'banner' ) ), array( $r ) );
+		$box                  = array_merge( self::shape_formats( array( 'box' ) ), array( $r ) );
+		$box_tower            = array_merge( self::shape_formats( array( 'box', 'tower' ) ), array( $r ) );
+		$banner_box           = array_merge( self::shape_formats( array( 'banner', 'box' ) ), array( $r ) );
+		$banner_box_billboard = array_merge( self::shape_formats( array( 'banner', 'box', 'billboard' ) ), array( $r ) );
+		$box_billboard        = array_merge( self::shape_formats( array( 'box', 'billboard' ) ), array( $r ) );
 
 		$map = array(
 			// Core placements (free).
@@ -205,10 +220,11 @@ class Placement_Format_Map {
 			// Keys must be real placement ids: 'content' (before/after the post)
 			// and 'after_paragraph'. The old before_content / after_content /
 			// paragraph / comment keys matched nothing, so those slots accepted
-			// any size. 'content' takes both shapes — a before/after-post strip
-			// can run full-width (Banner) or as an in-flow rectangle (Box).
-			'content'                      => $banner_box,
-			'after_paragraph'              => $box,
+			// any size. 'content' takes Banner, Box AND Billboard — a
+			// before/after-post strip can run full-width (Banner or
+			// Billboard) or as an in-flow rectangle (Box).
+			'content'                      => $banner_box_billboard,
+			'after_paragraph'              => $box_billboard,
 			'widget'                       => $box_tower, // Sidebar: Box or Tower.
 			'before_archive'               => $banner,
 			'after_archive'                => $banner,
@@ -224,7 +240,9 @@ class Placement_Format_Map {
 			'bp_before_groups'             => $banner,
 			'bp_after_groups'              => $banner,
 
-			// bbPress.
+			// bbPress. Not a "between-content" slot in the owner's sense
+			// (a single list-position strip, not a taller reserved box),
+			// so no Billboard here.
 			'bbpress'                      => $banner_box,
 
 			// Jetonomy.

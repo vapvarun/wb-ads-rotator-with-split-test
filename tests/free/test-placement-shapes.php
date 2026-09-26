@@ -36,9 +36,13 @@ class Test_Placement_Shapes extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Every one of the six Banner sizes must fit the header — the original
-	 * bug was the header only recognizing 3 of them (728x90, 970x90, 468x60)
-	 * and had no taxonomy entry at all for 970x250.
+	 * Every one of the five Banner sizes must fit the header — the
+	 * original bug was the header only recognizing 3 of them (728x90,
+	 * 970x90, 468x60). 970x250 "Billboard" is deliberately NOT one of
+	 * them (see test_header_refuses_billboard_but_accepts_leaderboard()):
+	 * a later owner decision split it into its own shape, sold only
+	 * through the between-content placements, so the header's reserved
+	 * box stays 90px instead of leaving dead space around a 728x90 ad.
 	 *
 	 * @dataProvider banner_sizes_provider
 	 */
@@ -53,13 +57,51 @@ class Test_Placement_Shapes extends \WP_UnitTestCase {
 
 	public function banner_sizes_provider(): array {
 		return array(
-			'728x90 leaderboard'        => array( 'leaderboard' ),
-			'970x90 large-leaderboard'  => array( 'large-leaderboard' ),
-			'970x250 billboard'         => array( 'billboard' ),
-			'468x60 banner'             => array( 'banner' ),
-			'320x50 mobile-banner'      => array( 'mobile-banner' ),
+			'728x90 leaderboard'          => array( 'leaderboard' ),
+			'970x90 large-leaderboard'    => array( 'large-leaderboard' ),
+			'468x60 banner'               => array( 'banner' ),
+			'320x50 mobile-banner'        => array( 'mobile-banner' ),
 			'320x100 mobile-large-banner' => array( 'mobile-large-banner' ),
 		);
+	}
+
+	/**
+	 * Billboard (970x250) is its own shape, split out of Banner: the
+	 * header (Banner-only) refuses it, but the between-content placements
+	 * ('content' — before/after the post — and 'after_paragraph') accept
+	 * it alongside whatever they already accepted (Banner+Box / Box).
+	 */
+	public function test_header_refuses_billboard_but_accepts_leaderboard(): void {
+		$billboard_id   = $this->ad_with_format( 'billboard', 970, 250 );
+		$leaderboard_id = $this->ad_with_format( 'leaderboard', 728, 90 );
+
+		$this->assertFalse( Ad_Formats::fits( $billboard_id, 'header' ), 'The header no longer accepts the Billboard shape.' );
+		$this->assertTrue( Ad_Formats::fits( $leaderboard_id, 'header' ), 'The header still accepts its own Banner sizes.' );
+	}
+
+	public function test_between_content_placements_accept_billboard(): void {
+		$billboard_id = $this->ad_with_format( 'billboard', 970, 250 );
+
+		foreach ( array( 'content', 'after_paragraph' ) as $placement ) {
+			$this->assertTrue( Ad_Formats::fits( $billboard_id, $placement ), "'{$placement}' should accept the Billboard shape." );
+		}
+	}
+
+	/**
+	 * Billboard is scoped narrowly — only the two between-content
+	 * placements named on the card, not every other Box-accepting
+	 * placement (e.g. popup, which is Box-only but not "between content").
+	 * BuddyPress/bbPress/Jetonomy slugs are excluded here: those
+	 * integrations aren't active in this test run, so they're absent from the
+	 * placement registry, which the (correctly) permissive "unmapped
+	 * placement" default would make look like a false pass.
+	 */
+	public function test_billboard_is_not_accepted_outside_between_content(): void {
+		$billboard_id = $this->ad_with_format( 'billboard', 970, 250 );
+
+		foreach ( array( 'header', 'footer', 'widget', 'popup', 'comments', 'before_archive', 'after_archive' ) as $placement ) {
+			$this->assertFalse( Ad_Formats::fits( $billboard_id, $placement ), "'{$placement}' should not accept the Billboard shape." );
+		}
 	}
 
 	public function test_box_sizes_fit_widget_not_header(): void {
@@ -105,9 +147,9 @@ class Test_Placement_Shapes extends \WP_UnitTestCase {
 			}
 		);
 
-		$billboard_id = $this->ad_with_format( 'billboard', 970, 250 );
+		$large_leaderboard_id = $this->ad_with_format( 'large-leaderboard', 970, 90 );
 		$this->assertFalse(
-			Ad_Formats::fits( $billboard_id, 'header' ),
+			Ad_Formats::fits( $large_leaderboard_id, 'header' ),
 			'A site narrowing the Banner shape via the filter should stop accepting sizes it removed.'
 		);
 

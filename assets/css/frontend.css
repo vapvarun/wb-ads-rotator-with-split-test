@@ -68,13 +68,15 @@
 	--wbam-close-size: 44px;
 	--wbam-transition: 0.2s ease;
 
-	/* Shape height caps (owner decision 13): the box a Banner/Box/Tower
-	   placement reserves never changes size between reloads, no matter
-	   which fitting ad is rotated in — this is what stops the header
-	   jumping between 82px and 219px across page loads. Banner's desktop
-	   cap covers its tallest recommended size (970x250); the mobile
-	   breakpoint below drops to the tallest mobile banner (320x100). */
-	--wbam-shape-banner-h: 250px;
+	/* Shape height caps (owner decision 13): the box a placement reserves
+	   never changes size between reloads, no matter which fitting ad is
+	   rotated in — this is what stops the header jumping between 82px and
+	   219px across page loads. Banner (header, footer, before/after
+	   archive, sticky) reserves only its own tallest size (728x90/970x90);
+	   970x250 "Billboard" is its own shape, sold only where a taller box
+	   is already reserved for Box anyway (the between-content placements),
+	   not in a strip-shaped Banner slot — see class-placement-format-map.php. */
+	--wbam-shape-banner-h: 90px;
 	--wbam-shape-banner-h-mobile: 100px;
 	--wbam-shape-box-h: 280px;
 	--wbam-shape-tower-h: 600px;
@@ -324,29 +326,44 @@
 /* ==========================================================================
    Shape height caps (owner decision 13, card 10343726460)
 
-   Banner placements (header, footer, before/after content, before/after
-   archive) reserve a fixed height regardless of which fitting ad
-   renders — this is what stops the header jumping between 82px and
-   219px across reloads. Images already never crop or stretch
-   (object-fit: contain, below); centering keeps a shorter ad (e.g.
-   320x50 in a Banner box) from looking stuck to one edge.
+   Banner-only placements (header, footer, before/after archive, sticky's
+   own overlay CSS covers itself further down) reserve just their own
+   tallest size — this is what stops the header jumping between 82px and
+   219px across reloads, without leaving dead space around a 728x90/970x90
+   strip ad. Images already never crop or stretch (object-fit: contain,
+   below); centering keeps a shorter ad (e.g. 320x50) from looking stuck
+   to one edge.
 
-   ponytail: a text/rich/code ("Any" shape) ad in a Banner slot can in
-   principle be taller than the 250px cap and get clipped by
-   `overflow: hidden` — real house-promo copy is one short line, so this
-   is an accepted simplification, not a redesign of rich-content ad
-   layout. Raise the cap (or exempt rich-content specifically) if a
-   site's copy needs more room.
+   Between-content placements (before/after content, after paragraph) also
+   accept Box (up to 336x280) and Billboard (970x250) — Box is the taller
+   of the two, so THAT is the reserved height here, not Billboard's 250px;
+   reserving only 250px would clip a legitimate 336x280 Box ad that these
+   slots already sold before Billboard existed.
+
+   ponytail: a text/rich/code ("Any" shape) ad in either group can in
+   principle be taller than its cap and get clipped by `overflow: hidden`
+   — real house-promo copy is one short line, so this is an accepted
+   simplification, not a redesign of rich-content ad layout. Raise the cap
+   (or exempt rich-content specifically) if a site's copy needs more room.
    ========================================================================== */
 
 .wbam-placement-header,
 .wbam-placement-footer,
-.wbam-placement-before-content,
-.wbam-placement-after-content,
 .wbam-placement-before-archive,
 .wbam-placement-after-archive {
 	min-height: var(--wbam-shape-banner-h);
 	max-height: var(--wbam-shape-banner-h);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.wbam-placement-before-content,
+.wbam-placement-after-content,
+.wbam-placement-paragraph {
+	min-height: var(--wbam-shape-box-h);
+	max-height: var(--wbam-shape-box-h);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -366,12 +383,13 @@
 
 /* Phone breakpoint matches the rest of this file (480px, see below) — a
    Banner ad on phones is one of the mobile sizes (320x50/320x100), so the
-   reserved box shrinks to match instead of leaving a 250px-tall gap. */
+   reserved box shrinks to match instead of leaving a 90px-tall gap that
+   still doesn't fit the desktop cap's own reasoning. Between-content
+   placements keep their 280px cap on phones too — a Box ad is ~300px
+   wide, which already fits a 320-390px viewport without shrinking. */
 @media screen and (max-width: 480px) {
 	.wbam-placement-header,
 	.wbam-placement-footer,
-	.wbam-placement-before-content,
-	.wbam-placement-after-content,
 	.wbam-placement-before-archive,
 	.wbam-placement-after-archive {
 		min-height: var(--wbam-shape-banner-h-mobile);
