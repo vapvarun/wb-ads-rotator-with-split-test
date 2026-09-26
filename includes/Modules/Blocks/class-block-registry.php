@@ -56,6 +56,8 @@ class Block_Registry {
 				'wp-i18n',
 				'wp-data',
 				'wp-api-fetch',
+				'wp-compose',
+				'wp-url',
 			),
 			WBAM_VERSION,
 			true

@@ -21,6 +21,9 @@
 	var ServerSideRender    = wp.serverSideRender;
 	var PanelBody           = wp.components.PanelBody;
 	var SelectControl       = wp.components.SelectControl;
+	var ComboboxControl     = wp.components.ComboboxControl;
+	var useDebounce         = wp.compose.useDebounce;
+	var addQueryArgs        = wp.url.addQueryArgs;
 	var Placeholder         = wp.components.Placeholder;
 	var __                  = wp.i18n.__;
 	var apiFetch            = wp.apiFetch;
@@ -40,6 +43,11 @@
 		useEffect(
 			function() {
 				var cancelled = false;
+
+				if ( ! path ) {
+					setItems( [] );
+					return;
+				}
 
 				apiFetch( { path: path } ).then( function( response ) {
 					if ( ! cancelled && response && response[ listKey ] ) {
@@ -64,16 +72,37 @@
 		var attributes  = props.attributes;
 		var setAttributes = props.setAttributes;
 		var blockProps  = useBlockProps();
-		var ads         = useWbamList( '/wbam/v1/ads?per_page=100', 'ads' );
+		var searchState = useState( '' );
+		var setSearch   = useDebounce( searchState[ 1 ], 300 );
 
-		var options = [ { label: __( 'Select an ad…', 'wb-ads-rotator-with-split-test' ), value: 0 } ].concat(
-			ads.map( function( ad ) {
-				return { label: ad.title || ( '#' + ad.id ), value: ad.id };
-			} )
-		);
+		// Search by title (20 at a time) instead of loading every ad, and
+		// fetch the selected ad by id so its title shows even when it is
+		// not among the search results.
+		var ads      = useWbamList( addQueryArgs( '/wbam/v1/ads', { per_page: 20, search: searchState[ 0 ] } ), 'ads' );
+		var selected = useWbamList( attributes.adId ? addQueryArgs( '/wbam/v1/ads', { include: [ attributes.adId ] } ) : '', 'ads' );
+
+		var seen    = {};
+		var options = selected.concat( ads ).filter( function( ad ) {
+			var isNew = ! seen[ ad.id ];
+			seen[ ad.id ] = true;
+			return isNew;
+		} ).map( function( ad ) {
+			return { label: ad.title || ( '#' + ad.id ), value: String( ad.id ) };
+		} );
 
 		function onChange( value ) {
 			setAttributes( { adId: parseInt( value, 10 ) || 0 } );
+		}
+
+		function picker( label ) {
+			return el( ComboboxControl, {
+				label: label,
+				value: attributes.adId ? String( attributes.adId ) : null,
+				options: options,
+				onChange: onChange,
+				onFilterValueChange: setSearch,
+				placeholder: __( 'Search ads by title', 'wb-ads-rotator-with-split-test' ),
+			} );
 		}
 
 		var inspector = el(
@@ -82,12 +111,7 @@
 			el(
 				PanelBody,
 				{ title: __( 'Ad', 'wb-ads-rotator-with-split-test' ) },
-				el( SelectControl, {
-					label: __( 'Ad', 'wb-ads-rotator-with-split-test' ),
-					value: attributes.adId,
-					options: options,
-					onChange: onChange,
-				} )
+				picker( __( 'Ad', 'wb-ads-rotator-with-split-test' ) )
 			)
 		);
 
@@ -103,7 +127,7 @@
 						label: __( 'WB Ad', 'wb-ads-rotator-with-split-test' ),
 						instructions: __( 'Choose an ad. Only enabled ads are listed.', 'wb-ads-rotator-with-split-test' ),
 					},
-					el( SelectControl, { value: attributes.adId, options: options, onChange: onChange } )
+					picker( __( 'Ad', 'wb-ads-rotator-with-split-test' ) )
 				)
 			);
 		}

@@ -61,6 +61,16 @@ class Ads_API {
 							'minimum'           => 1,
 							'sanitize_callback' => 'absint',
 						),
+						'search'   => array(
+							'type'              => 'string',
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+						'include'  => array(
+							'type'    => 'array',
+							'items'   => array( 'type' => 'integer' ),
+							'default' => array(),
+						),
 					),
 				),
 				array(
@@ -235,6 +245,10 @@ class Ads_API {
 
 		$query = new \WP_Query(
 			array(
+				// The block editor's ad picker searches by title and fetches
+				// the selected ad by id, so it works past one page of ads.
+				's'                      => (string) $request['search'],
+				'post__in'               => array_map( 'absint', (array) $request['include'] ),
 				'post_type'              => 'wbam-ad',
 				'post_status'            => 'publish',
 				// This endpoint is public (permission_callback __return_true), so
