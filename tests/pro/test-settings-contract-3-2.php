@@ -123,24 +123,56 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 		$this->assertContains( 'wallet', Settings_Helper::get_available_modules()['classifieds']['depends_on'] );
 	}
 
-	/** D13: the banner's "Enable now" writes FREE's setting through FREE's API. */
-	public function test_enable_format_matching_writes_free_setting(): void {
-		$_REQUEST['_wpnonce'] = wp_create_nonce( 'wbam_enable_format_matching' );
+	/**
+	 * D13: the Format Matching checkbox in Settings > Ads & Display is the
+	 * one control (owner decision, QA wave 4, card 10343726460) - the
+	 * banner's CTA only navigates there now; it must not carry its own
+	 * write path, and the old direct-flip handler must be gone, not just
+	 * unhooked.
+	 */
+	public function test_format_matching_step_links_to_the_setting_not_a_direct_flip(): void {
+		$this->assertFalse(
+			method_exists( Next_Step_Banner::class, 'handle_enable_format_matching' ),
+			'The direct-flip handler must be removed, not left dead.'
+		);
 
-		$redirect = static function ( $location ) {
-			throw new \RuntimeException( (string) $location );
-		};
-		add_filter( 'wp_redirect', $redirect );
-		try {
-			Next_Step_Banner::handle_enable_format_matching();
-		} catch ( \RuntimeException $e ) {
-			unset( $e );
-		} finally {
-			remove_filter( 'wp_redirect', $redirect );
+		// Clear every higher-priority step so format-matching is the one
+		// resolve_next_step() actually surfaces.
+		global $wpdb;
+		foreach ( array( 'wbam_packages', 'wbam_advertisers' ) as $name ) {
+			$table = $wpdb->prefix . $name;
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test isolation on a known table name.
+			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table ) {
+				$wpdb->query( "DELETE FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			}
 		}
+		delete_option( 'wbam_pro_demo_data_ids' );
+		self::factory()->post->create( array( 'post_type' => 'wbam-ad' ) );
+		\WBAM_Pro\Modules\Packages\Package_Manager::get_instance()->create(
+			array(
+				'name'          => 'Sidebar month',
+				'price'         => 49,
+				'pricing_model' => 'flat',
+			)
+		);
+		$advertiser = \WBAM_Pro\Modules\Advertisers\Advertiser_Manager::get_instance()->get_or_create(
+			(int) self::factory()->user->create( array( 'role' => 'subscriber' ) )
+		);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test isolation, approving out of the default 'pending' status so it does not outrank the step under test.
+		$wpdb->update( $wpdb->prefix . 'wbam_advertisers', array( 'status' => 'active' ), array( 'id' => $advertiser->id ) );
+		\WBAM\Core\Settings_Helper::update( 'format_matching', false );
 
-		$this->assertTrue( \WBAM\Core\Settings_Helper::get( 'format_matching' ) );
-		$this->assertTrue( Settings_Helper::format_matching_enabled() );
+		$step = Next_Step_Banner::resolve_next_step();
+		$this->assertNotNull( $step );
+		$this->assertSame( 'enable-format-matching', $step['slug'] );
+		$this->assertSame(
+			\WBAM\Core\Admin_Links::settings( 'ads-display' ) . '#wbam_setting_format_matching',
+			$step['cta_url']
+		);
+
+		// Never touched by merely reading the step - the checkbox is the
+		// only writer.
+		$this->assertFalse( Settings_Helper::format_matching_enabled() );
 	}
 
 	/** D14: a programmatic wbam_pro_settings write is not an error and logs nothing. */
