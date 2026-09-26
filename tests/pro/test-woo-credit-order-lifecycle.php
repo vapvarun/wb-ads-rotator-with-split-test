@@ -1,10 +1,8 @@
 <?php
 /**
- * WooCommerce credit orders: the order says the wallet was credited, and a
- * refunded or cancelled order takes the credits back, once.
- *
- * The SDK adapter only listens for completed/processing, so a refunded order
- * kept its credits, and nothing on the order told the owner why it completed.
+ * WooCommerce credit orders: the order says the wallet was credited. Since SDK
+ * 1.8.0 the adapter itself takes credits back on a refund or cancel (capped at
+ * the unspent balance); the plugin only books that reversal as revenue.
  * WooCommerce is not loaded in this suite, so the order is a stand-in with the
  * WC_Order methods the handlers call; the hooks pass the order object.
  *
@@ -93,18 +91,55 @@ class Test_Woo_Credit_Order_Lifecycle extends Pro_Test_Case {
 		$this->assertStringContainsString( '50.00', $this->order->notes[0] );
 	}
 
-	public function test_refunded_order_takes_the_credits_back_once(): void {
-		Credits_Bridge::get_instance()->reverse_woo_order_credits( self::ORDER_ID, $this->order );
-		// Cancelled after refunded, or a replayed hook: nothing more.
-		Credits_Bridge::get_instance()->reverse_woo_order_credits( self::ORDER_ID, $this->order );
-
-		$this->assertSame( 0.0, (float) Credits_Bridge::get_balance( $this->advertiser->id ) );
-		$this->assertCount( 1, $this->order->notes );
+	/**
+	 * SDK 1.8.0's WooCommerce adapter takes the credits back itself on a
+	 * refund or cancel (capped at the unspent balance). A second reversal
+	 * here deducted the same order twice.
+	 */
+	public function test_the_plugin_no_longer_reverses_woo_orders_itself(): void {
+		$bridge = Credits_Bridge::get_instance();
+		$this->assertFalse( has_action( 'woocommerce_order_status_refunded', array( $bridge, 'reverse_woo_order_credits' ) ) );
+		$this->assertFalse( has_action( 'woocommerce_order_status_cancelled', array( $bridge, 'reverse_woo_order_credits' ) ) );
+		$this->assertFalse( method_exists( $bridge, 'reverse_woo_order_credits' ) );
 	}
 
-	public function test_an_order_the_adapter_never_credited_is_left_alone(): void {
-		Credits_Bridge::get_instance()->reverse_woo_order_credits( self::ORDER_ID + 1, $this->order );
+	/**
+	 * The adapter announces its reversal on wbcom_credits_refunded; that is
+	 * booked once as a top-up refund, less revenue.
+	 */
+	public function test_an_adapter_refund_is_booked_as_a_topup_refund(): void {
+		global $wpdb;
+		$user   = (int) $this->order->get_customer_id();
+		$ledger = \Wbcom\Credits\Credits::adjust( 'wbam-pro', $user, -2000, 'Refund of WooCommerce order' );
+		$this->assertNotFalse( $ledger );
 
-		$this->assertSame( 50.0, (float) Credits_Bridge::get_balance( $this->advertiser->id ) );
+		$context = array(
+			'gateway'    => 'woocommerce',
+			'session_id' => 'woo:order:' . self::ORDER_ID,
+			'ledger_id'  => (int) $ledger,
+			'reason'     => 'gateway_refund',
+		);
+		do_action( 'wbcom_credits_refunded', 'wbam-pro', $user, 2000, $context );
+		do_action( 'wbcom_credits_refunded', 'wbam-pro', $user, 2000, $context ); // Replayed.
+
+		$table = \WBAM_Pro\Core\Revenue_Ledger::table_name();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test assertion.
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT source, amount FROM {$table} WHERE ledger_id = %d", (int) $ledger ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$this->assertCount( 1, $rows );
+		$this->assertSame( \WBAM_Pro\Core\Revenue_Ledger::SOURCE_TOPUP_REFUND, $rows[0]->source );
+		$this->assertSame( -2000, (int) $rows[0]->amount );
+	}
+
+	/** Stripe and PayPal also fire the generic hook: booked once, by the gateway listener. */
+	public function test_a_gateway_refund_on_the_generic_hook_is_not_booked_twice(): void {
+		global $wpdb;
+		$user   = (int) $this->order->get_customer_id();
+		$ledger = \Wbcom\Credits\Credits::adjust( 'wbam-pro', $user, -1000, 'Stripe refund' );
+
+		do_action( 'wbcom_credits_refunded', 'wbam-pro', $user, 1000, array( 'gateway' => 'stripe', 'ledger_id' => (int) $ledger ) );
+
+		$table = \WBAM_Pro\Core\Revenue_Ledger::table_name();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test assertion.
+		$this->assertSame( 0, (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE ledger_id = %d", (int) $ledger ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 }
