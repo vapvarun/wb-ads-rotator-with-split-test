@@ -340,29 +340,30 @@
    reserving only 250px would clip a legitimate 336x280 Box ad that these
    slots already sold before Billboard existed.
 
-   The height is reserved on each ad's creative box (.wbam-ad-slot.wbam-ad -
-   Placement_Engine::render_ad() puts both classes on the same wrapper, one
-   per rendered ad; a ">" combinator here never matches, since that would
-   require .wbam-ad-slot and .wbam-ad to be two different elements), not on
-   the whole placement: the "Advertisement" label keeps its natural,
-   theme-dependent height above it, a stack of several ads reserves one row
-   each, and a taller text/rich/code ("Any" shape) ad grows instead of being
+   The height is reserved on each ad's CREATIVE (.wbam-ad-slot > .wbam-ad).
+   Placement_Engine::render_ad() prints the outer .wbam-ad.wbam-ad-slot
+   wrapper, then the "Advertisement" label, then the creative as its own
+   .wbam-ad.wbam-ad-{type} child. Reserving on the outer wrapper made it a
+   flex row, so the label sat beside the ad instead of above it. On the
+   child, the label keeps its natural, theme-dependent height above, a
+   stack of several ads reserves one row each, and a taller text/rich/code
+   ("Any" shape) ad grows instead of being
    clipped. Nothing here ever uses overflow: hidden.
    ========================================================================== */
 
-.wbam-placement-header .wbam-ad-slot.wbam-ad,
-.wbam-placement-footer .wbam-ad-slot.wbam-ad,
-.wbam-placement-before-archive .wbam-ad-slot.wbam-ad,
-.wbam-placement-after-archive .wbam-ad-slot.wbam-ad {
+.wbam-placement-header .wbam-ad-slot > .wbam-ad,
+.wbam-placement-footer .wbam-ad-slot > .wbam-ad,
+.wbam-placement-before-archive .wbam-ad-slot > .wbam-ad,
+.wbam-placement-after-archive .wbam-ad-slot > .wbam-ad {
 	min-height: var(--wbam-shape-banner-h);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
-.wbam-placement-before-content .wbam-ad-slot.wbam-ad,
-.wbam-placement-after-content .wbam-ad-slot.wbam-ad,
-.wbam-placement-paragraph .wbam-ad-slot.wbam-ad {
+.wbam-placement-before-content .wbam-ad-slot > .wbam-ad,
+.wbam-placement-after-content .wbam-ad-slot > .wbam-ad,
+.wbam-placement-paragraph .wbam-ad-slot > .wbam-ad {
 	min-height: var(--wbam-shape-box-h);
 	display: flex;
 	align-items: center;
@@ -394,16 +395,16 @@
    .wbam-ad-image img) still grow a Box or Billboard creative past 100px to
    its own full, unclipped height; only the common Banner case tightens up. */
 @media screen and (max-width: 480px) {
-	.wbam-placement-header .wbam-ad-slot.wbam-ad,
-	.wbam-placement-footer .wbam-ad-slot.wbam-ad,
-	.wbam-placement-before-archive .wbam-ad-slot.wbam-ad,
-	.wbam-placement-after-archive .wbam-ad-slot.wbam-ad {
+	.wbam-placement-header .wbam-ad-slot > .wbam-ad,
+	.wbam-placement-footer .wbam-ad-slot > .wbam-ad,
+	.wbam-placement-before-archive .wbam-ad-slot > .wbam-ad,
+	.wbam-placement-after-archive .wbam-ad-slot > .wbam-ad {
 		min-height: var(--wbam-shape-banner-h-mobile);
 	}
 
-	.wbam-placement-before-content .wbam-ad-slot.wbam-ad,
-	.wbam-placement-after-content .wbam-ad-slot.wbam-ad,
-	.wbam-placement-paragraph .wbam-ad-slot.wbam-ad {
+	.wbam-placement-before-content .wbam-ad-slot > .wbam-ad,
+	.wbam-placement-after-content .wbam-ad-slot > .wbam-ad,
+	.wbam-placement-paragraph .wbam-ad-slot > .wbam-ad {
 		min-height: var(--wbam-shape-banner-h-mobile);
 	}
 }

@@ -2,11 +2,10 @@
 /**
  * Shape-height-cap reservation (owner decision 13, card 10343726460):
  *
- * - The reservation selectors used a child combinator,
- *   ".wbam-ad-slot > .wbam-ad", but Placement_Engine::render_ad() puts
- *   both classes on the SAME wrapper element (one per rendered ad) - a
- *   child combinator requires two different elements, so the rule never
- *   matched anything and no height was ever reserved.
+ * - The reserve belongs on the ad's CREATIVE: render_ad() prints the outer
+ *   .wbam-ad.wbam-ad-slot wrapper, then the label, then the creative as its
+ *   own .wbam-ad.wbam-ad-{type} child. A reserve on the outer wrapper made it
+ *   a flex row and put the "Advertisement" label beside the ad.
  * - Between-content (before/after content, after paragraph) reserved a
  *   flat 280px (Box's height) even on phones, where a Banner creative
  *   (after_paragraph/content both accept Banner) renders ~100px tall,
@@ -25,21 +24,30 @@ class Test_Shape_Reserve_Selector_And_Phone_Banner extends WP_UnitTestCase {
 		return (string) file_get_contents( WBAM_PATH . 'assets/css/frontend.css' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 	}
 
-	public function test_no_selector_uses_the_dead_child_combinator(): void {
+	public function test_reserve_targets_the_creative_not_the_slot_wrapper(): void {
 		$css = $this->css();
-		$this->assertDoesNotMatchRegularExpression(
-			'/\.wbam-ad-slot\s*>\s*\.wbam-ad\b/',
-			$css,
-			'.wbam-ad-slot and .wbam-ad are the same element (Placement_Engine::render_ad()); a ">" combinator between them never matches.'
-		);
+		$this->assertStringNotContainsString( '.wbam-ad-slot.wbam-ad', $css, 'A reserve on the outer slot puts the label beside the ad.' );
+		foreach ( array( 'header', 'before-content', 'after-content', 'paragraph' ) as $placement ) {
+			$this->assertStringContainsString( ".wbam-placement-{$placement} .wbam-ad-slot > .wbam-ad", $css );
+		}
 	}
 
-	public function test_reservation_selectors_are_compound_on_the_same_element(): void {
-		$css = $this->css();
-		$this->assertMatchesRegularExpression( '/\.wbam-placement-header \.wbam-ad-slot\.wbam-ad\b/', $css );
-		$this->assertMatchesRegularExpression( '/\.wbam-placement-before-content \.wbam-ad-slot\.wbam-ad\b/', $css );
-		$this->assertMatchesRegularExpression( '/\.wbam-placement-after-content \.wbam-ad-slot\.wbam-ad\b/', $css );
-		$this->assertMatchesRegularExpression( '/\.wbam-placement-paragraph \.wbam-ad-slot\.wbam-ad\b/', $css );
+	/** The child selector only works if the creative really is a child of the slot. */
+	public function test_rendered_creative_is_a_child_of_the_slot_below_the_label(): void {
+		$ad_id = self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
+		update_post_meta( $ad_id, '_wbam_enabled', '1' );
+		update_post_meta( $ad_id, '_wbam_ad_data', array( 'type' => 'rich-content', 'content' => '<p>Hello</p>' ) );
+
+		$html = (string) \WBAM\Modules\Placements\Placement_Engine::get_instance()->render_ad( $ad_id, array( 'placement' => 'header' ) );
+		$this->assertNotSame( '', $html, 'The test ad must render.' );
+
+		$doc = new \DOMDocument();
+		libxml_use_internal_errors( true );
+		$doc->loadHTML( '<?xml encoding="utf-8"?><div>' . $html . '</div>' );
+		libxml_clear_errors();
+		$xpath = new \DOMXPath( $doc );
+		$creative = $xpath->query( "//*[contains(concat(' ', normalize-space(@class), ' '), ' wbam-ad-slot ')]/*[contains(concat(' ', normalize-space(@class), ' '), ' wbam-ad ')]" );
+		$this->assertGreaterThan( 0, $creative->length, 'The creative (.wbam-ad) must be a direct child of .wbam-ad-slot.' );
 	}
 
 	public function test_between_content_drops_to_the_banner_floor_on_phones(): void {
@@ -48,7 +56,7 @@ class Test_Shape_Reserve_Selector_And_Phone_Banner extends WP_UnitTestCase {
 		// Isolate the max-width:480px block (the last one in the file is the
 		// shape-cap media query; a following block also matches 480px for
 		// spacing tokens, so anchor on the shape-cap selectors instead).
-		$start = strpos( $css, '.wbam-placement-header .wbam-ad-slot.wbam-ad,' );
+		$start = strpos( $css, '.wbam-placement-header .wbam-ad-slot > .wbam-ad,' );
 		$this->assertNotFalse( $start, 'Could not locate the shape-cap rules to scope the phone-breakpoint check.' );
 		$block_start = strpos( $css, '@media', $start );
 		$this->assertNotFalse( $block_start );
@@ -73,9 +81,9 @@ class Test_Shape_Reserve_Selector_And_Phone_Banner extends WP_UnitTestCase {
 		}
 		$phone_block = substr( $css, $block_start, $pos - $block_start );
 
-		$this->assertStringContainsString( '.wbam-placement-before-content .wbam-ad-slot.wbam-ad', $phone_block );
-		$this->assertStringContainsString( '.wbam-placement-after-content .wbam-ad-slot.wbam-ad', $phone_block );
-		$this->assertStringContainsString( '.wbam-placement-paragraph .wbam-ad-slot.wbam-ad', $phone_block );
+		$this->assertStringContainsString( '.wbam-placement-before-content .wbam-ad-slot > .wbam-ad', $phone_block );
+		$this->assertStringContainsString( '.wbam-placement-after-content .wbam-ad-slot > .wbam-ad', $phone_block );
+		$this->assertStringContainsString( '.wbam-placement-paragraph .wbam-ad-slot > .wbam-ad', $phone_block );
 		$this->assertSame(
 			2,
 			substr_count( $phone_block, 'min-height: var(--wbam-shape-banner-h-mobile);' ),
@@ -86,7 +94,7 @@ class Test_Shape_Reserve_Selector_And_Phone_Banner extends WP_UnitTestCase {
 
 	public function test_frontend_rtl_css_matches(): void {
 		$rtl = (string) file_get_contents( WBAM_PATH . 'assets/css/frontend-rtl.css' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-		$this->assertDoesNotMatchRegularExpression( '/\.wbam-ad-slot\s*>\s*\.wbam-ad\b/', $rtl );
-		$this->assertMatchesRegularExpression( '/\.wbam-placement-before-content \.wbam-ad-slot\.wbam-ad\b/', $rtl );
+		$this->assertStringNotContainsString( '.wbam-ad-slot.wbam-ad', $rtl );
+		$this->assertStringContainsString( '.wbam-placement-before-content .wbam-ad-slot > .wbam-ad', $rtl );
 	}
 }
