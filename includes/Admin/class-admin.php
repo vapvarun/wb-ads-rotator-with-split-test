@@ -3002,6 +3002,11 @@ class Admin {
 				$type    = $engine->get_ad_type( $type_id );
 				if ( $type ) {
 					echo '<span class="dashicons ' . esc_attr( $type->get_icon() ) . '"></span> ' . esc_html( $type->get_name() );
+				} else {
+					// No `_wbam_ad_data` yet (fixture/legacy rows) - a blank
+					// cell reads as a loading glitch; every other empty column
+					// on this screen prints a dash.
+					echo '—';
 				}
 				break;
 
@@ -3018,6 +3023,23 @@ class Admin {
 				break;
 
 			case 'status':
+				// An ad awaiting moderation sits at core post_status 'pending'
+				// (Ad_Submission_Manager::reject()/revert_to_pending() set it),
+				// with `_wbam_enabled` still '1' from creation - this column
+				// read only the toggle and showed "Enabled" on ads that were
+				// not actually live because they had not been approved yet.
+				// post_status is core WordPress, so this stays a Free-only
+				// check with no Pro coupling.
+				$post_status = get_post_status( $post_id );
+				if ( 'pending' === $post_status ) {
+					echo wp_kses_post( \WBAM\Admin\UX::status_badge( 'pending', __( 'Pending review', 'wb-ads-rotator-with-split-test' ) ) );
+					break;
+				}
+				if ( 'draft' === $post_status ) {
+					echo wp_kses_post( \WBAM\Admin\UX::status_badge( 'draft', __( 'Draft', 'wb-ads-rotator-with-split-test' ) ) );
+					break;
+				}
+
 				$enabled = get_post_meta( $post_id, '_wbam_enabled', true );
 				$status  = '1' === $enabled ? 'enabled' : 'disabled';
 				$text    = '1' === $enabled ? __( 'Enabled', 'wb-ads-rotator-with-split-test' ) : __( 'Disabled', 'wb-ads-rotator-with-split-test' );
