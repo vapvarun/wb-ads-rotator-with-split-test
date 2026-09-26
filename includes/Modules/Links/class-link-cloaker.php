@@ -109,10 +109,31 @@ class Link_Cloaker {
 		// Record click.
 		$link_manager->increment_clicks( $link->id );
 
-		// Allow filtering before redirect.
-		$destination   = apply_filters( 'wbam_link_redirect_url', $link->get_destination_url(), $link );
+		/**
+		 * Filter the destination URL a partnership link redirects visitors to.
+		 *
+		 * @since 2.0.0
+		 * @param string $url  Destination URL, as stored on the link.
+		 * @param Link   $link Link object being redirected.
+		 */
+		$destination = apply_filters( 'wbam_link_redirect_url', $link->get_destination_url(), $link );
+
+		/**
+		 * Filter the HTTP redirect status used for a partnership link.
+		 *
+		 * @since 2.0.0
+		 * @param int  $redirect_type Redirect type (301, 302, 307), as stored on the link.
+		 * @param Link $link          Link object being redirected.
+		 */
 		$redirect_type = apply_filters( 'wbam_link_redirect_type', $link->redirect_type, $link );
 
+		/**
+		 * Fires immediately before a partnership link click redirects the visitor.
+		 *
+		 * @since 2.0.0
+		 * @param Link   $link        Link object being redirected.
+		 * @param string $destination Resolved destination URL.
+		 */
 		do_action( 'wbam_before_link_redirect', $link, $destination );
 
 		// Perform redirect.
@@ -158,7 +179,12 @@ class Link_Cloaker {
 		$wp_query->set_404();
 		status_header( 404 );
 
-		// Allow custom handling.
+		/**
+		 * Fires when a partnership link slug doesn't resolve to any link,
+		 * after the default 404 response has already been set.
+		 *
+		 * @since 2.0.0
+		 */
 		do_action( 'wbam_link_not_found' );
 	}
 
@@ -190,6 +216,13 @@ class Link_Cloaker {
 				break;
 		}
 
+		/**
+		 * Fires when an inactive/expired partnership link is accessed, after
+		 * the configured inactive-link action (home/custom/404) has run.
+		 *
+		 * @since 2.0.0
+		 * @param Link $link The inactive link object.
+		 */
 		do_action( 'wbam_inactive_link_accessed', $link );
 	}
 

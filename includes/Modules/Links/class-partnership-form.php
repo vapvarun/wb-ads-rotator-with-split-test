@@ -548,7 +548,13 @@ class Partnership_Form {
 			wp_send_json_error( array( 'message' => $validation->get_error_message() ) );
 		}
 
-		// Check for duplicate submissions.
+		/**
+		 * Filter how many hours a duplicate partnership submission (same
+		 * email + website URL) is blocked for. Return 0 to disable the check.
+		 *
+		 * @since 2.0.0
+		 * @param int $hours Duplicate-submission window, in hours. Default 24.
+		 */
 		$duplicate_hours = apply_filters( 'wbam_partnership_form_duplicate_hours', 24 );
 
 		if ( $duplicate_hours > 0 && $this->manager->has_recent_submission( $data['email'], $data['website_url'], $duplicate_hours ) ) {

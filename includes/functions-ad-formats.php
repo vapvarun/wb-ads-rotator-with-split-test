@@ -308,6 +308,14 @@ if ( ! function_exists( 'wbam_ad_types_without_placements' ) ) {
 	 * @return string[] Ad type IDs that bypass placements.
 	 */
 	function wbam_ad_types_without_placements() {
+		/**
+		 * Filter which ad type IDs are never served through a placement
+		 * (e.g. a video ad played in-stream by the host plugin instead of
+		 * painted into a header/sidebar slot).
+		 *
+		 * @since 3.1.1
+		 * @param string[] $types Ad type IDs to exclude from placements. Default `array( 'video' )`.
+		 */
 		return (array) apply_filters( 'wbam_ad_types_without_placements', array( 'video' ) );
 	}
 }

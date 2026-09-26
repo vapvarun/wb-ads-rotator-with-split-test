@@ -1561,6 +1561,16 @@ class Admin {
 		// Same rule the portal wizard already enforces on its slot grid.
 		// Existing sites that have not opted into format_matching keep
 		// every placement tickable, same as today.
+		/**
+		 * Filter whether the ad editor greys out placements the ad's
+		 * resolved size doesn't fit, instead of letting every placement
+		 * stay tickable regardless of shape.
+		 *
+		 * @since 3.2.0
+		 * @param bool $enforce Whether to enforce format matching. Defaults
+		 *                      to the site's format_matching setting.
+		 * @param int  $post_id Ad post ID.
+		 */
 		$enforce_format = (bool) apply_filters(
 			'wbam_enforce_format_matching',
 			\WBAM\Core\Settings_Helper::format_matching_enabled(),
@@ -1849,6 +1859,13 @@ class Admin {
 	 * @return string[]
 	 */
 	private static function ad_types_without_sizing() {
+		/**
+		 * Filter which ad type IDs skip the fixed width/height sizing
+		 * metabox.
+		 *
+		 * @since 2.10.0
+		 * @param string[] $types Ad type IDs to exclude from sizing. Default `array( 'video' )`.
+		 */
 		return (array) apply_filters( 'wbam_ad_types_without_sizing', array( 'video' ) );
 	}
 
@@ -2019,6 +2036,18 @@ class Admin {
 		$assigned_placements = get_post_meta( $post->ID, '_wbam_placements', true );
 		$assigned_placements = is_array( $assigned_placements ) ? array_map( 'strval', $assigned_placements ) : array();
 
+		/**
+		 * Filter the placement registry: slug => { name, description,
+		 * group, accepted_formats }. This is the single source of truth
+		 * for "which placements exist and what do they accept" across
+		 * admin, REST, WP-CLI and the frontend. Free seeds it from its
+		 * own Placement_Engine at priority 5; Placement_Format_Map
+		 * attaches accepted_formats at priority 20; Pro and third-party
+		 * placements add their own entries at the default priority 10.
+		 *
+		 * @since 2.7.0
+		 * @param array<string,array{name?:string,description?:string,group?:string,accepted_formats?:string[]}> $registry Placement registry, keyed by placement slug. Empty until a callback populates it.
+		 */
 		$placement_registry = apply_filters( 'wbam_get_placements', array() );
 		$placement_registry = is_array( $placement_registry ) ? $placement_registry : array();
 

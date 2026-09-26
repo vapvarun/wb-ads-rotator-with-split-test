@@ -151,7 +151,17 @@ class Placement_Settings {
 					<?php endif; ?>
 					<th scope="col" role="columnheader"><?php echo esc_html( $label_ads ); ?></th>
 					<?php if ( $show_extra ) : ?>
-						<?php do_action( 'wbam_placement_matrix_head' ); ?>
+						<?php
+						/**
+						 * Fires inside the placement matrix's <thead> row, after the
+						 * built-in columns, when an active add-on has registered a
+						 * wbam_placement_matrix_cell callback. Echo one <th> per
+						 * extra column added in the row below.
+						 *
+						 * @since 3.2.0
+						 */
+						do_action( 'wbam_placement_matrix_head' );
+						?>
 					<?php endif; ?>
 				</tr>
 			</thead>
@@ -217,7 +227,20 @@ class Placement_Settings {
 						<?php endif; ?>
 						<td role="cell" data-label="<?php echo esc_attr( $label_ads ); ?>"><?php echo esc_html( (string) $count ); ?></td>
 						<?php if ( $show_extra ) : ?>
-							<?php do_action( 'wbam_placement_matrix_cell', $id, $placement ); ?>
+							<?php
+							/**
+							 * Fires once per placement row in the matrix, after the
+							 * built-in "Active ads" cell, when an active add-on has
+							 * registered a callback here (see wbam_placement_matrix_head
+							 * for the matching header cell). Echo one <td> matching the
+							 * extra header column.
+							 *
+							 * @since 3.2.0
+							 * @param string                                        $id        Placement slug.
+							 * @param \WBAM\Modules\Placements\Placement_Interface $placement Placement instance for this row.
+							 */
+							do_action( 'wbam_placement_matrix_cell', $id, $placement );
+							?>
 						<?php endif; ?>
 					</tr>
 				<?php endforeach; ?>

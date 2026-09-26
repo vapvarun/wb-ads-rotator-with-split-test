@@ -547,6 +547,14 @@ class Ads_API {
 		$frontend = \WBAM\Frontend\Frontend::get_instance();
 		$frontend->record_analytics( $ad_id, $event_type, $placement );
 
+		/**
+		 * Fires after a REST-tracked impression/click is recorded.
+		 *
+		 * @since 2.7.0
+		 * @param int    $ad_id      Ad post ID.
+		 * @param string $event_type Event type ('impression' or 'click').
+		 * @param string $placement  Placement slug the event was recorded for.
+		 */
 		do_action( 'wbam_rest_event_tracked', $ad_id, $event_type, $placement );
 
 		return rest_ensure_response( array( 'tracked' => true ) );
@@ -631,6 +639,13 @@ class Ads_API {
 			}
 		}
 
+		/**
+		 * Fires after an ad has been duplicated.
+		 *
+		 * @since 2.7.0
+		 * @param int $new_id ID of the newly created duplicate.
+		 * @param int $id     ID of the ad that was duplicated.
+		 */
 		do_action( 'wbam_ad_duplicated', $new_id, $id );
 
 		$new_post = get_post( $new_id );

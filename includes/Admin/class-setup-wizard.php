@@ -40,6 +40,13 @@ class Setup_Wizard {
 	 * Initialize.
 	 */
 	public function init() {
+		/**
+		 * Filter whether the first-run setup wizard is available at all.
+		 *
+		 * @since 1.0.0
+		 * @param bool $enabled Whether to register the wizard's admin page,
+		 *                      init hook and notice. Default true.
+		 */
 		if ( apply_filters( 'wbam_enable_setup_wizard', true ) ) {
 			add_action( 'admin_menu', array( $this, 'add_wizard_page' ) );
 			add_action( 'admin_init', array( $this, 'setup_wizard' ) );

@@ -98,6 +98,13 @@ class Plugin {
 		$this->init_components();
 		$this->setup_hooks();
 
+		/**
+		 * Fires once the plugin's components and hooks are fully wired.
+		 * The safe point for add-ons (including Pro) to register their
+		 * own placements, ad types and integrations.
+		 *
+		 * @since 1.0.0
+		 */
 		do_action( 'wbam_init' );
 	}
 

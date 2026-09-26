@@ -974,13 +974,18 @@ class Settings {
 			exit;
 		}
 
-		// Old section slugs (pre-3.2.0 layout, or PRO's retired horizontal
-		// tabs) that now render somewhere else — merged into another
-		// section's body (License) or simply renamed (Ad Display,
-		// Geolocation, Advertising). Map those here so both the nav
-		// highlight and the body agree on which section is "current".
-		//
-		// @param array<string,string> $aliases Old slug => current slug.
+		/**
+		 * Filter the old section slug -> current section slug map.
+		 *
+		 * Old section slugs (pre-3.2.0 layout, or PRO's retired horizontal
+		 * tabs) that now render somewhere else — merged into another
+		 * section's body (License) or simply renamed (Ad Display,
+		 * Geolocation, Advertising). Map those here so both the nav
+		 * highlight and the body agree on which section is "current".
+		 *
+		 * @since 3.2.0
+		 * @param array<string,string> $aliases Old slug => current slug.
+		 */
 		$aliases = (array) apply_filters(
 			'wbam_settings_section_aliases',
 			array(

@@ -108,6 +108,12 @@ class Partnership_Manager {
 		$partnership_id = $wpdb->insert_id;
 		$partnership    = $this->get( $partnership_id );
 
+		/**
+		 * Fires after a new partnership inquiry is inserted.
+		 *
+		 * @since 2.0.0
+		 * @param Partnership $partnership Newly created partnership object.
+		 */
 		do_action( 'wbam_partnership_created', $partnership );
 
 		return $partnership;
@@ -341,6 +347,13 @@ class Partnership_Manager {
 
 		if ( false !== $result ) {
 			$updated_partnership = $this->get( $id );
+			/**
+			 * Fires after a partnership inquiry is updated.
+			 *
+			 * @since 2.0.0
+			 * @param Partnership $updated_partnership Partnership object after the update.
+			 * @param Partnership $existing            Partnership object before the update.
+			 */
 			do_action( 'wbam_partnership_updated', $updated_partnership, $existing );
 		}
 
@@ -366,6 +379,13 @@ class Partnership_Manager {
 
 		if ( $result ) {
 			$partnership = $this->get( $id );
+			/**
+			 * Fires after a partnership inquiry is accepted. Notifies the
+			 * requester by default (see Partnership_Emails::notify_requester_accepted()).
+			 *
+			 * @since 2.0.0
+			 * @param Partnership $partnership Partnership object, now accepted.
+			 */
 			do_action( 'wbam_partnership_accepted', $partnership );
 		}
 
@@ -391,6 +411,13 @@ class Partnership_Manager {
 
 		if ( $result ) {
 			$partnership = $this->get( $id );
+			/**
+			 * Fires after a partnership inquiry is rejected. Notifies the
+			 * requester by default (see Partnership_Emails::notify_requester_rejected()).
+			 *
+			 * @since 2.0.0
+			 * @param Partnership $partnership Partnership object, now rejected.
+			 */
 			do_action( 'wbam_partnership_rejected', $partnership );
 		}
 
@@ -427,6 +454,13 @@ class Partnership_Manager {
 			return false;
 		}
 
+		/**
+		 * Fires before a partnership inquiry is deleted, while it still exists.
+		 *
+		 * @since 2.0.0
+		 * @param int         $id          Partnership ID about to be deleted.
+		 * @param Partnership $partnership Partnership object about to be deleted.
+		 */
 		do_action( 'wbam_before_partnership_delete', $id, $partnership );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -437,6 +471,12 @@ class Partnership_Manager {
 		);
 
 		if ( false !== $result ) {
+			/**
+			 * Fires after a partnership inquiry is deleted.
+			 *
+			 * @since 2.0.0
+			 * @param int $id ID of the deleted partnership.
+			 */
 			do_action( 'wbam_partnership_deleted', $id );
 		}
 

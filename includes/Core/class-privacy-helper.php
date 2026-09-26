@@ -45,7 +45,17 @@ class Privacy_Helper {
 			return true; // Consent not required by settings.
 		}
 
-		// Allow developers to override consent check.
+		/**
+		 * Filter the consent check result before the plugin's own logic
+		 * runs, e.g. to bridge a third-party consent-management plugin.
+		 *
+		 * @since 2.4.0
+		 * @param bool|null $has_consent Return true/false to short-circuit;
+		 *                               null (default) to defer to the
+		 *                               plugin's own `require_consent_adsense`
+		 *                               setting.
+		 * @param string    $consent_type Consent category, e.g. 'marketing'.
+		 */
 		$has_consent = apply_filters( 'wbam_has_consent', null, $consent_type );
 		if ( null !== $has_consent ) {
 			return (bool) $has_consent;

@@ -53,6 +53,13 @@ class Partnership_Emails {
 	 * @param Partnership $partnership Partnership object.
 	 */
 	public function notify_admin_new_inquiry( $partnership ) {
+		/**
+		 * Filter whether the admin new-inquiry notification email sends.
+		 *
+		 * @since 2.0.0
+		 * @param bool        $send        Whether to send the email. Default true.
+		 * @param Partnership $partnership Partnership object the inquiry was submitted for.
+		 */
 		if ( ! apply_filters( 'wbam_send_partnership_admin_notification', true, $partnership ) ) {
 			return;
 		}
@@ -77,6 +84,13 @@ class Partnership_Emails {
 	 * @param Partnership $partnership Partnership object.
 	 */
 	public function notify_requester_accepted( $partnership ) {
+		/**
+		 * Filter whether the requester's "accepted" notification email sends.
+		 *
+		 * @since 2.0.0
+		 * @param bool        $send        Whether to send the email. Default true.
+		 * @param Partnership $partnership Partnership object that was accepted.
+		 */
 		if ( ! apply_filters( 'wbam_send_partnership_accepted_notification', true, $partnership ) ) {
 			return;
 		}
@@ -100,6 +114,13 @@ class Partnership_Emails {
 	 * @param Partnership $partnership Partnership object.
 	 */
 	public function notify_requester_rejected( $partnership ) {
+		/**
+		 * Filter whether the requester's "rejected" notification email sends.
+		 *
+		 * @since 2.0.0
+		 * @param bool        $send        Whether to send the email. Default true.
+		 * @param Partnership $partnership Partnership object that was rejected.
+		 */
 		if ( ! apply_filters( 'wbam_send_partnership_rejected_notification', true, $partnership ) ) {
 			return;
 		}
@@ -165,6 +186,13 @@ Best regards,
 			$site_name
 		);
 
+		/**
+		 * Filter the plain-text body of the admin new-inquiry notification email.
+		 *
+		 * @since 2.0.0
+		 * @param string      $message     Rendered email body.
+		 * @param Partnership $partnership Partnership object the inquiry was submitted for.
+		 */
 		return apply_filters( 'wbam_partnership_admin_notification_message', $message, $partnership );
 	}
 
@@ -208,6 +236,13 @@ Best regards,
 			$site_url
 		);
 
+		/**
+		 * Filter the plain-text body of the requester's "accepted" notification email.
+		 *
+		 * @since 2.0.0
+		 * @param string      $message     Rendered email body.
+		 * @param Partnership $partnership Partnership object that was accepted.
+		 */
 		return apply_filters( 'wbam_partnership_accepted_notification_message', $message, $partnership );
 	}
 
@@ -244,6 +279,13 @@ Best regards,
 			$site_url
 		);
 
+		/**
+		 * Filter the plain-text body of the requester's "rejected" notification email.
+		 *
+		 * @since 2.0.0
+		 * @param string      $message     Rendered email body.
+		 * @param Partnership $partnership Partnership object that was rejected.
+		 */
 		return apply_filters( 'wbam_partnership_rejected_notification_message', $message, $partnership );
 	}
 
@@ -270,10 +312,27 @@ Best regards,
 		$sent = apply_filters( 'wbam_partnership_pre_send_email', null, $to, $subject, $message );
 
 		if ( null === $sent ) {
+			/**
+			 * Filter the wp_mail() headers used for a partnership email. This
+			 * class's own get_email_headers() adds the plain-text Content-Type
+			 * and From header at default priority.
+			 *
+			 * @since 2.0.0
+			 * @param string[] $headers Email headers. Empty until a callback adds to it.
+			 */
 			$headers = apply_filters( 'wbam_partnership_email_headers', array() );
 			$sent    = wp_mail( $to, $subject, $message, $headers );
 		}
 
+		/**
+		 * Fires after a partnership email has been sent (or skipped/failed).
+		 *
+		 * @since 2.0.0
+		 * @param string    $to      Recipient email.
+		 * @param string    $subject Email subject.
+		 * @param string    $message Plain-text email body.
+		 * @param bool|null $sent    wp_mail()'s result, or the pre_send_email filter's result.
+		 */
 		do_action( 'wbam_partnership_email_sent', $to, $subject, $message, $sent );
 
 		return $sent;

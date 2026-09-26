@@ -126,7 +126,14 @@ class Links_Module {
 		add_action( 'wp_ajax_wbam_track_link_click', array( $this, 'ajax_track_click' ) );
 		add_action( 'wp_ajax_nopriv_wbam_track_link_click', array( $this, 'ajax_track_click' ) );
 
-		// Allow PRO extensions.
+		/**
+		 * Fires after the Links module has wired its own hooks, so an
+		 * extension (Pro's Links_Pro_Module) can add its own AJAX handlers
+		 * and filters on top.
+		 *
+		 * @since 2.0.0
+		 * @param Links_Module $module This module instance.
+		 */
 		do_action( 'wbam_links_module_init', $this );
 	}
 
@@ -134,7 +141,12 @@ class Links_Module {
 	 * Enqueue frontend scripts for click tracking.
 	 */
 	public function enqueue_frontend_scripts() {
-		// Only load if we have links to track.
+		/**
+		 * Filter whether the frontend click-tracking script is enqueued.
+		 *
+		 * @since 2.0.0
+		 * @param bool $load Whether to enqueue the tracking script. Default true.
+		 */
 		if ( ! apply_filters( 'wbam_load_link_tracking_js', true ) ) {
 			return;
 		}
@@ -181,8 +193,16 @@ class Links_Module {
 		// Track the click.
 		$this->manager->increment_clicks( $link_id );
 
-		// Allow PRO to add detailed tracking.
-		do_action( 'wbam_link_click_tracked', $link_id, $_POST );
+		/**
+		 * Fires after a link click AJAX request has incremented the click
+		 * count, so an extension (Pro's Link_Tracker) can record richer
+		 * per-click data (referrer, geo, device) from the same request.
+		 *
+		 * @since 2.0.0
+		 * @param int   $link_id Link ID that was clicked.
+		 * @param array $_post   Raw, unsanitized $_POST data from the AJAX request.
+		 */
+		do_action( 'wbam_link_click_tracked', $link_id, $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- raw request passed through for listeners to sanitize per their own needs; this handler itself does not read $_POST.
 
 		wp_send_json_success();
 	}

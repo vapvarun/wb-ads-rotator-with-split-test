@@ -599,6 +599,13 @@ class Links_API {
 			array( '%d', '%s', '%s', '%s' )
 		);
 
+		/**
+		 * Fires after a REST-tracked partnership link click is recorded.
+		 *
+		 * @since 2.7.0
+		 * @param int    $id   Link ID.
+		 * @param object $link Link row object.
+		 */
 		do_action( 'wbam_link_clicked', $id, $link );
 
 		return rest_ensure_response( array( 'tracked' => true ) );

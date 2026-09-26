@@ -67,6 +67,14 @@ class Targeting_Engine {
 			return false;
 		}
 
+		/**
+		 * Filter the final should-display decision for an ad, after the
+		 * built-in schedule, targeting and frequency checks have all passed.
+		 *
+		 * @since 1.0.0
+		 * @param bool $should_display Whether to display the ad. Default true.
+		 * @param int  $ad_id          Ad ID being evaluated.
+		 */
 		return apply_filters( 'wbam_should_display_ad', true, $ad_id );
 	}
 

@@ -86,6 +86,13 @@ class Placement_Engine {
 		// hook on the ad-count cache (Plugin::init_hooks()).
 		add_action( 'untrashed_post', array( $this, 'maybe_clear_cache_on_delete' ) );
 
+		/**
+		 * Fires once the placement engine has registered its built-in ad
+		 * types and placements and is ready to serve ads.
+		 *
+		 * @since 3.2.0
+		 * @param Placement_Engine $engine The placement engine instance.
+		 */
 		do_action( 'wbam_placements_init', $this );
 	}
 
@@ -99,6 +106,14 @@ class Placement_Engine {
 		$this->register_ad_type( new AdSense_Ad() );
 		$this->register_ad_type( new Email_Capture_Ad() );
 
+		/**
+		 * Fires after the built-in ad types are registered. Call
+		 * `$engine->register_ad_type( new My_Ad_Type() )` here to add a
+		 * custom ad type; `My_Ad_Type` must implement `Ad_Type_Interface`.
+		 *
+		 * @since 3.2.0
+		 * @param Placement_Engine $engine The placement engine instance.
+		 */
 		do_action( 'wbam_register_ad_types', $this );
 	}
 
@@ -118,6 +133,17 @@ class Placement_Engine {
 		$this->register_placement( new Popup_Placement() );
 		$this->register_placement( new Comment_Placement() );
 
+		/**
+		 * Fires after the built-in placements are registered. Call
+		 * `$engine->register_placement( new My_Placement() )` here to add a
+		 * custom placement; `My_Placement` must implement
+		 * `Placement_Interface`. Placements registered after `init` (id est
+		 * after `wbam_placements_init` has fired) still register
+		 * immediately — see `register_placement()`.
+		 *
+		 * @since 3.2.0
+		 * @param Placement_Engine $engine The placement engine instance.
+		 */
 		do_action( 'wbam_register_placements', $this );
 	}
 
@@ -408,11 +434,18 @@ class Placement_Engine {
 			}
 		);
 
-		// Slot policy: a rotating placement shows `wbam_placement_ad_count`
-		// ads per load (one by default), never every creative that targets
-		// it. Placements that legitimately render every eligible ad can opt
-		// out per-placement via the wbam_placement_render_mode filter
-		// returning 'stack' for their slug.
+		/**
+		 * Filter the render mode for a placement.
+		 *
+		 * Slot policy: a rotating placement shows `wbam_placement_ad_count`
+		 * ads per load (one by default), never every creative that targets
+		 * it. Placements that legitimately render every eligible ad can opt
+		 * out per-placement by returning 'stack' for their slug.
+		 *
+		 * @since 2.7.0
+		 * @param string $render_mode  'rotate' (default) or 'stack'.
+		 * @param string $placement_id Placement slug being rendered.
+		 */
 		$render_mode = apply_filters( 'wbam_placement_render_mode', 'rotate', $placement_id );
 
 		/**
@@ -584,23 +617,28 @@ class Placement_Engine {
 			return '';
 		}
 
+		// Per-creative page cap: an ad renders at most once per request
+		// regardless of how many placements it targets. Prevents the
+		// "same ad 6 times on one page" experience when an advertiser
+		// enables every compatible placement on a single creative.
+		//
+		// Bypass by setting $options['allow_duplicate'] = true (reserved
+		// for surfaces that legitimately need the same ad twice, e.g.
+		// preview screens).
+		$allow_duplicate = ! empty( $options['allow_duplicate'] );
+
 		/**
-		 * Per-creative page cap: an ad renders at most once per request
-		 * regardless of how many placements it targets. Prevents the
-		 * "same ad 6 times on one page" experience when an advertiser
-		 * enables every compatible placement on a single creative.
-		 *
-		 * Bypass by setting $options['allow_duplicate'] = true (reserved
-		 * for surfaces that legitimately need the same ad twice, e.g.
-		 * preview screens).
-		 *
-		 * The cap is also filterable so site owners can opt out per
-		 * placement (e.g. sticky bar that must always show).
+		 * Filter whether the once-per-request page cap is enforced for an ad.
+		 * Lets a site owner opt out per placement (e.g. a sticky bar that must
+		 * always show, even if the same ad already rendered elsewhere).
 		 *
 		 * @since 2.8.0
+		 * @param bool  $enforce_cap Whether to enforce the cap. Defaults to
+		 *                           the inverse of $options['allow_duplicate'].
+		 * @param int   $ad_id       Ad ID being rendered.
+		 * @param array $options     Render options passed to render_ad().
 		 */
-		$allow_duplicate = ! empty( $options['allow_duplicate'] );
-		$enforce_cap     = apply_filters( 'wbam_enforce_page_cap', ! $allow_duplicate, $ad_id, $options );
+		$enforce_cap = apply_filters( 'wbam_enforce_page_cap', ! $allow_duplicate, $ad_id, $options );
 
 		if ( $enforce_cap && isset( $this->rendered_ad_ids[ $ad_id ] ) ) {
 			return '';

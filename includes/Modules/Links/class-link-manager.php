@@ -143,6 +143,13 @@ class Link_Manager {
 			$this->update_category_count( $data['category_id'] );
 		}
 
+		/**
+		 * Fires after a new partnership link is inserted.
+		 *
+		 * @since 2.0.0
+		 * @param int   $link_id ID of the newly created link.
+		 * @param array $data    Link data that was saved.
+		 */
 		do_action( 'wbam_link_created', $link_id, $data );
 
 		return $link_id;
@@ -399,6 +406,13 @@ class Link_Manager {
 			}
 		}
 
+		/**
+		 * Fires after a partnership link is updated.
+		 *
+		 * @since 2.0.0
+		 * @param int   $id   Link ID.
+		 * @param array $data Updated link data.
+		 */
 		do_action( 'wbam_link_updated', $id, $data );
 
 		return false !== $result;
@@ -418,6 +432,14 @@ class Link_Manager {
 			return false;
 		}
 
+		/**
+		 * Fires before a partnership link is deleted, while the link and its
+		 * click records still exist.
+		 *
+		 * @since 2.0.0
+		 * @param int  $id   Link ID about to be deleted.
+		 * @param Link $link Link object about to be deleted.
+		 */
 		do_action( 'wbam_before_link_delete', $id, $link );
 
 		// Delete click records.
@@ -441,6 +463,12 @@ class Link_Manager {
 			$this->update_category_count( $link->category_id );
 		}
 
+		/**
+		 * Fires after a partnership link and its click records are deleted.
+		 *
+		 * @since 2.0.0
+		 * @param int $id ID of the deleted link.
+		 */
 		do_action( 'wbam_link_deleted', $id );
 
 		return false !== $result;
