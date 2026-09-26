@@ -95,7 +95,7 @@ class Help_Docs {
 			<?php
 			\WBAM\Admin\UX::page_header(
 				array(
-					'title' => __( 'Help & Documentation', 'wb-ads-rotator-with-split-test' ),
+					'title' => __( 'Help & Docs', 'wb-ads-rotator-with-split-test' ),
 					'desc'  => __( 'Guides and answers for setting up and running ads.', 'wb-ads-rotator-with-split-test' ),
 				)
 			);
@@ -123,7 +123,9 @@ class Help_Docs {
 						'url'   => admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=faq' ),
 					),
 				),
-				$active_tab
+				$active_tab,
+				'underline',
+				__( 'Help topics', 'wb-ads-rotator-with-split-test' )
 			);
 			?>
 

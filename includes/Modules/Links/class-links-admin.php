@@ -179,7 +179,7 @@ class Links_Admin {
 		<?php
 		\WBAM\Admin\UX::page_header(
 			array(
-				'title'   => __( 'Links', 'wb-ads-rotator-with-split-test' ),
+				'title'   => __( 'All Links', 'wb-ads-rotator-with-split-test' ),
 				'desc'    => __( 'Cloaked, trackable outbound and affiliate links.', 'wb-ads-rotator-with-split-test' ),
 				'actions' => '<a href="' . esc_url( admin_url( 'admin.php?page=wbam-links&action=add' ) ) . '" class="wbam-admin-btn wbam-admin-btn--primary">' . esc_html__( 'Add New Link', 'wb-ads-rotator-with-split-test' ) . '</a>',
 			)
