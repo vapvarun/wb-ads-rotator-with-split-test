@@ -123,4 +123,51 @@ class Test_Shape_Reserve_Selector_And_Phone_Banner extends WP_UnitTestCase {
 		$this->assertLessThan( $phone, $rule, 'Must come before the phone block so the phone floor still wins.' );
 		$this->assertStringContainsString( 'min-height: var(--wbam-shape-banner-h);', substr( $css, $rule, (int) strpos( $css, '}', $rule ) - $rule ) );
 	}
+
+	private function render_sized_ad( array $meta ): string {
+		$ad_id = self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
+		update_post_meta( $ad_id, '_wbam_enabled', '1' );
+		update_post_meta( $ad_id, '_wbam_ad_data', array( 'type' => 'rich-content', 'content' => '<p>Hello</p>' ) );
+		foreach ( $meta as $key => $value ) {
+			update_post_meta( $ad_id, $key, $value );
+		}
+
+		return (string) \WBAM\Modules\Placements\Placement_Engine::get_instance()->render_ad( $ad_id, array( 'placement' => 'after_paragraph' ) );
+	}
+
+	/** QA wave 5 follow-up: the slot carries the creative's own aspect ratio and width. */
+	public function test_slot_carries_the_creatives_aspect_ratio(): void {
+		$custom = $this->render_sized_ad(
+			array(
+				'_wbam_is_responsive' => '0',
+				'_wbam_ad_format'     => 'custom',
+				'_wbam_ad_width'      => 970,
+				'_wbam_ad_height'     => 250,
+			)
+		);
+		$named  = $this->render_sized_ad(
+			array(
+				'_wbam_is_responsive' => '0',
+				'_wbam_ad_format'     => 'leaderboard',
+			)
+		);
+		$fluid  = $this->render_sized_ad( array( '_wbam_is_responsive' => '1' ) );
+
+		$this->assertStringContainsString( 'style="--wbam-ad-ar:970 / 250;--wbam-ad-w:970px"', $custom );
+		$this->assertStringContainsString( 'wbam-ad-slot--sized', $custom );
+		$this->assertStringContainsString( '--wbam-ad-ar:728 / 90;', $named, 'A named format uses its own pixel size.' );
+		$this->assertStringNotContainsString( '--wbam-ad-ar', $fluid, 'Responsive ads keep the default reserve.' );
+	}
+
+	/** Between-content sized creatives reserve by aspect ratio, capped at their own width, over the px floors. */
+	public function test_between_content_reserves_by_aspect_ratio(): void {
+		$css   = $this->css();
+		$start = strpos( $css, '.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad' );
+		$this->assertNotFalse( $start, 'Needs the extra .wbam-ad-slot so it outranks the phone floor.' );
+		$rule = substr( $css, $start, (int) strpos( $css, '}', $start ) - $start );
+
+		$this->assertStringContainsString( 'aspect-ratio: var(--wbam-ad-ar);', $rule );
+		$this->assertStringContainsString( 'max-width: var(--wbam-ad-w);', $rule );
+		$this->assertStringContainsString( 'min-height: auto;', $rule, 'Content taller than the ratio still grows, never clips.' );
+	}
 }

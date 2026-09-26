@@ -42,7 +42,8 @@ class Test_Visitor_Ad_Surfaces extends \WP_UnitTestCase {
 			$html = Placement_Engine::get_instance()->render_ad( $ad_id, array( 'skip_targeting' => true, 'allow_duplicate' => true ) );
 
 			$this->assertNotSame( '', $html );
-			$this->assertStringNotContainsString( 'style=', $html, 'Colours come from theme tokens, so dark mode works.' );
+			// The only inline style allowed is the slot's own size (render_ad()).
+			$this->assertDoesNotMatchRegularExpression( '/style="(?!--wbam-ad-ar:\d+ \/ \d+;--wbam-ad-w:\d+px")/', $html, 'Colours come from theme tokens, so dark mode works.' );
 			$this->assertStringNotContainsString( 'placehold.co', $html, 'No hot-linked images.' );
 			$this->assertStringNotContainsString( 'href="#"', $html, 'Every link goes somewhere.' );
 			$this->assertStringNotContainsString( 'paragraph 2', $html, 'No developer copy.' );

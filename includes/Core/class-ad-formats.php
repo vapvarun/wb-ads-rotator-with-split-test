@@ -248,6 +248,31 @@ class Ad_Formats {
 	}
 
 	/**
+	 * The pixel size an ad renders at: its named format's size, or its
+	 * custom width x height. Zeros for a responsive ad or an unknown size.
+	 *
+	 * @since 3.2.0
+	 * @param int $ad_id Ad post ID.
+	 * @return array{width:int, height:int}
+	 */
+	public static function get_resolved_dimensions( $ad_id ) {
+		$format = self::get_ad_format( $ad_id );
+		$meta   = self::get( $format );
+
+		if ( self::CUSTOM !== $format && $meta && ! empty( $meta['width'] ) && ! empty( $meta['height'] ) ) {
+			return array(
+				'width'  => (int) $meta['width'],
+				'height' => (int) $meta['height'],
+			);
+		}
+
+		return self::CUSTOM === $format ? self::get_ad_dimensions( $ad_id ) : array(
+			'width'  => 0,
+			'height' => 0,
+		);
+	}
+
+	/**
 	 * Resolve an ad's declared pixel dimensions, if any.
 	 *
 	 * @param int $ad_id Ad post ID.

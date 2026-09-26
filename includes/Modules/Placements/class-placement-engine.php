@@ -663,6 +663,7 @@ class Placement_Engine {
 
 			$is_responsive = '1' === (string) get_post_meta( $ad_id, '_wbam_is_responsive', true );
 			$classes       = 'wbam-ad wbam-ad-slot';
+			$sized_style   = '';
 			if ( $is_responsive ) {
 				$classes .= ' wbam-ad-slot--responsive';
 			} else {
@@ -671,6 +672,13 @@ class Placement_Engine {
 				$shape = \WBAM\Core\Placement_Format_Map::shape_for_ad( $ad_id );
 				if ( '' !== $shape ) {
 					$classes .= ' wbam-ad-slot--shape-' . sanitize_html_class( $shape );
+				}
+				// Known pixel size: the creative reserves exactly its own
+				// aspect ratio at any column width (frontend.css).
+				$dims = \WBAM\Core\Ad_Formats::get_resolved_dimensions( $ad_id );
+				if ( $dims['width'] > 0 && $dims['height'] > 0 ) {
+					$classes    .= ' wbam-ad-slot--sized';
+					$sized_style = sprintf( ' style="--wbam-ad-ar:%1$d / %2$d;--wbam-ad-w:%1$dpx"', $dims['width'], $dims['height'] );
 				}
 			}
 			/**
@@ -724,7 +732,7 @@ class Placement_Engine {
 				esc_attr( $classes ),
 				$ad_id,
 				$is_responsive ? '1' : '0',
-				( $placement ? ' data-placement="' . esc_attr( $placement ) . '"' : '' ) . $viewable,
+				( $placement ? ' data-placement="' . esc_attr( $placement ) . '"' : '' ) . $viewable . $sized_style,
 				$inner // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ad rendered upstream by ad type handler; label escaped above.
 			);
 		}

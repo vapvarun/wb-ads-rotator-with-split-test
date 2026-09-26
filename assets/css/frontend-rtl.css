@@ -266,7 +266,9 @@
    5, card 10343726460): render_ad() tags the slot .wbam-ad-slot--shape-*,
    so a 728x90 Banner reserves 90px here, not Box's 280px. A Box keeps the
    280px default above; a responsive or text ad (no shape) does too. These
-   sit before the phone block so its 100px floor still wins at 480px. */
+   sit before the phone block so its 100px floor still wins at 480px.
+   They are the fallback: a creative whose pixel size is known uses the
+   aspect-ratio rule below instead. */
 .wbam-placement-before-content .wbam-ad-slot--shape-banner > .wbam-ad,
 .wbam-placement-after-content .wbam-ad-slot--shape-banner > .wbam-ad,
 .wbam-placement-paragraph .wbam-ad-slot--shape-banner > .wbam-ad {
@@ -277,6 +279,24 @@
 .wbam-placement-after-content .wbam-ad-slot--shape-billboard > .wbam-ad,
 .wbam-placement-paragraph .wbam-ad-slot--shape-billboard > .wbam-ad {
 	min-height: var(--wbam-shape-billboard-h);
+}
+
+/* Known pixel size (render_ad() prints --wbam-ad-ar and --wbam-ad-w on
+   .wbam-ad-slot--sized): the creative reserves exactly its own aspect
+   ratio, never wider than its own width, so a 970x250 in a 650px column
+   reserves the ~168px it scales to, not a fixed 250px. The extra
+   .wbam-ad-slot outranks the phone floor below: that floor exists only
+   because an unsized Banner's phone height is unknown (320x50/320x100),
+   and a known ratio answers that exactly. min-height: auto keeps a taller
+   text/code creative growing instead of clipping. */
+.wbam-placement-before-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad,
+.wbam-placement-after-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad,
+.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad {
+	min-height: auto;
+	aspect-ratio: var(--wbam-ad-ar);
+	width: 100%;
+	max-width: var(--wbam-ad-w);
+	margin-inline: auto;
 }
 
 /* Sidebar takes Box OR Tower (owner decision 13) — a min-height only,
