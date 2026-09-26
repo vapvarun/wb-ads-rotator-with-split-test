@@ -123,4 +123,35 @@ class Test_Frontend_Conditional_Assets extends WP_UnitTestCase {
 		$this->assertTrue( wp_style_is( 'wbam-frontend', 'enqueued' ), 'render_ad() must turn the CSS on as a safety net.' );
 		$this->assertTrue( wp_script_is( 'wbam-frontend', 'enqueued' ) );
 	}
+
+	/**
+	 * A classic sidebar renders after wp_head, too late for the safety net
+	 * to put the CSS in the head (card 10344005566): an active WB Ad widget,
+	 * or a block widget holding a WB Ad block, must preload it.
+	 */
+	public function test_active_sidebar_ad_widget_preloads_assets_in_the_head(): void {
+		global $_wp_sidebars_widgets;
+		$this->disable_every_existing_ad();
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$this->go_to( get_permalink( $page_id ) );
+
+		update_option( 'widget_block', array( 3 => array( 'content' => '<!-- wp:wb-ads/ad {"adId":5} /-->' ) ) );
+		update_option( 'sidebars_widgets', array( 'wp_inactive_widgets' => array( 'block-3' ), 'sidebar-1' => array() ) );
+		$_wp_sidebars_widgets = array();
+		Frontend::get_instance()->enqueue_assets();
+		$this->assertFalse( wp_style_is( 'wbam-frontend', 'enqueued' ), 'An inactive widget preloads nothing.' );
+
+		update_option( 'sidebars_widgets', array( 'sidebar-1' => array( 'block-3' ) ) );
+		$_wp_sidebars_widgets = array();
+		Frontend::get_instance()->enqueue_assets();
+		$this->assertTrue( wp_style_is( 'wbam-frontend', 'enqueued' ), 'A block widget holding a WB Ad block preloads the CSS.' );
+
+		wp_dequeue_style( 'wbam-frontend' );
+		update_option( 'sidebars_widgets', array( 'sidebar-1' => array( 'wbam_ad_widget-2' ) ) );
+		$_wp_sidebars_widgets = array();
+		Frontend::get_instance()->enqueue_assets();
+		$this->assertTrue( wp_style_is( 'wbam-frontend', 'enqueued' ), 'An active WB Ad widget preloads the CSS.' );
+
+		$_wp_sidebars_widgets = array();
+	}
 }

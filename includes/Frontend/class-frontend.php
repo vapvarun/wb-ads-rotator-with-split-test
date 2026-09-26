@@ -192,6 +192,23 @@ class Frontend {
 			}
 		}
 
+		// A classic sidebar renders after wp_head, so the render-time safety
+		// net would print the CSS in the footer and the ad would flash
+		// unstyled. An active WB Ad widget, or a block widget holding a WB Ad
+		// block or shortcode, preloads it. Block-theme template parts render
+		// before wp_head, where the safety net already reaches the head.
+		if ( is_active_widget( false, false, 'wbam_ad_widget', true ) ) {
+			return true;
+		}
+		foreach ( (array) get_option( 'widget_block', array() ) as $number => $instance ) {
+			$content = is_array( $instance ) && isset( $instance['content'] ) ? (string) $instance['content'] : '';
+			if ( ( false !== strpos( $content, 'wp:wb-ads/' ) || false !== strpos( $content, '[wbam_ad' ) )
+				&& is_active_widget( false, 'block-' . $number, 'block', true )
+			) {
+				return true;
+			}
+		}
+
 		/**
 		 * Whether this request should preload the frontend ad CSS/JS in the
 		 * head even though none of the built-in signals matched - e.g. a
