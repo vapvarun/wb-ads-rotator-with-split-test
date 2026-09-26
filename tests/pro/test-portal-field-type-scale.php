@@ -29,15 +29,13 @@ class Test_Portal_Field_Type_Scale extends Pro_Test_Case {
 		return substr( $css, $open, strpos( $css, '}', $open ) - $open );
 	}
 
-	public function test_field_rules_do_not_override_the_base_size_and_selects_grow(): void {
+	public function test_field_rules_do_not_override_the_base_size(): void {
 		$css = file_get_contents( WBAM_PRO_PATH . 'assets/css/portal.css' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 
 		foreach ( array( '.wbam-input {', '.wbam-form-row select,', '.wbam-profile .wbam-form-row input[type="text"],' ) as $selector ) {
 			$this->assertStringNotContainsString( 'font-size', $this->rule( $css, $selector ), "{$selector} must inherit the base field size." );
 		}
 
-		$select = $this->rule( $css, '.wbam-form-field.wbam-form-field select:where(:not([multiple])),' . "\n" . '.wbam-form-row.wbam-form-row select' );
-		$this->assertStringContainsString( 'height: auto', $select );
-		$this->assertStringContainsString( 'min-height: 44px', $select );
+		// Select height: one 44px rule for every field, see test-portal-field-height.php.
 	}
 }
