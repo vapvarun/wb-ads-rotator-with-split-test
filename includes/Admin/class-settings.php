@@ -324,17 +324,12 @@ class Settings {
 			)
 		);
 
-		add_settings_field(
-			'viewable_impressions',
-			__( 'Count Impressions When Seen', 'wb-ads-rotator-with-split-test' ),
-			array( $this, 'render_checkbox_field' ),
-			'wbam-settings',
-			'wbam_display',
-			array(
-				'id'          => 'viewable_impressions',
-				'description' => __( 'Count popup, sticky and code/AdSense ads only once at least half the ad has been on screen for one second. Other ads count when the page loads.', 'wb-ads-rotator-with-split-test' ),
-			)
-		);
+		// "Count Impressions When Seen" (viewable_impressions) is plug-and-play
+		// (owner decision, card 10343706274): no settings field any more. A
+		// site that already had this on keeps counting this way — see
+		// `wbam_viewable_impressions` in Frontend::defers_impression(), whose
+		// default is this site's already-stored value. A developer who wants
+		// it on a fresh install uses that filter instead.
 
 		// Placements Section. The matrix is section-level content, not a
 		// settings field - it renders from render_placements_section() below

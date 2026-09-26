@@ -368,7 +368,20 @@ class Frontend {
 	 * @return bool
 	 */
 	public static function defers_impression( $ad_id, $placement ) {
-		if ( ! Settings_Helper::is_enabled( 'viewable_impressions' ) ) {
+		/**
+		 * Whether "viewable" impressions (popup/sticky/code/AdSense ads count
+		 * only once actually seen) are counted this way.
+		 *
+		 * Plug and play (owner decision, card 10343706274): this used to be a
+		 * Settings UI checkbox; the field is gone, but a site that already had
+		 * it on keeps counting this way — the current stored value is this
+		 * filter's default, so nothing changes silently. A developer who
+		 * wants a different default uses this filter.
+		 *
+		 * @since 3.2.0
+		 * @param bool $enabled Whether to defer viewable-only ad types.
+		 */
+		if ( ! apply_filters( 'wbam_viewable_impressions', Settings_Helper::is_enabled( 'viewable_impressions' ) ) ) {
 			return false;
 		}
 

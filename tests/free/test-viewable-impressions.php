@@ -90,4 +90,35 @@ class Test_Viewable_Impressions extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/data-wbam-viewable="[^"]+ad_id(=|%3D)' . $code . '/', $this->render( $code, 'header' ) );
 		$this->assertStringNotContainsString( 'data-wbam-viewable', $this->render( $rich, 'header' ) );
 	}
+
+	/**
+	 * Plug and play (owner decision, card 10343706274): no Settings UI field
+	 * any more, so a site's already-stored value is the `wbam_viewable_impressions`
+	 * filter's default (nothing changes silently), and a developer can
+	 * override it without a field to click.
+	 */
+	public function test_plug_and_play_filter_defaults_to_the_stored_value_and_is_overridable(): void {
+		update_option( 'wbam_settings', array( 'viewable_impressions' => true ) );
+		$code = $this->ad( 'code' );
+		$this->assertTrue( Frontend::defers_impression( $code, 'header' ), "Site's stored 'on' value is the filter's default." );
+
+		$forced_off = static function () {
+			return false;
+		};
+		add_filter( 'wbam_viewable_impressions', $forced_off );
+		$this->assertFalse( Frontend::defers_impression( $code, 'header' ), 'Filter overrides the stored default.' );
+		remove_filter( 'wbam_viewable_impressions', $forced_off );
+	}
+
+	/** The field is gone from the Ads & Display settings page. */
+	public function test_no_settings_field_renders_for_viewable_impressions(): void {
+		$settings = \WBAM\Admin\Settings::get_instance();
+		$settings->register_settings();
+
+		ob_start();
+		$settings->render_ads_display_page();
+		$html = ob_get_clean();
+
+		$this->assertStringNotContainsString( 'wbam_settings[viewable_impressions]', $html );
+	}
 }
