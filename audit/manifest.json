@@ -384,7 +384,7 @@
       "group": "wbam_settings_group",
       "type": "array",
       "default": "{}",
-      "controls": "Master settings array — display, frontend CSS, lazy load, ad label/text, container class, responsive, mobile/tablet hiding"
+      "controls": "Master settings array \u2014 display, frontend CSS, lazy load, ad label/text, container class, responsive, mobile/tablet hiding"
     },
     {
       "key": "wbam_setup_complete",
@@ -576,7 +576,7 @@
       "enforcement_count": 22,
       "meta": false,
       "requires_context": "none",
-      "note": "WP core capability — primary gate for all 9 admin pages, all 22 REST routes (settings/ads/analytics/links/abilities), and 7 AJAX handlers. FREE registers no custom caps."
+      "note": "WP core capability \u2014 primary gate for all 9 admin pages, all 22 REST routes (settings/ads/analytics/links/abilities), and 7 AJAX handlers. FREE registers no custom caps."
     },
     {
       "cap": "edit_post",
@@ -783,7 +783,7 @@
       "type": "action",
       "args": 0,
       "where": "includes/Core/class-plugin.php:95",
-      "purpose": "Plugin initialization complete — extension point for Pro/themes"
+      "purpose": "Plugin initialization complete \u2014 extension point for Pro/themes"
     },
     {
       "name": "wbam_ad_impression",
@@ -1196,14 +1196,14 @@
       "type": "action",
       "args": 1,
       "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Extension point — register custom placements"
+      "purpose": "Extension point \u2014 register custom placements"
     },
     {
       "name": "wbam_register_ad_types",
       "type": "action",
       "args": 1,
       "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Extension point — register custom ad types"
+      "purpose": "Extension point \u2014 register custom ad types"
     },
     {
       "name": "wbam_rest_event_tracked",
@@ -1245,7 +1245,7 @@
       "type": "action",
       "args": 0,
       "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard sample step (after) — KEY EXTENSION POINT for PRO"
+      "purpose": "Setup wizard sample step (after) \u2014 KEY EXTENSION POINT for PRO"
     },
     {
       "name": "wbam_setup_wizard_sample_form_before",
@@ -1273,7 +1273,7 @@
       "type": "action",
       "args": 1,
       "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard sample save (after) — used by PRO save_pro_options"
+      "purpose": "Setup wizard sample save (after) \u2014 used by PRO save_pro_options"
     },
     {
       "name": "wbam_setup_wizard_sample_ad_created",
@@ -1329,7 +1329,7 @@
       "type": "filter",
       "args": 3,
       "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Filter rendered ad HTML — KEY EXTENSION POINT for PRO impression tracking"
+      "purpose": "Filter rendered ad HTML \u2014 KEY EXTENSION POINT for PRO impression tracking"
     },
     {
       "name": "wbam_ads_for_placement",
@@ -1413,7 +1413,7 @@
       "type": "filter",
       "args": 1,
       "where": "includes/Modules/Links/",
-      "purpose": "Filter currency symbol for partnership budgets — KEY EXTENSION POINT for PRO multi-currency"
+      "purpose": "Filter currency symbol for partnership budgets \u2014 KEY EXTENSION POINT for PRO multi-currency"
     },
     {
       "name": "wbam_detected_device",
@@ -1707,7 +1707,7 @@
       "type": "filter",
       "args": 1,
       "where": "includes/Core/class-placement-format-map.php",
-      "purpose": "Filter placement→format compatibility map"
+      "purpose": "Filter placement\u2192format compatibility map"
     },
     {
       "name": "wbam_placement_render_mode",
@@ -1756,7 +1756,7 @@
       "type": "filter",
       "args": 3,
       "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Final gate before ad displays — KEY EXTENSION POINT for PRO frequency cap, campaign pacing"
+      "purpose": "Final gate before ad displays \u2014 KEY EXTENSION POINT for PRO frequency cap, campaign pacing"
     },
     {
       "name": "wbam_ad_cap_reached",
@@ -1792,6 +1792,16 @@
       "args": 1,
       "where": "includes/Admin/class-admin.php",
       "purpose": "Lifetime impression/click totals for a page of ads in the All Ads list, keyed by ad ID (3.2.0)"
+    },
+    {
+      "name": "wbam_ad_container_class",
+      "type": "filter",
+      "purpose": "Extra CSS class on every rendered ad's container wrapper (card 10343726590, replaces the removed Custom Container Class field; default = stored value)."
+    },
+    {
+      "name": "wbam_email_capture_cookie_days",
+      "type": "filter",
+      "purpose": "Days a dismissed email sign-up ad stays hidden, per ad (card 10343726590, replaces the removed Dismiss Duration field; args: $days, $ad_id; default = the ad's stored value)."
     }
   ],
   "buddypress_integration": {
@@ -1935,10 +1945,10 @@
   "wp_cli": [],
   "storage_drivers": [],
   "security": {
-    "uploads_gate": "n/a — plugin does not handle direct file uploads",
+    "uploads_gate": "n/a \u2014 plugin does not handle direct file uploads",
     "signing_entry_points": [],
     "always_sign_filter": null,
-    "rate_limit_middleware": "Per-IP transient (md5(IP)) — 60/min for /ads/track and /analytics/track, 30/min for /links/{id}/track",
+    "rate_limit_middleware": "Per-IP transient (md5(IP)) \u2014 60/min for /ads/track and /analytics/track, 30/min for /links/{id}/track",
     "nonce_actions": [
       "wbam_dismiss_notice",
       "wbam_frontend",
@@ -2040,8 +2050,8 @@
       "declared_but_unenforced": [],
       "enforced_but_undeclared": [],
       "manage_options_gate_count": 22,
-      "manage_options_gate_note": "Bare current_user_can('manage_options') checks across plugin admin/REST/AJAX paths. Plugin gates ALL 9 admin pages, ALL 22 REST routes, and ALL admin AJAX handlers behind manage_options — typical WP pattern but a permission monoculture: only full administrators can operate the plugin. No granular plugin caps exist; staff/editor workflows are not supported. Future enhancement opportunity: introduce wbam_manage_ads / wbam_view_analytics caps and gate non-destructive views (analytics dashboard) at a lower threshold.",
-      "scanner_note": "Scanned every PHP file in build/free/wb-ads-rotator-with-split-test (72 files). Detected zero add_role / add_cap declarations. CPT 'wbam-ad' uses capability_type=post with default map_meta_cap (false) — no primitive caps auto-generated; all CPT screens fall back to manage_options (post-type default for non-public CPTs without explicit capability map). FREE plugin registers 0 custom capabilities.",
+      "manage_options_gate_note": "Bare current_user_can('manage_options') checks across plugin admin/REST/AJAX paths. Plugin gates ALL 9 admin pages, ALL 22 REST routes, and ALL admin AJAX handlers behind manage_options \u2014 typical WP pattern but a permission monoculture: only full administrators can operate the plugin. No granular plugin caps exist; staff/editor workflows are not supported. Future enhancement opportunity: introduce wbam_manage_ads / wbam_view_analytics caps and gate non-destructive views (analytics dashboard) at a lower threshold.",
+      "scanner_note": "Scanned every PHP file in build/free/wb-ads-rotator-with-split-test (72 files). Detected zero add_role / add_cap declarations. CPT 'wbam-ad' uses capability_type=post with default map_meta_cap (false) \u2014 no primitive caps auto-generated; all CPT screens fall back to manage_options (post-type default for non-public CPTs without explicit capability map). FREE plugin registers 0 custom capabilities.",
       "summary": {
         "total_caps_enforced": 3,
         "custom_caps_registered": 0,
@@ -2054,5 +2064,8 @@
         "cpt_map_meta_cap": false
       }
     }
-  }
+  },
+  "notes": [
+    "Settings clean-up (card 10343726590, 2026-09-26): removed 2 dead fields with no reader anywhere (_wbam_ad_data[after_posts]/[posts_repeat] and the whole Archive Settings metabox panel, which only showed for a placement id 'archive' that does not exist), and converted 2 rarely-changed fields to filters: container_class (wbam_ad_container_class) and the email-capture ad's cookie_days (wbam_email_capture_cookie_days). Every filter's default is the site's/ad's already-stored value, so upgraded sites and ads behave the same."
+  ]
 }
