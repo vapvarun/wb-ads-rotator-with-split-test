@@ -21,7 +21,11 @@ class Test_Next_Step_Banner_Action_Screens extends Pro_Test_Case {
 	public function set_up(): void {
 		parent::set_up();
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
-		set_current_screen( 'wbam-ad_page_wbam-classifieds' );
+		// All Ads (edit.php?post_type=wbam-ad) - the actual target of the
+		// "create-first-ad" step a fresh, empty install resolves to (owner
+		// decision, admin polish audit item 3a: the banner only shows on
+		// the Dashboard and the one screen its own button opens).
+		set_current_screen( 'edit-wbam-ad' );
 	}
 
 	public function tear_down(): void {
@@ -43,6 +47,22 @@ class Test_Next_Step_Banner_Action_Screens extends Pro_Test_Case {
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( 'wbam-next-step-banner', $output );
+	}
+
+	/**
+	 * Off its own step's target screen (Classifieds, say), the banner does
+	 * not render even with no action param - only the Dashboard and the
+	 * step's own target screen show it (item 3a).
+	 */
+	public function test_banner_is_hidden_on_a_screen_that_is_not_the_steps_target(): void {
+		unset( $_GET['action'] );
+		set_current_screen( 'wbam-ad_page_wbam-classifieds' );
+
+		ob_start();
+		Next_Step_Banner::maybe_render();
+		$output = ob_get_clean();
+
+		$this->assertSame( '', $output );
 	}
 
 	/**

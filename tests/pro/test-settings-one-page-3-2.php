@@ -381,29 +381,34 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$this->assertFalse( $stored['ad_approved'] );
 	}
 
-	/** Posting-without-a-plan moved to the Classifieds leaf, with its own save + redirect there. */
-	public function test_posting_access_save_persists_and_redirects_to_classifieds(): void {
+	/**
+	 * Posting-without-a-plan is one field inside the Classifieds section's
+	 * one shared save (card 10343706274: one form, one Save per section -
+	 * this card no longer has its own nonce/redirect; handle_posting_access_save()
+	 * was absorbed into render_classifieds_settings()'s own save block).
+	 */
+	public function test_posting_access_save_persists_via_the_shared_classifieds_save(): void {
 		$_POST = array(
-			'wbam_save_posting_access'   => '1',
-			'wbam_posting_access_nonce'  => wp_create_nonce( 'wbam_posting_access' ),
-			'require_membership_to_post' => '1',
+			'wbam_save_classifieds_settings' => '1',
+			'_wpnonce'                        => wp_create_nonce( 'wbam_classifieds_settings' ),
+			'wbam_singular_label'             => 'Listing',
+			'wbam_plural_label'               => 'Listings',
+			'wbam_url_slug'                   => 'classifieds',
+			'wbam_submission_form_type'       => 'wizard',
+			'require_membership_to_post'      => '1',
 		);
+		$_REQUEST = $_POST;
 
-		$redirect = static function ( $location ) {
-			throw new \RuntimeException( $location );
-		};
-		add_filter( 'wp_redirect', $redirect );
-		try {
-			$this->admin->handle_posting_access_save();
-			$this->fail( 'Expected handle_posting_access_save() to redirect.' );
-		} catch ( \RuntimeException $e ) {
-			$this->assertStringContainsString( 'page=wbam-settings', $e->getMessage() );
-			$this->assertStringContainsString( 'section=classifieds', $e->getMessage() );
-		} finally {
-			remove_filter( 'wp_redirect', $redirect );
-		}
+		$method = new \ReflectionMethod( Pro_Admin::class, 'render_classifieds_settings' );
+		$method->setAccessible( true );
+		ob_start();
+		$method->invoke( $this->admin );
+		$html = (string) ob_get_clean();
 
 		$this->assertTrue( (bool) Settings_Helper::get( 'require_membership_to_post', false ) );
+		// One form, one Save: no separate "Posting without a plan" submit button.
+		$this->assertSame( 1, substr_count( $html, '<form' ) );
+		$this->assertSame( 1, substr_count( $html, 'type="submit"' ) );
 	}
 
 	/**

@@ -162,13 +162,14 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
 
 		$_POST = array(
-			'wbam_save_pages'        => '1',
-			'_wpnonce'               => wp_create_nonce( 'wbam_pages_settings' ),
 			'wbam_page_my_favorites' => (string) $page_id,
 		);
 		$_REQUEST = $_POST;
 
-		$html = $this->render( 'render_pages_settings' );
+		// $saving=true: the shared General-section nonce (card 10343706274)
+		// is now verified once by render_general_section(), not by this
+		// card's own removed nonce/isset() check.
+		$html = $this->render( 'render_pages_settings', true );
 
 		$this->assertStringContainsString( 'name="wbam_page_my_favorites"', $html );
 		$this->assertStringContainsString( 'name="wbam_page_contact"', $html );

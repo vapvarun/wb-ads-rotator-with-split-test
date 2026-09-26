@@ -287,4 +287,51 @@ class Test_Settings_One_Page_3_2 extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'wbam_settings[ad_label]', $html, 'ad-display alias must land on Ads & Display content.' );
 	}
+
+	/**
+	 * Admin polish audit item 3a ("notices only where they act"): the legacy
+	 * ip-api notice shows on the WB Ad Manager Dashboard (All Ads) and never
+	 * twice on the Settings > Location screen, where the Geo Targeting card
+	 * already carries its own copy inline. QA reject on card 10343706274:
+	 * the global admin_notices hook used to fire on every WBAM screen,
+	 * including Location, stacking a second copy above the one inside the
+	 * card.
+	 */
+	public function test_legacy_geo_notice_does_not_repeat_on_the_location_screen(): void {
+		update_option( 'wbam_settings', array( 'geo_primary_provider' => 'ip-api' ) );
+		$settings = Settings::get_instance();
+		$settings->register_settings();
+
+		set_current_screen( 'wbam-ad_page_wbam-settings' );
+		$_GET['section'] = 'location';
+
+		ob_start();
+		$settings->maybe_render_legacy_geo_notice();
+		$global_notice_html = ob_get_clean();
+		$this->assertSame( '', $global_notice_html, 'The global hook must not render on Settings > Location - the card below already has its own copy.' );
+
+		ob_start();
+		$settings->render_page();
+		$page_html = ob_get_clean();
+		$this->assertSame(
+			1,
+			substr_count( $page_html, 'still using' ),
+			'Exactly one copy of the legacy-provider notice on the Location screen.'
+		);
+	}
+
+	/** The same notice does show on the WB Ad Manager Dashboard (All Ads). */
+	public function test_legacy_geo_notice_shows_on_the_dashboard(): void {
+		update_option( 'wbam_settings', array( 'geo_primary_provider' => 'ip-api' ) );
+		$settings = Settings::get_instance();
+		$settings->register_settings();
+
+		set_current_screen( 'edit-wbam-ad' );
+
+		ob_start();
+		$settings->maybe_render_legacy_geo_notice();
+		$html = ob_get_clean();
+
+		$this->assertStringContainsString( 'ip-api.com', $html );
+	}
 }

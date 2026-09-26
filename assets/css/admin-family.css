@@ -250,6 +250,18 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 	max-width: var(--wbam-form-max);
 }
 
+/* Destructive, rarely-used settings (Privacy & Data > Delete Data on
+   Uninstall) get a warning accent and sit last in the section (PV1),
+   instead of blending in as an ordinary card. */
+.wbam-card--danger {
+	border-color: var(--wbam-danger);
+	border-inline-start-width: 3px;
+}
+
+.wbam-card--danger h2 {
+	color: var(--wbam-danger-hover);
+}
+
 .wbam-settings-card {
 	margin-bottom: var(--wbam-space-5);
 	background:    var(--wbam-bg);
@@ -723,6 +735,22 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 	border-bottom: 0;
 }
 
+/* A section whose content is NOT a bare form-table (a matrix, a custom
+   component, the Site Mode card, the Shortcodes reference) still needs an
+   explicit `.wbam-card` wrapper for its own card surface - nothing else
+   cards it. But when a `.wbam-card` wraps a section that IS a form-table
+   (every settings tab folded onto this one screen, card 10343706274),
+   the auto-card rule above nests a second border/shadow inside the first.
+   Neutralize the form-table's own card styling in that one case only -
+   the outer `.wbam-card` already provides it. */
+.wbam-settings-page .wbam-card .form-table {
+	margin:        0;
+	background:    none;
+	border:        0;
+	border-radius: 0;
+	box-shadow:    none;
+}
+
 @media screen and (max-width: 640px) {
 	.wbam-page-header {
 		flex-direction:  column;
@@ -796,7 +824,16 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 	   the whole screen past a 390px viewport. */
 	grid-template-columns: 240px minmax(0, 1fr);
 	gap:                   var(--wbam-space-6);
-	align-items:           start;
+	/* No `align-items: start` here. A grid item does not stretch to the row
+	   height when its own alignment is "start", so the QA-reported "rail
+	   doesn't stay put when you scroll" bug: the <nav> column shrank to its
+	   own ~400px of content instead of matching the (often 6000px+) content
+	   column, leaving position:sticky on .wbam-settings-nav__list nothing to
+	   travel within - it unstuck the instant that 400px scrolled by. Default
+	   (stretch) gives the nav column the full row height as its containing
+	   block; the sticky child still only ever occupies its own content
+	   height (nothing else in .wbam-settings-nav has a border/background),
+	   so visually nothing else about the rail changes. */
 }
 
 .wbam-settings-nav__form {

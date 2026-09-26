@@ -125,6 +125,13 @@ class Placement_Settings {
 		// confusion with nothing behind it. Drawing it is Pro's call.
 		$show_adv = defined( 'WBAM_PRO_VERSION' );
 
+		// Extra column(s) an active add-on wants in this same matrix - e.g.
+		// Pro's rotation module adds "Ads shown" here instead of repeating
+		// every placement in its own separate card (owner decision, admin
+		// polish audit item 3b). Gated on has_action() so a bare Free
+		// install draws no empty column.
+		$show_extra = has_action( 'wbam_placement_matrix_cell' );
+
 		// Column header text is reused as the mobile card's row label (via
 		// the `data-label` attribute + a CSS `content: attr()` rule below
 		// 782px — see .wbam-placement-matrix in assets/css/admin.css).
@@ -143,12 +150,15 @@ class Placement_Settings {
 						<th scope="col" role="columnheader"><?php echo esc_html( $label_adv ); ?></th>
 					<?php endif; ?>
 					<th scope="col" role="columnheader"><?php echo esc_html( $label_ads ); ?></th>
+					<?php if ( $show_extra ) : ?>
+						<?php do_action( 'wbam_placement_matrix_head' ); ?>
+					<?php endif; ?>
 				</tr>
 			</thead>
 			<tbody role="rowgroup">
 			<?php foreach ( $grouped as $group => $placements ) : ?>
 				<tr class="wbam-placement-matrix__group" role="row">
-					<th colspan="<?php echo $show_adv ? 4 : 3; ?>" scope="colgroup" role="columnheader"><?php echo esc_html( ucfirst( (string) $group ) ); ?></th>
+					<th colspan="<?php echo (int) ( 3 + $show_adv + $show_extra ); ?>" scope="colgroup" role="columnheader"><?php echo esc_html( ucfirst( (string) $group ) ); ?></th>
 				</tr>
 				<?php
 				foreach ( $placements as $id => $placement ) :
@@ -206,6 +216,9 @@ class Placement_Settings {
 							</td>
 						<?php endif; ?>
 						<td role="cell" data-label="<?php echo esc_attr( $label_ads ); ?>"><?php echo esc_html( (string) $count ); ?></td>
+						<?php if ( $show_extra ) : ?>
+							<?php do_action( 'wbam_placement_matrix_cell', $id, $placement ); ?>
+						<?php endif; ?>
 					</tr>
 				<?php endforeach; ?>
 			<?php endforeach; ?>

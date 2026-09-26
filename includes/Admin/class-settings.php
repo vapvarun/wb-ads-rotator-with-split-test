@@ -105,10 +105,16 @@ class Settings {
 			return;
 		}
 
-		$screen  = get_current_screen();
-		$is_ours = $screen && ( false !== strpos( (string) $screen->id, 'wbam' )
-			|| in_array( $screen->post_type, array( 'wbam-ad', 'wbam-classified' ), true ) );
-		if ( ! $is_ours ) {
+		// Shows only on the WB Ad Manager Dashboard (All Ads - the plugin's
+		// own overview/landing screen) and Settings > Location (owner
+		// decision, admin polish audit item 3a: "notices only where they
+		// act") - never on every WBAM screen at once. Settings > Location
+		// gets its own copy inline, inside the Geo Targeting card (see
+		// render_geo_section()), so this global hook only needs to cover
+		// the Dashboard - showing it here too would repeat it on that one
+		// page (the QA reject this fixes).
+		$screen = get_current_screen();
+		if ( ! $screen || 'wbam-ad' !== $screen->post_type ) {
 			return;
 		}
 
@@ -366,7 +372,7 @@ class Settings {
 			array(
 				'label_for'   => 'wbam_setting_geo_enabled',
 				'id'          => 'geo_enabled',
-				'description' => __( "Allow country/region lookup for this visitor's IP.", 'wb-ads-rotator-with-split-test' ),
+				'description' => __( "Allow country/region lookup for each visitor's IP address.", 'wb-ads-rotator-with-split-test' ),
 			)
 		);
 
@@ -492,10 +498,15 @@ class Settings {
 			);
 		}
 
-		// Advanced Section.
+		// Danger Zone section (formerly "Advanced" - the only field here is
+		// destructive, so the card is styled and ordered as one). Rendered
+		// last on the Privacy & Data section, after every other card
+		// (owner decision, admin polish audit PV1) - see
+		// render_settings_page_sections()'s `wbam-card--danger` class and
+		// render_privacy_page()'s render order.
 		add_settings_section(
 			'wbam_advanced',
-			__( 'Advanced', 'wb-ads-rotator-with-split-test' ),
+			__( 'Danger Zone', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_advanced_section' ),
 			'wbam-settings'
 		);
@@ -1187,20 +1198,25 @@ class Settings {
 			<?php
 			settings_fields( 'wbam_settings_group' );
 			$this->render_settings_page_sections( $ids );
+			/**
+			 * Fires inside the Ads & Display section's one `<form>`, after
+			 * FREE's own cards and before the single Save button (card
+			 * 10343706274: one form, one Save per section) - PRO hooks its Ad
+			 * Visibility by Role/Member Type card and (when the rotation
+			 * module is active) its Ad Rotation card here. PRO's fields post
+			 * through this same `options.php` submission because
+			 * `wbam_pro_settings` is also registered under this page's
+			 * `wbam_settings_group` (see Pro_Admin::register_settings()) -
+			 * its own sanitizer runs unchanged, only the physical form is
+			 * shared.
+			 *
+			 * @since 3.2.0
+			 */
+			do_action( 'wbam_settings_ads_display_content' );
 			submit_button();
 			?>
 		</form>
 		<?php
-		/**
-		 * Fires inside the Ads & Display section, after FREE's own cards.
-		 *
-		 * PRO hooks its Ad Visibility by Role/Member Type card and (when the
-		 * rotation module is active) its Ad Rotation card here — see
-		 * `Pro_Admin::render_ads_display_content_card()`.
-		 *
-		 * @since 3.2.0
-		 */
-		do_action( 'wbam_settings_ads_display_content' );
 	}
 
 	/**
@@ -1216,16 +1232,18 @@ class Settings {
 			<?php
 			settings_fields( 'wbam_settings_group' );
 			$this->render_settings_page_sections( array( 'wbam_links' ) );
+			/**
+			 * Fires inside the Links section's one `<form>`, after cloaking
+			 * settings and before the single Save button (card 10343706274:
+			 * one form, one Save per section).
+			 *
+			 * @since 3.2.0
+			 */
+			do_action( 'wbam_settings_links_content' );
 			submit_button();
 			?>
 		</form>
 		<?php
-		/**
-		 * Fires inside the Links section, after cloaking settings.
-		 *
-		 * @since 3.2.0
-		 */
-		do_action( 'wbam_settings_links_content' );
 	}
 
 	/**
@@ -1236,21 +1254,33 @@ class Settings {
 	 * @since 3.2.0
 	 */
 	public function render_location_page() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- options.php verifies this page's own nonce; PRO's card (hooked below) checks its own $saving-gated fields itself.
+		$saving = isset( $_POST['option_page'] ) && 'wbam_settings_group' === wp_unslash( $_POST['option_page'] ) && isset( $_POST['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'wbam_settings_group-options' );
 		?>
 		<form action="options.php" method="post" class="wbam-settings-form">
 			<?php
 			settings_fields( 'wbam_settings_group' );
 			$this->render_settings_page_sections( array( 'wbam_geo' ) );
+			/**
+			 * Fires inside the Location section's one `<form>`, after
+			 * visitor geolocation and before the single Save button (card
+			 * 10343706274: one form, one Save per section). PRO's
+			 * classified-maps card writes its own option
+			 * (`wbam_pro_geolocation_settings`) directly - it cannot share
+			 * this page's native `wbam_settings_group` Settings API
+			 * processing the way `wbam_pro_settings` does elsewhere, so it
+			 * is instead gated on the `$saving` flag this same submission
+			 * already verified.
+			 *
+			 * @since 3.2.0
+			 * @param bool $saving Whether this exact request is a verified
+			 *                     save of this page's form.
+			 */
+			do_action( 'wbam_settings_location_content', $saving );
 			submit_button();
 			?>
 		</form>
 		<?php
-		/**
-		 * Fires inside the Location section, after visitor geolocation.
-		 *
-		 * @since 3.2.0
-		 */
-		do_action( 'wbam_settings_location_content' );
 	}
 
 	/**
@@ -1263,22 +1293,32 @@ class Settings {
 	 * @since 3.2.0
 	 */
 	public function render_privacy_page() {
-		$ids = defined( 'WBAM_PRO_VERSION' ) ? array( 'wbam_advanced' ) : array( 'wbam_privacy', 'wbam_advanced' );
+		// 'wbam_advanced' (Danger Zone: Delete Data on Uninstall) always
+		// renders LAST, after PRO's analytics/GDPR card - destructive and
+		// rarely used, so it never sits above the settings someone actually
+		// came here to change (PV1, admin polish audit).
+		$ids = defined( 'WBAM_PRO_VERSION' ) ? array() : array( 'wbam_privacy' );
 		?>
 		<form action="options.php" method="post" class="wbam-settings-form">
 			<?php
 			settings_fields( 'wbam_settings_group' );
 			$this->render_settings_page_sections( $ids );
+			/**
+			 * Fires inside the Privacy & Data section's one `<form>`, after
+			 * FREE's own cards and before the single Save button (card
+			 * 10343706274: one form, one Save per section). PRO's
+			 * analytics/GDPR card posts through this same `options.php`
+			 * submission because `wbam_pro_settings` is also registered
+			 * under this page's `wbam_settings_group`.
+			 *
+			 * @since 3.2.0
+			 */
+			do_action( 'wbam_settings_privacy_content' );
+			$this->render_settings_page_sections( array( 'wbam_advanced' ) );
 			submit_button();
 			?>
 		</form>
 		<?php
-		/**
-		 * Fires inside the Privacy & Data section, after FREE's own cards.
-		 *
-		 * @since 3.2.0
-		 */
-		do_action( 'wbam_settings_privacy_content' );
 	}
 
 	/**
@@ -1337,7 +1377,10 @@ class Settings {
 				continue;
 			}
 
-			echo '<div class="wbam-card" id="' . esc_attr( 'wbam-jump-' . $section['id'] ) . '">';
+			// Danger Zone (Delete Data on Uninstall) is the one card styled
+			// as a warning - destructive, rarely used, ordered last (PV1).
+			$card_class = 'wbam_advanced' === $section['id'] ? 'wbam-card wbam-card--danger' : 'wbam-card';
+			echo '<div class="' . esc_attr( $card_class ) . '" id="' . esc_attr( 'wbam-jump-' . $section['id'] ) . '">';
 			if ( $section['title'] ) {
 				echo '<h2>' . esc_html( $section['title'] ) . '</h2>';
 			}
@@ -1410,6 +1453,17 @@ class Settings {
 			: __( 'Choose which slots this site uses. Unticking a slot stops ads rendering there.', 'wb-ads-rotator-with-split-test' );
 
 		echo '<p>' . esc_html( $copy ) . '</p>';
+
+		/**
+		 * Fires after the Placements intro copy, before the matrix table.
+		 *
+		 * PRO's rotation module hooks this to explain the "Ads shown" column
+		 * it adds to the matrix (see Placement_Settings::render_table()'s
+		 * `wbam_placement_matrix_head`/`wbam_placement_matrix_cell` hooks).
+		 *
+		 * @since 3.2.0
+		 */
+		do_action( 'wbam_placement_matrix_intro' );
 
 		\WBAM\Admin\Placement_Settings::render_table();
 	}
@@ -1488,10 +1542,10 @@ class Settings {
 	}
 
 	/**
-	 * Render advanced section.
+	 * Render advanced (Danger Zone) section.
 	 */
 	public function render_advanced_section() {
-		echo '<p>' . esc_html__( 'Advanced plugin settings.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+		echo '<p>' . esc_html__( 'Destructive and rarely-used. Double-check before saving.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 	}
 
 	/**
