@@ -630,6 +630,16 @@ class Placement_Engine {
 		// No ad-type handler emits .wbam-ad itself, so this wrapper is
 		// the single source of that class.
 		if ( '' !== $output ) {
+			// Safety net (owner decision, card 10342761510): every render
+			// path funnels through here, so this is the one place that
+			// guarantees the frontend CSS/JS is on for an ad that
+			// enqueue_assets()'s cheap page-level prediction could not see
+			// coming (a widget, a template do_shortcode() call outside
+			// post_content, etc). No-op if it is already on.
+			if ( ! is_admin() ) {
+				\WBAM\Frontend\Frontend::get_instance()->enqueue_render_time_assets();
+			}
+
 			$is_responsive = '1' === (string) get_post_meta( $ad_id, '_wbam_is_responsive', true );
 			$classes       = 'wbam-ad wbam-ad-slot';
 			if ( $is_responsive ) {

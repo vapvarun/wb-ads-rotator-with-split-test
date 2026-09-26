@@ -76,6 +76,18 @@ class Links_Module {
 	 * Initialize the module.
 	 */
 	public function init() {
+		// The site owner's Links module switch (Settings > Modules) is the
+		// single gate for this feature: off means no admin menu, no
+		// cloaking/redirect handling, no shortcodes, and - the reason this
+		// check lives here rather than only in Links_Admin/Partnership_Admin
+		// - no frontend links-frontend.js/partnership-form.css/js either.
+		// Plugin::init_hooks() instantiates this class unconditionally, so
+		// gating at the top of init() is the one place every consumer of
+		// the module (frontend and admin) routes through.
+		if ( ! \WBAM\Core\Settings_Helper::is_module_enabled( 'links' ) ) {
+			return;
+		}
+
 		// Initialize manager (available everywhere).
 		$this->manager = Link_Manager::get_instance();
 

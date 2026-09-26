@@ -551,11 +551,6 @@ parameters:
 			path: includes/Admin/class-help-docs.php
 
 		-
-			message: "#^Method WBAM\\\\Admin\\\\List_Empty_States\\:\\:enqueue_shared_styles\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: includes/Admin/class-list-empty-states.php
-
-		-
 			message: "#^Method WBAM\\\\Admin\\\\List_Empty_States\\:\\:init\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: includes/Admin/class-list-empty-states.php

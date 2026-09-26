@@ -44,9 +44,13 @@ class List_Empty_States {
 		add_action( 'admin_notices', array( $this, 'maybe_render_ads_empty_state' ) );
 		add_action( 'admin_head-edit.php', array( $this, 'maybe_print_ads_empty_state_style' ) );
 
-		// Links list table shares the markup via its no_items() override
-		// but needs admin.css present on its screen to pick up the styles.
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_shared_styles' ) );
+		// The Links list table shares the same '.wbam-empty-state' markup,
+		// but does NOT need its own admin.css enqueue: that screen's
+		// get_current_screen()->post_type resolves to 'wbam-ad' (Links_Admin's
+		// parent_slug is 'edit.php?post_type=wbam-ad'), so Admin::enqueue_assets()
+		// already loads admin.css there with the correct wbam-admin-tokens
+		// dependency. A second registration here under 'dashicons' instead
+		// was a duplicate-handle risk, not a real gap.
 	}
 
 	/**
@@ -168,31 +172,6 @@ class List_Empty_States {
 				'cta_url'   => admin_url( 'admin.php?page=wbam-links&action=add' ),
 				'inline'    => true,
 			)
-		);
-	}
-
-	/**
-	 * Ensure admin.css is loaded on screens that render a shared
-	 * empty state but don't already depend on it (currently the
-	 * Links page, which enqueues only links-admin.css).
-	 *
-	 * @param string $hook Current admin page hook suffix.
-	 */
-	public function enqueue_shared_styles( $hook ) {
-		$shared_css_hooks = array(
-			'wbam-ad_page_wbam-links',
-		);
-
-		if ( ! in_array( $hook, $shared_css_hooks, true ) ) {
-			return;
-		}
-
-		wp_enqueue_style( 'dashicons' );
-		wp_enqueue_style(
-			'wbam-admin',
-			wbam_asset_url( 'css/admin.css' ),
-			array( 'dashicons' ),
-			WBAM_VERSION
 		);
 	}
 

@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use WBAM\Core\Settings_Helper;
 use WBAM\Core\Privacy_Helper;
 use WBAM\Core\Singleton;
+use WBAM\Modules\Placements\Placement_Engine;
 
 /**
  * Frontend class.
@@ -35,6 +36,11 @@ class Frontend {
 	 */
 	public function init() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		// Safety net: a style enqueued after wp_head (e.g. from a widget or a
+		// bbPress/BuddyPress hook rendered deep in the body) never gets
+		// printed by WP core's default wp_print_styles pass. Print it once
+		// more, late, if render_ad() turned it on this request.
+		add_action( 'wp_footer', array( $this, 'print_late_style' ), 1 );
 		add_action( 'wp_ajax_wbam_track_click', array( $this, 'handle_click_tracking' ) );
 		add_action( 'wp_ajax_nopriv_wbam_track_click', array( $this, 'handle_click_tracking' ) );
 		add_action( 'wp_ajax_wbam_email_capture', array( $this, 'handle_email_capture' ) );
@@ -46,12 +52,27 @@ class Frontend {
 	}
 
 	/**
-	 * Enqueue frontend assets.
+	 * Register the frontend CSS/JS handles and decide, cheaply, whether
+	 * this request should have them turned on in the head.
+	 *
+	 * Registration always runs (no HTTP cost - it just tells WP where the
+	 * files are) so `render_ad()`'s safety net can enqueue an
+	 * already-registered handle by name from any render path (widget,
+	 * shortcode, block, template call) without knowing the URLs itself.
+	 *
+	 * The actual `wp_enqueue_*()` call only fires when this request is
+	 * predicted to show an ad: a live ad in a site-wide slot (header,
+	 * footer, sticky, popup - shows on every page), or a page-specific
+	 * signal (singular content/paragraph/comment placement, an archive
+	 * placement, or a block/shortcode already in the content). A visitor
+	 * on a page with no ads and no site-wide slot loads neither file.
+	 *
+	 * @since 3.2.0 Split from the previous always-on enqueue_assets().
 	 */
 	public function enqueue_assets() {
 		$frontend_css_url = wbam_asset_url( 'css/frontend.css' );
 
-		wp_enqueue_style(
+		wp_register_style(
 			'wbam-frontend',
 			$frontend_css_url,
 			array( 'dashicons' ),
@@ -68,7 +89,7 @@ class Frontend {
 			wp_add_inline_style( 'wbam-frontend', ':root{--wbam-theme-button:' . $theme_button . ';}' );
 		}
 
-		wp_enqueue_script(
+		wp_register_script(
 			'wbam-frontend',
 			wbam_asset_url( 'js/frontend.js' ),
 			array(),
@@ -87,6 +108,129 @@ class Frontend {
 				'nonce'   => wp_create_nonce( 'wbam_frontend' ),
 			)
 		);
+
+		if ( $this->should_preload_ad_assets() ) {
+			$this->enqueue_render_time_assets();
+		}
+	}
+
+	/**
+	 * Cheap, request-time prediction of whether this page will show an ad,
+	 * so the CSS/JS can go out in the head instead of waiting for the
+	 * render-time safety net (which only reaches styles printed before
+	 * `wp_head` via the late-print fallback in the footer).
+	 *
+	 * Reuses Placement_Engine::get_ads_for_placement()'s own 5-minute
+	 * object cache - no new cache layer, per placement checked here.
+	 *
+	 * @since 3.2.0
+	 * @return bool
+	 */
+	private function should_preload_ad_assets() {
+		if ( is_admin() ) {
+			return false;
+		}
+
+		$engine = Placement_Engine::get_instance();
+
+		// A live ad in a site-wide slot shows on every page, so the CSS/JS
+		// belongs in the head everywhere - checking this first also covers
+		// the header/footer/sticky/popup placements themselves, several of
+		// which render on hooks (`wp_body_open`, `wp_footer`) that fire
+		// too late for a style to make the initial <head> print.
+		foreach ( array( 'header', 'footer', 'sticky', 'popup' ) as $sitewide_id ) {
+			if ( ! empty( $engine->get_ads_for_placement( $sitewide_id ) ) ) {
+				return true;
+			}
+		}
+
+		if ( is_singular() ) {
+			foreach ( array( 'content', 'after_paragraph' ) as $placement_id ) {
+				if ( ! empty( $engine->get_ads_for_placement( $placement_id ) ) ) {
+					return true;
+				}
+			}
+
+			if ( ! empty( $engine->get_ads_for_placement( 'comments' ) ) ) {
+				return true;
+			}
+
+			$post = get_queried_object();
+			if ( $post instanceof \WP_Post
+				&& ( has_block( 'wb-ads/ad', $post ) || has_block( 'wb-ads/placement', $post )
+					|| has_shortcode( $post->post_content, 'wbam_ad' ) || has_shortcode( $post->post_content, 'wbam_ads' ) )
+			) {
+				return true;
+			}
+		}
+
+		if ( is_archive() || is_home() ) {
+			foreach ( array( 'before_archive', 'after_archive' ) as $placement_id ) {
+				if ( ! empty( $engine->get_ads_for_placement( $placement_id ) ) ) {
+					return true;
+				}
+			}
+		}
+
+		// BuddyPress / bbPress screens carry their own placements (profile,
+		// group, activity, forum, topic) which render through the same
+		// render_ad() funnel as everything else; asking each one here would
+		// duplicate that placement's own eligibility rules. wbam_placements_init.
+		if ( ( function_exists( 'is_buddypress' ) && is_buddypress() )
+			|| ( function_exists( 'is_bbpress' ) && is_bbpress() )
+		) {
+			foreach ( array( 'bbpress' ) as $placement_id ) {
+				if ( ! empty( $engine->get_ads_for_placement( $placement_id ) ) ) {
+					return true;
+				}
+			}
+		}
+
+		/**
+		 * Whether this request should preload the frontend ad CSS/JS in the
+		 * head even though none of the built-in signals matched - e.g. a
+		 * theme template that calls `do_shortcode('[wbam_ad id="1"]')`
+		 * outside post_content, where has_shortcode() cannot see it.
+		 *
+		 * @since 3.2.0
+		 * @param bool $preload Whether to preload.
+		 */
+		return (bool) apply_filters( 'wbam_preload_frontend_assets', false );
+	}
+
+	/**
+	 * Turn on the already-registered frontend CSS/JS.
+	 *
+	 * The single place every render path funnels through
+	 * (Placement_Engine::render_ad()) calls this the moment it actually
+	 * produces ad output, so a widget, shortcode, block or template call
+	 * that `should_preload_ad_assets()` could not predict still gets its
+	 * ad styled. Idempotent - safe to call on every render.
+	 *
+	 * @since 3.2.0
+	 */
+	public function enqueue_render_time_assets() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		wp_enqueue_style( 'wbam-frontend' );
+		wp_enqueue_script( 'wbam-frontend' );
+	}
+
+	/**
+	 * Print the frontend stylesheet again in the footer if it was turned on
+	 * after `wp_head` already ran (the render-time safety net firing from a
+	 * widget or a hook deep in the body). WP core only auto-prints styles
+	 * enqueued before `wp_print_styles` fires on `wp_head`; anything queued
+	 * later is otherwise silently dropped from the page.
+	 *
+	 * @since 3.2.0
+	 */
+	public function print_late_style() {
+		if ( wp_style_is( 'wbam-frontend', 'enqueued' ) && ! wp_style_is( 'wbam-frontend', 'done' ) ) {
+			wp_print_styles( array( 'wbam-frontend' ) );
+		}
 	}
 
 	/**

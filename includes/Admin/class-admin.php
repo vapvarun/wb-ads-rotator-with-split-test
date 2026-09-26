@@ -1137,8 +1137,11 @@ class Admin {
 			wp_localize_script( 'wbam-admin', 'wbamFormatData', $format_data );
 		}
 
-		// Code editor.
-		if ( 'post' === $hook || 'post-new' === $hook ) {
+		// Code editor. $hook is the real admin_enqueue_scripts hook suffix
+		// ('post.php' / 'post-new.php'), not the screen base ('post' /
+		// 'post-new') - the old comparison never matched, so the HTML code
+		// editor never initialised on the ad edit screen.
+		if ( 'post.php' === $hook || 'post-new.php' === $hook ) {
 			$settings = wp_enqueue_code_editor( array( 'type' => 'text/html' ) );
 			if ( false !== $settings ) {
 				wp_localize_script( 'wbam-admin', 'wbamCodeEditor', $settings );

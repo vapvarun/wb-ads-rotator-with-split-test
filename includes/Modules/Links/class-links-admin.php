@@ -103,13 +103,14 @@ class Links_Admin {
 			WBAM_VERSION
 		);
 
-		wp_enqueue_script(
-			'wbam-admin',
-			wbam_asset_url( 'js/admin.js' ),
-			array( 'jquery' ),
-			WBAM_VERSION,
-			true
-		);
+		// 'wbam-admin' (js/admin.js) is NOT re-registered here. This screen's
+		// $screen->post_type resolves to 'wbam-ad' (its parent_slug is
+		// 'edit.php?post_type=wbam-ad'), so Admin::enqueue_assets() already
+		// registers and enqueues it with the full jquery/media-editor/
+		// wbam-toast dependency set on this exact hook. A second
+		// registration here with only 'jquery' as a dep was a silent no-op
+		// when Admin's ran first (WP_Dependencies::add() never overwrites
+		// an existing handle) and a real bug if it ever ran second.
 	}
 
 	/**
