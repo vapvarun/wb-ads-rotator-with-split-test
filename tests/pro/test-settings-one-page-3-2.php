@@ -284,16 +284,36 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$this->assertTrue( $stored['featured_downgrade_notification'], 'Downgrade toggle must survive a Classifieds save.' );
 	}
 
-	/** The Emails leaf's own form now owns the featured-email toggles' save. */
-	public function test_emails_leaf_saves_featured_toggles_without_touching_email_settings(): void {
-		update_option( 'wbam_pro_classifieds_settings', array( 'featured_admin_notification' => false ) );
-		update_option( 'wbam_pro_email_settings', array( 'from_name' => 'Keep Me' ) );
+	/**
+	 * Round trip (owner decision, card 10343706274): Emails is one section,
+	 * one form, one Save now - the featured-listing toggles are merged into
+	 * the same notification list and the same submit. One save updates BOTH
+	 * `wbam_pro_email_settings` and `wbam_pro_classifieds_settings`, each
+	 * through its own read-modify-write, so read = write holds per key even
+	 * though the two groups live in different options: every posted key
+	 * lands on the value posted, every un-posted boolean saves false, and a
+	 * Classifieds-owned key this form never renders (singular_label)
+	 * survives untouched.
+	 */
+	public function test_emails_save_updates_both_option_groups_and_leaves_other_classifieds_keys_alone(): void {
+		update_option(
+			'wbam_pro_classifieds_settings',
+			array(
+				'singular_label'              => 'Listing',
+				'featured_admin_notification'  => false,
+				'featured_member_notification' => false,
+			)
+		);
+		update_option( 'wbam_pro_email_settings', array( 'from_name' => 'Old Name' ) );
 
 		$_POST = array(
-			'wbam_save_featured_email_settings' => '1',
-			'_wpnonce'                            => wp_create_nonce( 'wbam_featured_email_settings' ),
-			'wbam_featured_admin_notification'    => '1',
-			'wbam_featured_member_notification'   => '1',
+			'wbam_save_email_settings'          => '1',
+			'_wpnonce'                           => wp_create_nonce( 'wbam_email_settings' ),
+			'wbam_email_from_name'               => 'New Name',
+			'wbam_email_from_email'              => 'new@example.org',
+			'wbam_featured_admin_notification'   => '1',
+			'wbam_featured_member_notification'  => '1',
+			// wbam_featured_downgrade_notification intentionally absent/unchecked.
 		);
 		$_REQUEST = $_POST;
 
@@ -301,17 +321,22 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$method->setAccessible( true );
 		ob_start();
 		$method->invoke( $this->admin );
-		ob_end_clean();
+		$html = (string) ob_get_clean();
+
+		$email = Settings_Helper::get_email();
+		$this->assertSame( 'New Name', $email['from_name'], 'Posted key saves the posted value.' );
+		$this->assertSame( 'new@example.org', $email['from_email'] );
 
 		$classifieds = Settings_Helper::get_classifieds();
-		$this->assertTrue( $classifieds['featured_admin_notification'] );
+		$this->assertTrue( $classifieds['featured_admin_notification'], 'Posted featured toggle saves true.' );
 		$this->assertTrue( $classifieds['featured_member_notification'] );
-		$this->assertFalse( ! empty( $classifieds['featured_downgrade_notification'] ), 'Untouched toggle stays false.' );
+		$this->assertFalse( ! empty( $classifieds['featured_downgrade_notification'] ), 'Un-posted featured toggle saves false.' );
+		$this->assertSame( 'Listing', $classifieds['singular_label'], 'A Classifieds-owned key this form never renders must survive untouched.' );
 
-		// The separate Email Settings form was not submitted, so its option
-		// must be exactly what it was before.
-		$email_settings = Settings_Helper::get_email();
-		$this->assertSame( 'Keep Me', $email_settings['from_name'] );
+		// One form, one Save: no separate "Featured Listing Notifications" card/button.
+		$this->assertSame( 1, substr_count( $html, '<form' ) );
+		$this->assertSame( 1, substr_count( $html, 'type="submit"' ) );
+		$this->assertStringNotContainsString( 'Featured Listing Notifications', $html );
 	}
 
 	/**
