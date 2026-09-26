@@ -93,8 +93,8 @@ class Test_AB_Testing_List_Scale extends Pro_Test_Case {
 		( new \ReflectionMethod( $admin, 'render_list' ) )->invoke( $admin );
 		$html = ob_get_clean();
 
-		$this->assertMatchesRegularExpression( '/href="[^"]*status=running[^"]*"[^>]*>\s*Running/', $html );
-		$this->assertDoesNotMatchRegularExpression( '/href="#"[^>]*>\s*Running/', $html );
+		$this->assertMatchesRegularExpression( '/href="[^"]*status=running[^"]*"[^>]*>\s*Live/', $html );
+		$this->assertDoesNotMatchRegularExpression( '/href="#"[^>]*>\s*Live/', $html );
 	}
 
 	public function test_list_screen_paged_param_moves_to_a_second_page(): void {

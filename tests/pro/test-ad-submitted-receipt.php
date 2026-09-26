@@ -68,7 +68,7 @@ class Test_Ad_Submitted_Receipt extends Pro_Test_Case {
 		$receipts = array_values( array_filter( $sent, static fn( $m ) => get_user_by( 'id', $user )->user_email === $m['to'] ) );
 		$this->assertCount( 1, $receipts, 'The advertiser gets one receipt.' );
 		$this->assertStringContainsString( 'Receipt ad', $receipts[0]['message'] );
-		$this->assertStringContainsString( 'Pending Review', $receipts[0]['message'] );
+		$this->assertStringContainsString( 'Pending review', $receipts[0]['message'] );
 	}
 
 	public function test_templates_nothing_sends_are_removed(): void {

@@ -2,7 +2,7 @@
 /**
  * Customer emails describe the event (card 10342623123, journey QA).
  *
- * - A complimentary credit is not a "Credits added successfully" purchase.
+ * - A complimentary grant is not a "Funds added successfully" purchase.
  * - "Promote your classified listings" only when there is a listing to promote.
  * - Reply-To survives a comma in the display name (wp_mail() splits on it).
  * - A REST rejection passes its reason to the applicant.
@@ -52,13 +52,13 @@ class Test_Customer_Email_Journey_Rejects extends Pro_Test_Case {
 		Advertiser_Manager::get_instance()->adjust_balance( $this->advertiser->id, 25, 'Welcome gift', Revenue_Ledger::SOURCE_COMPLIMENTARY_CREDIT );
 		$mail = $this->last_mail();
 
-		$this->assertStringContainsString( 'complimentary credit', $mail['subject'] );
-		$this->assertStringNotContainsString( 'Credits added successfully', $mail['subject'] );
+		$this->assertStringContainsString( 'complimentary funds', $mail['subject'] );
+		$this->assertStringNotContainsString( 'Funds added successfully', $mail['subject'] );
 		$this->assertStringContainsString( 'nothing to pay', $mail['message'] );
 		$this->assertStringNotContainsString( 'Promote your classified listings', $mail['message'], 'No live listing, nothing to promote.' );
 
 		Advertiser_Manager::get_instance()->adjust_balance( $this->advertiser->id, 50, 'Bank transfer', Revenue_Ledger::SOURCE_OFFLINE_PAYMENT );
-		$this->assertStringContainsString( 'Credits added successfully', $this->last_mail()['subject'] );
+		$this->assertStringContainsString( 'Funds added successfully', $this->last_mail()['subject'] );
 	}
 
 	public function test_reply_to_keeps_a_name_with_a_comma(): void {

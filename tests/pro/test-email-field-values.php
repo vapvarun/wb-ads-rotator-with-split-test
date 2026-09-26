@@ -95,7 +95,7 @@ class Test_Email_Field_Values extends Pro_Test_Case {
 	public function test_credits_added_email_shows_money_not_ledger_units(): void {
 		Credits_Bridge::topup( (int) $this->advertiser->id, 2.5, 'Gift' );
 
-		$message = $this->mail_about( 'Credits added' )['message'];
+		$message = $this->mail_about( 'Funds added' )['message'];
 		$this->assertStringContainsString( '+' . wbam_format_price( 2.5 ), $message );
 		$this->assertStringNotContainsString( '+250', $message );
 	}

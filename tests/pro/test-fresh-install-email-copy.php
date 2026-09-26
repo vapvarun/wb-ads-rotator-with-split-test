@@ -48,7 +48,7 @@ class Test_Fresh_Install_Email_Copy extends Pro_Test_Case {
 		Advertiser_Manager::get_instance()->adjust_balance( (int) $this->advertiser->id, 200, 'Welcome credit' );
 
 		$this->assertCount( 1, $this->sent );
-		$this->assertStringContainsString( 'Credits added', $this->sent[0]['subject'] );
+		$this->assertStringContainsString( 'Funds added', $this->sent[0]['subject'] );
 		$this->assertStringContainsString( '+' . wbam_format_price( 200 ), $this->sent[0]['message'] );
 	}
 
