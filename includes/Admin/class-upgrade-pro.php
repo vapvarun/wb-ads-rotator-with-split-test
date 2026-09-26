@@ -236,7 +236,7 @@ class Upgrade_Pro {
 							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 						</tr>
 						<tr>
-							<td><?php esc_html_e( 'Wallet & Prepaid Credits', 'wb-ads-rotator-with-split-test' ); ?></td>
+							<td><?php esc_html_e( 'Balance & Payments', 'wb-ads-rotator-with-split-test' ); ?></td>
 							<td class="wbam-cross"><?php echo wbam_icon( 'minus', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 						</tr>

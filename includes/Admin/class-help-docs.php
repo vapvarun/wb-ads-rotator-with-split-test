@@ -256,7 +256,7 @@ class Help_Docs {
 							<?php
 							printf(
 								/* translators: 1: opening anchor tag, 2: closing anchor tag */
-								esc_html__( 'Turn modules on or off in %1$sSettings > General%2$s (Classifieds, Campaigns, Wallet, A/B Testing, etc.). Each module adds its own submenu under WB Ad Manager.', 'wb-ads-rotator-with-split-test' ),
+								esc_html__( 'Turn modules on or off in %1$sSettings > General%2$s (Classifieds, Campaigns, Payments, A/B Testing, etc.). Each module adds its own submenu under WB Ad Manager.', 'wb-ads-rotator-with-split-test' ),
 								'<a href="' . esc_url( \WBAM\Core\Admin_Links::settings( 'general' ) ) . '">',
 								'</a>'
 							);
@@ -383,7 +383,7 @@ class Help_Docs {
 			<?php if ( ! $this->is_pro_active ) : ?>
 			<div class="wbam-upgrade-cta">
 				<h3><?php esc_html_e( 'Unlock PRO', 'wb-ads-rotator-with-split-test' ); ?></h3>
-				<p><?php esc_html_e( 'Turn your site into an ad marketplace. Pro adds an advertiser portal, wallet & payments, classifieds, campaigns with budgets, advanced analytics, and more. Keep all the Free features. Add revenue on top.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p><?php esc_html_e( 'Turn your site into an ad marketplace. Pro adds an advertiser portal, balance & payments, classifieds, campaigns with budgets, advanced analytics, and more. Keep all the Free features. Add revenue on top.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<p>
 					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=pro-features' ) ); ?>" class="button button-primary">
 						<?php esc_html_e( 'See PRO Features', 'wb-ads-rotator-with-split-test' ); ?>
@@ -429,16 +429,16 @@ class Help_Docs {
 				<ul>
 					<li><?php esc_html_e( 'Overview, My Ads, Campaigns, Classifieds, Inquiries', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Favorites, Following, Messages, Link Partnerships', 'wb-ads-rotator-with-split-test' ); ?></li>
-					<li><?php esc_html_e( 'Wallet (credit balance and transaction history)', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Balance (running total and transaction history)', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Membership plans, Analytics, Share of Voice, Profile', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>
 			</div>
 
 			<div class="wbam-doc-section">
-				<h3><?php esc_html_e( 'Credits & Wallet System', 'wb-ads-rotator-with-split-test' ); ?></h3>
-				<p><?php esc_html_e( 'Built-in credit system advertisers use to pay for ads and listings.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<h3><?php esc_html_e( 'Balance & Payments System', 'wb-ads-rotator-with-split-test' ); ?></h3>
+				<p><?php esc_html_e( 'Built-in balance system advertisers use to pay for ads and listings.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<ul>
-					<li><?php esc_html_e( 'Advertisers purchase credits to pay for ads and listings', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Advertisers add funds to pay for ads and listings', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Supports WooCommerce, Stripe, PayPal, and manual payments', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Hold > Deduct > Refund lifecycle for safe billing', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Full transaction ledger with audit trail', 'wb-ads-rotator-with-split-test' ); ?></li>
@@ -510,23 +510,23 @@ class Help_Docs {
 		<div class="wbam-help-section wbam-pro-teaser">
 			<h2><?php esc_html_e( 'What\'s in WB Ad Manager PRO', 'wb-ads-rotator-with-split-test' ); ?></h2>
 			<p class="wbam-pro-teaser-intro">
-				<?php esc_html_e( 'PRO keeps everything you have in the Free plugin and adds a full monetization layer. Advertiser portal, wallet, campaigns, classifieds, and revenue analytics. Here\'s what you get when you upgrade.', 'wb-ads-rotator-with-split-test' ); ?>
+				<?php esc_html_e( 'PRO keeps everything you have in the Free plugin and adds a full monetization layer. Advertiser portal, balance & payments, campaigns, classifieds, and revenue analytics. Here\'s what you get when you upgrade.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 
 			<div class="wbam-doc-section">
 				<h3><?php esc_html_e( 'Advertiser Portal', 'wb-ads-rotator-with-split-test' ); ?></h3>
 				<p><?php esc_html_e( 'Let advertisers sign up, submit, and manage their own ads. You review & approve.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<ul>
-					<li><?php esc_html_e( 'Advertiser registration and dedicated dashboard (14 tabs: Overview, My Ads, Campaigns, Classifieds, Inquiries, Favorites, Following, Messages, Link Partnerships, Wallet, Membership, Analytics, Share of Voice, Profile)', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Advertiser registration and dedicated dashboard (14 tabs: Overview, My Ads, Campaigns, Classifieds, Inquiries, Favorites, Following, Messages, Link Partnerships, Balance, Membership, Analytics, Share of Voice, Profile)', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Self-service ad submission with admin review queue', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Per-advertiser caps and share-of-voice reporting', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>
 			</div>
 
 			<div class="wbam-doc-section">
-				<h3><?php esc_html_e( 'Wallet, Credits & Payments', 'wb-ads-rotator-with-split-test' ); ?></h3>
+				<h3><?php esc_html_e( 'Balance & Payments', 'wb-ads-rotator-with-split-test' ); ?></h3>
 				<ul>
-					<li><?php esc_html_e( 'Prepaid credit wallet per advertiser (hold → deduct → refund lifecycle)', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Prepaid balance per advertiser (hold → deduct → refund lifecycle)', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'WooCommerce, Stripe, PayPal, and manual top-up integrations', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Full transaction ledger with audit trail and CSV export', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'CPM, CPC, and flat-rate billing models', 'wb-ads-rotator-with-split-test' ); ?></li>
@@ -581,7 +581,7 @@ class Help_Docs {
 				<h3><?php esc_html_e( 'Community & Developer Extras', 'wb-ads-rotator-with-split-test' ); ?></h3>
 				<ul>
 					<li><?php esc_html_e( 'Enhanced BuddyPress integration. Seller profiles in member directory, activity stream for listings, following/favorites system', 'wb-ads-rotator-with-split-test' ); ?></li>
-					<li><?php esc_html_e( 'Admin audit logs of every ad / credit / campaign action', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Admin audit logs of every ad / balance / campaign action', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Ad review queue with approval workflow', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Priority support from Wbcom Designs', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>
@@ -659,8 +659,8 @@ class Help_Docs {
 			</div>
 
 			<div class="wbam-faq-item">
-				<h4><?php esc_html_e( 'How does the credit/wallet system work?', 'wb-ads-rotator-with-split-test' ); ?></h4>
-				<p><?php esc_html_e( 'Advertisers purchase credits which are used to pay for ad submissions, classified listings, and upgrades. Credits are held when a listing is submitted and deducted when approved (or refunded if rejected). Configure payment methods in Settings > Credits.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<h4><?php esc_html_e( 'How does the balance system work?', 'wb-ads-rotator-with-split-test' ); ?></h4>
+				<p><?php esc_html_e( 'Advertisers add funds to pay for ad submissions, classified listings, and upgrades. Funds are held when a listing is submitted and deducted when approved (or refunded if rejected). Configure payment methods in Settings > Payments.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 
 			<div class="wbam-faq-item">
