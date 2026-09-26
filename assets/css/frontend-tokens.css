@@ -52,8 +52,11 @@
 	--wbam-warning:       #dba617;
 	--wbam-border:        var(--bx-color-border, var(--reign-site-border-color, #e5e5e5));
 	--wbam-border-strong: #c3c4c7;
-	/* Form field edge: 3:1 against the surface (WCAG 1.4.11). Follows --wbam-text, so dark mode adapts. */
-	--wbam-input-border:  color-mix(in srgb, var(--wbam-text) 60%, transparent);
+	/* Form field edge (WCAG 1.4.11): a solid colour, at least 3:1 on every
+	   surface a field sits on - 3.66 on white, 3.41 on --wbam-surface, 3.22
+	   on --wbam-surface-alt. Dark value in the dark block below. A theme can
+	   set its own by declaring --wbam-input-border on html:root. */
+	--wbam-input-border:  #82868b;
 	--wbam-border-subtle: #dcdcde;
 	--wbam-shadow-sm:     0 1px 2px rgba(0, 0, 0, 0.04);
 	--wbam-shadow-md:     0 2px 6px rgba(0, 0, 0, 0.08);
@@ -153,6 +156,8 @@ html.dark,
 	--wbam-border:        #3a4253;
 	--wbam-border-strong: #4a5263;
 	--wbam-border-subtle: #2f3645;
+	/* 4.57 on --wbam-bg, 4.03 on --wbam-card-bg, 3.62 on --wbam-surface-alt. */
+	--wbam-input-border:  #7a8294;
 	--wbam-text:          #e4e4e7;
 	--wbam-text-muted:    #b4b4b8;
 	--wbam-text-subtle:   #8a8a90;
