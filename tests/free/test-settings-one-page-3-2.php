@@ -125,7 +125,49 @@ class Test_Settings_One_Page_3_2 extends WP_UnitTestCase {
 		$html = ob_get_clean();
 
 		$this->assertStringContainsString( 'wbam_settings[geo_primary_provider]', $html );
+		$this->assertStringContainsString( 'id="wbam_setting_geo_enabled"', $html );
 		$this->assertSame( 1, substr_count( $html, '<form' ) );
+	}
+
+	/**
+	 * QA reject 10343031101: the ad editor's Geo Targeting "Turn it on" link
+	 * and the legacy-provider admin notice link must land on the Location
+	 * section (the one that renders the Geolocation on/off checkbox), not
+	 * General — both used `Admin_Links::settings( 'general' )` before this
+	 * section existed.
+	 */
+	public function test_geo_targeting_links_resolve_to_the_section_with_the_geo_toggle(): void {
+		$settings = Settings::get_instance();
+		$settings->register_settings();
+
+		$url          = \WBAM\Core\Admin_Links::settings( 'location' );
+		$url_in_html  = esc_url( $url ); // Both callers echo the URL through esc_url() in an href attribute.
+		$this->assertStringContainsString( 'section=location', $url );
+
+		// The ad-editor metabox's "Turn it on in Settings" link. Geolocation
+		// is off by default (no _wbam_geo_targeting meta yet), which is what
+		// renders this notice.
+		$ad_id = self::factory()->post->create( array( 'post_type' => 'wbam-ad' ) );
+		ob_start();
+		( new \WBAM\Admin\Display_Options() )->render_geo_targeting( get_post( $ad_id ) );
+		$editor_html = ob_get_clean();
+		$this->assertStringContainsString( $url_in_html, $editor_html );
+
+		// The legacy-provider admin notice link.
+		update_option( 'wbam_settings', array( 'geo_primary_provider' => 'ip-api' ) );
+		$_GET['page'] = 'wbam-settings'; // Any WB Ad Manager screen; only current_user_can() + get_current_screen() gate this.
+		set_current_screen( 'edit-wbam-ad' );
+		ob_start();
+		$settings->maybe_render_legacy_geo_notice();
+		$notice_html = ob_get_clean();
+		$this->assertStringContainsString( $url_in_html, $notice_html );
+
+		// Both links land on a page that actually renders the toggle they promise.
+		ob_start();
+		$_GET['section'] = 'location';
+		$settings->render_page();
+		$page_html = ob_get_clean();
+		$this->assertStringContainsString( 'id="wbam_setting_geo_enabled"', $page_html );
 	}
 
 	/**
