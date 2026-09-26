@@ -167,6 +167,18 @@ class UX {
 				'disabled' => true,
 			),
 			'span'     => array( 'class' => true ),
+			// wbam_icon() emits <i data-lucide="…">, e.g. the Custom Fields
+			// "Add Field" button — missing here, wp_kses() silently dropped
+			// the whole element (empty <i>, so there was no text left behind
+			// to explain the gap) and Lucide never got a data-lucide node to
+			// hydrate.
+			'i'        => array(
+				'class'       => true,
+				'data-lucide' => true,
+				'aria-hidden' => true,
+				'aria-label'  => true,
+				'role'        => true,
+			),
 			'svg'      => $svg_attrs,
 			'path'     => $svg_attrs,
 			'line'     => $svg_attrs,

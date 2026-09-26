@@ -482,7 +482,13 @@ class Display_Options {
 				<p class="description"><?php esc_html_e( 'Limit to specific roles. Leave all unchecked to show to all roles.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<div class="wbam-checkbox-list wbam-inline">
 					<?php
-					$available_roles = wp_roles()->get_names();
+					// translate_user_role() is what core's own Users list and
+					// the Pro role-picker (Pro_Admin::render_role_chip_grid())
+					// both use - wp_roles()->get_names() alone returns the
+					// name exactly as add_role() registered it, in whatever
+					// language the plugin that added the role was written
+					// in, not this site's admin language.
+					$available_roles = array_map( 'translate_user_role', wp_roles()->get_names() );
 
 					// A4 fix: two role SLUGS can register the same display
 					// NAME - e.g. a companion plugin's own role labeled
