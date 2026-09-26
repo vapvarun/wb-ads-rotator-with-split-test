@@ -89,6 +89,17 @@ class Before_Archive_Placement implements Placement_Interface {
 	 * Multiple hooks for theme compatibility.
 	 */
 	public function register() {
+		// Block (FSE) themes: get_the_block_template_html() builds the whole
+		// page as a string BEFORE `<!DOCTYPE html>` is printed (see
+		// wp-includes/template-canvas.php), and the Query Loop block still fires
+		// `loop_start` while it does - so any echo hook prints above the doctype
+		// and drops the page into quirks mode. On a block theme the
+		// `render_block_core/query` filter (a return value) is the only path.
+		if ( wp_is_block_theme() ) {
+			add_filter( 'render_block_core/query', array( $this, 'inject_before_query_block' ), 10, 2 );
+			return;
+		}
+
 		// Standard WordPress hook.
 		add_action( 'loop_start', array( $this, 'display_ads_loop' ), 5 );
 
@@ -105,21 +116,6 @@ class Before_Archive_Placement implements Placement_Interface {
 		add_action( 'ocean_before_content', array( $this, 'display_ads' ) );
 		// Theme My Login / General themes.
 		add_action( 'theme_before_content', array( $this, 'display_ads' ) );
-
-		// Block (FSE) themes: `loop_start`/the theme hooks above never fire on
-		// a block-template archive/home/search page - there is no PHP loop,
-		// the Query Loop block runs its own `WP_Query`. And even where
-		// `loop_start` DOES fire (the Query Loop block's `the_post()` still
-		// triggers it), `get_the_block_template_html()` builds the whole
-		// page's HTML as a string BEFORE `<!DOCTYPE html>` is echoed (see
-		// wp-includes/template-canvas.php) - so a direct echo() here would
-		// print above the doctype. Use the block-safe `render_block_core/query`
-		// filter instead: it receives the rendered Query Loop block markup and
-		// returns a string, which composes into the template HTML in the
-		// right place, after the doctype.
-		if ( wp_is_block_theme() ) {
-			add_filter( 'render_block_core/query', array( $this, 'inject_before_query_block' ), 10, 2 );
-		}
 	}
 
 	/**

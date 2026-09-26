@@ -89,6 +89,14 @@ class After_Archive_Placement implements Placement_Interface {
 	 * Multiple hooks for theme compatibility.
 	 */
 	public function register() {
+		// Block (FSE) themes: `loop_end` fires before the doctype is printed,
+		// same as Before_Archive_Placement::register() explains. On a block
+		// theme the `render_block_core/query` filter is the only path.
+		if ( wp_is_block_theme() ) {
+			add_filter( 'render_block_core/query', array( $this, 'inject_after_query_block' ), 10, 2 );
+			return;
+		}
+
 		// Standard WordPress hook.
 		add_action( 'loop_end', array( $this, 'display_ads_loop' ), 15 );
 
@@ -105,13 +113,6 @@ class After_Archive_Placement implements Placement_Interface {
 		add_action( 'ocean_after_content', array( $this, 'display_ads' ) );
 		// Theme My Login / General themes.
 		add_action( 'theme_after_content', array( $this, 'display_ads' ) );
-
-		// Block (FSE) themes: same pre-doctype echo problem as Before_Archive_Placement
-		// (see that class's register() for the full explanation). Use the
-		// block-safe `render_block_core/query` filter instead of echoing.
-		if ( wp_is_block_theme() ) {
-			add_filter( 'render_block_core/query', array( $this, 'inject_after_query_block' ), 10, 2 );
-		}
 	}
 
 	/**
