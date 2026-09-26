@@ -120,9 +120,10 @@ class Admin {
 		if ( 'edit-wbam-ad' === $screen->id ) {
 			UX::page_header(
 				array(
-					'title'   => __( 'Ads', 'wb-ads-rotator-with-split-test' ),
-					'desc'    => __( 'Every ad running on your site.', 'wb-ads-rotator-with-split-test' ),
-					'actions' => '<a href="' . esc_url( \WBAM\Core\Admin_Links::ads_new() ) . '" class="wbam-admin-btn wbam-admin-btn--primary">' . esc_html__( 'Add New', 'wb-ads-rotator-with-split-test' ) . '</a>',
+					'title'       => __( 'Ads', 'wb-ads-rotator-with-split-test' ),
+					'desc'        => __( 'Every ad running on your site.', 'wb-ads-rotator-with-split-test' ),
+					'core_screen' => true,
+					'actions'     => '<a href="' . esc_url( \WBAM\Core\Admin_Links::ads_new() ) . '" class="wbam-admin-btn wbam-admin-btn--primary">' . esc_html__( 'Add New', 'wb-ads-rotator-with-split-test' ) . '</a>',
 				)
 			);
 			return;
@@ -131,10 +132,11 @@ class Admin {
 		if ( 'wbam-ad' === $screen->id && 'post-new.php' === $pagenow ) {
 			UX::page_header(
 				array(
-					'title'      => __( 'Add New Ad', 'wb-ads-rotator-with-split-test' ),
-					'desc'       => __( 'Choose an ad type below and fill in its settings.', 'wb-ads-rotator-with-split-test' ),
-					'back_url'   => \WBAM\Core\Admin_Links::ads_list(),
-					'back_label' => __( 'Back to list', 'wb-ads-rotator-with-split-test' ),
+					'title'       => __( 'Add New Ad', 'wb-ads-rotator-with-split-test' ),
+					'desc'        => __( 'Choose an ad type below and fill in its settings.', 'wb-ads-rotator-with-split-test' ),
+					'core_screen' => true,
+					'back_url'    => \WBAM\Core\Admin_Links::ads_list(),
+					'back_label'  => __( 'Back to list', 'wb-ads-rotator-with-split-test' ),
 				)
 			);
 			return;
@@ -143,8 +145,9 @@ class Admin {
 		if ( 'edit-wbam_ad_tag' === $screen->id ) {
 			UX::page_header(
 				array(
-					'title' => __( 'Ad Tags', 'wb-ads-rotator-with-split-test' ),
-					'desc'  => __( 'Group ads by tag for use in shortcodes and blocks.', 'wb-ads-rotator-with-split-test' ),
+					'title'       => __( 'Ad Tags', 'wb-ads-rotator-with-split-test' ),
+					'desc'        => __( 'Group ads by tag for use in shortcodes and blocks.', 'wb-ads-rotator-with-split-test' ),
+					'core_screen' => true,
 				)
 			);
 		}

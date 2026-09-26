@@ -58,16 +58,21 @@ class UX {
 		$args = wp_parse_args(
 			$args,
 			array(
-				'title'      => '',
-				'desc'       => '',
-				'actions'    => '',
-				'back_url'   => '',
-				'back_label' => __( 'Back to list', 'wb-ads-rotator-with-split-test' ),
-				'echo'       => true,
+				'title'       => '',
+				'desc'        => '',
+				'actions'     => '',
+				'back_url'    => '',
+				'back_label'  => __( 'Back to list', 'wb-ads-rotator-with-split-test' ),
+				'echo'        => true,
+				// Printed on in_admin_header, above a core screen's own .wrap.
+				'core_screen' => false,
 			)
 		);
 
 		ob_start();
+		if ( $args['core_screen'] ) {
+			echo '<div class="wrap wbam-core-screen-header">';
+		}
 		?>
 		<div class="wbam-page-header">
 			<div class="wbam-page-header__left">
@@ -87,11 +92,16 @@ class UX {
 			<?php endif; ?>
 		</div>
 		<?php
-		// WordPress relocates admin notices to just after the first h1/hr; keep
-		// an anchor so notices land under the header, not above it.
-		?>
-		<hr class="wp-header-end" style="margin:0;border:0;">
-		<?php
+		if ( $args['core_screen'] ) {
+			// A core screen already prints its own wp-header-end inside its
+			// .wrap, below this header. A second anchor would make common.js
+			// insert every notice twice (once after each anchor).
+			echo '</div>';
+		} else {
+			// WordPress relocates admin notices to just after the first
+			// h1/hr; keep an anchor so notices land under the header.
+			echo '<hr class="wp-header-end" style="margin:0;border:0;">';
+		}
 		$html = ob_get_clean();
 
 		if ( $args['echo'] ) {

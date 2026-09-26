@@ -173,6 +173,20 @@ class Test_Admin_Page_Shell extends Pro_Test_Case {
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( 'wbam-page-header', $output, "'{$hook}' must render the shared page header." );
+		$this->assert_core_screen_header_markup( $output );
+	}
+
+	/**
+	 * A header printed on in_admin_header sits outside the core screen's own
+	 * .wrap: it needs its own .wrap for the page gutter, and it must not add
+	 * a second wp-header-end - common.js inserts each notice after EVERY
+	 * anchor, so two anchors print every notice twice.
+	 *
+	 * @param string $output Rendered header.
+	 */
+	private function assert_core_screen_header_markup( string $output ): void {
+		$this->assertStringNotContainsString( 'wp-header-end', $output, 'The core screen keeps its own notice anchor.' );
+		$this->assertMatchesRegularExpression( '/class="wrap wbam-core-screen-header"/', $output, 'The header needs the .wrap page gutter.' );
 	}
 
 	public function free_core_screens(): array {
@@ -206,6 +220,7 @@ class Test_Admin_Page_Shell extends Pro_Test_Case {
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( 'wbam-page-header', $output, "'{$taxonomy}' must render the shared page header." );
+		$this->assert_core_screen_header_markup( $output );
 	}
 
 	public function pro_classified_taxonomy_screens(): array {
