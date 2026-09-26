@@ -187,12 +187,10 @@ class List_Empty_States {
 			return;
 		}
 
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-
 		wp_enqueue_style( 'dashicons' );
 		wp_enqueue_style(
 			'wbam-admin',
-			WBAM_URL . 'assets/css/admin' . $suffix . '.css',
+			wbam_asset_url( 'css/admin.css' ),
 			array( 'dashicons' ),
 			WBAM_VERSION
 		);

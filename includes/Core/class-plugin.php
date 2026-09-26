@@ -296,12 +296,10 @@ class Plugin {
 	 * @since 3.0.0
 	 */
 	public function register_shared_assets(): void {
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-
 		if ( ! wp_script_is( 'wbam-toast', 'registered' ) ) {
 			wp_register_script(
 				'wbam-toast',
-				WBAM_URL . 'assets/js/toast' . $suffix . '.js',
+				wbam_asset_url( 'js/toast.js' ),
 				array(),
 				WBAM_VERSION,
 				true
@@ -311,7 +309,7 @@ class Plugin {
 		if ( ! wp_style_is( 'wbam-toast', 'registered' ) ) {
 			wp_register_style(
 				'wbam-toast',
-				WBAM_URL . 'assets/css/toast' . $suffix . '.css',
+				wbam_asset_url( 'css/toast.css' ),
 				array(),
 				WBAM_VERSION
 			);

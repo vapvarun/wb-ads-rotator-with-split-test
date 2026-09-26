@@ -98,14 +98,14 @@ class Links_Admin {
 
 		wp_enqueue_style(
 			'wbam-links-admin',
-			WBAM_URL . 'assets/css/links-admin.css',
+			wbam_asset_url( 'css/links-admin.css' ),
 			array( 'wbam-admin-tokens' ),
 			WBAM_VERSION
 		);
 
 		wp_enqueue_script(
 			'wbam-admin',
-			WBAM_URL . 'assets/js/admin.js',
+			wbam_asset_url( 'js/admin.js' ),
 			array( 'jquery' ),
 			WBAM_VERSION,
 			true

@@ -319,7 +319,7 @@ class Links_List_Table extends \WP_List_Table {
 		return sprintf(
 			'<input type="checkbox" name="link[]" value="%s" aria-label="%s">',
 			esc_attr( $item->id ),
-			/* translators: %s: link name. */
+			/* translators: %s: name of the item being selected */
 			esc_attr( sprintf( __( 'Select %s', 'wb-ads-rotator-with-split-test' ), $item->name ) )
 		);
 	}

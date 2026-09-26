@@ -46,7 +46,7 @@ class Block_Registry {
 	public function register() {
 		wp_register_script(
 			'wbam-blocks-editor',
-			WBAM_URL . 'blocks/editor.js',
+			wbam_asset_url( 'blocks/editor.js' ),
 			array(
 				'wp-blocks',
 				'wp-element',

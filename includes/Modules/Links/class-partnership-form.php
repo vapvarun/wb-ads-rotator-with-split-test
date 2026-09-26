@@ -99,12 +99,12 @@ class Partnership_Form {
 			return;
 		}
 
-		wp_enqueue_style( 'wbam-partnership-form', WBAM_URL . 'assets/css/partnership-form.css', array(), WBAM_VERSION );
+		wp_enqueue_style( 'wbam-partnership-form', wbam_asset_url( 'css/partnership-form.css' ), array(), WBAM_VERSION );
 		$this->apply_styles_filter();
 
 		wp_enqueue_script(
 			'wbam-partnership-form',
-			WBAM_URL . 'assets/js/partnership-form.js',
+			wbam_asset_url( 'js/partnership-form.js' ),
 			array( 'jquery' ),
 			WBAM_VERSION,
 			true

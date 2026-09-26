@@ -49,17 +49,19 @@ class Frontend {
 	 * Enqueue frontend assets.
 	 */
 	public function enqueue_assets() {
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$frontend_css_url = wbam_asset_url( 'css/frontend.css' );
 
 		wp_enqueue_style(
 			'wbam-frontend',
-			WBAM_URL . 'assets/css/frontend' . $suffix . '.css',
+			$frontend_css_url,
 			array( 'dashicons' ),
 			WBAM_VERSION
 		);
 		// Load the RTL stylesheet (frontend-rtl.css / frontend-rtl.min.css) on RTL locales.
+		// WP core's RTL swap needs the raw suffix string, derived here from the
+		// URL wbam_asset_url() already resolved rather than re-checking SCRIPT_DEBUG.
 		wp_style_add_data( 'wbam-frontend', 'rtl', 'replace' );
-		wp_style_add_data( 'wbam-frontend', 'suffix', $suffix );
+		wp_style_add_data( 'wbam-frontend', 'suffix', false !== strpos( $frontend_css_url, '.min.css' ) ? '.min' : '' );
 
 		$theme_button = self::theme_button_color();
 		if ( '' !== $theme_button ) {
@@ -68,7 +70,7 @@ class Frontend {
 
 		wp_enqueue_script(
 			'wbam-frontend',
-			WBAM_URL . 'assets/js/frontend' . $suffix . '.js',
+			wbam_asset_url( 'js/frontend.js' ),
 			array(),
 			WBAM_VERSION,
 			array(

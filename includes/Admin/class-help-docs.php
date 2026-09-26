@@ -78,7 +78,7 @@ class Help_Docs {
 
 		wp_enqueue_style(
 			'wbam-help-docs',
-			WBAM_URL . 'assets/css/help-docs.css',
+			wbam_asset_url( 'css/help-docs.css' ),
 			array( 'wbam-admin-tokens' ),
 			WBAM_VERSION
 		);

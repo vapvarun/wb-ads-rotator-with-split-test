@@ -70,14 +70,14 @@ class Field_Tooltips {
 
 		wp_enqueue_style(
 			self::HANDLE,
-			WBAM_URL . 'assets/css/admin-tooltips.min.css',
+			wbam_asset_url( 'css/admin-tooltips.css' ),
 			array( 'dashicons', 'wbam-admin-tokens' ),
 			WBAM_VERSION
 		);
 
 		wp_enqueue_script(
 			self::HANDLE,
-			WBAM_URL . 'assets/js/admin-tooltips.min.js',
+			wbam_asset_url( 'js/admin-tooltips.js' ),
 			array(),
 			WBAM_VERSION,
 			true

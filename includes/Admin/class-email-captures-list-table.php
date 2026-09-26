@@ -91,7 +91,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 		return sprintf(
 			'<label class="screen-reader-text" for="wbam-capture-%1$d">%2$s</label><input type="checkbox" id="wbam-capture-%1$d" name="capture_ids[]" value="%1$d" />',
 			(int) $item->id,
-			/* translators: %s: email address */
+			/* translators: %s: name of the item being selected */
 			esc_html( sprintf( __( 'Select %s', 'wb-ads-rotator-with-split-test' ), $item->email ) )
 		);
 	}

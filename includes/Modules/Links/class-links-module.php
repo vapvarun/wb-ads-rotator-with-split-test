@@ -129,7 +129,7 @@ class Links_Module {
 
 		wp_enqueue_script(
 			'wbam-links-frontend',
-			WBAM_URL . 'assets/js/links-frontend.js',
+			wbam_asset_url( 'js/links-frontend.js' ),
 			array(),
 			WBAM_VERSION,
 			true

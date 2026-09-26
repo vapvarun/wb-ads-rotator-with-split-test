@@ -819,12 +819,10 @@ class Admin {
 	 * @param string $hook Current admin page hook suffix.
 	 */
 	public function enqueue_admin_tokens( $hook ) {
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-
 		if ( ! wp_style_is( 'wbam-admin-tokens', 'registered' ) ) {
 			wp_register_style(
 				'wbam-admin-tokens',
-				WBAM_URL . 'assets/css/admin-tokens' . $suffix . '.css',
+				wbam_asset_url( 'css/admin-tokens.css' ),
 				array(),
 				WBAM_VERSION
 			);
@@ -835,7 +833,7 @@ class Admin {
 		if ( ! wp_style_is( 'wbam-admin-family', 'registered' ) ) {
 			wp_register_style(
 				'wbam-admin-family',
-				WBAM_URL . 'assets/css/admin-family' . $suffix . '.css',
+				wbam_asset_url( 'css/admin-family.css' ),
 				array( 'wbam-admin-tokens' ),
 				WBAM_VERSION
 			);
@@ -1099,18 +1097,16 @@ class Admin {
 
 		wp_enqueue_media();
 
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-
 		wp_enqueue_style(
 			'wbam-admin',
-			WBAM_URL . 'assets/css/admin' . $suffix . '.css',
+			wbam_asset_url( 'css/admin.css' ),
 			array( 'wbam-admin-tokens' ),
 			WBAM_VERSION
 		);
 
 		wp_enqueue_script(
 			'wbam-admin',
-			WBAM_URL . 'assets/js/admin' . $suffix . '.js',
+			wbam_asset_url( 'js/admin.js' ),
 			array( 'jquery', 'media-editor', 'wbam-toast' ),
 			WBAM_VERSION,
 			true
@@ -1151,7 +1147,7 @@ class Admin {
 
 		wp_enqueue_script(
 			'wbam-placement-settings',
-			WBAM_URL . 'assets/js/admin-placement-settings.js',
+			wbam_asset_url( 'js/admin-placement-settings.js' ),
 			array( 'wbam-toast' ),
 			WBAM_VERSION,
 			true
@@ -1185,11 +1181,9 @@ class Admin {
 			return;
 		}
 
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-
 		wp_enqueue_script(
 			'wbam-admin-settings-nav',
-			WBAM_URL . 'assets/js/admin-settings-nav' . $suffix . '.js',
+			wbam_asset_url( 'js/admin-settings-nav.js' ),
 			array(),
 			WBAM_VERSION,
 			true

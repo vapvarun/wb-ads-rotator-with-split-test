@@ -19,6 +19,60 @@ if ( ! defined( 'ABSPATH' ) ) {
 use WBAM\Core\Ad_Formats;
 use WBAM\Core\Settings_Helper;
 
+if ( ! function_exists( 'wbam_asset_url' ) ) {
+	/**
+	 * Build a plugin asset URL, inserting the SCRIPT_DEBUG minification
+	 * suffix before the extension.
+	 *
+	 * Single source of truth for "which file does this handle load" —
+	 * every wp_register_style()/wp_register_script()/wp_enqueue_*() call
+	 * for a FREE-plugin-owned CSS/JS file must go through here instead of
+	 * inlining its own `defined( 'SCRIPT_DEBUG' ) ...` copy, so the build
+	 * only has to keep one rule true: ship both the source and the .min,
+	 * and let this decide which loads.
+	 *
+	 * Accepts a path relative to assets/ ("css/toast.css") or a full
+	 * plugin-relative path ("blocks/editor.js") for the one non-assets/
+	 * case (block editor scripts).
+	 *
+	 * @since 3.2.0
+	 * @param string $relative_path Path relative to assets/, or a full
+	 *                              plugin-relative path starting with
+	 *                              'assets/' or 'blocks/'.
+	 * @return string Absolute URL with the .min suffix inserted unless
+	 *                SCRIPT_DEBUG is on.
+	 */
+	function wbam_asset_url( $relative_path ) {
+		$relative_path = ltrim( (string) $relative_path, '/' );
+
+		if ( 0 !== strpos( $relative_path, 'assets/' ) && 0 !== strpos( $relative_path, 'blocks/' ) ) {
+			$relative_path = 'assets/' . $relative_path;
+		}
+
+		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
+		/**
+		 * Filter the minification suffix an asset URL resolves to.
+		 *
+		 * Exists so the test suite can drive the SCRIPT_DEBUG-on (source
+		 * file) path without defining the SCRIPT_DEBUG constant globally,
+		 * which would leak into every other test in the run.
+		 *
+		 * @since 3.2.0
+		 * @param string $suffix        '.min' or ''.
+		 * @param string $relative_path The path passed to wbam_asset_url().
+		 */
+		$suffix = apply_filters( 'wbam_asset_suffix', $suffix, $relative_path );
+		$dot    = strrpos( $relative_path, '.' );
+
+		if ( false !== $dot ) {
+			$relative_path = substr( $relative_path, 0, $dot ) . $suffix . substr( $relative_path, $dot );
+		}
+
+		return WBAM_URL . $relative_path;
+	}
+}
+
 if ( ! function_exists( 'wbam_update_ad_data' ) ) {
 	/**
 	 * Merge changes into an ad's `_wbam_ad_data` and save it.
@@ -137,7 +191,7 @@ if ( ! function_exists( 'wbam_register_lucide' ) ) {
 		if ( ! wp_style_is( 'wbam-lucide', 'registered' ) ) {
 			wp_register_style(
 				'wbam-lucide',
-				WBAM_URL . 'assets/css/lucide.css',
+				wbam_asset_url( 'css/lucide.css' ),
 				array(),
 				WBAM_VERSION
 			);

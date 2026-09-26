@@ -120,7 +120,7 @@ class Partnership_Admin {
 
 		wp_enqueue_style(
 			'wbam-partnership-admin',
-			WBAM_URL . 'assets/css/partnership-admin.css',
+			wbam_asset_url( 'css/partnership-admin.css' ),
 			array( 'wbam-admin-tokens' ),
 			WBAM_VERSION
 		);
@@ -375,7 +375,7 @@ class Partnership_Admin {
 								<th scope="row" class="check-column">
 									<label class="screen-reader-text" for="wbam-partnership-<?php echo esc_attr( $partnership->id ); ?>">
 										<?php
-										/* translators: %s: requester name */
+										/* translators: %s: name of the item being selected */
 										echo esc_html( sprintf( __( 'Select %s', 'wb-ads-rotator-with-split-test' ), $partnership->name ) );
 										?>
 									</label>

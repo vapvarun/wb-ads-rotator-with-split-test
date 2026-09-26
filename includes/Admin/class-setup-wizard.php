@@ -224,16 +224,15 @@ class Setup_Wizard {
 		// spacing and buttons match the rest of the plugin. setup-wizard.css
 		// declares only the two tokens unique to the wizard and inherits the
 		// base palette from admin-tokens.css.
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		if ( ! wp_style_is( 'wbam-admin-tokens', 'registered' ) ) {
 			wp_register_style(
 				'wbam-admin-tokens',
-				WBAM_URL . 'assets/css/admin-tokens' . $suffix . '.css',
+				wbam_asset_url( 'css/admin-tokens.css' ),
 				array(),
 				WBAM_VERSION
 			);
 		}
-		wp_enqueue_style( 'wbam-setup', WBAM_URL . 'assets/css/setup-wizard.css', array( 'wbam-admin-tokens' ), WBAM_VERSION );
+		wp_enqueue_style( 'wbam-setup', wbam_asset_url( 'css/setup-wizard.css' ), array( 'wbam-admin-tokens' ), WBAM_VERSION );
 
 		// Clean buffer and start fresh for page output.
 		ob_end_clean();

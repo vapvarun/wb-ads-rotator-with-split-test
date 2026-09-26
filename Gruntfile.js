@@ -18,7 +18,8 @@ module.exports = function( grunt ) {
 		clean: {
 			build: [
 				'assets/css/*.min.css',
-				'assets/js/*.min.js'
+				'assets/js/*.min.js',
+				'blocks/*.min.js'
 			]
 		},
 
@@ -52,6 +53,19 @@ module.exports = function( grunt ) {
 					cwd: 'assets/js',
 					src: [ '*.js', '!*.min.js' ],
 					dest: 'assets/js',
+					ext: '.min.js'
+				} ]
+			},
+			// The block editor script is a plain file with no build pipeline
+			// (see includes/Modules/Blocks/class-block-registry.php) but is
+			// still routed through wbam_asset_url(), so it needs the same
+			// SCRIPT_DEBUG-off .min sibling as everything under assets/js.
+			blocks: {
+				files: [ {
+					expand: true,
+					cwd: 'blocks',
+					src: [ '*.js', '!*.min.js' ],
+					dest: 'blocks',
 					ext: '.min.js'
 				} ]
 			}
@@ -96,7 +110,11 @@ module.exports = function( grunt ) {
 			},
 			js: {
 				files: [ 'assets/js/*.js', '!assets/js/*.min.js' ],
-				tasks: [ 'uglify' ]
+				tasks: [ 'uglify:target' ]
+			},
+			blocks: {
+				files: [ 'blocks/*.js', '!blocks/*.min.js' ],
+				tasks: [ 'uglify:blocks' ]
 			}
 		}
 	} );

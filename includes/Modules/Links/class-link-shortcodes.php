@@ -48,7 +48,7 @@ class Link_Shortcodes {
 	public function register_assets() {
 		wp_register_style(
 			'wbam-links-frontend',
-			WBAM_URL . 'assets/css/links-frontend.css',
+			wbam_asset_url( 'css/links-frontend.css' ),
 			array(),
 			WBAM_VERSION
 		);
