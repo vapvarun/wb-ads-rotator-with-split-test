@@ -92,7 +92,10 @@ class Test_Asset_Suffix_Registered_Handles extends Pro_Test_Case {
 		}
 
 		// Settings > Tools and > Credits, gated on $_GET['section']; the
-		// field tooltips are gated on $_GET['page'] starting with wbam-.
+		// Field tooltips are gated on the specific hooks whose templates
+		// call Field_Tooltips::tip_icon() - Advertisers/Packages plus
+		// Report_Shell's own pages - not every wbam-* screen (Settings has
+		// no tip icon, and used to load this needlessly).
 		// Both hook in from admin-only boot (is_admin() is false under
 		// PHPUnit): register them the way a real admin load does.
 		// Field_Tooltips::register() runs once per process (static flag)
@@ -106,7 +109,9 @@ class Test_Asset_Suffix_Registered_Handles extends Pro_Test_Case {
 			do_action( 'admin_enqueue_scripts', 'wbam-ad_page_wbam-settings' );
 		}
 		\WBAM_Pro\Admin\Field_Tooltips::enqueue_assets( 'wbam-ad_page_wbam-settings' );
-		$this->assertArrayHasKey( 'wbam-pro-field-tooltips', wp_scripts()->registered, 'The tooltip gate must actually run here.' );
+		$this->assertArrayNotHasKey( 'wbam-pro-field-tooltips', wp_scripts()->registered, 'Settings has no tip icon; the gate must not fire here.' );
+		\WBAM_Pro\Admin\Field_Tooltips::enqueue_assets( 'wbam-ad_page_wbam-advertisers' );
+		$this->assertArrayHasKey( 'wbam-pro-field-tooltips', wp_scripts()->registered, 'The Advertisers page renders a tip icon; the gate must fire here.' );
 		$this->assertContains( 'wbam-lucide', wp_scripts()->queue, 'Settings > Credits must enqueue the bundled Lucide.' );
 		remove_action( 'admin_enqueue_scripts', array( $credits, 'maybe_enqueue_lucide' ) );
 
