@@ -34,6 +34,9 @@ class Test_Advertise_Page_Payment_None extends Pro_Test_Case {
 			)
 		);
 
+		// Open registration: on an invite-only site guests get "Contact us".
+		update_option( 'users_can_register', 1 );
+
 		wp_set_current_user( 0 );
 	}
 

@@ -50,6 +50,9 @@ class Test_Advertise_Page_Cta extends Pro_Test_Case {
 		);
 		$this->package_id = (int) $package->id;
 
+		// Open registration: on an invite-only site guests get "Contact us".
+		update_option( 'users_can_register', 1 );
+
 		wp_set_current_user( 0 );
 	}
 
