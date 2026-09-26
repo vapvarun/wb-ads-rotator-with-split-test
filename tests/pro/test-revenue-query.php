@@ -156,6 +156,25 @@ class Test_Revenue_Query extends Pro_Test_Case {
 	}
 
 	/**
+	 * wp_delete_user() removes the advertiser row too; the ledger keeps only
+	 * the advertiser id. Label it by that id instead of "Unknown".
+	 */
+	public function test_rows_of_a_deleted_advertiser_are_labelled_by_advertiser_id(): void {
+		$today = gmdate( 'Y-m-d' );
+
+		$charge = Credits_Bridge::adjust( $this->advertiser->id, 15.00, 'x', Revenue_Ledger::SOURCE_OFFLINE_PAYMENT );
+		$this->assertNotWPError( $charge );
+
+		global $wpdb;
+		$wpdb->delete( $wpdb->prefix . 'wbam_advertisers', array( 'id' => $this->advertiser->id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test-only: the advertiser row is gone.
+		$wpdb->delete( $wpdb->users, array( 'ID' => $this->user ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test-only.
+
+		$expected = "Deleted advertiser #{$this->advertiser->id}";
+		$this->assertSame( $expected, Revenue_Query::top_advertisers( $today, $today )[0]['name'] );
+		$this->assertSame( $expected, Revenue_Query::recent( $today, $today )[0]['advertiser'] );
+	}
+
+	/**
 	 * A negative amount on a usage source (a listing/campaign/plan refund,
 	 * which shares its charge's own source rather than getting a dedicated
 	 * refund constant) is prefixed "Refund: "; the positive charge on the
