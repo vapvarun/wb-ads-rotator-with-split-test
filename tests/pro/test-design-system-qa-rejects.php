@@ -63,7 +63,9 @@ class Test_Design_System_Qa_Rejects extends Pro_Test_Case {
 
 		$output = $this->render_private( 'render_classified_bulk_reject_form', array( array( (int) $classified->id ) ) );
 
-		$this->assertStringContainsString( '1 listing selected', $output );
+		// Card 10343726476 (Item decision): the item word is the site's
+		// classifieds label, default "classified", not a hard-coded "listing".
+		$this->assertStringContainsString( '1 classified selected', $output );
 		$this->assertStringNotContainsString( 'submission selected', $output );
 	}
 

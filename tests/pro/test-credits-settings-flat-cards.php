@@ -29,6 +29,7 @@ class Test_Credits_Settings_Flat_Cards extends Pro_Test_Case {
 
 	public function tear_down(): void {
 		delete_option( 'wbcom_credits_gateway_settings_wbam-pro' );
+		delete_option( 'wbam_credit_price_cents' );
 		wp_set_current_user( 0 );
 		parent::tear_down();
 	}
@@ -94,6 +95,11 @@ class Test_Credits_Settings_Flat_Cards extends Pro_Test_Case {
 
 	/** Every field name/id a merchant might already have bookmarked in a password manager, or that JS/tests target, survives the markup flatten untouched. */
 	public function test_every_pricing_and_gateway_field_name_survives_the_flatten(): void {
+		// The "Price per unit of balance" row only renders when a site sells
+		// below face value (card 10343726476, owner decision) - force that
+		// condition so this field-name-survives-the-flatten check still
+		// covers it.
+		update_option( 'wbam_credit_price_cents', 1 );
 		$html = $this->render();
 
 		// Pricing & Payments (now a bare <h2> + one merged form-table).

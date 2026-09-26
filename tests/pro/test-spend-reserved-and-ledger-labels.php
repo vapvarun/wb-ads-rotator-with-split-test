@@ -86,7 +86,7 @@ class Test_Spend_Reserved_And_Ledger_Labels extends Pro_Test_Case {
 
 		$this->assertSame( '+$20.55', $paid->get_formatted_amount() );
 		$this->assertSame( 'Paid top-up', $paid->get_type_label() );
-		$this->assertSame( 'Complimentary credit', $gift->get_type_label() );
+		$this->assertSame( 'Complimentary funds', $gift->get_type_label() );
 		$this->assertSame( Revenue_Ledger::ledger_timestamp( $paid->get_created_at() ), $paid->get_timestamp() );
 
 		$listed = Credits_Bridge::query_ledger( array( 'user_id' => $this->user, 'search' => 'Bank transfer' ) );

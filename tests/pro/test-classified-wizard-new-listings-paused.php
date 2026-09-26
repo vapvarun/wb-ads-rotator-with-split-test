@@ -44,7 +44,9 @@ class Test_Classified_Wizard_New_Listings_Paused extends Pro_Test_Case {
 
 		$html = $this->render_wizard( false );
 
-		$this->assertStringContainsString( 'New listings are paused', $html );
+		// Card 10343726476 (Item decision): the item word is the site's
+		// classifieds label, default "Classifieds".
+		$this->assertStringContainsString( 'New Classifieds are paused', $html );
 		// Must land inside Step 1's own content block, not a later step
 		// (the mobile progress bar also prints a "data-step=2" chip, before
 		// Step 1's content, so anchor on the Step 2 *content* div instead).

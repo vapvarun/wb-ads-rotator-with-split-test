@@ -44,8 +44,10 @@ class Test_Overview_Member_Getting_Started extends Pro_Test_Case {
 
 		$html = $this->render_overview( $advertiser );
 
+		// Card 10343726476 (Item decision): the item word is the site's
+		// classifieds label, default "classified", not a hard-coded "listing".
 		$this->assertStringContainsString(
-			'Post your first listing',
+			'Post your first classified',
 			$html,
 			'A member with zero classifieds must see onboarding guidance, not an empty dashboard.'
 		);

@@ -196,8 +196,11 @@ class Test_Revenue_Query extends Pro_Test_Case {
 			$by_amount[ $row['amount'] > 0 ? 'charge' : 'refund' ] = $row;
 		}
 
-		$this->assertSame( 'Classified listing', $by_amount['charge']['source_label'] );
-		$this->assertSame( 'Refund: Classified listing', $by_amount['refund']['source_label'] );
+		// Card 10343726476 (Item decision): the source label is the site's
+		// singular classifieds label, default "Classified" - not a hard-coded
+		// "listing" suffix (the label already names the item).
+		$this->assertSame( 'Classified', $by_amount['charge']['source_label'] );
+		$this->assertSame( 'Refund: Classified', $by_amount['refund']['source_label'] );
 	}
 
 	/**

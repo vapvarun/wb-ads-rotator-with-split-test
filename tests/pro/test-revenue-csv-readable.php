@@ -41,7 +41,7 @@ class Test_Revenue_Csv_Readable extends Pro_Test_Case {
 		$this->assertSame( array( 'Date', 'Transaction ID', 'Advertiser', 'Type', 'Item', 'Amount', 'Currency', 'Counts as' ), $header );
 		$this->assertSame( '49.00', $row[5] );
 		$this->assertSame( 'USD', $row[6] );
-		$this->assertSame( 'Credits used', $row[7], 'A package charge is usage, not revenue.' );
+		$this->assertSame( 'Spent', $row[7], 'A package charge is usage, not revenue.' );
 		$this->assertDoesNotMatchRegularExpression( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $row[0], 'Dates use the site format, not raw MySQL.' );
 	}
 }

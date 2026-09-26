@@ -84,7 +84,7 @@ class Test_Transactions_List_Scale extends Pro_Test_Case {
 
 		$table = new Transactions_List_Table();
 		$views = ( new \ReflectionMethod( $table, 'get_views' ) )->invoke( $table );
-		$this->assertStringContainsString( 'Top Up <span class="count">(2)</span>', $views['topup'] );
+		$this->assertStringContainsString( 'Top-up <span class="count">(2)</span>', $views['topup'] );
 		$this->assertStringContainsString( 'Deduction <span class="count">(1)</span>', $views['deduction'] );
 	}
 

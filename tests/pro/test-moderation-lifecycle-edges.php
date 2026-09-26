@@ -1035,9 +1035,11 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 	 * Step "Two different 'listing live' email subjects".
 	 */
 	public function test_listing_live_email_has_one_subject_for_approval_and_auto_publish(): void {
+		// Card 10343726476 (Item decision): the item word is the site's
+		// classifieds label, default "classified", not a hard-coded "listing".
 		$subjects = $this->mail_subjects();
 		$this->listing( 'Approved live listing' );
-		$this->assertNotEmpty( preg_grep( '/Your listing is live: Approved live listing/', (array) $subjects ), 'Emails: ' . implode( ' | ', (array) $subjects ) );
+		$this->assertNotEmpty( preg_grep( '/Your classified is live: Approved live listing/', (array) $subjects ), 'Emails: ' . implode( ' | ', (array) $subjects ) );
 		$this->assertEmpty( preg_grep( '/classified listing is now live/', (array) $subjects ) );
 	}
 }
