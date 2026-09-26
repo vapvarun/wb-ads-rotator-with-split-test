@@ -86,7 +86,6 @@
 		$(document).on('change', 'input[name="wbam_placements[]"]', function() {
 			$('.wbam-paragraph-settings').toggle($('input[value="after_paragraph"]').is(':checked'));
 			$('.wbam-activity-settings').toggle($('input[value="bp_activity"]').is(':checked'));
-			$('.wbam-archive-settings').toggle($('input[value="archive"]').is(':checked'));
 			$('.wbam-placement-settings').each(function() {
 				var slug = $(this).data('placement');
 				$(this).prop('hidden', ! $('input[name="wbam_placements[]"]').filter(function() {

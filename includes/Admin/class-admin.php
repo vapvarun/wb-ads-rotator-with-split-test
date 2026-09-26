@@ -1308,8 +1308,6 @@ class Admin {
 		$paragraph_repeat = isset( $data['paragraph_repeat'] ) ? $data['paragraph_repeat'] : false;
 		$after_activity   = isset( $data['after_activity'] ) ? absint( $data['after_activity'] ) : 3;
 		$activity_repeat  = isset( $data['activity_repeat'] ) ? $data['activity_repeat'] : false;
-		$after_posts      = isset( $data['after_posts'] ) ? absint( $data['after_posts'] ) : 3;
-		$posts_repeat     = isset( $data['posts_repeat'] ) ? $data['posts_repeat'] : false;
 
 		// A3 fix: an ad type that bypasses placements entirely (video ads
 		// are selected by `_wbam_ad_type` and delivered in-stream, not
@@ -1407,20 +1405,6 @@ class Admin {
 					<label>
 						<input type="checkbox" name="wbam_data[activity_repeat]" value="1" <?php checked( $activity_repeat ); ?> />
 						<?php esc_html_e( 'Repeat after every X activities', 'wb-ads-rotator-with-split-test' ); ?>
-					</label>
-				</div>
-			</div>
-
-			<div class="wbam-extra-settings wbam-archive-settings" <?php echo ! in_array( 'archive', $placements, true ) ? 'style="display:none;"' : ''; ?>>
-				<h4><?php esc_html_e( 'Archive Settings', 'wb-ads-rotator-with-split-test' ); ?></h4>
-				<div class="wbam-field">
-					<label for="wbam_after_posts"><?php esc_html_e( 'Insert after post:', 'wb-ads-rotator-with-split-test' ); ?></label>
-					<input type="number" id="wbam_after_posts" name="wbam_data[after_posts]" value="<?php echo esc_attr( $after_posts ); ?>" min="1" max="50" />
-				</div>
-				<div class="wbam-field">
-					<label>
-						<input type="checkbox" name="wbam_data[posts_repeat]" value="1" <?php checked( $posts_repeat ); ?> />
-						<?php esc_html_e( 'Repeat after every X posts', 'wb-ads-rotator-with-split-test' ); ?>
 					</label>
 				</div>
 			</div>
@@ -2427,10 +2411,6 @@ class Admin {
 			// Activity settings.
 			$data['after_activity']  = isset( $raw_data['after_activity'] ) ? absint( $raw_data['after_activity'] ) : 3;
 			$data['activity_repeat'] = isset( $raw_data['activity_repeat'] ) ? true : false;
-
-			// Archive settings.
-			$data['after_posts']  = isset( $raw_data['after_posts'] ) ? absint( $raw_data['after_posts'] ) : 3;
-			$data['posts_repeat'] = isset( $raw_data['posts_repeat'] ) ? true : false;
 
 			/**
 			 * Filter ad data before saving.
