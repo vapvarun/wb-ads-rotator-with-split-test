@@ -47,3 +47,4 @@ echo do_shortcode( '[wbam_ad id="123"]' );
 
 - [Hooks and Filters](10-hooks-and-filters.md)
 - [Ad Shortcodes](../shortcodes/00-ad-shortcodes.md)
+- [Add-on UI Kit](40-addon-ui-kit.md)

@@ -384,7 +384,7 @@
       "group": "wbam_settings_group",
       "type": "array",
       "default": "{}",
-      "controls": "Master settings array \u2014 display, frontend CSS, lazy load, ad label/text, container class, responsive, mobile/tablet hiding"
+      "controls": "Master settings array — display, frontend CSS, lazy load, ad label/text, container class, responsive, mobile/tablet hiding"
     },
     {
       "key": "wbam_setup_complete",
@@ -576,7 +576,7 @@
       "enforcement_count": 22,
       "meta": false,
       "requires_context": "none",
-      "note": "WP core capability \u2014 primary gate for all 9 admin pages, all 22 REST routes (settings/ads/analytics/links/abilities), and 7 AJAX handlers. FREE registers no custom caps."
+      "note": "WP core capability — primary gate for all 9 admin pages, all 22 REST routes (settings/ads/analytics/links/abilities), and 7 AJAX handlers. FREE registers no custom caps."
     },
     {
       "cap": "edit_post",
@@ -779,18 +779,11 @@
   ],
   "hooks_fired": [
     {
-      "name": "wbam_init",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Core/class-plugin.php:95",
-      "purpose": "Plugin initialization complete \u2014 extension point for Pro/themes"
-    },
-    {
-      "name": "wbam_ad_impression",
+      "name": "wbam_ad_cap_reached",
       "type": "action",
       "args": 2,
-      "where": "includes/Frontend/class-frontend.php",
-      "purpose": "Fired when ad impression is recorded"
+      "where": "includes/Modules/Targeting/class-frequency-manager.php",
+      "purpose": "Fired when an ad reaches its total impression cap and stops being eligible for delivery"
     },
     {
       "name": "wbam_ad_clicked",
@@ -800,6 +793,34 @@
       "purpose": "Fired when ad click is tracked"
     },
     {
+      "name": "wbam_ad_container_class",
+      "type": "filter",
+      "purpose": "Extra CSS class on every rendered ad's container wrapper (card 10343726590, replaces the removed Custom Container Class field; default = stored value).",
+      "args": 1,
+      "where": "includes/Modules/Placements/class-placement-engine.php:735"
+    },
+    {
+      "name": "wbam_ad_data_before_save",
+      "type": "filter",
+      "args": 3,
+      "where": "includes/Admin/class-admin.php",
+      "purpose": "Filter ad meta before save"
+    },
+    {
+      "name": "wbam_ad_delivery_tier",
+      "type": "filter",
+      "args": 3,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "An ad's delivery tier (sample 0, house 10, paid 20); the highest tier with a renderable ad wins the slot"
+    },
+    {
+      "name": "wbam_ad_display_rules",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Frontend/class-frontend.php",
+      "purpose": "Filter ad display rules"
+    },
+    {
       "name": "wbam_ad_duplicated",
       "type": "action",
       "args": 2,
@@ -807,128 +828,142 @@
       "purpose": "Fired after REST ad duplication"
     },
     {
-      "name": "wbam_save_ad_meta",
-      "type": "action",
+      "name": "wbam_ad_event_total",
+      "type": "filter",
+      "args": 3,
+      "where": "includes/Admin/class-admin.php:3397",
+      "purpose": "Filters the lifetime event total shown in the ads list table."
+    },
+    {
+      "name": "wbam_ad_event_totals",
+      "type": "filter",
       "args": 1,
-      "where": "includes/API/class-ads-api.php:748",
-      "purpose": "Fired after REST ad meta save"
+      "where": "includes/Admin/class-admin.php",
+      "purpose": "Lifetime impression/click totals for a page of ads in the All Ads list, keyed by ad ID (3.2.0)"
+    },
+    {
+      "name": "wbam_ad_formats",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/functions-ad-formats.php",
+      "purpose": "Filter the registered ad-format catalog"
+    },
+    {
+      "name": "wbam_ad_impression",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Frontend/class-frontend.php",
+      "purpose": "Fired when ad impression is recorded"
+    },
+    {
+      "name": "wbam_ad_link_rel",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "rel on an ad's click-through link (sponsored noopener for paid ads, noopener for house ads)"
     },
     {
       "name": "wbam_ad_metabox_options",
       "type": "action",
-      "args": 0,
+      "args": 1,
       "where": "includes/Admin/",
       "purpose": "Extension point in ad edit metabox"
     },
     {
-      "name": "wbam_demo_data_cleared",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Admin/class-demo-data-cleaner.php",
-      "purpose": "Fired after demo data wipe"
+      "name": "wbam_ad_not_delivering_reason",
+      "type": "filter",
+      "args": 2,
+      "where": "blocks/wb-ad/render.php",
+      "purpose": "Editor-preview notice for a WB Ad block whose ad renders nothing"
     },
     {
-      "name": "wbam_email_captured",
-      "type": "action",
+      "name": "wbam_ad_output",
+      "type": "filter",
+      "args": 3,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Filter rendered ad HTML — KEY EXTENSION POINT for PRO impression tracking"
+    },
+    {
+      "name": "wbam_ad_tag_taxonomy_args",
+      "type": "filter",
       "args": 1,
-      "where": "includes/Frontend/class-frontend.php",
-      "purpose": "Fired after email capture form submission"
+      "where": "includes/Core/class-plugin.php:462",
+      "purpose": "Filter the ad tag taxonomy arguments. Lets a site relabel the taxonomy, widen its capabilities, or turn on hierarchy without forking the plugin."
     },
     {
-      "name": "wbam_email_form_before",
-      "type": "action",
-      "args": 0,
-      "where": "templates/email-form*",
-      "purpose": "Email form template hook (before form)"
-    },
-    {
-      "name": "wbam_email_form_after",
-      "type": "action",
-      "args": 0,
-      "where": "templates/email-form*",
-      "purpose": "Email form template hook (after form)"
-    },
-    {
-      "name": "wbam_email_form_before_fields",
-      "type": "action",
-      "args": 0,
-      "where": "templates/email-form*",
-      "purpose": "Email form fields hook (before)"
-    },
-    {
-      "name": "wbam_email_form_after_fields",
-      "type": "action",
-      "args": 0,
-      "where": "templates/email-form*",
-      "purpose": "Email form fields hook (after)"
-    },
-    {
-      "name": "wbam_email_form_after_email",
-      "type": "action",
-      "args": 0,
-      "where": "templates/email-form*",
-      "purpose": "After email field"
-    },
-    {
-      "name": "wbam_email_form_after_name",
-      "type": "action",
-      "args": 0,
-      "where": "templates/email-form*",
-      "purpose": "After name field"
-    },
-    {
-      "name": "wbam_email_form_submission_before",
-      "type": "action",
+      "name": "wbam_ad_types_without_placements",
+      "type": "filter",
       "args": 1,
-      "where": "includes/Frontend/class-frontend.php",
-      "purpose": "Pre-process email form submission"
+      "where": "includes/functions-ad-formats.php:319",
+      "purpose": "Filter which ad type IDs are never served through a placement (e.g. a video ad played in-stream by the host plugin instead of painted into a header/sidebar slot)."
     },
     {
-      "name": "wbam_email_form_submission_after",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Frontend/class-frontend.php",
-      "purpose": "Post-process email form submission"
+      "name": "wbam_ad_types_without_sizing",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-admin.php:1869",
+      "purpose": "Filter which ad type IDs skip the fixed width/height sizing metabox."
     },
     {
-      "name": "wbam_link_clicked",
-      "type": "action",
+      "name": "wbam_admin_menu_section_map",
+      "type": "filter",
       "args": 2,
-      "where": "includes/API/class-links-api.php:602",
-      "purpose": "Fired after link click is tracked via REST"
+      "where": "includes/Admin/class-admin.php:952",
+      "purpose": "Filter the slug -> section-key map for a menu. $parent_slug says which menu."
     },
     {
-      "name": "wbam_link_click_tracked",
-      "type": "action",
+      "name": "wbam_admin_menu_sections",
+      "type": "filter",
       "args": 2,
-      "where": "includes/Modules/Links/",
-      "purpose": "Fired after link click is tracked via AJAX"
+      "where": "includes/Admin/class-admin.php:962",
+      "purpose": "Filter the ordered section-key -> label list for a menu. Controls both section order and labels (an empty label renders no header row)."
     },
     {
-      "name": "wbam_link_created",
-      "type": "action",
+      "name": "wbam_admin_status_variant",
+      "type": "filter",
       "args": 2,
-      "where": "includes/Modules/Links/class-link-manager.php",
-      "purpose": "Fired after link is created"
+      "where": "includes/Admin/class-ux.php:263",
+      "purpose": "Filter the badge variant chosen for a status."
     },
     {
-      "name": "wbam_link_updated",
-      "type": "action",
+      "name": "wbam_ads_eligible_for_placement",
+      "type": "filter",
       "args": 2,
-      "where": "includes/Modules/Links/class-link-manager.php",
-      "purpose": "Fired after link is updated"
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Pre-draw eligibility for a placement; drop ads here so the next eligible ad fills the slot"
     },
     {
-      "name": "wbam_link_deleted",
-      "type": "action",
+      "name": "wbam_ads_for_placement",
+      "type": "filter",
+      "args": 3,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Filter the candidate ad list for a placement"
+    },
+    {
+      "name": "wbam_advertiser_placements",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Core/class-settings-helper.php:327",
+      "purpose": "Filter the placements sellable to advertisers."
+    },
+    {
+      "name": "wbam_analytics_raw_retention_days",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Core/class-analytics-rollup.php",
+      "purpose": "Days raw analytics events are kept before roll-up (default 90)"
+    },
+    {
+      "name": "wbam_asset_suffix",
+      "type": "filter",
       "args": 2,
-      "where": "includes/Modules/Links/class-link-manager.php",
-      "purpose": "Fired after link is deleted"
+      "where": "includes/functions-ad-formats.php:65",
+      "purpose": "Filter the minification suffix an asset URL resolves to. Exists so the test suite can drive the SCRIPT_DEBUG-on (source file) path without defining the SCRIPT_DEBUG constant globally, which would leak into every other test in the run."
     },
     {
       "name": "wbam_before_link_delete",
       "type": "action",
-      "args": 1,
+      "args": 2,
       "where": "includes/Modules/Links/class-link-manager.php",
       "purpose": "Fired before link deletion"
     },
@@ -940,487 +975,53 @@
       "purpose": "Fired before redirect to destination URL"
     },
     {
-      "name": "wbam_inactive_link_accessed",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-link-cloaker.php",
-      "purpose": "Fired when inactive/expired link is accessed"
-    },
-    {
-      "name": "wbam_link_not_found",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-link-cloaker.php",
-      "purpose": "Fired when link slug 404s"
-    },
-    {
-      "name": "wbam_link_form_before",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Link form template (before)"
-    },
-    {
-      "name": "wbam_link_form_after",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Link form template (after)"
-    },
-    {
-      "name": "wbam_link_form_fields_before",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Link form fields (before)"
-    },
-    {
-      "name": "wbam_link_form_fields_after",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Link form fields (after)"
-    },
-    {
-      "name": "wbam_link_form_after_fields",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Link form fields completed"
-    },
-    {
-      "name": "wbam_link_save_before",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-link-manager.php",
-      "purpose": "Pre-save link"
-    },
-    {
-      "name": "wbam_link_save_after",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Modules/Links/class-link-manager.php",
-      "purpose": "Post-save link"
-    },
-    {
-      "name": "wbam_link_category_form_before",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Link category form (before)"
-    },
-    {
-      "name": "wbam_link_category_form_after",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Link category form (after)"
-    },
-    {
-      "name": "wbam_link_category_form_fields_before",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Link category form fields (before)"
-    },
-    {
-      "name": "wbam_link_category_form_fields_after",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Link category form fields (after)"
-    },
-    {
-      "name": "wbam_link_category_save_before",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Pre-save link category"
-    },
-    {
-      "name": "wbam_link_category_save_after",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Modules/Links/class-links-admin.php",
-      "purpose": "Post-save link category"
-    },
-    {
-      "name": "wbam_links_module_init",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-links-module.php",
-      "purpose": "Links module initialized"
-    },
-    {
-      "name": "wbam_partnership_form_before",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "Partnership form template (before)"
-    },
-    {
-      "name": "wbam_partnership_form_after",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "Partnership form template (after)"
-    },
-    {
-      "name": "wbam_partnership_form_before_fields",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "Partnership form fields (before)"
-    },
-    {
-      "name": "wbam_partnership_form_after_fields",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "Partnership form fields (after)"
-    },
-    {
-      "name": "wbam_partnership_form_after_name_email",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "After name+email fields"
-    },
-    {
-      "name": "wbam_partnership_form_after_website",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "After website field"
-    },
-    {
-      "name": "wbam_partnership_form_after_type",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "After partnership-type field"
-    },
-    {
-      "name": "wbam_partnership_form_after_anchor",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "After anchor-text field"
-    },
-    {
-      "name": "wbam_partnership_form_after_budget",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "After budget field"
-    },
-    {
-      "name": "wbam_partnership_form_after_message",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "After message field"
-    },
-    {
-      "name": "wbam_partnership_form_submission_before",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "Pre-submit partnership form"
-    },
-    {
-      "name": "wbam_partnership_form_submission_after",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Modules/Links/class-partnership-form.php",
-      "purpose": "Post-submit partnership form"
-    },
-    {
-      "name": "wbam_partnership_created",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Modules/Links/class-partnership-manager.php",
-      "purpose": "Fired after partnership created"
-    },
-    {
-      "name": "wbam_partnership_updated",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Modules/Links/class-partnership-manager.php",
-      "purpose": "Fired after partnership updated"
-    },
-    {
-      "name": "wbam_partnership_deleted",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Links/class-partnership-manager.php",
-      "purpose": "Fired after partnership deleted"
-    },
-    {
       "name": "wbam_before_partnership_delete",
       "type": "action",
-      "args": 1,
+      "args": 2,
       "where": "includes/Modules/Links/class-partnership-manager.php",
       "purpose": "Fired before partnership deletion"
     },
     {
-      "name": "wbam_partnership_accepted",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Modules/Links/class-partnership-manager.php",
-      "purpose": "Fired when partnership accepted"
-    },
-    {
-      "name": "wbam_partnership_rejected",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Modules/Links/class-partnership-manager.php",
-      "purpose": "Fired when partnership rejected"
-    },
-    {
-      "name": "wbam_partnership_email_sent",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Modules/Links/class-partnership-emails.php",
-      "purpose": "Fired after partnership email sent"
-    },
-    {
-      "name": "wbam_placements_init",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Placement engine initialized"
-    },
-    {
-      "name": "wbam_register_placements",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Extension point \u2014 register custom placements"
-    },
-    {
-      "name": "wbam_register_ad_types",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Extension point \u2014 register custom ad types"
-    },
-    {
-      "name": "wbam_rest_event_tracked",
-      "type": "action",
-      "args": 3,
-      "where": "includes/API/class-ads-api.php:524",
-      "purpose": "Fired after REST tracking event recorded"
-    },
-    {
-      "name": "wbam_setup_wizard_ready_before",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard render (before)"
-    },
-    {
-      "name": "wbam_setup_wizard_ready_after",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard render (after)"
-    },
-    {
-      "name": "wbam_setup_wizard_ready_after_steps",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard after steps panel"
-    },
-    {
-      "name": "wbam_setup_wizard_sample_before",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard sample step (before)"
-    },
-    {
-      "name": "wbam_setup_wizard_sample_after",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard sample step (after) \u2014 KEY EXTENSION POINT for PRO"
-    },
-    {
-      "name": "wbam_setup_wizard_sample_form_before",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard sample form (before)"
-    },
-    {
-      "name": "wbam_setup_wizard_sample_form_after",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard sample form (after)"
-    },
-    {
-      "name": "wbam_setup_wizard_sample_save_before",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard sample save (before)"
-    },
-    {
-      "name": "wbam_setup_wizard_sample_save_after",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard sample save (after) \u2014 used by PRO save_pro_options"
-    },
-    {
-      "name": "wbam_setup_wizard_sample_ad_created",
-      "type": "action",
-      "args": 1,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Sample ad created during setup"
-    },
-    {
-      "name": "wbam_setup_wizard_complete",
-      "type": "action",
-      "args": 0,
-      "where": "includes/Admin/class-setup-wizard.php",
-      "purpose": "Setup wizard completed"
-    },
-    {
-      "name": "wbam_ad_data_before_save",
-      "type": "filter",
-      "args": 2,
-      "where": "includes/Admin/class-admin.php",
-      "purpose": "Filter ad meta before save"
-    },
-    {
-      "name": "wbam_ad_display_rules",
-      "type": "filter",
-      "args": 2,
-      "where": "includes/Frontend/class-frontend.php",
-      "purpose": "Filter ad display rules"
-    },
-    {
-      "name": "wbam_ad_formats",
-      "type": "filter",
-      "args": 1,
-      "where": "includes/functions-ad-formats.php",
-      "purpose": "Filter the registered ad-format catalog"
-    },
-    {
-      "name": "wbam_viewable_impressions",
-      "type": "filter",
-      "args": 1,
-      "where": "includes/Frontend/class-frontend.php:384",
-      "purpose": "Whether an impression counts only once it scrolls into view (card 10343726590, replaces the removed 'Count Impressions When Seen' Settings field; default = stored viewable_impressions setting)"
-    },
-    {
-      "name": "wbam_notice_suppressor_namespaces",
-      "type": "filter",
-      "args": 1,
-      "where": "includes/Admin/class-notice-suppressor.php",
-      "purpose": "Namespace prefixes whose admin notices are kept on WB Ads screens; PRO adds WBAM_Pro\\ so its banner and notices are not stripped"
-    },
-    {
-      "name": "wbam_skip_content_injection",
-      "type": "filter",
-      "args": 2,
-      "where": "includes/Modules/Placements/class-content-placement.php, class-paragraph-placement.php",
-      "purpose": "Skip before/after-content and after-paragraph ads on the current page; PRO returns true on its application pages (dashboard, posting forms, listings browser)"
-    },
-    {
-      "name": "wbam_ad_output",
-      "type": "filter",
-      "args": 3,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Filter rendered ad HTML \u2014 KEY EXTENSION POINT for PRO impression tracking"
-    },
-    {
-      "name": "wbam_ads_for_placement",
-      "type": "filter",
-      "args": 2,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Filter the candidate ad list for a placement"
-    },
-    {
-      "name": "wbam_placement_candidates",
-      "type": "action",
-      "args": 2,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "A placement's candidate ads before each is checked; batch-load what a wbam_should_display_ad callback needs (Pro loads campaigns here)"
-    },
-    {
-      "name": "wbam_ads_eligible_for_placement",
-      "type": "filter",
-      "args": 2,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Pre-draw eligibility for a placement; drop ads here so the next eligible ad fills the slot"
-    },
-    {
-      "name": "wbam_ad_delivery_tier",
-      "type": "filter",
-      "args": 3,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "An ad's delivery tier (sample 0, house 10, paid 20); the highest tier with a renderable ad wins the slot"
-    },
-    {
-      "name": "wbam_rotation_pick",
-      "type": "filter",
-      "args": 4,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Choose the winner from a same-tier pool; null keeps the priority-weighted draw"
-    },
-    {
-      "name": "wbam_ad_link_rel",
-      "type": "filter",
-      "args": 2,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "rel on an ad's click-through link (sponsored noopener for paid ads, noopener for house ads)"
-    },
-    {
-      "name": "wbam_popup_repeat_days",
-      "type": "filter",
-      "args": 2,
-      "where": "includes/Modules/Placements/class-popup-placement.php",
-      "purpose": "Days before a visitor sees a popup ad again (default 1; an ad's stored popup_repeat_days seeds it)"
-    },
-    {
-      "name": "wbam_popup_skip_mobile_first_view",
-      "type": "filter",
-      "args": 2,
-      "where": "includes/Modules/Placements/class-popup-placement.php",
-      "purpose": "Hold a popup back on a phone's first page view (default false; an ad's stored popup_mobile_first_view seeds it)"
-    },
-    {
       "name": "wbam_code_ad_content",
       "type": "filter",
-      "args": 2,
+      "args": 3,
       "where": "includes/Modules/AdTypes/class-code-ad.php",
       "purpose": "Filter raw HTML/JS code-ad content"
     },
     {
       "name": "wbam_code_ad_sandbox_attrs",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "includes/Modules/AdTypes/class-code-ad.php",
       "purpose": "Filter iframe sandbox attributes for code ads"
     },
     {
       "name": "wbam_code_ad_use_sandbox",
       "type": "filter",
-      "args": 2,
+      "args": 3,
       "where": "includes/Modules/AdTypes/class-code-ad.php",
       "purpose": "Whether to render code ad in sandboxed iframe"
     },
     {
+      "name": "wbam_count_visitor_views",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Targeting/class-frequency-manager.php",
+      "purpose": "Whether visitor views of an ad are counted in the wbam_ad_views cookie (Pro advertiser/campaign caps)"
+    },
+    {
       "name": "wbam_currency_symbol",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "includes/Modules/Links/",
-      "purpose": "Filter currency symbol for partnership budgets \u2014 KEY EXTENSION POINT for PRO multi-currency"
+      "purpose": "Filter currency symbol for partnership budgets — KEY EXTENSION POINT for PRO multi-currency"
+    },
+    {
+      "name": "wbam_demo_data_cleared",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Admin/class-demo-data-cleaner.php",
+      "purpose": "Fired after demo data wipe"
     },
     {
       "name": "wbam_detected_device",
@@ -1430,65 +1031,135 @@
       "purpose": "Filter device-type detection result"
     },
     {
+      "name": "wbam_email_capture_cookie_days",
+      "type": "filter",
+      "purpose": "Days a dismissed email sign-up ad stays hidden, per ad (card 10343726590, replaces the removed Dismiss Duration field; args: $days, $ad_id; default = the ad's stored value).",
+      "args": 2,
+      "where": "includes/Modules/AdTypes/class-email-capture-ad.php:114"
+    },
+    {
       "name": "wbam_email_capture_success_message",
       "type": "filter",
-      "args": 1,
+      "args": 3,
       "where": "includes/Frontend/class-frontend.php",
       "purpose": "Filter the success message shown after email capture"
     },
     {
+      "name": "wbam_email_captured",
+      "type": "action",
+      "args": 3,
+      "where": "includes/Frontend/class-frontend.php",
+      "purpose": "Fired after email capture form submission"
+    },
+    {
+      "name": "wbam_email_form_after",
+      "type": "action",
+      "args": 2,
+      "where": "templates/email-form*",
+      "purpose": "Email form template hook (after form)"
+    },
+    {
+      "name": "wbam_email_form_after_email",
+      "type": "action",
+      "args": 2,
+      "where": "templates/email-form*",
+      "purpose": "After email field"
+    },
+    {
+      "name": "wbam_email_form_after_fields",
+      "type": "action",
+      "args": 2,
+      "where": "templates/email-form*",
+      "purpose": "Email form fields hook (after)"
+    },
+    {
+      "name": "wbam_email_form_after_name",
+      "type": "action",
+      "args": 2,
+      "where": "templates/email-form*",
+      "purpose": "After name field"
+    },
+    {
+      "name": "wbam_email_form_before",
+      "type": "action",
+      "args": 2,
+      "where": "templates/email-form*",
+      "purpose": "Email form template hook (before form)"
+    },
+    {
+      "name": "wbam_email_form_before_fields",
+      "type": "action",
+      "args": 2,
+      "where": "templates/email-form*",
+      "purpose": "Email form fields hook (before)"
+    },
+    {
       "name": "wbam_email_form_button_text",
       "type": "filter",
-      "args": 1,
+      "args": 3,
       "where": "templates/email-form*",
       "purpose": "Filter submit button text"
     },
     {
       "name": "wbam_email_form_classes",
       "type": "filter",
-      "args": 1,
+      "args": 3,
       "where": "templates/email-form*",
       "purpose": "Filter form CSS classes"
     },
     {
       "name": "wbam_email_form_data",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "includes/Frontend/class-frontend.php",
       "purpose": "Filter sanitized email form data"
     },
     {
       "name": "wbam_email_form_placeholders",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "templates/email-form*",
       "purpose": "Filter input placeholders"
     },
     {
       "name": "wbam_email_form_privacy_text",
       "type": "filter",
-      "args": 1,
+      "args": 3,
       "where": "templates/email-form*",
       "purpose": "Filter privacy notice"
     },
     {
       "name": "wbam_email_form_show_cookie_check",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "templates/email-form*",
       "purpose": "Show cookie consent checkbox"
     },
     {
+      "name": "wbam_email_form_submission_after",
+      "type": "action",
+      "args": 3,
+      "where": "includes/Frontend/class-frontend.php",
+      "purpose": "Post-process email form submission"
+    },
+    {
+      "name": "wbam_email_form_submission_before",
+      "type": "action",
+      "args": 4,
+      "where": "includes/Frontend/class-frontend.php",
+      "purpose": "Pre-process email form submission"
+    },
+    {
       "name": "wbam_email_form_success_message",
       "type": "filter",
-      "args": 1,
+      "args": 3,
       "where": "templates/email-form*",
       "purpose": "Filter success message"
     },
     {
       "name": "wbam_email_form_validation",
       "type": "filter",
-      "args": 2,
+      "args": 5,
       "where": "includes/Frontend/class-frontend.php",
       "purpose": "Filter validation result"
     },
@@ -1500,9 +1171,23 @@
       "purpose": "Toggle setup wizard on/off"
     },
     {
-      "name": "wbam_enforce_page_cap",
+      "name": "wbam_enabled_placements",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Core/class-settings-helper.php:253",
+      "purpose": "Filter the placements usable on this site."
+    },
+    {
+      "name": "wbam_enforce_format_matching",
       "type": "filter",
       "args": 2,
+      "where": "includes/Admin/class-admin.php, includes/Modules/Placements/class-placement-engine.php, includes/functions-ad-formats.php",
+      "purpose": "Whether a placement must fit the ad's resolved size before it can be saved/rendered there (owner decision 13, card 10343726460); default is Settings_Helper::format_matching_enabled()"
+    },
+    {
+      "name": "wbam_enforce_page_cap",
+      "type": "filter",
+      "args": 3,
       "where": "includes/Modules/Placements/class-placement-engine.php",
       "purpose": "Enforce per-page ad cap"
     },
@@ -1523,16 +1208,170 @@
     {
       "name": "wbam_has_consent",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "includes/Core/class-privacy-helper.php",
       "purpose": "Filter whether user has analytics consent"
     },
     {
-      "name": "wbam_link_category_save_data",
+      "name": "wbam_inactive_link_accessed",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-link-cloaker.php",
+      "purpose": "Fired when inactive/expired link is accessed"
+    },
+    {
+      "name": "wbam_init",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Core/class-plugin.php:95",
+      "purpose": "Plugin initialization complete — extension point for Pro/themes"
+    },
+    {
+      "name": "wbam_is_admin_screen",
       "type": "filter",
       "args": 2,
+      "where": "includes/Admin/class-admin.php:806",
+      "purpose": "Filter whether the shared admin token palette should load here. Lets an extension opt a custom screen into the WB Ad Manager admin styling foundation."
+    },
+    {
+      "name": "wbam_is_module_enabled",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Core/class-settings-helper.php:190",
+      "purpose": "Filter whether a single module is enabled. PRO reads this so a module switched off in FREE also removes the submenus PRO contributes to it."
+    },
+    {
+      "name": "wbam_legacy_settings_tab_map",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-admin.php:220",
+      "purpose": "Filter the old Pro Settings tab slug -> new section slug map. Most tabs keep their slug as the section slug; PRO adds the few that were renamed or merged (analytics -> privacy; modules/pages/rotation -> advertising)."
+    },
+    {
+      "name": "wbam_link_category_form_after",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Link category form (after)"
+    },
+    {
+      "name": "wbam_link_category_form_before",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Link category form (before)"
+    },
+    {
+      "name": "wbam_link_category_form_fields_after",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Link category form fields (after)"
+    },
+    {
+      "name": "wbam_link_category_form_fields_before",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Link category form fields (before)"
+    },
+    {
+      "name": "wbam_link_category_save_after",
+      "type": "action",
+      "args": 4,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Post-save link category"
+    },
+    {
+      "name": "wbam_link_category_save_before",
+      "type": "action",
+      "args": 3,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Pre-save link category"
+    },
+    {
+      "name": "wbam_link_category_save_data",
+      "type": "filter",
+      "args": 3,
       "where": "includes/Modules/Links/class-links-admin.php",
       "purpose": "Filter category save data"
+    },
+    {
+      "name": "wbam_link_click_tracked",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/",
+      "purpose": "Fired after link click is tracked via AJAX"
+    },
+    {
+      "name": "wbam_link_click_trends",
+      "type": "filter",
+      "args": 3,
+      "where": "includes/Modules/Links/class-link-manager.php:1006",
+      "purpose": "Filter the click-trends payload before it is returned."
+    },
+    {
+      "name": "wbam_link_clicked",
+      "type": "action",
+      "args": 2,
+      "where": "includes/API/class-links-api.php:602",
+      "purpose": "Fired after link click is tracked via REST"
+    },
+    {
+      "name": "wbam_link_created",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-link-manager.php",
+      "purpose": "Fired after link is created"
+    },
+    {
+      "name": "wbam_link_deleted",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-link-manager.php",
+      "purpose": "Fired after link is deleted"
+    },
+    {
+      "name": "wbam_link_form_after",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Link form template (after)"
+    },
+    {
+      "name": "wbam_link_form_after_fields",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Link form fields completed"
+    },
+    {
+      "name": "wbam_link_form_before",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Link form template (before)"
+    },
+    {
+      "name": "wbam_link_form_fields_after",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Link form fields (after)"
+    },
+    {
+      "name": "wbam_link_form_fields_before",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-links-admin.php",
+      "purpose": "Link form fields (before)"
+    },
+    {
+      "name": "wbam_link_not_found",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Modules/Links/class-link-cloaker.php",
+      "purpose": "Fired when link slug 404s"
     },
     {
       "name": "wbam_link_redirect_type",
@@ -1549,25 +1388,53 @@
       "purpose": "Filter destination URL before redirect"
     },
     {
+      "name": "wbam_link_save_after",
+      "type": "action",
+      "args": 4,
+      "where": "includes/Modules/Links/class-link-manager.php",
+      "purpose": "Post-save link"
+    },
+    {
+      "name": "wbam_link_save_before",
+      "type": "action",
+      "args": 3,
+      "where": "includes/Modules/Links/class-link-manager.php",
+      "purpose": "Pre-save link"
+    },
+    {
       "name": "wbam_link_save_data",
       "type": "filter",
-      "args": 2,
+      "args": 3,
       "where": "includes/Modules/Links/class-link-manager.php",
       "purpose": "Filter link save data"
     },
     {
       "name": "wbam_link_shortcode_attributes",
       "type": "filter",
-      "args": 2,
+      "args": 3,
       "where": "includes/Modules/Links/class-link-shortcodes.php",
       "purpose": "Filter [wbam_link] shortcode attrs"
     },
     {
+      "name": "wbam_link_shortcode_defaults",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Modules/Links/class-link-shortcodes.php:88",
+      "purpose": "Filter default attributes for the wbam_link shortcode."
+    },
+    {
       "name": "wbam_link_shortcode_output",
       "type": "filter",
-      "args": 3,
+      "args": 4,
       "where": "includes/Modules/Links/class-link-shortcodes.php",
       "purpose": "Filter [wbam_link] HTML output"
+    },
+    {
+      "name": "wbam_link_updated",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-link-manager.php",
+      "purpose": "Fired after link is updated"
     },
     {
       "name": "wbam_link_url_shortcode_output",
@@ -1575,6 +1442,20 @@
       "args": 3,
       "where": "includes/Modules/Links/class-link-shortcodes.php",
       "purpose": "Filter [wbam_link_url] output"
+    },
+    {
+      "name": "wbam_links_module_init",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-links-module.php",
+      "purpose": "Links module initialized"
+    },
+    {
+      "name": "wbam_links_shortcode_defaults",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Modules/Links/class-link-shortcodes.php:251",
+      "purpose": "Filter default attributes for the wbam_links shortcode."
     },
     {
       "name": "wbam_links_shortcode_output",
@@ -1598,6 +1479,27 @@
       "purpose": "Whether to load link-tracking JS"
     },
     {
+      "name": "wbam_module_defaults",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Core/class-settings-helper.php:156",
+      "purpose": "Filter the optional module list and their default states."
+    },
+    {
+      "name": "wbam_notice_suppressor_namespaces",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-notice-suppressor.php",
+      "purpose": "Namespace prefixes whose admin notices are kept on WB Ads screens; PRO adds WBAM_Pro\\ so its banner and notices are not stripped"
+    },
+    {
+      "name": "wbam_partnership_accepted",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-manager.php",
+      "purpose": "Fired when partnership accepted"
+    },
+    {
       "name": "wbam_partnership_accepted_notification_message",
       "type": "filter",
       "args": 2,
@@ -1607,16 +1509,23 @@
     {
       "name": "wbam_partnership_admin_notification_message",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "includes/Modules/Links/class-partnership-emails.php",
       "purpose": "Filter admin notification email"
     },
     {
-      "name": "wbam_partnership_pre_send_email",
-      "type": "filter",
-      "args": 4,
-      "where": "includes/Modules/Links/class-partnership-emails.php",
-      "purpose": "Short-circuit a partnership email (Pro routes it through its branded email layout)"
+      "name": "wbam_partnership_created",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-manager.php",
+      "purpose": "Fired after partnership created"
+    },
+    {
+      "name": "wbam_partnership_deleted",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-manager.php",
+      "purpose": "Fired after partnership deleted"
     },
     {
       "name": "wbam_partnership_email_headers",
@@ -1626,6 +1535,69 @@
       "purpose": "Filter email headers"
     },
     {
+      "name": "wbam_partnership_email_sent",
+      "type": "action",
+      "args": 4,
+      "where": "includes/Modules/Links/class-partnership-emails.php",
+      "purpose": "Fired after partnership email sent"
+    },
+    {
+      "name": "wbam_partnership_form_after",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "Partnership form template (after)"
+    },
+    {
+      "name": "wbam_partnership_form_after_anchor",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "After anchor-text field"
+    },
+    {
+      "name": "wbam_partnership_form_after_budget",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "After budget field"
+    },
+    {
+      "name": "wbam_partnership_form_after_fields",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "Partnership form fields (after)"
+    },
+    {
+      "name": "wbam_partnership_form_after_message",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "After message field"
+    },
+    {
+      "name": "wbam_partnership_form_after_name_email",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "After name+email fields"
+    },
+    {
+      "name": "wbam_partnership_form_after_type",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "After partnership-type field"
+    },
+    {
+      "name": "wbam_partnership_form_after_website",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "After website field"
+    },
+    {
       "name": "wbam_partnership_form_attributes",
       "type": "filter",
       "args": 1,
@@ -1633,16 +1605,30 @@
       "purpose": "Filter form HTML attributes"
     },
     {
+      "name": "wbam_partnership_form_before",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "Partnership form template (before)"
+    },
+    {
+      "name": "wbam_partnership_form_before_fields",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "Partnership form fields (before)"
+    },
+    {
       "name": "wbam_partnership_form_button_class",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "includes/Modules/Links/class-partnership-form.php",
       "purpose": "Filter submit button class"
     },
     {
       "name": "wbam_partnership_form_data",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "includes/Modules/Links/class-partnership-form.php",
       "purpose": "Filter sanitized form data"
     },
@@ -1675,9 +1661,23 @@
       "purpose": "Filter form CSS deps"
     },
     {
+      "name": "wbam_partnership_form_submission_after",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "Post-submit partnership form"
+    },
+    {
+      "name": "wbam_partnership_form_submission_before",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-form.php",
+      "purpose": "Pre-submit partnership form"
+    },
+    {
       "name": "wbam_partnership_form_success_message",
       "type": "filter",
-      "args": 1,
+      "args": 3,
       "where": "includes/Modules/Links/class-partnership-form.php",
       "purpose": "Filter success message"
     },
@@ -1691,16 +1691,30 @@
     {
       "name": "wbam_partnership_form_validation",
       "type": "filter",
-      "args": 2,
+      "args": 3,
       "where": "includes/Modules/Links/class-partnership-form.php",
       "purpose": "Filter form validation result"
     },
     {
       "name": "wbam_partnership_form_wrapper_class",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "includes/Modules/Links/class-partnership-form.php",
       "purpose": "Filter wrapper class"
+    },
+    {
+      "name": "wbam_partnership_pre_send_email",
+      "type": "filter",
+      "args": 4,
+      "where": "includes/Modules/Links/class-partnership-emails.php",
+      "purpose": "Short-circuit a partnership email (Pro routes it through its branded email layout)"
+    },
+    {
+      "name": "wbam_partnership_rejected",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Links/class-partnership-manager.php",
+      "purpose": "Fired when partnership rejected"
     },
     {
       "name": "wbam_partnership_rejected_notification_message",
@@ -1710,25 +1724,53 @@
       "purpose": "Filter rejected notification email"
     },
     {
+      "name": "wbam_partnership_updated",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Links/class-partnership-manager.php",
+      "purpose": "Fired after partnership updated"
+    },
+    {
+      "name": "wbam_placement_ad_count",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Ads a rotating placement shows per load (default 1, 0 = all); paid first, house/sample fill"
+    },
+    {
+      "name": "wbam_placement_candidates",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "A placement's candidate ads before each is checked; batch-load what a wbam_should_display_ad callback needs (Pro loads campaigns here)"
+    },
+    {
       "name": "wbam_placement_format_map",
       "type": "filter",
       "args": 1,
       "where": "includes/Core/class-placement-format-map.php",
-      "purpose": "Filter placement\u2192format compatibility map"
+      "purpose": "Filter placement→format compatibility map"
     },
     {
-      "name": "wbam_placement_shapes",
-      "type": "filter",
-      "args": 1,
-      "where": "includes/Core/class-placement-format-map.php",
-      "purpose": "Override (or narrow) a shape's size list; wbam_placement_format_map wins outright if both are hooked"
-    },
-    {
-      "name": "wbam_enforce_format_matching",
-      "type": "filter",
+      "name": "wbam_placement_matrix_cell",
+      "type": "action",
       "args": 2,
-      "where": "includes/Admin/class-admin.php, includes/Modules/Placements/class-placement-engine.php, includes/functions-ad-formats.php",
-      "purpose": "Whether a placement must fit the ad's resolved size before it can be saved/rendered there (owner decision 13, card 10343726460); default is Settings_Helper::format_matching_enabled()"
+      "where": "includes/Admin/class-placement-settings.php:242",
+      "purpose": "Fires once per placement row in the matrix, after the built-in \"Active ads\" cell, when an active add-on has registered a callback here (see wbam_placement_matrix_head for the matching header cell). Echo one <td> matching the extra header column."
+    },
+    {
+      "name": "wbam_placement_matrix_head",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-placement-settings.php:163",
+      "purpose": "Fires inside the placement matrix's <thead> row, after the built-in columns, when an active add-on has registered a wbam_placement_matrix_cell callback. Echo one <th> per extra column added in the row below."
+    },
+    {
+      "name": "wbam_placement_matrix_intro",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-settings.php:1473",
+      "purpose": "Fires after the Placements intro copy, before the matrix table. PRO's rotation module hooks this to explain the \"Ads shown\" column it adds to the matrix (see Placement_Settings::render_table()'s `wbam_placement_matrix_head`/`wbam_placement_matrix_cell` hooks)."
     },
     {
       "name": "wbam_placement_render_mode",
@@ -1738,18 +1780,74 @@
       "purpose": "Filter render mode (single/rotation)"
     },
     {
-      "name": "wbam_ad_not_delivering_reason",
+      "name": "wbam_placement_shapes",
       "type": "filter",
-      "args": 2,
-      "where": "blocks/wb-ad/render.php",
-      "purpose": "Editor-preview notice for a WB Ad block whose ad renders nothing"
+      "args": 1,
+      "where": "includes/Core/class-placement-format-map.php",
+      "purpose": "Override (or narrow) a shape's size list; wbam_placement_format_map wins outright if both are hooked"
     },
     {
-      "name": "wbam_placement_ad_count",
+      "name": "wbam_placements_init",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Placement engine initialized"
+    },
+    {
+      "name": "wbam_popup_repeat_days",
       "type": "filter",
       "args": 2,
+      "where": "includes/Modules/Placements/class-popup-placement.php",
+      "purpose": "Days before a visitor sees a popup ad again (default 1; an ad's stored popup_repeat_days seeds it)"
+    },
+    {
+      "name": "wbam_popup_skip_mobile_first_view",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-popup-placement.php",
+      "purpose": "Hold a popup back on a phone's first page view (default false; an ad's stored popup_mobile_first_view seeds it)"
+    },
+    {
+      "name": "wbam_preload_frontend_assets",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Frontend/class-frontend.php:221",
+      "purpose": "Whether this request should preload the frontend ad CSS/JS in the head even though none of the built-in signals matched - e.g. a theme template that calls `do_shortcode('[wbam_ad id=\"1\"]')` outside post_content, where has_shortcode() cannot see it."
+    },
+    {
+      "name": "wbam_register_ad_types",
+      "type": "action",
+      "args": 1,
       "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Ads a rotating placement shows per load (default 1, 0 = all); paid first, house/sample fill"
+      "purpose": "Extension point — register custom ad types"
+    },
+    {
+      "name": "wbam_register_placements",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Extension point — register custom placements"
+    },
+    {
+      "name": "wbam_rest_event_tracked",
+      "type": "action",
+      "args": 3,
+      "where": "includes/API/class-ads-api.php:524",
+      "purpose": "Fired after REST tracking event recorded"
+    },
+    {
+      "name": "wbam_rotation_pick",
+      "type": "filter",
+      "args": 4,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Choose the winner from a same-tier pool; null keeps the priority-weighted draw"
+    },
+    {
+      "name": "wbam_save_ad_meta",
+      "type": "action",
+      "args": 1,
+      "where": "includes/API/class-ads-api.php:748",
+      "purpose": "Fired after REST ad meta save"
     },
     {
       "name": "wbam_send_partnership_accepted_notification",
@@ -1761,7 +1859,7 @@
     {
       "name": "wbam_send_partnership_admin_notification",
       "type": "filter",
-      "args": 1,
+      "args": 2,
       "where": "includes/Modules/Links/class-partnership-emails.php",
       "purpose": "Whether to send admin notification"
     },
@@ -1773,11 +1871,151 @@
       "purpose": "Whether to send rejected notification"
     },
     {
-      "name": "wbam_setup_wizard_sample_ads",
+      "name": "wbam_settings_ads_display_content",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-settings.php:1222",
+      "purpose": "Fires inside the Ads & Display section's one `<form>`, after FREE's own cards and before the single Save button (card 10343706274: one form, one Save per section) - PRO hooks its Ad Visibility by Role/Member Type card and (when the rotation module is active) its Ad Rotation card here. PRO's fields post through this same `options.php` submission because `wbam_pro_settings` is also registered under this page's `wbam_settings_group` (see Pro_Admin::register_settings()) - its own sanitizer runs unchanged, only the physical form is shared."
+    },
+    {
+      "name": "wbam_settings_links_content",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-settings.php:1249",
+      "purpose": "Fires inside the Links section's one `<form>`, after cloaking settings and before the single Save button (card 10343706274: one form, one Save per section)."
+    },
+    {
+      "name": "wbam_settings_location_content",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Admin/class-settings.php:1286",
+      "purpose": "Fires inside the Location section's one `<form>`, after visitor geolocation and before the single Save button (card 10343706274: one form, one Save per section). PRO's classified-maps card writes its own option (`wbam_pro_geolocation_settings`) directly - it cannot share this page's native `wbam_settings_group` Settings API processing the way `wbam_pro_settings` does elsewhere, so it is instead gated on the `$saving` flag this same submission already verified. save of this page's form."
+    },
+    {
+      "name": "wbam_settings_privacy_content",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-settings.php:1323",
+      "purpose": "Fires inside the Privacy & Data section's one `<form>`, after FREE's own cards and before the single Save button (card 10343706274: one form, one Save per section). PRO's analytics/GDPR card posts through this same `options.php` submission because `wbam_pro_settings` is also registered under this page's `wbam_settings_group`."
+    },
+    {
+      "name": "wbam_settings_section_aliases",
       "type": "filter",
       "args": 1,
+      "where": "includes/Admin/class-settings.php:989",
+      "purpose": "Filter the old section slug -> current section slug map. Old section slugs (pre-3.2.0 layout, or PRO's retired horizontal tabs) that now render somewhere else — merged into another section's body (License) or simply renamed (Ad Display, Geolocation, Advertising). Map those here so both the nav highlight and the body agree on which section is \"current\"."
+    },
+    {
+      "name": "wbam_settings_sections",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-settings.php:1118",
+      "purpose": "Filter the sidebar sections on the one Settings screen."
+    },
+    {
+      "name": "wbam_settings_tools_content",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-settings.php:1424",
+      "purpose": "Fires inside the Tools section."
+    },
+    {
+      "name": "wbam_setup_wizard_complete",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard completed"
+    },
+    {
+      "name": "wbam_setup_wizard_next_steps",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-setup-wizard.php:748",
+      "purpose": "Filter the next steps shown on the ready screen."
+    },
+    {
+      "name": "wbam_setup_wizard_ready_after",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard render (after)"
+    },
+    {
+      "name": "wbam_setup_wizard_ready_after_steps",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard after steps panel"
+    },
+    {
+      "name": "wbam_setup_wizard_ready_before",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard render (before)"
+    },
+    {
+      "name": "wbam_setup_wizard_sample_ad_created",
+      "type": "action",
+      "args": 3,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Sample ad created during setup"
+    },
+    {
+      "name": "wbam_setup_wizard_sample_ads",
+      "type": "filter",
+      "args": 2,
       "where": "includes/Admin/class-setup-wizard.php",
       "purpose": "Filter the sample ads list"
+    },
+    {
+      "name": "wbam_setup_wizard_sample_after",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard sample step (after) — KEY EXTENSION POINT for PRO"
+    },
+    {
+      "name": "wbam_setup_wizard_sample_before",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard sample step (before)"
+    },
+    {
+      "name": "wbam_setup_wizard_sample_form_after",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard sample form (after)"
+    },
+    {
+      "name": "wbam_setup_wizard_sample_form_before",
+      "type": "action",
+      "args": 0,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard sample form (before)"
+    },
+    {
+      "name": "wbam_setup_wizard_sample_options",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-setup-wizard.php:405",
+      "purpose": "Filter available sample ad options in setup wizard."
+    },
+    {
+      "name": "wbam_setup_wizard_sample_save_after",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard sample save (after) — used by PRO save_pro_options"
+    },
+    {
+      "name": "wbam_setup_wizard_sample_save_before",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Setup wizard sample save (before)"
     },
     {
       "name": "wbam_setup_wizard_steps",
@@ -1789,23 +2027,16 @@
     {
       "name": "wbam_should_display_ad",
       "type": "filter",
-      "args": 3,
-      "where": "includes/Modules/Placements/class-placement-engine.php",
-      "purpose": "Final gate before ad displays \u2014 KEY EXTENSION POINT for PRO frequency cap, campaign pacing"
-    },
-    {
-      "name": "wbam_ad_cap_reached",
-      "type": "action",
       "args": 2,
-      "where": "includes/Modules/Targeting/class-frequency-manager.php",
-      "purpose": "Fired when an ad reaches its total impression cap and stops being eligible for delivery"
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Final gate before ad displays — KEY EXTENSION POINT for PRO frequency cap, campaign pacing"
     },
     {
-      "name": "wbam_analytics_raw_retention_days",
+      "name": "wbam_skip_content_injection",
       "type": "filter",
-      "args": 1,
-      "where": "includes/Core/class-analytics-rollup.php",
-      "purpose": "Days raw analytics events are kept before roll-up (default 90)"
+      "args": 2,
+      "where": "includes/Modules/Placements/class-content-placement.php, class-paragraph-placement.php",
+      "purpose": "Skip before/after-content and after-paragraph ads on the current page; PRO returns true on its application pages (dashboard, posting forms, listings browser)"
     },
     {
       "name": "wbam_viewable_beacon_url",
@@ -1815,28 +2046,11 @@
       "purpose": "URL the viewability beacon sends for a popup/sticky/code ad when Count Impressions When Seen is on (Pro points it at its billing pixel)"
     },
     {
-      "name": "wbam_count_visitor_views",
-      "type": "filter",
-      "args": 2,
-      "where": "includes/Modules/Targeting/class-frequency-manager.php",
-      "purpose": "Whether visitor views of an ad are counted in the wbam_ad_views cookie (Pro advertiser/campaign caps)"
-    },
-    {
-      "name": "wbam_ad_event_totals",
+      "name": "wbam_viewable_impressions",
       "type": "filter",
       "args": 1,
-      "where": "includes/Admin/class-admin.php",
-      "purpose": "Lifetime impression/click totals for a page of ads in the All Ads list, keyed by ad ID (3.2.0)"
-    },
-    {
-      "name": "wbam_ad_container_class",
-      "type": "filter",
-      "purpose": "Extra CSS class on every rendered ad's container wrapper (card 10343726590, replaces the removed Custom Container Class field; default = stored value)."
-    },
-    {
-      "name": "wbam_email_capture_cookie_days",
-      "type": "filter",
-      "purpose": "Days a dismissed email sign-up ad stays hidden, per ad (card 10343726590, replaces the removed Dismiss Duration field; args: $days, $ad_id; default = the ad's stored value)."
+      "where": "includes/Frontend/class-frontend.php:384",
+      "purpose": "Whether an impression counts only once it scrolls into view (card 10343726590, replaces the removed 'Count Impressions When Seen' Settings field; default = stored viewable_impressions setting)"
     }
   ],
   "buddypress_integration": {
@@ -1980,10 +2194,10 @@
   "wp_cli": [],
   "storage_drivers": [],
   "security": {
-    "uploads_gate": "n/a \u2014 plugin does not handle direct file uploads",
+    "uploads_gate": "n/a — plugin does not handle direct file uploads",
     "signing_entry_points": [],
     "always_sign_filter": null,
-    "rate_limit_middleware": "Per-IP transient (md5(IP)) \u2014 60/min for /ads/track and /analytics/track, 30/min for /links/{id}/track",
+    "rate_limit_middleware": "Per-IP transient (md5(IP)) — 60/min for /ads/track and /analytics/track, 30/min for /links/{id}/track",
     "nonce_actions": [
       "wbam_dismiss_notice",
       "wbam_frontend",
@@ -2085,8 +2299,8 @@
       "declared_but_unenforced": [],
       "enforced_but_undeclared": [],
       "manage_options_gate_count": 22,
-      "manage_options_gate_note": "Bare current_user_can('manage_options') checks across plugin admin/REST/AJAX paths. Plugin gates ALL 9 admin pages, ALL 22 REST routes, and ALL admin AJAX handlers behind manage_options \u2014 typical WP pattern but a permission monoculture: only full administrators can operate the plugin. No granular plugin caps exist; staff/editor workflows are not supported. Future enhancement opportunity: introduce wbam_manage_ads / wbam_view_analytics caps and gate non-destructive views (analytics dashboard) at a lower threshold.",
-      "scanner_note": "Scanned every PHP file in build/free/wb-ads-rotator-with-split-test (72 files). Detected zero add_role / add_cap declarations. CPT 'wbam-ad' uses capability_type=post with default map_meta_cap (false) \u2014 no primitive caps auto-generated; all CPT screens fall back to manage_options (post-type default for non-public CPTs without explicit capability map). FREE plugin registers 0 custom capabilities.",
+      "manage_options_gate_note": "Bare current_user_can('manage_options') checks across plugin admin/REST/AJAX paths. Plugin gates ALL 9 admin pages, ALL 22 REST routes, and ALL admin AJAX handlers behind manage_options — typical WP pattern but a permission monoculture: only full administrators can operate the plugin. No granular plugin caps exist; staff/editor workflows are not supported. Future enhancement opportunity: introduce wbam_manage_ads / wbam_view_analytics caps and gate non-destructive views (analytics dashboard) at a lower threshold.",
+      "scanner_note": "Scanned every PHP file in build/free/wb-ads-rotator-with-split-test (72 files). Detected zero add_role / add_cap declarations. CPT 'wbam-ad' uses capability_type=post with default map_meta_cap (false) — no primitive caps auto-generated; all CPT screens fall back to manage_options (post-type default for non-public CPTs without explicit capability map). FREE plugin registers 0 custom capabilities.",
       "summary": {
         "total_caps_enforced": 3,
         "custom_caps_registered": 0,
