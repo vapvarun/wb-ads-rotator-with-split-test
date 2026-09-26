@@ -1016,9 +1016,7 @@ class Abilities {
 		wp_update_post( $update_data );
 
 		if ( isset( $input['content'] ) && is_array( $input['content'] ) ) {
-			$existing = get_post_meta( $id, '_wbam_ad_data', true );
-			$merged   = is_array( $existing ) ? array_merge( $existing, $input['content'] ) : $input['content'];
-			update_post_meta( $id, '_wbam_ad_data', $merged );
+			wbam_update_ad_data( $id, $input['content'] );
 		}
 
 		if ( isset( $input['enabled'] ) ) {

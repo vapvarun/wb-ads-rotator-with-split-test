@@ -706,8 +706,7 @@ class Ads_API {
 	 */
 	private function save_ad_meta( $post_id, $request ) {
 		if ( isset( $request['ad_data'] ) && is_array( $request['ad_data'] ) ) {
-			$ad_data = $this->sanitize_ad_data( $request['ad_data'] );
-			update_post_meta( $post_id, '_wbam_ad_data', $ad_data );
+			wbam_update_ad_data( $post_id, $this->sanitize_ad_data( $request['ad_data'] ) );
 		}
 
 		if ( isset( $request['enabled'] ) ) {

@@ -2445,7 +2445,8 @@ class Admin {
 			 */
 			$data = apply_filters( 'wbam_ad_data_before_save', $data, $post_id, $raw_data );
 
-			update_post_meta( $post_id, '_wbam_ad_data', $data );
+			// Merged, so options of placements the form did not offer survive.
+			wbam_update_ad_data( $post_id, $data );
 		}
 
 		/**

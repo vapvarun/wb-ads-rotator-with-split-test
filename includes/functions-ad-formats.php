@@ -18,6 +18,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use WBAM\Core\Ad_Formats;
 
+if ( ! function_exists( 'wbam_update_ad_data' ) ) {
+	/**
+	 * Merge changes into an ad's `_wbam_ad_data` and save it.
+	 *
+	 * Every save path goes through here, so a partial save (the advertiser
+	 * portal, a REST update, an ability) never clears keys it did not send,
+	 * such as the owner's per-placement popup and sticky options.
+	 *
+	 * @since 3.2.0
+	 * @param int                 $ad_id   Ad post ID.
+	 * @param array<string,mixed> $changes Keys to set.
+	 * @return array<string,mixed> The saved data.
+	 */
+	function wbam_update_ad_data( $ad_id, array $changes ) {
+		$data = get_post_meta( (int) $ad_id, '_wbam_ad_data', true );
+		$data = array_merge( is_array( $data ) ? $data : array(), $changes );
+		update_post_meta( (int) $ad_id, '_wbam_ad_data', $data );
+
+		return $data;
+	}
+}
+
 if ( ! function_exists( 'wbam_icon' ) ) {
 	/**
 	 * Render a Lucide icon.
