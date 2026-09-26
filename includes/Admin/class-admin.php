@@ -717,6 +717,14 @@ class Admin {
 				'wbam-analytics'                 => 'reports',
 				'wbam-revenue'                   => 'reports',
 				'wbam-audit-log'                 => 'reports',
+				// Links (folded into this menu in 3.2.0).
+				'wbam-links'                     => 'links',
+				'wbam-link-categories'           => 'links',
+				'wbam-partnerships'              => 'links',
+				'wbam-link-analytics'            => 'links',
+				'wbam-link-keywords'             => 'links',
+				'wbam-link-health'               => 'links',
+				'wbam-link-import'               => 'links',
 				// Settings. wbam-pro-settings and wbam-tools no longer exist
 				// as separate submenu items as of 3.2.0 - both live inside
 				// the one wbam-settings screen (see WBAM\Admin\Settings) -
@@ -732,6 +740,7 @@ class Admin {
 				'ads'       => '',
 				'delivery'  => __( 'Delivery', 'wb-ads-rotator-with-split-test' ),
 				'campaigns' => __( 'Campaigns', 'wb-ads-rotator-with-split-test' ),
+				'links'     => __( 'Links', 'wb-ads-rotator-with-split-test' ),
 				'reports'   => __( 'Reports', 'wb-ads-rotator-with-split-test' ),
 				'settings'  => __( 'Settings', 'wb-ads-rotator-with-split-test' ),
 				'other'     => '',
