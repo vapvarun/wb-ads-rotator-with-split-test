@@ -284,7 +284,8 @@ class Plugin {
 	}
 
 	/**
-	 * Register the shared toast/confirm toolkit (script + style).
+	 * Register the shared toast/confirm toolkit (script + style) and the
+	 * frontend design tokens.
 	 *
 	 * Single source of truth for the `wbam-toast` handle — both this plugin
 	 * and WB Ad Manager Pro depend on it. Mirrors the guard pattern in
@@ -303,6 +304,17 @@ class Plugin {
 				array(),
 				WBAM_VERSION,
 				true
+			);
+		}
+
+		// The frontend palette: frontend.css (ads) and Pro's portal both
+		// build on it, and frontend.css only loads where an ad renders.
+		if ( ! wp_style_is( 'wbam-frontend-tokens', 'registered' ) ) {
+			wp_register_style(
+				'wbam-frontend-tokens',
+				wbam_asset_url( 'css/frontend-tokens.css' ),
+				array(),
+				WBAM_VERSION
 			);
 		}
 

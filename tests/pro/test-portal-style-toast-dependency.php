@@ -66,4 +66,15 @@ class Test_Portal_Style_Toast_Dependency extends Pro_Test_Case {
 
 		$this->assertSame( array(), $this->caught_doing_it_wrong, 'Printing the queued style must not trigger a missing-dependency notice.' );
 	}
+
+	public function test_pro_tokens_depend_on_the_free_palette(): void {
+		global $wp_styles;
+		$wp_styles = null;
+		wp_styles();
+		wp_register_style( 'wbam-frontend-tokens', false, array() );
+
+		Pro_Plugin::register_frontend_styles();
+
+		$this->assertContains( 'wbam-frontend-tokens', wp_styles()->registered['wbam-pro-tokens']->deps, 'Pro tokens derive from the free palette; frontend.css is not on portal pages.' );
+	}
 }

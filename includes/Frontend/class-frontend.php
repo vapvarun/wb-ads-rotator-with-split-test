@@ -75,7 +75,7 @@ class Frontend {
 		wp_register_style(
 			'wbam-frontend',
 			$frontend_css_url,
-			array( 'dashicons' ),
+			array( 'dashicons', 'wbam-frontend-tokens' ),
 			WBAM_VERSION
 		);
 		// Load the RTL stylesheet (frontend-rtl.css / frontend-rtl.min.css) on RTL locales.
@@ -86,7 +86,7 @@ class Frontend {
 
 		$theme_button = self::theme_button_color();
 		if ( '' !== $theme_button ) {
-			wp_add_inline_style( 'wbam-frontend', ':root{--wbam-theme-button:' . $theme_button . ';}' );
+			wp_add_inline_style( 'wbam-frontend-tokens', ':root{--wbam-theme-button:' . $theme_button . ';}' );
 		}
 
 		wp_register_script(
