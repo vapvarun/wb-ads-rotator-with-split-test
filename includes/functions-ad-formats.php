@@ -73,6 +73,44 @@ if ( ! function_exists( 'wbam_asset_url' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wbam_csv_safe' ) ) {
+	/**
+	 * Neutralise a CSV cell a spreadsheet would run as a formula.
+	 *
+	 * Per OWASP (CSV injection), a cell starting with = + - @, a tab or a
+	 * carriage return is prefixed with an apostrophe so Excel and Sheets
+	 * show it as text. Numbers (a negative amount) and a lone placeholder
+	 * character pass through unchanged.
+	 *
+	 * @since 3.2.0
+	 * @param mixed $value Cell value.
+	 * @return mixed The value, or the prefixed string.
+	 */
+	function wbam_csv_safe( $value ) {
+		if ( ! is_string( $value ) || is_numeric( $value ) || strlen( $value ) < 2 ) {
+			return $value;
+		}
+
+		return false !== strpos( "=+-@\t\r", $value[0] ) ? "'" . $value : $value;
+	}
+}
+
+if ( ! function_exists( 'wbam_fputcsv' ) ) {
+	/**
+	 * Write one CSV row with every cell run through wbam_csv_safe().
+	 *
+	 * Every CSV export in both plugins writes rows through here.
+	 *
+	 * @since 3.2.0
+	 * @param resource          $handle Writable handle.
+	 * @param array<int, mixed> $fields Row cells.
+	 * @return int|false Bytes written, or false on failure.
+	 */
+	function wbam_fputcsv( $handle, array $fields ) {
+		return fputcsv( $handle, array_map( 'wbam_csv_safe', $fields ), ',', '"', '\\' );
+	}
+}
+
 if ( ! function_exists( 'wbam_update_ad_data' ) ) {
 	/**
 	 * Merge changes into an ad's `_wbam_ad_data` and save it.

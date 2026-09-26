@@ -266,14 +266,14 @@ class Email_Captures {
 	 */
 	public function stream_csv( $handle, array $args ) {
 		$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
-		fputcsv( $handle, array( 'Email', 'Name', 'Ad', 'Ad ID', 'IP', 'Date' ) );
+		wbam_fputcsv( $handle, array( 'Email', 'Name', 'Ad', 'Ad ID', 'IP', 'Date' ) );
 
 		$page = 1;
 		do {
 			$rows = $this->get_page( $page, 500, $args );
 			_prime_post_caches( array_filter( array_map( 'intval', wp_list_pluck( $rows, 'ad_id' ) ) ), false, false );
 			foreach ( $rows as $row ) {
-				fputcsv(
+				wbam_fputcsv(
 					$handle,
 					array(
 						$row->email,
