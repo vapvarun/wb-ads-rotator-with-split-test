@@ -27,6 +27,8 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 		delete_option( 'wbam_pro_classifieds_settings' );
 		delete_option( 'wbam_settings' );
 		delete_option( 'wbam_page_my_favorites' );
+		delete_option( 'wbam_page_advertiser_dashboard' );
+		delete_option( 'wbam_page_advertise' );
 		$_POST    = array();
 		$_REQUEST = array();
 		parent::tear_down();
@@ -175,6 +177,58 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 		$this->assertStringContainsString( 'name="wbam_page_contact"', $html );
 		$this->assertSame( $page_id, (int) get_option( 'wbam_page_my_favorites' ) );
 		$this->assertSame( get_permalink( $page_id ), wbam_get_my_favorites_url() );
+	}
+
+	/**
+	 * D18 (card 10343787048 / 10343726460): the same page picked for two
+	 * roles - on wp-ads, Advertise and Advertiser Dashboard both resolved to
+	 * page 4 - must be refused on save, naming the conflicting roles,
+	 * instead of silently writing both options to the same page.
+	 */
+	public function test_the_same_page_for_two_roles_is_refused(): void {
+		// This shared test environment's fixture already has real default
+		// pages installed - capture their pre-save values rather than
+		// assume a blank 0, and prove the refused save left BOTH exactly
+		// where they were, not just skipped the second one.
+		$dashboard_before = (int) get_option( 'wbam_page_advertiser_dashboard' );
+		$advertise_before = (int) get_option( 'wbam_page_advertise' );
+
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'Shared Page' ) );
+
+		$_POST = array(
+			'wbam_save_pages'            => '1',
+			'_wpnonce'                   => wp_create_nonce( 'wbam_pages_settings' ),
+			'wbam_page_advertiser_dashboard' => (string) $page_id,
+			'wbam_page_advertise'        => (string) $page_id,
+		);
+		$_REQUEST = $_POST;
+
+		$html = $this->render( 'render_pages_settings' );
+
+		$this->assertStringContainsString( 'Shared Page', $html );
+		$this->assertStringContainsString( 'Advertiser Dashboard', $html );
+		$this->assertStringContainsString( 'Advertise with us', $html );
+		$this->assertSame( $dashboard_before, (int) get_option( 'wbam_page_advertiser_dashboard' ), 'A conflicting save must write nothing, not just skip the loser.' );
+		$this->assertSame( $advertise_before, (int) get_option( 'wbam_page_advertise' ) );
+	}
+
+	/** The same save with two DIFFERENT pages must go through as normal. */
+	public function test_different_pages_for_two_roles_still_saves(): void {
+		$dashboard_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$advertise_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+
+		$_POST = array(
+			'wbam_save_pages'            => '1',
+			'_wpnonce'                   => wp_create_nonce( 'wbam_pages_settings' ),
+			'wbam_page_advertiser_dashboard' => (string) $dashboard_id,
+			'wbam_page_advertise'        => (string) $advertise_id,
+		);
+		$_REQUEST = $_POST;
+
+		$this->render( 'render_pages_settings' );
+
+		$this->assertSame( $dashboard_id, (int) get_option( 'wbam_page_advertiser_dashboard' ) );
+		$this->assertSame( $advertise_id, (int) get_option( 'wbam_page_advertise' ) );
 	}
 
 	/** D17: "Accept new listings" off pauses posting only; the module stays the one master switch. */
