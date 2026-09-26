@@ -86,6 +86,7 @@
 	   not in a strip-shaped Banner slot — see class-placement-format-map.php. */
 	--wbam-shape-banner-h: 90px;
 	--wbam-shape-banner-h-mobile: 100px;
+	--wbam-shape-billboard-h: 250px;
 	--wbam-shape-box-h: 280px;
 	--wbam-shape-tower-h: 600px;
 

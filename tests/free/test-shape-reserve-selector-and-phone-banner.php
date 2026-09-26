@@ -97,4 +97,30 @@ class Test_Shape_Reserve_Selector_And_Phone_Banner extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '.wbam-ad-slot.wbam-ad', $rtl );
 		$this->assertStringContainsString( '.wbam-placement-before-content .wbam-ad-slot > .wbam-ad', $rtl );
 	}
+
+	/** QA wave 5: the slot carries the ad's own shape, so its creative can reserve by it. */
+	public function test_rendered_slot_carries_the_ads_own_shape(): void {
+		$ad_id = self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
+		update_post_meta( $ad_id, '_wbam_enabled', '1' );
+		update_post_meta( $ad_id, '_wbam_ad_data', array( 'type' => 'rich-content', 'content' => '<p>Hello</p>' ) );
+		update_post_meta( $ad_id, '_wbam_is_responsive', '0' );
+		update_post_meta( $ad_id, '_wbam_ad_format', 'custom' );
+		update_post_meta( $ad_id, '_wbam_ad_width', 728 );
+		update_post_meta( $ad_id, '_wbam_ad_height', 90 );
+
+		$html = (string) \WBAM\Modules\Placements\Placement_Engine::get_instance()->render_ad( $ad_id, array( 'placement' => 'after_paragraph' ) );
+
+		$this->assertMatchesRegularExpression( '/class="[^"]*wbam-ad-slot[^"]*wbam-ad-slot--shape-banner/', $html );
+	}
+
+	/** QA wave 5: a Banner in between-content reserves the Banner height on desktop, not Box's 280px. */
+	public function test_between_content_reserves_by_the_ads_own_shape_on_desktop(): void {
+		$css   = $this->css();
+		$rule  = strpos( $css, '.wbam-placement-paragraph .wbam-ad-slot--shape-banner > .wbam-ad' );
+		$phone = strpos( $css, '@media', (int) strpos( $css, '.wbam-placement-header .wbam-ad-slot > .wbam-ad,' ) );
+
+		$this->assertNotFalse( $rule );
+		$this->assertLessThan( $phone, $rule, 'Must come before the phone block so the phone floor still wins.' );
+		$this->assertStringContainsString( 'min-height: var(--wbam-shape-banner-h);', substr( $css, $rule, (int) strpos( $css, '}', $rule ) - $rule ) );
+	}
 }

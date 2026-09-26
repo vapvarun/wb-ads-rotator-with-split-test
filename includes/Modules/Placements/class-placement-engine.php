@@ -644,6 +644,13 @@ class Placement_Engine {
 			$classes       = 'wbam-ad wbam-ad-slot';
 			if ( $is_responsive ) {
 				$classes .= ' wbam-ad-slot--responsive';
+			} else {
+				// The creative reserves height by its own shape, not the
+				// slot's tallest accepted one (see frontend.css).
+				$shape = \WBAM\Core\Placement_Format_Map::shape_for_ad( $ad_id );
+				if ( '' !== $shape ) {
+					$classes .= ' wbam-ad-slot--shape-' . sanitize_html_class( $shape );
+				}
 			}
 			/**
 			 * Filter the extra CSS class added to every rendered ad's

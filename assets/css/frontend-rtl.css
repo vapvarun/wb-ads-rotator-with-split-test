@@ -262,6 +262,23 @@
 	justify-content: center;
 }
 
+/* Between-content reserves by the ad's OWN shape when it has one (QA wave
+   5, card 10343726460): render_ad() tags the slot .wbam-ad-slot--shape-*,
+   so a 728x90 Banner reserves 90px here, not Box's 280px. A Box keeps the
+   280px default above; a responsive or text ad (no shape) does too. These
+   sit before the phone block so its 100px floor still wins at 480px. */
+.wbam-placement-before-content .wbam-ad-slot--shape-banner > .wbam-ad,
+.wbam-placement-after-content .wbam-ad-slot--shape-banner > .wbam-ad,
+.wbam-placement-paragraph .wbam-ad-slot--shape-banner > .wbam-ad {
+	min-height: var(--wbam-shape-banner-h);
+}
+
+.wbam-placement-before-content .wbam-ad-slot--shape-billboard > .wbam-ad,
+.wbam-placement-after-content .wbam-ad-slot--shape-billboard > .wbam-ad,
+.wbam-placement-paragraph .wbam-ad-slot--shape-billboard > .wbam-ad {
+	min-height: var(--wbam-shape-billboard-h);
+}
+
 /* Sidebar takes Box OR Tower (owner decision 13) — a min-height only,
    not a hard cap: reserving the shorter Box height stops the sidebar
    collapsing to nothing between ads, without clipping a legitimate

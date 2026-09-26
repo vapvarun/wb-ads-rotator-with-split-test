@@ -161,6 +161,33 @@ class Placement_Format_Map {
 	}
 
 	/**
+	 * The shape ('banner', 'box', ...) an ad's own size belongs to.
+	 *
+	 * Lets the frontend reserve height by the creative's shape instead of
+	 * the tallest shape its slot accepts (QA wave 5, card 10343726460).
+	 *
+	 * @since 3.2.0
+	 * @param int $ad_id Ad post ID.
+	 * @return string Shape name, or '' for a responsive ad or a size outside every shape.
+	 */
+	public static function shape_for_ad( $ad_id ) {
+		$format = Ad_Formats::get_ad_format( $ad_id );
+
+		if ( Ad_Formats::CUSTOM === $format ) {
+			$dims   = Ad_Formats::get_ad_dimensions( $ad_id );
+			$format = Ad_Formats::detect_by_dimensions( $dims['width'], $dims['height'] );
+		}
+
+		foreach ( self::shapes() as $shape => $formats ) {
+			if ( in_array( $format, (array) $formats, true ) ) {
+				return (string) $shape;
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Resolve the format slugs for one or more shape names.
 	 *
 	 * @since 3.2.0
