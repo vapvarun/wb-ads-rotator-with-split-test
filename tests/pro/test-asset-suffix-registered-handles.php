@@ -95,14 +95,17 @@ class Test_Asset_Suffix_Registered_Handles extends Pro_Test_Case {
 		// field tooltips are gated on $_GET['page'] starting with wbam-.
 		// Both hook in from admin-only boot (is_admin() is false under
 		// PHPUnit): register them the way a real admin load does.
+		// Field_Tooltips::register() runs once per process (static flag)
+		// while the test framework resets hooks between tests, so call its
+		// enqueue directly rather than rely on the hook still being there.
 		require_once WBAM_PRO_PATH . 'includes/Admin/class-field-tooltips.php'; // Admin-only load in production.
-		\WBAM_Pro\Admin\Field_Tooltips::register();
 		$credits = new \WBAM_Pro\Admin\Credits_Settings();
 		$_GET['page'] = 'wbam-settings';
 		foreach ( array( 'tools', 'credits' ) as $section ) {
 			$_GET['section'] = $section;
 			do_action( 'admin_enqueue_scripts', 'wbam-ad_page_wbam-settings' );
 		}
+		\WBAM_Pro\Admin\Field_Tooltips::enqueue_assets( 'wbam-ad_page_wbam-settings' );
 		$this->assertArrayHasKey( 'wbam-pro-field-tooltips', wp_scripts()->registered, 'The tooltip gate must actually run here.' );
 		$this->assertContains( 'wbam-lucide', wp_scripts()->queue, 'Settings > Credits must enqueue the bundled Lucide.' );
 		remove_action( 'admin_enqueue_scripts', array( $credits, 'maybe_enqueue_lucide' ) );
