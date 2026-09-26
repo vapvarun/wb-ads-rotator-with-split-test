@@ -31,6 +31,17 @@ class Partnership_Admin {
 	private $manager;
 
 	/**
+	 * The screen's hook suffix, as returned by add_submenu_page() - the
+	 * actual value depends on which top-level menu 'edit.php?post_type=wbam-ad'
+	 * resolves to (Pro active vs Free-only change it), so a hardcoded
+	 * 'links_page_wbam-partnerships' broke enqueue_scripts() with Pro active.
+	 *
+	 * @since 3.2.0
+	 * @var string
+	 */
+	private $page_hook = '';
+
+	/**
 	 * Constructor.
 	 */
 	protected function __construct() {
@@ -57,7 +68,7 @@ class Partnership_Admin {
 			return;
 		}
 
-		add_submenu_page(
+		$this->page_hook = add_submenu_page(
 			'edit.php?post_type=wbam-ad',
 			__( 'Partnership Inquiries', 'wb-ads-rotator-with-split-test' ),
 			__( 'Partnerships', 'wb-ads-rotator-with-split-test' ),
@@ -103,7 +114,7 @@ class Partnership_Admin {
 	 * @param string $hook Current admin page.
 	 */
 	public function enqueue_scripts( $hook ) {
-		if ( 'links_page_wbam-partnerships' !== $hook ) {
+		if ( ! $this->page_hook || $this->page_hook !== $hook ) {
 			return;
 		}
 
