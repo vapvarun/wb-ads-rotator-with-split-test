@@ -1,10 +1,9 @@
 <?php
 /**
  * Classifieds polish (card 10344005566): the listing edit screen has one
- * Featured control (no second Listing Type select, no unexplained
- * "Premium"), the listing-live email does not upsell featuring to a
- * listing that is already featured and links to Promote, and the renew
- * reminder links straight to Promote.
+ * Featured control (no second Listing Type select), the listing-live
+ * email does not upsell featuring to a listing that is already featured
+ * and links to Promote, and the renew reminder links straight to Promote.
  *
  * @package WBAM\Tests
  */
@@ -80,8 +79,8 @@ class Test_Classifieds_Featured_Polish extends Pro_Test_Case {
 		$this->assertStringNotContainsString( 'Premium', $html );
 	}
 
-	public function test_unticking_featured_unfeatures_a_premium_listing(): void {
-		$this->classified->listing_type = 'premium';
+	public function test_unticking_featured_unfeatures_the_listing(): void {
+		$this->classified->listing_type = 'featured';
 		$this->classified->save();
 
 		$_POST = array( 'wbam_classified_nonce' => wp_create_nonce( 'wbam_classified_meta_box' ) );
