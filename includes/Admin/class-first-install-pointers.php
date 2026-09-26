@@ -193,14 +193,14 @@ class First_Install_Pointers {
 			'sizing_section'  => array(
 				'target'  => '.wbam-sizing-section',
 				'title'   => esc_html__( 'Pick how this ad is sized', 'wb-ads-rotator-with-split-test' ),
-				'content' => esc_html__( 'Responsive ads fill any slot. Fixed-size ads only render where the size matches. The system auto-filters placements below based on your choice.', 'wb-ads-rotator-with-split-test' ),
+				'content' => esc_html__( 'Responsive ads fill any placement. Fixed-size ads only render where the size matches. The system auto-filters placements below based on your choice.', 'wb-ads-rotator-with-split-test' ),
 				'edge'    => 'top',
 				'align'   => 'left',
 			),
 			'priority_slider' => array(
 				'target'  => '#wbam_priority',
 				'title'   => esc_html__( 'Priority controls your win share', 'wb-ads-rotator-with-split-test' ),
-				'content' => esc_html__( 'When multiple ads compete for the same slot, higher priority wins a bigger share. Default is 5. Live hint below shows the exact win percentage in a three-way tie.', 'wb-ads-rotator-with-split-test' ),
+				'content' => esc_html__( 'When multiple ads compete for the same placement, higher priority wins a bigger share. Default is 5. Live hint below shows the exact win percentage in a three-way tie.', 'wb-ads-rotator-with-split-test' ),
 				// E2 fix: this target lives in the narrow sidebar column,
 				// close to the viewport's right edge — the shared 420px
 				// width (needed for the wider content-area pointers below)
@@ -214,7 +214,7 @@ class First_Install_Pointers {
 			'placement_cards' => array(
 				'target'  => '.wbam-placement-options',
 				'title'   => esc_html__( 'Where your ad can render', 'wb-ads-rotator-with-split-test' ),
-				'content' => esc_html__( 'These are the placement slots this ad qualifies for. Pick one or more. The rotation engine will decide which slot fires on each page load.', 'wb-ads-rotator-with-split-test' ),
+				'content' => esc_html__( 'These are the placements this ad qualifies for. Pick one or more. The rotation engine will decide which placement fires on each page load.', 'wb-ads-rotator-with-split-test' ),
 				'edge'    => 'top',
 				'align'   => 'left',
 			),

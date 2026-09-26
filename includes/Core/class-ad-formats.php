@@ -121,7 +121,7 @@ class Ad_Formats {
 				'responsive' => false,
 			),
 			self::RESPONSIVE      => array(
-				'label'      => __( 'Responsive (fills any slot)', 'wb-ads-rotator-with-split-test' ),
+				'label'      => __( 'Responsive (fills any placement)', 'wb-ads-rotator-with-split-test' ),
 				'width'      => 0,
 				'height'     => 0,
 				'responsive' => true,

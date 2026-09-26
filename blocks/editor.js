@@ -188,7 +188,7 @@
 					{
 						icon: 'layout',
 						label: __( 'WB Ad Placement', 'wb-ads-rotator-with-split-test' ),
-						instructions: __( 'Choose a placement. It shows whatever ad the rotation picks for that slot.', 'wb-ads-rotator-with-split-test' ),
+						instructions: __( 'Choose a placement. It shows whatever ad the rotation picks for that placement.', 'wb-ads-rotator-with-split-test' ),
 					},
 					el( SelectControl, { value: attributes.placementId, options: options, onChange: onChange } )
 				)

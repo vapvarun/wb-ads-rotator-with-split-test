@@ -144,7 +144,7 @@ class Placement_Settings {
 		<table class="widefat wbam-placement-matrix" role="table">
 			<thead role="rowgroup">
 				<tr role="row">
-					<th scope="col" role="columnheader"><?php esc_html_e( 'Slot', 'wb-ads-rotator-with-split-test' ); ?></th>
+					<th scope="col" role="columnheader"><?php esc_html_e( 'Placement', 'wb-ads-rotator-with-split-test' ); ?></th>
 					<th scope="col" role="columnheader"><?php echo esc_html( $label_site ); ?></th>
 					<?php if ( $show_adv ) : ?>
 						<th scope="col" role="columnheader"><?php echo esc_html( $label_adv ); ?></th>
@@ -253,7 +253,7 @@ class Placement_Settings {
 				<?php
 				printf(
 					/* translators: %s: link to the Upgrade to PRO screen. */
-					esc_html__( 'Want to sell these slots to advertisers and take submissions? That needs %s.', 'wb-ads-rotator-with-split-test' ),
+					esc_html__( 'Want to sell these placements to advertisers and take submissions? That needs %s.', 'wb-ads-rotator-with-split-test' ),
 					'<a href="' . esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-upgrade' ) ) . '">' . esc_html__( 'WB Ad Manager Pro', 'wb-ads-rotator-with-split-test' ) . '</a>'
 				);
 				?>

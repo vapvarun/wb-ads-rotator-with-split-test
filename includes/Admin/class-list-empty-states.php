@@ -68,7 +68,7 @@ class List_Empty_States {
 				array(
 					'icon'      => 'megaphone',
 					'title'     => __( 'No ads yet', 'wb-ads-rotator-with-split-test' ),
-					'body'      => __( 'Ads are the creatives your visitors will see. Create your first ad to choose where and how it displays.', 'wb-ads-rotator-with-split-test' ),
+					'body'      => __( 'This is what your visitors will see. Create your first ad to choose where and how it displays.', 'wb-ads-rotator-with-split-test' ),
 					'cta_label' => __( 'Create your first ad', 'wb-ads-rotator-with-split-test' ),
 					'cta_url'   => admin_url( 'post-new.php?post_type=' . self::POST_TYPE_AD ),
 				)

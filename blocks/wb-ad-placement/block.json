@@ -5,8 +5,8 @@
 	"title": "WB Ad Placement",
 	"category": "wb-ads",
 	"icon": "layout",
-	"description": "Render a WB Ad Manager placement slot - whichever ad the rotation and targeting rules pick for it.",
-	"keywords": [ "ad", "placement", "slot", "wbam" ],
+	"description": "Render a WB Ad Manager placement - whichever ad the rotation and targeting rules pick for it.",
+	"keywords": [ "ad", "placement", "wbam" ],
 	"textdomain": "wb-ads-rotator-with-split-test",
 	"attributes": {
 		"placementId": {

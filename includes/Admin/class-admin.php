@@ -357,7 +357,7 @@ class Admin {
 			'titles' => array(),
 		);
 
-		$body = __( 'Ads and placements now declare a shape (Banner, Box or Tower) so oversize creatives stop breaking your layout. Your site keeps serving exactly as it does today until you turn this on.', 'wb-ads-rotator-with-split-test' );
+		$body = __( 'Ads and placements now declare a shape (Banner, Box or Tower) so oversize images stop breaking your layout. Your site keeps serving exactly as it does today until you turn this on.', 'wb-ads-rotator-with-split-test' );
 		if ( $mismatched['count'] > 0 ) {
 			$body .= ' ' . sprintf(
 				/* translators: 1: number of ads that don't fit their placement, 2: comma-separated list of up to 10 ad titles */
@@ -1971,7 +1971,7 @@ class Admin {
 				<label for="wbam_priority"><?php esc_html_e( 'Priority', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'priority' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?></label>
 				<input type="range" id="wbam_priority" name="wbam_priority" min="1" max="10" value="<?php echo esc_attr( $priority ); ?>" />
 				<span class="wbam-priority-value"><?php echo esc_html( $priority ); ?></span>
-				<p class="description"><?php esc_html_e( 'Higher priority = bigger share when multiple ads compete for the same slot. Default is 5.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Higher priority = bigger share when multiple ads compete for the same placement. Default is 5.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<p class="wbam-priority-share-hint" aria-live="polite"></p>
 			</div>
 
@@ -2070,7 +2070,7 @@ class Admin {
 		?>
 		<div class="wbam-metabox">
 			<p class="wbam-sizing-unavailable-notice"<?php echo $sizing_hidden ? '' : ' hidden'; ?>>
-				<?php esc_html_e( 'This ad type has no fixed size. It plays inside protected lesson videos or as a standalone player, not in a sized slot.', 'wb-ads-rotator-with-split-test' ); ?>
+				<?php esc_html_e( 'This ad type has no fixed size. It plays inside protected lesson videos or as a standalone player, not in a sized placement.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 
 			<div class="wbam-sizing-section" data-no-sizing-types="<?php echo esc_attr( (string) wp_json_encode( array_values( self::ad_types_without_sizing() ) ) ); ?>"<?php echo $sizing_hidden ? ' hidden' : ''; ?>>
@@ -2082,12 +2082,12 @@ class Admin {
 					<label class="wbam-sizing-option <?php echo '1' === (string) $is_responsive ? 'is-active' : ''; ?>">
 						<input type="radio" name="wbam_sizing_mode" value="responsive" <?php checked( '1', (string) $is_responsive ); ?> />
 						<span class="wbam-sizing-option__title"><?php esc_html_e( 'Responsive', 'wb-ads-rotator-with-split-test' ); ?></span>
-						<span class="wbam-sizing-option__desc"><?php esc_html_e( 'Fills any slot. Best for AdSense auto and fluid HTML.', 'wb-ads-rotator-with-split-test' ); ?></span>
+						<span class="wbam-sizing-option__desc"><?php esc_html_e( 'Fills any placement. Best for AdSense auto and fluid HTML.', 'wb-ads-rotator-with-split-test' ); ?></span>
 					</label>
 					<label class="wbam-sizing-option <?php echo '1' !== (string) $is_responsive ? 'is-active' : ''; ?>">
 						<input type="radio" name="wbam_sizing_mode" value="fixed" <?php checked( '1', (string) $is_responsive, false ) ? '' : checked( true, true ); ?> <?php echo '1' !== (string) $is_responsive ? 'checked' : ''; ?> />
 						<span class="wbam-sizing-option__title"><?php esc_html_e( 'Fixed size', 'wb-ads-rotator-with-split-test' ); ?></span>
-						<span class="wbam-sizing-option__desc"><?php esc_html_e( 'Known width and height. Matches only compatible slots.', 'wb-ads-rotator-with-split-test' ); ?></span>
+						<span class="wbam-sizing-option__desc"><?php esc_html_e( 'Known width and height. Matches only compatible placements.', 'wb-ads-rotator-with-split-test' ); ?></span>
 					</label>
 				</div>
 
@@ -3298,8 +3298,8 @@ class Admin {
 						echo ' ' . wp_kses_post( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- UX::status_badge() output plus a translated title attribute, both escaped inline.
 							sprintf(
 								'<span class="wbam-status-badge wbam-status-badge--danger" title="%s">%s</span>',
-								esc_attr__( 'This ad is skipped by delivery until its creative is restored.', 'wb-ads-rotator-with-split-test' ),
-								esc_html__( 'Creative missing', 'wb-ads-rotator-with-split-test' )
+								esc_attr__( 'This ad is skipped by delivery until its image is restored.', 'wb-ads-rotator-with-split-test' ),
+								esc_html__( 'Image missing', 'wb-ads-rotator-with-split-test' )
 							)
 						);
 					}

@@ -353,7 +353,7 @@ class Settings {
 			array(
 				'id'          => 'format_matching',
 				'default'     => \WBAM\Core\Settings_Helper::format_matching_enabled(),
-				'description' => __( 'Only show an ad in placements that accept its size format, so oversize creatives never break the layout.', 'wb-ads-rotator-with-split-test' ),
+				'description' => __( 'Only show an ad in placements that accept its size format, so oversize images never break the layout.', 'wb-ads-rotator-with-split-test' ),
 			)
 		);
 
@@ -1456,8 +1456,8 @@ class Settings {
 		// once Pro's advertiser portal is active - Free-only sites just pick
 		// which slots this site itself uses.
 		$copy = defined( 'WBAM_PRO_VERSION' )
-			? __( 'Choose which slots this site uses, and which of those advertisers may buy. Unticking Site stops ads rendering in that slot. Unticking Advertisers only removes it from the advertiser portal - creatives already assigned keep running.', 'wb-ads-rotator-with-split-test' )
-			: __( 'Choose which slots this site uses. Unticking a slot stops ads rendering there.', 'wb-ads-rotator-with-split-test' );
+			? __( 'Choose which placements this site uses, and which of those advertisers may buy. Unticking Site stops ads rendering in that placement. Unticking Advertisers only removes it from the advertiser portal - ads already assigned keep running.', 'wb-ads-rotator-with-split-test' )
+			: __( 'Choose which placements this site uses. Unticking a placement stops ads rendering there.', 'wb-ads-rotator-with-split-test' );
 
 		echo '<p>' . esc_html( $copy ) . '</p>';
 

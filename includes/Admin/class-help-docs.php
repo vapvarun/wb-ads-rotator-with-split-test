@@ -461,7 +461,7 @@ class Help_Docs {
 					<li><?php esc_html_e( 'Impressions, clicks, and CTR tracking with daily aggregation', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Geographic and device breakdown', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Revenue dashboard and billing-proof ledger', 'wb-ads-rotator-with-split-test' ); ?></li>
-					<li><?php esc_html_e( 'Slot inventory view (AdSense-style capacity overview)', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Placement inventory view (AdSense-style capacity overview)', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Share of Voice analysis per advertiser', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>
 			</div>
@@ -561,7 +561,7 @@ class Help_Docs {
 					<li><?php esc_html_e( 'Daily impression & click aggregation with time-series reports', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'CTR and revenue reports, geo + device breakdowns, CSV export', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'A/B testing with statistical significance and traffic splitting', 'wb-ads-rotator-with-split-test' ); ?></li>
-					<li><?php esc_html_e( 'Slot inventory view. AdSense-style capacity overview', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Placement inventory view. AdSense-style capacity overview', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Share of Voice analysis per advertiser', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>
 			</div>
