@@ -28,6 +28,7 @@ class Test_Admin_Menu_Sections extends Pro_Test_Case {
 		);
 
 		$this->assertSame( 'advertisers', $groups['wbam-transactions'] );
+		$this->assertSame( 'advertisers', $groups['wbam-email-captures'], 'Card 10343706274: Email Captures moved off Settings > Tools into Advertisers.' );
 		$this->assertSame( 'classifieds', $groups['wbam-classified-reports'] );
 		$this->assertSame( 'classifieds', $groups['edit-tags.php?taxonomy=wbam-classified-cat&amp;post_type=wbam-classified'] );
 		$this->assertSame( array( 'ads', 'campaigns', 'advertisers', 'classifieds', 'links', 'reports' ), array_keys( $sections ) );

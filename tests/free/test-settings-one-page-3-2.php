@@ -203,13 +203,18 @@ class Test_Settings_One_Page_3_2 extends WP_UnitTestCase {
 		$this->assertSame( 1, substr_count( $html, '<form' ) );
 	}
 
-	/** Old wbam-tools / wbam-email-captures URLs redirect to the new sections. */
-	public function test_legacy_tools_and_email_captures_urls_redirect(): void {
+	/**
+	 * Old wbam-tools URL redirects to the new Tools & License section.
+	 * wbam-email-captures is a real registered page again (card 10343706274's
+	 * own submenu, see Test_Email_Captures_List), so this hook never fires
+	 * for it any more - covered instead by
+	 * Test_Email_Captures_List::test_legacy_settings_section_url_redirects_to_the_new_screen().
+	 */
+	public function test_legacy_tools_url_redirects(): void {
 		$admin = new \WBAM\Admin\Admin();
 
 		$cases = array(
-			'wbam-tools'          => 'section=tools',
-			'wbam-email-captures' => 'section=email-captures',
+			'wbam-tools' => 'section=tools',
 		);
 
 		foreach ( $cases as $old_page => $expected_fragment ) {
@@ -243,6 +248,28 @@ class Test_Settings_One_Page_3_2 extends WP_UnitTestCase {
 			$this->assertTrue( true );
 		} catch ( \RuntimeException $e ) {
 			$this->fail( 'Unrelated page must not trigger the legacy-settings redirect.' );
+		} finally {
+			remove_filter( 'wp_redirect', $redirect );
+		}
+	}
+
+	/**
+	 * wbam-email-captures is a real registered page again (card 10343706274),
+	 * so this hook - which only ever fires for a page with no matching menu
+	 * entry - must never trigger for it.
+	 */
+	public function test_email_captures_page_does_not_redirect(): void {
+		$admin    = new \WBAM\Admin\Admin();
+		$_GET     = array( 'page' => 'wbam-email-captures' );
+		$redirect = static function ( $location ) {
+			throw new \RuntimeException( $location );
+		};
+		add_filter( 'wp_redirect', $redirect );
+		try {
+			$admin->redirect_legacy_settings_url();
+			$this->assertTrue( true );
+		} catch ( \RuntimeException $e ) {
+			$this->fail( 'wbam-email-captures is a real page now; it must not redirect.' );
 		} finally {
 			remove_filter( 'wp_redirect', $redirect );
 		}

@@ -415,7 +415,7 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$cases = array(
 			'advertising' => 'wbam-site-mode-card',
 			'geolocation' => 'wbam_settings[geo_primary_provider]',
-			'license'     => 'id="email-captures"',
+			'license'     => 'Import Demo Data',
 		);
 
 		foreach ( $cases as $old_slug => $needle ) {

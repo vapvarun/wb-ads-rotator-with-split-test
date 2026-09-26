@@ -79,6 +79,22 @@ class Admin_Links {
 	}
 
 	/**
+	 * Get the Email Captures list screen URL.
+	 *
+	 * Its own submenu under Advertisers (card 10343706274) — no longer
+	 * embedded on the Settings screen's Tools section.
+	 *
+	 * @since 3.2.0
+	 * @param array $args Optional query arguments (e.g. `deleted`, `paged`).
+	 * @return string Admin URL.
+	 */
+	public static function email_captures( $args = array() ) {
+		$url = admin_url( 'edit.php?post_type=' . self::POST_TYPE . '&page=wbam-email-captures' );
+
+		return $args ? add_query_arg( $args, $url ) : $url;
+	}
+
+	/**
 	 * Get display options page URL.
 	 *
 	 * @return string Admin URL.

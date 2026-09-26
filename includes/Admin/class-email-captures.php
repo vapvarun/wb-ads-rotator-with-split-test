@@ -28,15 +28,36 @@ class Email_Captures {
 	/**
 	 * Hook into admin.
 	 *
-	 * @since 3.2.0 No longer registers its own submenu page — the list now
-	 *              renders inline on the Settings screen's Tools section
-	 *              (see WBAM\Admin\Settings::render_tools_section()). The old
-	 *              `wbam-email-captures` URL redirects there.
+	 * @since 3.2.0 Rendered inline on the Settings screen's Tools section for
+	 *              one release; moved to its own submenu (owner decision,
+	 *              card 10343706274) — Tools is demo-data/maintenance
+	 *              utilities, not a list-with-search-and-bulk-actions screen,
+	 *              and Email Captures is advertiser-lead data, so it now
+	 *              sits under Advertisers (see `wbam_admin_menu_section_map`
+	 *              in Pro; falls into the unlabelled catch-all on a
+	 *              FREE-only site).
 	 */
 	public function init() {
+		add_action( 'admin_menu', array( $this, 'add_menu' ) );
 		add_action( 'admin_post_wbam_export_email_captures', array( $this, 'handle_export' ) );
 		add_action( 'admin_post_wbam_delete_email_capture', array( $this, 'handle_delete' ) );
 		add_action( 'admin_init', array( $this, 'handle_bulk_delete' ) );
+	}
+
+	/**
+	 * Register the Email Captures submenu page.
+	 *
+	 * @since 3.2.0
+	 */
+	public function add_menu() {
+		add_submenu_page(
+			'edit.php?post_type=wbam-ad',
+			__( 'Email Captures', 'wb-ads-rotator-with-split-test' ),
+			__( 'Email Captures', 'wb-ads-rotator-with-split-test' ),
+			'manage_options',
+			'wbam-email-captures',
+			array( $this, 'render_page' )
+		);
 	}
 
 	/**
@@ -167,14 +188,14 @@ class Email_Captures {
 	}
 
 	/**
-	 * Render the Email Captures list, embedded inline on the Settings screen's
-	 * Tools section - no `.wrap`/page_header of its own, since the Settings
-	 * screen already provides those.
+	 * Render the Email Captures list screen: its own `.wrap`/page header,
+	 * search box, and bulk-action list table.
 	 *
-	 * @since 3.2.0 Replaces the standalone `wbam-email-captures` admin page.
+	 * @since 3.2.0 Was embedded inline on the Settings screen's Tools
+	 *              section; moved to its own submenu — see init()'s docblock.
 	 * @return void
 	 */
-	public function render_embedded() {
+	public function render_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
@@ -183,33 +204,28 @@ class Email_Captures {
 		$table->prepare_items();
 		$total = $this->count();
 		?>
-		<div class="wbam-email-captures">
-			<div class="wbam-settings-card__head">
-				<h2 class="wbam-settings-card__title"><?php esc_html_e( 'Email Captures', 'wb-ads-rotator-with-split-test' ); ?></h2>
-				<p class="wbam-settings-card__desc">
-					<?php
-					echo esc_html(
-						sprintf(
-							/* translators: %s: number of captured emails */
-							_n( '%s captured email address.', '%s captured email addresses.', $total, 'wb-ads-rotator-with-split-test' ),
-							number_format_i18n( $total )
-						)
-					);
-					?>
-				</p>
-			</div>
+		<div class="wrap wbam-admin">
 			<?php
+			\WBAM\Admin\UX::page_header(
+				array(
+					'title' => __( 'Email Captures', 'wb-ads-rotator-with-split-test' ),
+					'desc'  => sprintf(
+						/* translators: %s: number of captured emails */
+						_n( '%s captured email address.', '%s captured email addresses.', $total, 'wb-ads-rotator-with-split-test' ),
+						number_format_i18n( $total )
+					),
+				)
+			);
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only notice after the delete redirect.
 			$deleted = isset( $_GET['deleted'] ) ? absint( $_GET['deleted'] ) : 0;
 			if ( $deleted ) {
 				/* translators: %s: number of deleted captures */
-				echo '<div class="notice notice-success inline"><p>' . esc_html( sprintf( _n( '%s capture deleted.', '%s captures deleted.', $deleted, 'wb-ads-rotator-with-split-test' ), number_format_i18n( $deleted ) ) ) . '</p></div>';
+				echo '<div class="notice notice-success is-dismissible"><p>' . esc_html( sprintf( _n( '%s capture deleted.', '%s captures deleted.', $deleted, 'wb-ads-rotator-with-split-test' ), number_format_i18n( $deleted ) ) ) . '</p></div>';
 			}
 			?>
 			<form method="get">
 				<input type="hidden" name="post_type" value="wbam-ad">
-				<input type="hidden" name="page" value="wbam-settings">
-				<input type="hidden" name="section" value="tools">
+				<input type="hidden" name="page" value="wbam-email-captures">
 				<?php
 				if ( $total > 0 ) {
 					$table->search_box( __( 'Search captures', 'wb-ads-rotator-with-split-test' ), 'wbam-captures' );
@@ -287,7 +303,7 @@ class Email_Captures {
 	 */
 	public function handle_bulk_delete() {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- gatekeeper; the nonce is checked below.
-		if ( ! isset( $_GET['page'], $_GET['capture_ids'] ) || 'wbam-settings' !== $_GET['page'] ) {
+		if ( ! isset( $_GET['page'], $_GET['capture_ids'] ) || 'wbam-email-captures' !== $_GET['page'] ) {
 			return;
 		}
 		$action = isset( $_GET['action'] ) && '-1' !== $_GET['action'] ? sanitize_key( wp_unslash( $_GET['action'] ) ) : ( isset( $_GET['action2'] ) ? sanitize_key( wp_unslash( $_GET['action2'] ) ) : '' );
@@ -309,7 +325,7 @@ class Email_Captures {
 			$deleted = (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE id IN (" . implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')', $ids ) );
 		}
 
-		wp_safe_redirect( add_query_arg( 'deleted', $deleted, \WBAM\Core\Admin_Links::settings( 'email-captures' ) ) );
+		wp_safe_redirect( \WBAM\Core\Admin_Links::email_captures( array( 'deleted' => $deleted ) ) );
 		exit;
 	}
 
@@ -332,12 +348,11 @@ class Email_Captures {
 
 		$paged = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
 		wp_safe_redirect(
-			add_query_arg(
+			\WBAM\Core\Admin_Links::email_captures(
 				array(
 					'paged'   => $paged,
 					'deleted' => 1,
-				),
-				\WBAM\Core\Admin_Links::settings( 'email-captures' )
+				)
 			)
 		);
 		exit;

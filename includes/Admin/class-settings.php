@@ -949,24 +949,40 @@ class Settings {
 
 		$sections = $this->get_sections();
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only section selector, no state change.
+		$requested = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : '';
+
+		// Email Captures is its own submenu now (card 10343706274), not a
+		// section of this screen — a genuine HTTP redirect, not just an
+		// alias resolved for the nav highlight, since the content is not
+		// rendered here at all any more. Only `deleted`/`paged` are ever
+		// added by a caller of the old `?section=email-captures` URL
+		// (see Email_Captures' own redirects, now built via
+		// Admin_Links::email_captures() directly) — never the whole
+		// $_GET, which would carry this page's own `page`/`section` args
+		// straight into the redirect target.
+		if ( 'email-captures' === $requested ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only redirect, values re-sanitized below.
+			$carry = array_intersect_key( wp_unslash( $_GET ), array_flip( array( 'deleted', 'paged' ) ) );
+			wp_safe_redirect( \WBAM\Core\Admin_Links::email_captures( array_map( 'absint', $carry ) ) );
+			exit;
+		}
+
 		// Old section slugs (pre-3.2.0 layout, or PRO's retired horizontal
-		// tabs) that now render somewhere else — either merged into another
-		// section's body (Email Captures, License) or simply renamed
-		// (Ad Display, Geolocation, Advertising). Map those here so both the
-		// nav highlight and the body agree on which section is "current".
+		// tabs) that now render somewhere else — merged into another
+		// section's body (License) or simply renamed (Ad Display,
+		// Geolocation, Advertising). Map those here so both the nav
+		// highlight and the body agree on which section is "current".
 		//
 		// @param array<string,string> $aliases Old slug => current slug.
 		$aliases = (array) apply_filters(
 			'wbam_settings_section_aliases',
 			array(
-				'email-captures' => 'tools',
-				'ad-display'     => 'ads-display',
+				'ad-display' => 'ads-display',
 			)
 		);
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only section selector, no state change.
-		$requested = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : '';
-		$current   = isset( $aliases[ $requested ] ) ? $aliases[ $requested ] : $requested;
+		$current = isset( $aliases[ $requested ] ) ? $aliases[ $requested ] : $requested;
 
 		if ( ! isset( $sections[ $current ] ) ) {
 			$keys    = array_keys( $sections );
@@ -1347,10 +1363,10 @@ class Settings {
 	/**
 	 * Render the "Tools & License" section: demo-data/maintenance utilities
 	 * and license activation (PRO, via the `wbam_settings_tools_content`
-	 * action) plus this plugin's own Email Captures list. The old
-	 * `wbam-email-captures` and `wbam-pro-settings&tab=license` URLs both
-	 * redirect here — see render_page()'s `$aliases` and
-	 * `Pro_Admin::legacy_settings_tab_map()`.
+	 * action). The old `wbam-pro-settings&tab=license` URL redirects here —
+	 * see `Pro_Admin::legacy_settings_tab_map()`. Email Captures moved to
+	 * its own submenu (card 10343706274); the old `?section=email-captures`
+	 * URL redirects there — see render_page().
 	 *
 	 * @since 3.2.0
 	 */
@@ -1358,17 +1374,13 @@ class Settings {
 		if ( has_action( 'wbam_settings_tools_content' ) ) {
 			echo '<div class="wbam-card">';
 			/**
-			 * Fires inside the Tools section, before Email Captures.
+			 * Fires inside the Tools section.
 			 *
 			 * @since 3.2.0
 			 */
 			do_action( 'wbam_settings_tools_content' );
 			echo '</div>';
 		}
-
-		echo '<div class="wbam-card" id="email-captures">';
-		( new Email_Captures() )->render_embedded();
-		echo '</div>';
 	}
 
 	/**

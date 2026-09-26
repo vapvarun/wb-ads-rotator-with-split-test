@@ -76,12 +76,14 @@ class Admin {
 		add_action( 'restrict_manage_posts', array( $this, 'render_status_filter' ) );
 		add_action( 'pre_get_posts', array( $this, 'apply_status_filter' ) );
 
-		// Legacy settings URLs (wbam-pro-settings&tab=X, wbam-tools,
-		// wbam-email-captures) no longer resolve to a registered page now
-		// that everything lives on the one wbam-settings screen. WordPress
-		// fires this action right before the "Sorry, you are not allowed to
-		// access this page" wp_die() for any $_GET['page'] with no matching
-		// menu entry — redirect there instead of dying.
+		// Legacy settings URLs (wbam-pro-settings&tab=X, wbam-tools) no
+		// longer resolve to a registered page now that everything lives on
+		// the one wbam-settings screen. WordPress fires this action right
+		// before the "Sorry, you are not allowed to access this page"
+		// wp_die() for any $_GET['page'] with no matching menu entry —
+		// redirect there instead of dying. `wbam-email-captures` used to be
+		// handled here too, but it is a real registered page again (card
+		// 10343706274's own submenu), so this hook never fires for it.
 		add_action( 'admin_page_access_denied', array( $this, 'redirect_legacy_settings_url' ) );
 
 		// Settings link on the Plugins list row (Pro already has one).
@@ -137,11 +139,6 @@ class Admin {
 
 		if ( 'wbam-tools' === $page ) {
 			wp_safe_redirect( \WBAM\Core\Admin_Links::settings( 'tools' ) );
-			exit;
-		}
-
-		if ( 'wbam-email-captures' === $page ) {
-			wp_safe_redirect( \WBAM\Core\Admin_Links::settings( 'email-captures' ) );
 			exit;
 		}
 	}

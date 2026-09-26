@@ -21,7 +21,7 @@ class Test_Email_Captures_List extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
-		set_current_screen( 'wbam-ad_page_wbam-settings' );
+		set_current_screen( 'wbam-ad_page_wbam-email-captures' );
 		$this->ad_a = Factory::make_ad( array( 'post_title' => 'Newsletter A' ) );
 		$this->ad_b = Factory::make_ad( array( 'post_title' => 'Newsletter B' ) );
 		$this->capture( $this->ad_a, 'zoe@example.org', 'Zoe' );
@@ -30,7 +30,7 @@ class Test_Email_Captures_List extends WP_UnitTestCase {
 	}
 
 	public function tear_down(): void {
-		unset( $_GET['s'], $_GET['capture_ad'], $_GET['orderby'], $_GET['order'], $_GET['page'], $_GET['action'], $_GET['capture_ids'], $_GET['_wpnonce'], $_REQUEST['_wpnonce'] );
+		unset( $_GET['s'], $_GET['capture_ad'], $_GET['orderby'], $_GET['order'], $_GET['page'], $_GET['section'], $_GET['action'], $_GET['capture_ids'], $_GET['_wpnonce'], $_REQUEST['_wpnonce'] );
 		set_current_screen( 'front' );
 		parent::tear_down();
 	}
@@ -86,7 +86,7 @@ class Test_Email_Captures_List extends WP_UnitTestCase {
 	public function test_bulk_delete_removes_the_selected_rows(): void {
 		$ids = wp_list_pluck( $this->table()->items, 'id' );
 
-		$_GET['page']         = 'wbam-settings';
+		$_GET['page']         = 'wbam-email-captures';
 		$_GET['action']       = 'delete_captures';
 		$_GET['capture_ids']  = array( (string) $ids[0], (string) $ids[1] );
 		$_GET['_wpnonce']     = wp_create_nonce( 'bulk-captures' );
@@ -94,16 +94,59 @@ class Test_Email_Captures_List extends WP_UnitTestCase {
 
 		add_filter(
 			'wp_redirect',
-			static function () {
-				throw new \RuntimeException( 'redirected' );
+			static function ( $location ) {
+				throw new \RuntimeException( (string) $location );
 			}
 		);
 		try {
 			( new Email_Captures() )->handle_bulk_delete();
+			$this->fail( 'Expected a redirect.' );
 		} catch ( \RuntimeException $e ) {
-			$this->assertSame( 'redirected', $e->getMessage() );
+			$this->assertStringContainsString( 'page=wbam-email-captures', $e->getMessage(), 'Redirects to Email Captures\' own screen, not the old Settings section.' );
 		}
 
 		$this->assertSame( 1, ( new Email_Captures() )->count() );
+	}
+
+	/** Old `?section=email-captures` URL redirects to the new standalone screen. */
+	public function test_legacy_settings_section_url_redirects_to_the_new_screen(): void {
+		$settings = \WBAM\Admin\Settings::get_instance();
+		$_GET['section'] = 'email-captures';
+
+		add_filter(
+			'wp_redirect',
+			static function ( $location ) {
+				throw new \RuntimeException( (string) $location );
+			}
+		);
+		try {
+			$settings->render_page();
+			$this->fail( 'Expected a redirect.' );
+		} catch ( \RuntimeException $e ) {
+			$this->assertStringContainsString( 'page=wbam-email-captures', $e->getMessage() );
+		}
+	}
+
+	/** Its own submenu (card 10343706274), registered directly, not through Settings. */
+	public function test_registers_its_own_submenu_page(): void {
+		global $submenu;
+		$before = $submenu;
+
+		( new Email_Captures() )->add_menu();
+
+		$slugs = wp_list_pluck( $submenu['edit.php?post_type=wbam-ad'] ?? array(), 2 );
+		$this->assertContains( 'wbam-email-captures', $slugs );
+
+		$submenu = $before; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- test cleanup, restoring the global we just mutated.
+	}
+
+	/** No longer embedded on the Settings screen's Tools section. */
+	public function test_no_longer_embedded_on_the_tools_section(): void {
+		ob_start();
+		\WBAM\Admin\Settings::get_instance()->render_tools_section();
+		$html = ob_get_clean();
+
+		$this->assertStringNotContainsString( 'id="email-captures"', $html );
+		$this->assertStringNotContainsString( 'wbam-email-captures', $html );
 	}
 }
