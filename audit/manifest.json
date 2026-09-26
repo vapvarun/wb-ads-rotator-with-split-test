@@ -1710,6 +1710,20 @@
       "purpose": "Filter placement\u2192format compatibility map"
     },
     {
+      "name": "wbam_placement_shapes",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Core/class-placement-format-map.php",
+      "purpose": "Override (or narrow) a shape's size list; wbam_placement_format_map wins outright if both are hooked"
+    },
+    {
+      "name": "wbam_enforce_format_matching",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Admin/class-admin.php, includes/Modules/Placements/class-placement-engine.php, includes/functions-ad-formats.php",
+      "purpose": "Whether a placement must fit the ad's resolved size before it can be saved/rendered there (owner decision 13, card 10343726460); default is Settings_Helper::format_matching_enabled()"
+    },
+    {
       "name": "wbam_placement_render_mode",
       "type": "filter",
       "args": 2,
