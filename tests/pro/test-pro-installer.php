@@ -142,6 +142,31 @@ class Test_Pro_Installer extends Pro_Test_Case {
 		$this->assertSame( 20, has_action( 'init', array( \WBAM_Pro\Core\Installer::class, 'finish_classifieds_install' ) ) );
 	}
 
+	/**
+	 * Reactivating an existing install must respect what the owner removed:
+	 * a trashed plugin page stays trashed and deleted categories are not
+	 * seeded again (card 10342783654). Only a fresh install seeds them.
+	 */
+	public function test_reactivation_keeps_a_trashed_page_and_does_not_reseed(): void {
+		update_option( 'wbam_pro_db_version', \WBAM_Pro\Core\Installer::DB_VERSION );
+		update_option( \WBAM_Pro\Core\Installer::CLASSIFIEDS_PENDING_OPTION, 0 );
+
+		$page = (int) self::factory()->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+				'post_name'   => 'advertiser-dashboard',
+			)
+		);
+		update_option( 'wbam_page_advertiser_dashboard', $page );
+		wp_trash_post( $page );
+
+		$this->install_without_ddl( false );
+
+		$this->assertSame( $page, (int) get_option( 'wbam_page_advertiser_dashboard' ), 'A trashed page must not be replaced on reactivation.' );
+		$this->assertSame( 0, (int) get_option( \WBAM_Pro\Core\Installer::CLASSIFIEDS_PENDING_OPTION ), 'Reactivation must not queue the default categories again.' );
+	}
+
 	public function sdk_tables(): array {
 		return array(
 			array( '_credit_ledger' ),

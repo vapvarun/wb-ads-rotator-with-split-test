@@ -43,4 +43,27 @@ class Test_Demo_Data extends Pro_Test_Case {
 
 		$this->assertEmpty( $error, 'Demo data install must not produce DB errors' );
 	}
+
+	/**
+	 * The demo advertisers have made-up .demo addresses. Importing must not
+	 * email them (or anyone): card 10342783654.
+	 */
+	public function test_demo_import_sends_no_email(): void {
+		if ( ! defined( 'WBAM_DEMO_DATA_INCLUDED' ) ) {
+			define( 'WBAM_DEMO_DATA_INCLUDED', true );
+		}
+		require_once WBAM_PRO_PATH . 'demo-data-setup.php';
+
+		reset_phpmailer_instance();
+		$generator = new \WBAM_Demo_Data_Generator();
+		ob_start();
+		$generator->run();
+		ob_end_clean();
+		$sent = tests_retrieve_phpmailer_instance()->mock_sent;
+
+		$generator->delete_tracked_demo_data();
+
+		$this->assertSame( array(), wp_list_pluck( $sent, 'to' ) );
+		$this->assertFalse( has_filter( 'pre_wp_mail', '__return_false' ), 'Mail must work again after the import.' );
+	}
 }
