@@ -38,6 +38,9 @@
 
 .wbam-adtype-tabs {
 	position: relative;
+	margin: 0;
+	padding: 0;
+	border: 0;
 }
 
 .wbam-adtype-radio {
@@ -48,7 +51,46 @@
 
 /* Tab nav/pill styling lives in the shared .wbam-tabs / .wbam-tabs--pills
    component (admin-family.css) — this file only adds the icon sizing the
-   family's generic tab link doesn't know about. */
+   family's generic tab link doesn't know about, plus this instance's own
+   layout: this picker chooses a value (every option must stay reachable,
+   not scroll off), unlike the shared component's other consumers (Help &
+   Docs, Slot Inventory), which are real between-page navigation and are
+   deliberately exempt from this override. QA wave 4 (10343712795): at
+   390px the nowrap row showed 2 of 6 with no scroll cue; at 1280 the last
+   pill was clipped. An even grid instead — 2 columns under 480px (labels
+   don't all fit at 3-up that narrow), 3 columns from 480px, one row of 6
+   from 640px up. */
+.wbam-adtype-tabs__group {
+	flex-wrap: wrap;
+	overflow-x: visible;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--wbam-space-1);
+}
+
+@media screen and (min-width: 480px) {
+	.wbam-adtype-tabs__group {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media screen and (min-width: 640px) {
+	.wbam-adtype-tabs__group {
+		grid-template-columns: repeat(6, 1fr);
+	}
+}
+
+.wbam-adtype-tab {
+	cursor: pointer;
+	justify-content: center;
+	text-align: center;
+}
+
+.wbam-adtype-tab:focus-within {
+	outline: 2px solid var(--wbam-accent);
+	outline-offset: 2px;
+}
+
 .wbam-tabs__link .dashicons {
 	font-size: var(--wbam-font-size-xl);
 	width: 20px;

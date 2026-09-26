@@ -1380,23 +1380,36 @@ class Admin {
 		$engine   = Placement_Engine::get_instance();
 		$ad_types = $engine->get_ad_types();
 		?>
-		<div class="wbam-metabox wbam-adtype-tabs">
-			<?php foreach ( $ad_types as $type ) : ?>
-				<input type="radio"
-						name="wbam_data[type]"
-						value="<?php echo esc_attr( $type->get_id() ); ?>"
-						id="wbam-adtype-<?php echo esc_attr( $type->get_id() ); ?>"
-						class="wbam-adtype-radio"
-						aria-label="<?php echo esc_attr( $type->get_name() ); ?>"
-						<?php checked( $ad_type, $type->get_id() ); ?> />
-			<?php endforeach; ?>
+		<fieldset class="wbam-metabox wbam-adtype-tabs">
+			<legend class="screen-reader-text"><?php esc_html_e( 'Ad type', 'wb-ads-rotator-with-split-test' ); ?></legend>
 
-			<div class="wbam-tabs wbam-tabs--pills" role="tablist">
+			<?php
+			/*
+			 * QA wave 4 (10343712795): this picks a value, so it is a
+			 * radiogroup, not a tablist - `role="tab"` on a plain `<a>`
+			 * with the real value living in a separately-rendered, hidden
+			 * radio meant the pill and its value could (and did) disagree
+			 * about focus/selection state to assistive tech. Same
+			 * hidden-radio-plus-styled-label pattern already used for
+			 * Sizing (.wbam-sizing-option) and Placements
+			 * (.wbam-placement-option) on this same screen: the pill IS
+			 * the radio's label now, one element, one source of truth.
+			 * Arrow-key movement between options and native focus both
+			 * come from the browser's radio-group behavior for free.
+			 */
+			?>
+			<div class="wbam-tabs wbam-tabs--pills wbam-adtype-tabs__group" role="radiogroup" aria-label="<?php esc_attr_e( 'Ad type', 'wb-ads-rotator-with-split-test' ); ?>">
 				<?php foreach ( $ad_types as $type ) : ?>
-					<a href="#" class="wbam-tabs__link wbam-adtype-tab<?php echo ( $ad_type === $type->get_id() ) ? ' is-active' : ''; ?>" role="tab" data-type="<?php echo esc_attr( $type->get_id() ); ?>">
+					<label class="wbam-tabs__link wbam-adtype-tab<?php echo ( $ad_type === $type->get_id() ) ? ' is-active' : ''; ?>">
+						<input type="radio"
+								name="wbam_data[type]"
+								value="<?php echo esc_attr( $type->get_id() ); ?>"
+								id="wbam-adtype-<?php echo esc_attr( $type->get_id() ); ?>"
+								class="wbam-adtype-radio"
+								<?php checked( $ad_type, $type->get_id() ); ?> />
 						<span class="dashicons <?php echo esc_attr( $type->get_icon() ); ?>"></span>
 						<?php echo esc_html( $type->get_name() ); ?>
-					</a>
+					</label>
 				<?php endforeach; ?>
 			</div>
 
@@ -1406,7 +1419,7 @@ class Admin {
 					<?php $type->render_metabox( $post->ID, $data ); ?>
 				</div>
 			<?php endforeach; ?>
-		</div>
+		</fieldset>
 		<script>
 		jQuery(function($) {
 			function readTypeList(rawAttr) {
@@ -1452,12 +1465,15 @@ class Admin {
 				$placementsNote.prop('hidden', ! hidePlacements);
 			}
 
-			$('.wbam-adtype-tab').on('click', function(e) {
-				e.preventDefault();
-				var typeId = $(this).data('type');
-				$('#wbam-adtype-' + typeId).prop('checked', true);
+			// The pill IS the radio's label now (see the PHP above) - a
+			// click, a Tab, or an arrow-key move all end up here as one
+			// native 'change' event on the radio the browser actually
+			// selected, so this no longer needs to compute or set
+			// .checked itself.
+			$('.wbam-adtype-radio').on('change', function() {
+				var typeId = $(this).val();
 				$('.wbam-adtype-tab').removeClass('is-active');
-				$(this).addClass('is-active');
+				$(this).closest('.wbam-adtype-tab').addClass('is-active');
 				$('.wbam-adtype-content').hide();
 				$('.wbam-adtype-content[data-type="' + typeId + '"]').show();
 				syncTypeDependentPanels( String( typeId ) );
