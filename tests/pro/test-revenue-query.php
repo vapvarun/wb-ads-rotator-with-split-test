@@ -116,6 +116,108 @@ class Test_Revenue_Query extends Pro_Test_Case {
 		$this->assertSame( 10.0, Revenue_Query::rpm( $today, $today ) );
 	}
 
+	/**
+	 * The QA fixture scenario: a WP user row removed directly (not through
+	 * wp_delete_user(), whose 'deleted_user' hook would also remove the
+	 * advertiser row) leaves the advertiser row in place with no company
+	 * name and no WP account to read a display name from.
+	 */
+	public function test_top_advertisers_labels_a_deleted_wp_user_by_id(): void {
+		$today = gmdate( 'Y-m-d' );
+
+		$charge = Credits_Bridge::adjust( $this->advertiser->id, 15.00, 'x', Revenue_Ledger::SOURCE_OFFLINE_PAYMENT );
+		$this->assertNotWPError( $charge );
+
+		global $wpdb;
+		$wpdb->delete( $wpdb->users, array( 'ID' => $this->user ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test-only simulation of a row removed outside wp_delete_user().
+
+		$rows = Revenue_Query::top_advertisers( $today, $today );
+
+		$this->assertCount( 1, $rows );
+		$this->assertSame( "Deleted user #{$this->user}", $rows[0]['name'] );
+	}
+
+	/**
+	 * Same scenario on recent() — Recent Transactions' "Advertiser" column.
+	 */
+	public function test_recent_labels_a_deleted_wp_user_by_id(): void {
+		$today = gmdate( 'Y-m-d' );
+
+		$charge = Credits_Bridge::adjust( $this->advertiser->id, 15.00, 'x', Revenue_Ledger::SOURCE_OFFLINE_PAYMENT );
+		$this->assertNotWPError( $charge );
+
+		global $wpdb;
+		$wpdb->delete( $wpdb->users, array( 'ID' => $this->user ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- test-only simulation of a row removed outside wp_delete_user().
+
+		$rows = Revenue_Query::recent( $today, $today );
+
+		$this->assertCount( 1, $rows );
+		$this->assertSame( "Deleted user #{$this->user}", $rows[0]['advertiser'] );
+	}
+
+	/**
+	 * A negative amount on a usage source (a listing/campaign/plan refund,
+	 * which shares its charge's own source rather than getting a dedicated
+	 * refund constant) is prefixed "Refund: "; the positive charge on the
+	 * same source is not.
+	 */
+	public function test_recent_prefixes_a_usage_refund_but_not_its_charge(): void {
+		$today = gmdate( 'Y-m-d' );
+
+		$charge = Credits_Bridge::charge( $this->advertiser->id, 3.00, 501, 'listing', false, Revenue_Ledger::SOURCE_CLASSIFIED_LISTING );
+		$this->assertNotWPError( $charge );
+		$refund = Credits_Bridge::credit( $this->advertiser->id, 3.00, 501, 'listing refunded', Revenue_Ledger::SOURCE_CLASSIFIED_LISTING );
+		$this->assertNotWPError( $refund );
+
+		$rows = Revenue_Query::recent( $today, $today );
+		$this->assertCount( 2, $rows );
+
+		$by_amount = array();
+		foreach ( $rows as $row ) {
+			$by_amount[ $row['amount'] > 0 ? 'charge' : 'refund' ] = $row;
+		}
+
+		$this->assertSame( 'Classified listing', $by_amount['charge']['source_label'] );
+		$this->assertSame( 'Refund: Classified listing', $by_amount['refund']['source_label'] );
+	}
+
+	/**
+	 * by_placement(): an ad permanently deleted (its post gone, but the
+	 * ledger row's item_id survives) is "Unattributed", never confused with
+	 * an ad that genuinely runs in more than one placement.
+	 */
+	public function test_by_placement_labels_a_deleted_ad_as_unattributed(): void {
+		$today = gmdate( 'Y-m-d' );
+
+		$deleted_ad_id = 9999999; // Never created — nothing to resolve.
+		$charge        = Credits_Bridge::charge( $this->advertiser->id, 10.00, $deleted_ad_id, 'x', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		$this->assertNotWPError( $charge );
+
+		$rows = Revenue_Query::by_placement( $today, $today );
+
+		$this->assertCount( 1, $rows );
+		$this->assertSame( 'Unattributed (deleted ad or campaign)', $rows[0]['placement'] );
+	}
+
+	/**
+	 * by_placement(): an ad that resolves and genuinely runs in more than
+	 * one placement keeps the "Multiple placements" label.
+	 */
+	public function test_by_placement_keeps_multiple_placements_for_a_real_multi_placement_ad(): void {
+		$today = gmdate( 'Y-m-d' );
+
+		$ad_id = self::factory()->post->create( array( 'post_type' => 'wbam-ad' ) );
+		update_post_meta( $ad_id, '_wbam_placements', array( 'header', 'sidebar' ) );
+
+		$charge = Credits_Bridge::charge( $this->advertiser->id, 10.00, $ad_id, 'x', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		$this->assertNotWPError( $charge );
+
+		$rows = Revenue_Query::by_placement( $today, $today );
+
+		$this->assertCount( 1, $rows );
+		$this->assertSame( 'Multiple placements', $rows[0]['placement'] );
+	}
+
 	public function test_totals_cache_invalidates_after_a_new_charge(): void {
 		$start = gmdate( 'Y-m-d', strtotime( '-1 day' ) );
 		$end   = gmdate( 'Y-m-d', strtotime( '+1 day' ) );
