@@ -1374,6 +1374,20 @@
       "purpose": "rel on an ad's click-through link (sponsored noopener for paid ads, noopener for house ads)"
     },
     {
+      "name": "wbam_popup_repeat_days",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-popup-placement.php",
+      "purpose": "Days before a visitor sees a popup ad again (default 1; an ad's stored popup_repeat_days seeds it)"
+    },
+    {
+      "name": "wbam_popup_skip_mobile_first_view",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-popup-placement.php",
+      "purpose": "Hold a popup back on a phone's first page view (default false; an ad's stored popup_mobile_first_view seeds it)"
+    },
+    {
       "name": "wbam_code_ad_content",
       "type": "filter",
       "args": 2,

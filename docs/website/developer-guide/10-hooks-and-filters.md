@@ -30,7 +30,9 @@ WB Ad Manager fires actions and filters throughout its lifecycle so you can exte
 | `wbam_ads_eligible_for_placement` | Ads eligible for a placement before the winner is drawn |
 | `wbam_ad_delivery_tier` | An ad's tier: paid (20) beats house (10) beats sample (0) for a slot |
 | `wbam_rotation_pick` | The winner among same-tier ads (Pro's rotation model hooks here for paid ads) |
-| `wbam_ad_link_rel` | rel on an ad's link: `sponsored noopener` for paid ads, `noopener` for house ads |
+| `wbam_ad_link_rel` | rel on an ad's link: `sponsored noopener` for paid ads, `noopener` for house ads. An ad saved with the old per-ad nofollow option on (removed in 3.2.0) starts from its value plus `nofollow`. Return a string with `nofollow` to add it site-wide |
+| `wbam_popup_repeat_days` | Days before a visitor sees a popup ad again (`$days`, `$ad_id`; default 1, 0 = every page until closed). An ad saved with the old 'Show again after' field starts from its stored value |
+| `wbam_popup_skip_mobile_first_view` | Hold a popup ad back on a phone visitor's first page view (`$skip`, `$ad_id`; default false). An ad saved with the old first-view field starts from its stored value |
 | `wbam_ad_output` | The rendered ad HTML |
 | `wbam_placement_render_mode` | Rotate (pick one) vs stack (render every ad of the top delivery tier) for a placement |
 | `wbam_enforce_page_cap` | Whether the once-per-page cap applies to an ad |

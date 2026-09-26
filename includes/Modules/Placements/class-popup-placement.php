@@ -94,7 +94,30 @@ class Popup_Placement implements Placement_Interface {
 		}
 
 		foreach ( $ads as $ad_id ) {
-			$options = $this->save_options( $ad_id, (array) get_post_meta( $ad_id, '_wbam_ad_data', true ) );
+			$data    = (array) get_post_meta( $ad_id, '_wbam_ad_data', true );
+			$options = $this->save_options( $ad_id, $data );
+
+			/**
+			 * Days before a visitor sees this popup again; 0 shows it on
+			 * every page until they close it. Ads saved while this was a
+			 * field start from their stored value.
+			 *
+			 * @since 3.2.0
+			 * @param int $days  Default 1 (once per visitor per day).
+			 * @param int $ad_id Ad ID.
+			 */
+			$repeat_days = min( 365, absint( apply_filters( 'wbam_popup_repeat_days', isset( $data['popup_repeat_days'] ) ? absint( $data['popup_repeat_days'] ) : 1, $ad_id ) ) );
+
+			/**
+			 * Whether to hold this popup back on a phone visitor's first
+			 * page view. Ads saved while this was a field start from their
+			 * stored value.
+			 *
+			 * @since 3.2.0
+			 * @param bool $skip  Default false.
+			 * @param int  $ad_id Ad ID.
+			 */
+			$skip_first_view = (bool) apply_filters( 'wbam_popup_skip_mobile_first_view', isset( $data['popup_mobile_first_view'] ) ? ! $data['popup_mobile_first_view'] : false, $ad_id );
 
 			$output = $engine->render_ad( $ad_id, array( 'placement' => $this->get_id() ) );
 
@@ -112,8 +135,8 @@ class Popup_Placement implements Placement_Interface {
 					esc_attr( $options['popup_trigger'] ),
 					esc_attr( $options['popup_delay'] ),
 					esc_attr( $options['popup_scroll'] ),
-					esc_attr( $options['popup_repeat_days'] ),
-					$options['popup_mobile_first_view'] ? 1 : 0,
+					esc_attr( $repeat_days ),
+					$skip_first_view ? 0 : 1,
 					esc_attr__( 'Advertisement', 'wb-ads-rotator-with-split-test' ),
 					esc_attr__( 'Close', 'wb-ads-rotator-with-split-test' ),
 					$output // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped in render_ad.
@@ -155,17 +178,6 @@ class Popup_Placement implements Placement_Interface {
 			<label for="wbam_popup_scroll"><?php esc_html_e( 'Scroll Percentage', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<input type="number" id="wbam_popup_scroll" class="small-text" name="wbam_data[popup_scroll]" value="<?php echo esc_attr( $options['popup_scroll'] ); ?>" min="10" max="100" />%
 		</div>
-		<div class="wbam-placement-extra">
-			<label for="wbam_popup_repeat_days"><?php esc_html_e( 'Show again after (days)', 'wb-ads-rotator-with-split-test' ); ?></label>
-			<input type="number" id="wbam_popup_repeat_days" class="small-text" name="wbam_data[popup_repeat_days]" value="<?php echo esc_attr( $options['popup_repeat_days'] ); ?>" min="0" max="365" />
-			<span class="description"><?php esc_html_e( 'Each visitor sees the popup once in this many days. 0 shows it on every page until they close it.', 'wb-ads-rotator-with-split-test' ); ?></span>
-		</div>
-		<div class="wbam-placement-extra">
-			<label>
-				<input type="checkbox" name="wbam_data[popup_mobile_first_view]" value="1" <?php checked( $options['popup_mobile_first_view'] ); ?> />
-				<?php esc_html_e( 'Allow on a phone visitor\'s first page view', 'wb-ads-rotator-with-split-test' ); ?>
-			</label>
-		</div>
 		<?php
 	}
 
@@ -180,14 +192,13 @@ class Popup_Placement implements Placement_Interface {
 		$valid_triggers = array( 'delay', 'scroll', 'exit' );
 		$trigger        = isset( $data['popup_trigger'] ) ? sanitize_key( $data['popup_trigger'] ) : 'delay';
 
-		// Restrained defaults (owner decision 9): delayed, once per visitor
-		// per day, never on a phone's first page view.
+		// Restrained defaults (owner decision 9): delayed by 5 seconds. How
+		// often it repeats and the phone first-view rule are filters, see
+		// render_popup_ads().
 		return array(
-			'popup_trigger'           => in_array( $trigger, $valid_triggers, true ) ? $trigger : 'delay',
-			'popup_delay'             => isset( $data['popup_delay'] ) ? max( 1, min( 60, absint( $data['popup_delay'] ) ) ) : 5,
-			'popup_scroll'            => isset( $data['popup_scroll'] ) ? max( 10, min( 100, absint( $data['popup_scroll'] ) ) ) : 50,
-			'popup_repeat_days'       => isset( $data['popup_repeat_days'] ) ? min( 365, absint( $data['popup_repeat_days'] ) ) : 1,
-			'popup_mobile_first_view' => ! empty( $data['popup_mobile_first_view'] ),
+			'popup_trigger' => in_array( $trigger, $valid_triggers, true ) ? $trigger : 'delay',
+			'popup_delay'   => isset( $data['popup_delay'] ) ? max( 1, min( 60, absint( $data['popup_delay'] ) ) ) : 5,
+			'popup_scroll'  => isset( $data['popup_scroll'] ) ? max( 10, min( 100, absint( $data['popup_scroll'] ) ) ) : 50,
 		);
 	}
 }

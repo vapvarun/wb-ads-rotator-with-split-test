@@ -44,6 +44,8 @@ class Test_Placement_Options extends \WP_UnitTestCase {
 
 		$this->assertMatchesRegularExpression( '/data-placement="popup"(?! hidden)[^>]*>/', $metabox, 'A ticked placement shows its options.' );
 		$this->assertStringContainsString( 'name="wbam_data[popup_trigger]"', $metabox );
+		$this->assertStringNotContainsString( 'popup_repeat_days', $metabox, 'How often the popup repeats is a filter, not a field.' );
+		$this->assertStringNotContainsString( 'popup_mobile_first_view', $metabox, 'The phone first-view rule is a filter, not a field.' );
 		$this->assertMatchesRegularExpression( '/data-placement="sticky" hidden/', $metabox, 'An unticked placement keeps its options hidden.' );
 
 		$original = $_POST;
@@ -55,7 +57,6 @@ class Test_Placement_Options extends \WP_UnitTestCase {
 				'content'           => 'Option probe',
 				'popup_trigger'     => 'scroll',
 				'popup_scroll'      => '30',
-				'popup_repeat_days' => '3',
 				'sticky_position'   => 'bottom-bar',
 			),
 		);
@@ -65,7 +66,6 @@ class Test_Placement_Options extends \WP_UnitTestCase {
 		$saved = get_post_meta( $ad_id, '_wbam_ad_data', true );
 		$this->assertSame( 'scroll', $saved['popup_trigger'] );
 		$this->assertSame( 30, $saved['popup_scroll'] );
-		$this->assertSame( 3, $saved['popup_repeat_days'] );
 		$this->assertSame( 'bottom-bar', $saved['sticky_position'] );
 
 		add_filter( 'wbam_enforce_page_cap', '__return_false' );
@@ -74,16 +74,36 @@ class Test_Placement_Options extends \WP_UnitTestCase {
 		$popup = ob_get_clean();
 
 		$this->assertStringContainsString( 'data-trigger="scroll"', $popup );
-		$this->assertStringContainsString( 'data-repeat-days="3"', $popup );
+		$this->assertStringContainsString( 'data-repeat-days="1"', $popup, 'Once per visitor per day by default.' );
+		$this->assertStringContainsString( 'data-mobile-first-view="1"', $popup, 'Phones see it on the first view by default.' );
 		$this->assertStringContainsString( 'role="dialog" aria-modal="true"', $popup, 'The popup is announced as a modal dialog.' );
 	}
 
-	public function test_popup_defaults_are_restrained(): void {
-		$defaults = Placement_Engine::get_instance()->get_placement( 'popup' )->save_options( 0, array() );
+	public function test_popup_repeat_and_phone_rule_are_filters_seeded_by_stored_values(): void {
+		add_filter( 'wbam_enforce_page_cap', '__return_false' );
+		$popup = Placement_Engine::get_instance()->get_placement( 'popup' );
 
-		$this->assertSame( 'delay', $defaults['popup_trigger'] );
-		$this->assertSame( 1, $defaults['popup_repeat_days'], 'Once per visitor per day.' );
-		$this->assertFalse( $defaults['popup_mobile_first_view'], 'Never on a phone\'s first page view unless the owner allows it.' );
+		// An ad saved while these were fields keeps its values as the defaults.
+		$this->ad( array( 'popup' ), array( 'popup_repeat_days' => 3, 'popup_mobile_first_view' => false ) );
+		ob_start();
+		$popup->render_popup_ads();
+		$html = ob_get_clean();
+		$this->assertStringContainsString( 'data-repeat-days="3"', $html );
+		$this->assertStringContainsString( 'data-mobile-first-view="0"', $html, 'The stored "not on a phone\'s first view" still holds.' );
+
+		$days = static function () {
+			return 7;
+		};
+		add_filter( 'wbam_popup_repeat_days', $days );
+		add_filter( 'wbam_popup_skip_mobile_first_view', '__return_false' );
+		ob_start();
+		$popup->render_popup_ads();
+		$html = ob_get_clean();
+		remove_filter( 'wbam_popup_repeat_days', $days );
+		remove_filter( 'wbam_popup_skip_mobile_first_view', '__return_false' );
+
+		$this->assertStringContainsString( 'data-repeat-days="7"', $html );
+		$this->assertStringContainsString( 'data-mobile-first-view="1"', $html );
 	}
 
 	public function test_content_ad_renders_once_at_its_position(): void {
