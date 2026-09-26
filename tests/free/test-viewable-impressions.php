@@ -121,4 +121,23 @@ class Test_Viewable_Impressions extends WP_UnitTestCase {
 
 		$this->assertStringNotContainsString( 'wbam_settings[viewable_impressions]', $html );
 	}
+
+	/**
+	 * No form posts viewable_impressions any more, so a settings save must
+	 * keep the stored value (card 10344005566): the filter's default is it.
+	 */
+	public function test_settings_form_save_keeps_the_stored_value(): void {
+		( new \WBAM\Admin\Settings() )->register_settings();
+		update_option( 'wbam_settings', array( 'viewable_impressions' => true ) );
+
+		update_option(
+			'wbam_settings',
+			array(
+				'_fields'  => array( 'disable_ads_logged_in' ),
+				'ad_label' => 'Sponsored',
+			)
+		);
+
+		$this->assertTrue( get_option( 'wbam_settings' )['viewable_impressions'] );
+	}
 }
