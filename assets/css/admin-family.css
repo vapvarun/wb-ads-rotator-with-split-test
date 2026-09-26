@@ -716,7 +716,13 @@
 	list-style: none;
 }
 
+/* wp-admin gives every li a 6px bottom margin; the flex gap already spaces the rail. */
+.wbam-settings-nav__group-list > li {
+	margin: 0;
+}
+
 .wbam-settings-nav__link {
+	box-sizing:      border-box;
 	display:         flex;
 	align-items:     center;
 	gap:             var(--wbam-space-2);
