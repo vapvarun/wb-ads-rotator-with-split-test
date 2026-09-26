@@ -367,7 +367,7 @@ class Ad_Formats {
 	 * while claiming "Will render in:" — misleading when the admin had
 	 * only ticked a subset of placements in the metabox below, or none at
 	 * all). Pure computation — no WP calls, no DB reads — so it is
-	 * unit-testable in isolation from both `render_status_metabox()`
+	 * unit-testable in isolation from both `render_sizing_metabox()`
 	 * (initial server-rendered value) and the client-side live recompute
 	 * (`collect_format_js_data()` payload consumed by the inline script).
 	 *

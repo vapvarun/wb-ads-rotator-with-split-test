@@ -1371,34 +1371,19 @@
 }
 
 /* ==========================================================================
-   Ad Status metabox — Sizing section
+   Sizing metabox
    Two-choice responsive/fixed picker with live compatibility readout.
+
+   E5 fix (card 10343765758): this used to be a sub-section inside one very
+   tall "Ad Status" box, so it faked its own panel with a heading + a
+   border-top divider. Now it IS the "Sizing" metabox - WordPress's own
+   postbox title and border already do that job, so the divider and the
+   duplicate "Sizing" heading are gone; .wbam-sizing-section__hint is just
+   the one description line under the postbox title.
    ========================================================================== */
 
-.wbam-sizing-section {
-	margin-top: 18px;
-	padding-top: 15px;
-	border-top: 1px solid var(--wbam-border);
-}
-
-.wbam-sizing-section__head {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 8px;
-	margin-bottom: 10px;
-}
-
-.wbam-sizing-section__title {
-	margin: 0;
-	font-size: var(--wbam-font-size-sm);
-	font-weight: 600;
-	color: var(--wbam-text);
-}
-
 .wbam-sizing-section__hint {
-	font-size: 11px;
-	color: var(--wbam-text-muted);
+	margin: 0 0 10px;
 }
 
 .wbam-sizing-choice {
@@ -1456,12 +1441,14 @@
 	line-height: 1.4;
 }
 
+/* E5 fix: this was a grey box faking a sub-panel inside the old combined
+   "Ad Status" box. Sizing is its own metabox now, so a top border is
+   enough to separate it from the mode picker above - no second nested box
+   style. */
 .wbam-sizing-fixed-fields {
-	padding: 12px;
-	background: var(--wbam-bg);
-	border: 1px solid var(--wbam-border);
-	border-radius: var(--wbam-r-md);
+	padding-top: 12px;
 	margin-bottom: 12px;
+	border-top: 1px solid var(--wbam-border);
 }
 
 .wbam-sizing-fixed-fields[hidden] {
@@ -1509,20 +1496,16 @@
 	font-size: 11px;
 }
 
-/* E5 fix: this used to be a full blue "info" panel sitting right below the
-   grey .wbam-sizing-fixed-fields panel — two different nested box styles in
-   the same Sizing group. One neutral panel throughout the Status metabox;
-   the accent lives only in the left border, same language
-   .wbam-sizing-unavailable-notice already uses above. */
+/* E5 fix: this was a second nested box style (grey/blue panel) inside the
+   old combined "Ad Status" box. Sizing is its own metabox now, so the live
+   summary is a plain row - a top border separates it from the fields
+   above, same divider language as .wbam-sizing-fixed-fields, no box. */
 .wbam-sizing-compat {
 	display: flex;
 	align-items: flex-start;
 	gap: 6px;
-	padding: 10px 12px;
-	background: var(--wbam-bg);
-	border: 1px solid var(--wbam-border);
-	border-left: 4px solid var(--wbam-accent);
-	border-radius: var(--wbam-r-md);
+	padding-top: 10px;
+	border-top: 1px solid var(--wbam-border);
 	font-size: var(--wbam-font-size-xs);
 	line-height: 1.5;
 }

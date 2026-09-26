@@ -1281,10 +1281,17 @@ class Admin {
 			);
 		}
 
-		// 'default' (not 'high') so this renders after core's own Publish
-		// box in the side column. 'high' put it first, pushing the Update
-		// button below several screens' worth of Priority/Sizing/Session
-		// Limit fields.
+		// 'default' (not 'high') so these render after core's own Publish
+		// box in the side column. 'high' put the old combined box first,
+		// pushing the Update button below several screens' worth of
+		// Priority/Sizing/Session Limit fields.
+		//
+		// E5 (card 10343765758): the old single "Ad Status" box was 1,031px
+		// tall with three nested fake-panel styles standing in for real
+		// sub-boxes. Split into three normal metaboxes so WordPress's own
+		// postbox chrome (collapse, drag, per-user order) does that job
+		// instead. Same fields, same names, same nonce, same save_meta() -
+		// only the box that wraps them changed.
 		add_meta_box(
 			'wbam-ad-status',
 			__( 'Ad Status', 'wb-ads-rotator-with-split-test' ),
@@ -1293,6 +1300,31 @@ class Admin {
 			'side',
 			'default'
 		);
+
+		add_meta_box(
+			'wbam-ad-sizing',
+			__( 'Sizing', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_sizing_metabox' ),
+			'wbam-ad',
+			'side',
+			'default'
+		);
+
+		// Pro (or any third party) hooks wbam_ad_metabox_options to add
+		// content here. Only register the box when something is actually
+		// listening - has_action() is the zero-config way to know that
+		// without a settings field, so a Free-only site never sees an
+		// empty "Pro Options" box.
+		if ( has_action( 'wbam_ad_metabox_options' ) ) {
+			add_meta_box(
+				'wbam-ad-pro-options',
+				__( 'Pro Options', 'wb-ads-rotator-with-split-test' ),
+				array( $this, 'render_pro_options_metabox' ),
+				'wbam-ad',
+				'side',
+				'default'
+			);
+		}
 
 		// Only show comparison metabox for existing ads with placements.
 		global $post;
@@ -1850,7 +1882,8 @@ class Admin {
 	}
 
 	/**
-	 * Render status metabox.
+	 * Render the "Ad Status" metabox: enabled/disabled, priority (with its
+	 * win-share hint) and the per-visitor view cap.
 	 *
 	 * @param \WP_Post $post Post.
 	 */
@@ -1861,6 +1894,76 @@ class Admin {
 		$priority      = '' === $priority ? 5 : absint( $priority );
 		$session_limit = get_post_meta( $post->ID, '_wbam_session_limit', true );
 		$session_limit = '' === $session_limit ? '' : absint( $session_limit );
+		?>
+		<div class="wbam-metabox">
+			<div class="wbam-status-options">
+				<label class="wbam-status-option">
+					<input type="radio" name="wbam_enabled" value="1" <?php checked( $enabled, '1' ); ?> />
+					<span class="wbam-status-enabled"><?php esc_html_e( 'Enabled', 'wb-ads-rotator-with-split-test' ); ?></span>
+				</label>
+				<label class="wbam-status-option">
+					<input type="radio" name="wbam_enabled" value="0" <?php checked( $enabled, '0' ); ?> />
+					<span class="wbam-status-disabled"><?php esc_html_e( 'Disabled', 'wb-ads-rotator-with-split-test' ); ?></span>
+				</label>
+			</div>
+
+			<div class="wbam-priority-field">
+				<label for="wbam_priority"><?php esc_html_e( 'Priority', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'priority' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?></label>
+				<input type="range" id="wbam_priority" name="wbam_priority" min="1" max="10" value="<?php echo esc_attr( $priority ); ?>" />
+				<span class="wbam-priority-value"><?php echo esc_html( $priority ); ?></span>
+				<p class="description"><?php esc_html_e( 'Higher priority = bigger share when multiple ads compete for the same slot. Default is 5.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p class="wbam-priority-share-hint" aria-live="polite"></p>
+			</div>
+
+			<div class="wbam-session-limit-field">
+				<label for="wbam_session_limit"><?php esc_html_e( 'Max views per visitor per day', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'session_limit' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?></label>
+				<input type="number" id="wbam_session_limit" name="wbam_session_limit" min="0" value="<?php echo esc_attr( $session_limit ); ?>" placeholder="<?php esc_attr_e( 'Unlimited', 'wb-ads-rotator-with-split-test' ); ?>" />
+				<p class="description"><?php esc_html_e( 'Max views per visitor session. Leave empty for unlimited.', 'wb-ads-rotator-with-split-test' ); ?></p>
+			</div>
+		</div>
+		<script>
+		jQuery(function($) {
+			// Priority slider live value + win-share hint. Frequency_Manager
+			// builds a weighted pool where each ad contributes `priority`
+			// copies, so this ad's share is p / (p + sum of the others).
+			// The others are the real enabled ads sharing its placements.
+			var priorityHint = <?php echo wp_json_encode( self::priority_hint_data( $post->ID ) ); ?>;
+
+			function updatePriorityHint( value ) {
+				var p     = parseInt( value, 10 ) || 5;
+				var share = Math.round( ( p / ( p + priorityHint.others ) ) * 100 );
+				$( '.wbam-priority-share-hint' ).text(
+					priorityHint.template.replace( '%2$d', share ).replace( /%%/g, '%' )
+				);
+			}
+
+			$('#wbam_priority').on('input', function() {
+				$(this).next('.wbam-priority-value').text(this.value);
+				updatePriorityHint( this.value );
+			});
+
+			// Initial paint so the hint is visible on page load.
+			updatePriorityHint( $( '#wbam_priority' ).val() );
+		});
+		</script>
+		<?php
+	}
+
+	/**
+	 * Render the "Sizing" metabox: responsive/fixed mode, format +
+	 * dimensions when fixed, and the live placement-compatibility summary.
+	 *
+	 * Split out of the old combined "Ad Status" box (card 10343765758, E5)
+	 * so it collapses, drags and remembers its own open/closed state like
+	 * any other WordPress postbox. Markup, field names/ids and the
+	 * `data-no-sizing-types` hook are unchanged from before the split -
+	 * render_settings_metabox()'s inline script finds `.wbam-sizing-section`
+	 * with a page-wide jQuery selector, so it doesn't care which metabox
+	 * contains it.
+	 *
+	 * @param \WP_Post $post Post.
+	 */
+	public function render_sizing_metabox( $post ) {
 		$is_responsive = get_post_meta( $post->ID, '_wbam_is_responsive', true );
 		$ad_format     = get_post_meta( $post->ID, '_wbam_ad_format', true );
 		$ad_width      = (int) get_post_meta( $post->ID, '_wbam_ad_width', true );
@@ -1894,40 +1997,14 @@ class Admin {
 		$sizing_hidden    = in_array( $current_ad_type, self::ad_types_without_sizing(), true );
 		?>
 		<div class="wbam-metabox">
-			<div class="wbam-status-options">
-				<label class="wbam-status-option">
-					<input type="radio" name="wbam_enabled" value="1" <?php checked( $enabled, '1' ); ?> />
-					<span class="wbam-status-enabled"><?php esc_html_e( 'Enabled', 'wb-ads-rotator-with-split-test' ); ?></span>
-				</label>
-				<label class="wbam-status-option">
-					<input type="radio" name="wbam_enabled" value="0" <?php checked( $enabled, '0' ); ?> />
-					<span class="wbam-status-disabled"><?php esc_html_e( 'Disabled', 'wb-ads-rotator-with-split-test' ); ?></span>
-				</label>
-			</div>
-
-			<div class="wbam-priority-field">
-				<label for="wbam_priority"><?php esc_html_e( 'Priority', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'priority' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?></label>
-				<input type="range" id="wbam_priority" name="wbam_priority" min="1" max="10" value="<?php echo esc_attr( $priority ); ?>" />
-				<span class="wbam-priority-value"><?php echo esc_html( $priority ); ?></span>
-				<p class="description"><?php esc_html_e( 'Higher priority = bigger share when multiple ads compete for the same slot. Default is 5.', 'wb-ads-rotator-with-split-test' ); ?></p>
-				<p class="wbam-priority-share-hint" aria-live="polite"></p>
-			</div>
-
-			<div class="wbam-session-limit-field">
-				<label for="wbam_session_limit"><?php esc_html_e( 'Max views per visitor per day', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'session_limit' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?></label>
-				<input type="number" id="wbam_session_limit" name="wbam_session_limit" min="0" value="<?php echo esc_attr( $session_limit ); ?>" placeholder="<?php esc_attr_e( 'Unlimited', 'wb-ads-rotator-with-split-test' ); ?>" />
-				<p class="description"><?php esc_html_e( 'Max views per visitor session. Leave empty for unlimited.', 'wb-ads-rotator-with-split-test' ); ?></p>
-			</div>
-
 			<p class="wbam-sizing-unavailable-notice"<?php echo $sizing_hidden ? '' : ' hidden'; ?>>
 				<?php esc_html_e( 'This ad type has no fixed size. It plays inside protected lesson videos or as a standalone player, not in a sized slot.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 
 			<div class="wbam-sizing-section" data-no-sizing-types="<?php echo esc_attr( (string) wp_json_encode( array_values( self::ad_types_without_sizing() ) ) ); ?>"<?php echo $sizing_hidden ? ' hidden' : ''; ?>>
-				<div class="wbam-sizing-section__head">
-					<h3 class="wbam-sizing-section__title"><?php esc_html_e( 'Sizing', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'sizing_mode' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?></h3>
-					<span class="wbam-sizing-section__hint"><?php esc_html_e( 'Controls where this ad can render.', 'wb-ads-rotator-with-split-test' ); ?></span>
-				</div>
+				<p class="wbam-sizing-section__hint description">
+					<?php esc_html_e( 'Controls where this ad can render.', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'sizing_mode' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?>
+				</p>
 
 				<div class="wbam-sizing-choice" role="radiogroup" aria-label="<?php esc_attr_e( 'Ad sizing mode', 'wb-ads-rotator-with-split-test' ); ?>">
 					<label class="wbam-sizing-option <?php echo '1' === (string) $is_responsive ? 'is-active' : ''; ?>">
@@ -1974,41 +2051,9 @@ class Admin {
 					<span class="wbam-sizing-compat__value"><?php echo esc_html( $sizing_compat['value'] ); ?></span>
 				</div>
 			</div>
-
-			<?php
-			/**
-			 * Action for adding additional metabox options.
-			 *
-			 * @since 1.0.0
-			 * @param \WP_Post $post Post object.
-			 */
-			do_action( 'wbam_ad_metabox_options', $post );
-			?>
 		</div>
 		<script>
 		jQuery(function($) {
-			// Priority slider live value + win-share hint. Frequency_Manager
-			// builds a weighted pool where each ad contributes `priority`
-			// copies, so this ad's share is p / (p + sum of the others).
-			// The others are the real enabled ads sharing its placements.
-			var priorityHint = <?php echo wp_json_encode( self::priority_hint_data( $post->ID ) ); ?>;
-
-			function updatePriorityHint( value ) {
-				var p     = parseInt( value, 10 ) || 5;
-				var share = Math.round( ( p / ( p + priorityHint.others ) ) * 100 );
-				$( '.wbam-priority-share-hint' ).text(
-					priorityHint.template.replace( '%2$d', share ).replace( /%%/g, '%' )
-				);
-			}
-
-			$('#wbam_priority').on('input', function() {
-				$(this).next('.wbam-priority-value').text(this.value);
-				updatePriorityHint( this.value );
-			});
-
-			// Initial paint so the hint is visible on page load.
-			updatePriorityHint( $( '#wbam_priority' ).val() );
-
 			// Sizing section wiring. We use a two-choice radio group for the
 			// sizing mode instead of a standalone checkbox so the mental
 			// model is explicit: 'responsive' or 'fixed', with the fixed
@@ -2186,6 +2231,27 @@ class Admin {
 		});
 		</script>
 		<?php
+	}
+
+	/**
+	 * Render the "Pro Options" metabox. This is a thin wrapper around the
+	 * existing wbam_ad_metabox_options action so anything already hooked
+	 * there (Pro's A/B testing + campaign link, or any third party) keeps
+	 * working unchanged - only registered when add_metaboxes() finds a
+	 * listener via has_action().
+	 *
+	 * @param \WP_Post $post Post object.
+	 */
+	public function render_pro_options_metabox( $post ) {
+		echo '<div class="wbam-metabox">';
+		/**
+		 * Action for adding additional metabox options.
+		 *
+		 * @since 1.0.0
+		 * @param \WP_Post $post Post object.
+		 */
+		do_action( 'wbam_ad_metabox_options', $post );
+		echo '</div>';
 	}
 
 	/**
@@ -2835,7 +2901,7 @@ class Admin {
 	 * Used both by the initial server-rendered value
 	 * (self::initial_compat_summary(), no-JS paint) and by the live
 	 * client-side recompute (collect_format_js_data() -> wbamFormatData.i18n
-	 * consumed by the inline script in render_status_metabox()).
+	 * consumed by the inline script in render_sizing_metabox()).
 	 * Centralized so wording never drifts between the two.
 	 *
 	 * @since 2.11.1
@@ -2867,7 +2933,7 @@ class Admin {
 	 * placement-compatibility summary, given an ad's currently persisted
 	 * sizing fields and its ticked placements.
 	 *
-	 * Mirrors the client-side recompute in render_status_metabox()'s
+	 * Mirrors the client-side recompute in render_sizing_metabox()'s
 	 * inline script so the initial (pre-JS) paint and the first live
 	 * update never disagree. Delegates the actual set logic to
 	 * Ad_Formats::summarize_placement_compat() (pure, unit-tested).
