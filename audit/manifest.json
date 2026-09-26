@@ -1339,6 +1339,13 @@
       "purpose": "Filter the candidate ad list for a placement"
     },
     {
+      "name": "wbam_placement_candidates",
+      "type": "action",
+      "args": 2,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "A placement's candidate ads before each is checked; batch-load what a wbam_should_display_ad callback needs (Pro loads campaigns here)"
+    },
+    {
       "name": "wbam_ads_eligible_for_placement",
       "type": "filter",
       "args": 2,

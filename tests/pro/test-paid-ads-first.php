@@ -24,6 +24,31 @@ class Test_Paid_Ads_First extends Pro_Test_Case {
 		update_option( \WBAM_Pro\Core\Pro_Plugin::SAMPLES_RETIRED_OPTION, 0 );
 	}
 
+	/**
+	 * A live campaign for a paid ad; paid ads only serve under one.
+	 */
+	private function live_campaign(): int {
+		global $wpdb;
+
+		$wpdb->insert(
+			$wpdb->prefix . 'wbam_advertisers',
+			array(
+				'user_id' => (int) self::factory()->user->create(),
+				'status'  => 'active',
+			)
+		);
+		$wpdb->insert(
+			$wpdb->prefix . 'wbam_campaigns',
+			array(
+				'advertiser_id' => (int) $wpdb->insert_id,
+				'name'          => 'Live',
+				'status'        => 'active',
+			)
+		);
+
+		return (int) $wpdb->insert_id;
+	}
+
 	private function make_ad( string $title, array $meta = array() ): int {
 		$ad_id = (int) self::factory()->post->create(
 			array(
@@ -60,7 +85,7 @@ class Test_Paid_Ads_First extends Pro_Test_Case {
 	public function test_paid_ad_beats_house_and_sample_ads(): void {
 		$house  = $this->make_ad( 'House ad' );
 		$sample = $this->make_ad( 'Sample ad', array( '_wbam_is_demo' => 1 ) );
-		$paid   = $this->make_ad( 'Paid ad', array( '_wbam_advertiser_id' => 7, '_wbam_priority' => 1 ) );
+		$paid   = $this->make_ad( 'Paid ad', array( '_wbam_advertiser_id' => 7, '_wbam_campaign_id' => $this->live_campaign(), '_wbam_priority' => 1 ) );
 
 		$this->assertSame( array( $paid ), $this->winners( 30 ), 'An eligible paid ad must win every draw, whatever the house ad priority.' );
 
@@ -74,7 +99,7 @@ class Test_Paid_Ads_First extends Pro_Test_Case {
 	public function test_demo_ad_with_an_advertiser_never_outranks_a_real_paid_ad(): void {
 		// A demo import attaches its ads to demo advertisers and campaigns.
 		$this->make_ad( 'Demo paid ad', array( '_wbam_is_demo' => 1, '_wbam_advertiser_id' => 3, '_wbam_campaign_id' => 2, '_wbam_priority' => 10 ) );
-		$paid = $this->make_ad( 'Real paid ad', array( '_wbam_advertiser_id' => 7, '_wbam_priority' => 1 ) );
+		$paid = $this->make_ad( 'Real paid ad', array( '_wbam_campaign_id' => $this->live_campaign(), '_wbam_priority' => 1 ) );
 
 		$this->assertSame( array( $paid ), $this->winners( 30 ), 'Demo ads are samples, whatever advertiser or campaign they carry.' );
 	}
@@ -82,8 +107,8 @@ class Test_Paid_Ads_First extends Pro_Test_Case {
 	public function test_stack_mode_shows_only_the_top_tier(): void {
 		$this->make_ad( 'House ad' );
 		$this->make_ad( 'Sample ad', array( '_wbam_sample_ad' => '1' ) );
-		$paid_a = $this->make_ad( 'Paid A', array( '_wbam_advertiser_id' => 7 ) );
-		$paid_b = $this->make_ad( 'Paid B', array( '_wbam_campaign_id' => 8 ) );
+		$paid_a = $this->make_ad( 'Paid A', array( '_wbam_campaign_id' => $this->live_campaign() ) );
+		$paid_b = $this->make_ad( 'Paid B', array( '_wbam_campaign_id' => $this->live_campaign() ) );
 
 		$stack = static function () {
 			return 'stack';

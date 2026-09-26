@@ -319,6 +319,17 @@ class Placement_Engine {
 		// One meta query for every candidate instead of one per ad below.
 		update_postmeta_cache( $ad_ids );
 
+		/**
+		 * Fires with a placement's candidate ads before each one is checked,
+		 * so an extension can batch-load what its `wbam_should_display_ad`
+		 * callback needs in one query instead of one per ad.
+		 *
+		 * @since 3.2.0
+		 * @param int[]  $ad_ids       Candidate ad IDs.
+		 * @param string $placement_id Placement ID.
+		 */
+		do_action( 'wbam_placement_candidates', $ad_ids, $placement_id );
+
 		// Filter through targeting engine and verify exact placement match.
 		$targeting = Targeting_Engine::get_instance();
 		$filtered  = array();

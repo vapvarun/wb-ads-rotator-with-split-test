@@ -20,6 +20,7 @@ WB Ad Manager fires actions and filters throughout its lifecycle so you can exte
 | `wbam_partnership_created` / `_accepted` / `_rejected` | `$partnership` | Partnership lifecycle events |
 | `wbam_setup_wizard_complete` | - | The setup wizard finished |
 | `wbam_demo_data_cleared` | `$counts` | Demo data was purged |
+| `wbam_placement_candidates` | `$ad_ids`, `$placement_id` | A placement's candidate ads, before each is checked; batch-load data for your `wbam_should_display_ad` callback here |
 
 ## Filters
 
@@ -31,7 +32,7 @@ WB Ad Manager fires actions and filters throughout its lifecycle so you can exte
 | `wbam_rotation_pick` | The winner among same-tier ads (Pro's rotation model hooks here for paid ads) |
 | `wbam_ad_link_rel` | rel on an ad's link: `sponsored noopener` for paid ads, `noopener` for house ads |
 | `wbam_ad_output` | The rendered ad HTML |
-| `wbam_placement_render_mode` | Rotate (pick one) vs stack (render all) for a placement |
+| `wbam_placement_render_mode` | Rotate (pick one) vs stack (render every ad of the top delivery tier) for a placement |
 | `wbam_enforce_page_cap` | Whether the once-per-page cap applies to an ad |
 | `wbam_should_display_ad` | Master gate on whether an ad shows |
 | `wbam_ad_display_rules` | The targeting rule set for an ad |
