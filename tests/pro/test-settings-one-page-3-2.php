@@ -200,8 +200,11 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 
 		$this->assertStringContainsString( 'wbam-page-jump', $html );
 		$this->assertStringContainsString( 'href="#wbam-jump-classifieds-label-url"', $html );
-		$this->assertStringContainsString( 'id="wbam-jump-classifieds-promote-listing"', $html );
+		$this->assertStringContainsString( 'id="wbam-jump-classifieds-inquiries"', $html );
 		$this->assertStringNotContainsString( 'wbam-jump-classifieds-seller-profile', $html, 'No BuddyPress in this suite, so that card (and its jump link) must not render.' );
+		// Promote a live listing (card 10343726590, owner decision 15): folded
+		// into the one Featured Price, no longer its own card/jump target.
+		$this->assertStringNotContainsString( 'wbam-jump-classifieds-promote-listing', $html );
 	}
 
 	/** Advertisers & Billing owns approval/trust, campaign billing defaults and the low-balance warning — one form. */
@@ -210,12 +213,14 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$this->admin->render_advertisers_billing_section( Settings_Helper::get() );
 		$html = ob_get_clean();
 
-		$this->assertStringContainsString( 'wbam_pro_settings[admin_as_advertiser]', $html );
 		$this->assertStringContainsString( 'wbam_pro_settings[trust_system_enabled]', $html );
 		$this->assertStringContainsString( 'wbam_pro_settings[default_pricing_model]', $html );
 		// low_balance_threshold is plug-and-play (owner decision, same card) —
 		// see Test_Settings_Contract_3_2::test_low_balance_threshold_is_plug_and_play().
 		$this->assertStringNotContainsString( 'wbam_pro_settings[low_balance_threshold]', $html );
+		// admin_as_advertiser is plug-and-play too (card 10343726590) — see
+		// Test_Settings_Audit_Cleanup for the wbam_pro_admin_as_advertiser filter.
+		$this->assertStringNotContainsString( 'wbam_pro_settings[admin_as_advertiser]', $html );
 		$this->assertSame( 1, substr_count( $html, '<form' ) );
 	}
 

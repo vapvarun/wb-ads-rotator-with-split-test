@@ -92,23 +92,51 @@ class Test_Submissions_Inquiries_Lists extends Pro_Test_Case {
 		$this->assertSame( $small, $big );
 	}
 
+	/**
+	 * One inbox (card 10343726590): the admin Inquiries screen reads
+	 * `wbam_message_threads`/`wbam_messages`, not the legacy
+	 * `wbam_classified_inquiries` table, so this seeds a listing-inquiry
+	 * thread the same way Message_Manager::get_or_create_guest_thread()
+	 * and add_guest_message() do.
+	 */
 	private function inquiry( string $company ): void {
 		global $wpdb;
+		$seller_user = (int) self::factory()->user->create();
+		$advertiser  = Advertiser_Manager::get_instance()->get_or_create( $seller_user );
+		Advertiser_Manager::get_instance()->update( $advertiser->id, array( 'company_name' => $company ) );
+
 		$post = self::factory()->post->create( array( 'post_type' => 'wbam-classified', 'post_title' => 'Bike ' . $company ) );
 		$wpdb->insert(
 			$wpdb->prefix . 'wbam_classifieds',
 			array(
 				'post_id'       => $post,
-				'advertiser_id' => $this->advertiser( $company ),
+				'advertiser_id' => $advertiser->id,
 			)
 		);
+		$classified_id = (int) $wpdb->insert_id;
+
 		$wpdb->insert(
-			$wpdb->prefix . 'wbam_classified_inquiries',
+			$wpdb->prefix . 'wbam_message_threads',
 			array(
-				'classified_id' => $wpdb->insert_id,
-				'sender_name'   => 'Buyer',
-				'sender_email'  => 'buyer@example.org',
-				'message'       => 'Still available?',
+				'classified_id'   => $classified_id,
+				'guest_name'      => 'Buyer',
+				'guest_email'     => 'buyer@example.org',
+				'participant_a'   => 0,
+				'participant_b'   => $seller_user,
+				'last_message_at' => current_time( 'mysql' ),
+			)
+		);
+		$thread_id = (int) $wpdb->insert_id;
+
+		$wpdb->insert(
+			$wpdb->prefix . 'wbam_messages',
+			array(
+				'thread_id'   => $thread_id,
+				'sender_id'   => 0,
+				'sender_type' => 'guest',
+				'content'     => 'Still available?',
+				'is_read'     => 0,
+				'created_at'  => current_time( 'mysql' ),
 			)
 		);
 	}

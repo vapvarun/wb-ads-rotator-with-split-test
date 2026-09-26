@@ -232,7 +232,13 @@ class Test_Moderation_State_Changes extends Pro_Test_Case {
 		$this->assertSame( '0', get_post_meta( (int) $submission->ad_id, '_wbam_enabled', true ) );
 	}
 
-	public function test_deleting_a_campaign_unlinks_and_pauses_its_ad_for_good(): void {
+	/**
+	 * Card 10343726590 (owner decision): deleting the campaign that paid for
+	 * a live ad now drafts it, the same expired-campaign path
+	 * check_expired_campaigns() already used - not a publish+paused ad the
+	 * portal's Resume refuses forever.
+	 */
+	public function test_deleting_a_campaign_drafts_its_ad_with_no_resume_button(): void {
 		$submission = $this->live_cpc_ad();
 		$ad_id      = (int) $submission->ad_id;
 
@@ -240,12 +246,11 @@ class Test_Moderation_State_Changes extends Pro_Test_Case {
 		$this->assertTrue( Campaign_Manager::get_instance()->delete( (int) $submission->campaign_id ) );
 
 		$this->assertSame( '', get_post_meta( $ad_id, '_wbam_campaign_id', true ), 'The ad no longer points at the deleted campaign.' );
-		$this->assertSame( '0', get_post_meta( $ad_id, '_wbam_enabled', true ), 'The ad stops serving.' );
-		$this->assertSame( 'paused', get_post_meta( $ad_id, '_wbam_status', true ) );
+		$this->assertSame( 'draft', get_post_status( $ad_id ), 'A deleted campaign\'s paid ad is drafted, like any other unpublished ad.' );
+		$this->assertSame( 'campaign_deleted', get_post_meta( $ad_id, '_wbam_disable_reason', true ) );
 
 		$response = $this->resume( $ad_id );
-		$this->assertFalse( $response['success'], 'Nobody pays for it any more, so it cannot be resumed.' );
-		$this->assertSame( '0', get_post_meta( $ad_id, '_wbam_enabled', true ) );
+		$this->assertFalse( $response['success'], 'A draft ad has no Resume button; the AJAX handler refuses it the same generic way as any other unpublished ad.' );
 	}
 
 	public function test_a_paused_live_ad_can_still_be_resumed(): void {
