@@ -73,7 +73,6 @@ class Admin {
 		// (see render_size_matching_notice()).
 		add_action( 'admin_notices', array( $this, 'render_size_matching_notice' ) );
 		add_action( 'admin_post_wbam_dismiss_size_matching', array( $this, 'handle_dismiss_size_matching_notice' ) );
-		add_action( 'admin_post_wbam_enable_size_matching', array( $this, 'handle_enable_size_matching' ) );
 
 		// Inline row-action link so a single "Disable" or "Enable"
 		// click on a row does not require opening the edit screen.
@@ -373,32 +372,23 @@ class Admin {
 			);
 		}
 
-		$enable_url  = wp_nonce_url( admin_url( 'admin-post.php?action=wbam_enable_size_matching' ), 'wbam_enable_size_matching' );
-		$dismiss_url = wp_nonce_url( admin_url( 'admin-post.php?action=wbam_dismiss_size_matching' ), 'wbam_dismiss_size_matching' );
+		// Owner decision (QA wave 4, 10343726460): the Format Matching
+		// checkbox in Settings > Ads & Display is the one control - this
+		// button used to flip the setting directly via its own admin-post
+		// handler, a second switch the checkbox didn't know about. It now
+		// only navigates to that field.
+		$settings_url = \WBAM\Core\Admin_Links::settings( 'ads-display' ) . '#wbam_setting_format_matching';
+		$dismiss_url  = wp_nonce_url( admin_url( 'admin-post.php?action=wbam_dismiss_size_matching' ), 'wbam_dismiss_size_matching' );
 		?>
 		<div class="notice notice-info is-dismissible">
 			<p><strong><?php esc_html_e( 'New: placement sizes by shape', 'wb-ads-rotator-with-split-test' ); ?></strong></p>
 			<p><?php echo esc_html( $body ); ?></p>
 			<p>
-				<a class="button button-primary" href="<?php echo esc_url( $enable_url ); ?>"><?php esc_html_e( 'Turn on size matching', 'wb-ads-rotator-with-split-test' ); ?></a>
+				<a class="button button-primary" href="<?php echo esc_url( $settings_url ); ?>"><?php esc_html_e( 'Go to the Format Matching setting', 'wb-ads-rotator-with-split-test' ); ?></a>
 				<a class="button" href="<?php echo esc_url( $dismiss_url ); ?>"><?php esc_html_e( 'Dismiss', 'wb-ads-rotator-with-split-test' ); ?></a>
 			</p>
 		</div>
 		<?php
-	}
-
-	/**
-	 * One-click "Turn on size matching" handler behind the notice above.
-	 */
-	public function handle_enable_size_matching() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Not allowed.', 'wb-ads-rotator-with-split-test' ) );
-		}
-		check_admin_referer( 'wbam_enable_size_matching' );
-		\WBAM\Core\Settings_Helper::update( 'format_matching', true );
-		$referer = wp_get_referer();
-		wp_safe_redirect( $referer ? $referer : admin_url( 'edit.php?post_type=wbam-ad' ) );
-		exit;
 	}
 
 	/**
