@@ -117,21 +117,15 @@ class Settings {
 			return;
 		}
 
-		// #wbam_geo matches the Geo Targeting section's data-subsection value
-		// (see render_ad_display_subsections()); admin-settings-nav.js reads
-		// it on load and activates that pill directly.
-		$settings_url = add_query_arg(
-			array(
-				'post_type' => 'wbam-ad',
-				'page'      => 'wbam-settings',
-			),
-			admin_url( 'edit.php' )
-		) . '#wbam_geo';
+		// Geolocation now lives in its own top-level Location section rather
+		// than a sub-nav pill inside "Ad Display", so a plain section link is
+		// enough — no anchor/pill-activation hand-off needed any more.
+		$settings_url = \WBAM\Core\Admin_Links::settings( 'location' );
 		?>
 		<div class="notice notice-warning is-dismissible">
 			<p>
 				<?php echo wp_kses_post( $notice ); ?>
-				<a href="<?php echo esc_url( $settings_url ); ?>"><?php esc_html_e( 'Open Geo Targeting settings', 'wb-ads-rotator-with-split-test' ); ?></a>
+				<a href="<?php echo esc_url( $settings_url ); ?>"><?php esc_html_e( 'Open Location settings', 'wb-ads-rotator-with-split-test' ); ?></a>
 			</p>
 		</div>
 		<?php
@@ -463,7 +457,24 @@ class Settings {
 			)
 		);
 
-		// Privacy Section.
+		// Grouped with AdSense (not a separate Privacy card) since consent
+		// only gates AdSense's own script load — see sanitize_settings(),
+		// unchanged: still `anonymize_ip`'s neighbour there, only where it
+		// renders moved.
+		add_settings_field(
+			'require_consent_adsense',
+			__( 'Require Consent for AdSense', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_checkbox_field' ),
+			'wbam-settings',
+			'wbam_adsense',
+			array(
+				'id'          => 'require_consent_adsense',
+				'description' => __( 'Only load AdSense scripts after user consent. Works with Cookie Notice, CookieYes, Complianz, and other consent plugins.', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+
+		// Privacy & Data section (shared with PRO's GDPR/analytics card when
+		// PRO is active — see Pro_Admin::map_settings_sections()).
 		add_settings_section(
 			'wbam_privacy',
 			__( 'Privacy & GDPR', 'wb-ads-rotator-with-split-test' ),
@@ -471,29 +482,27 @@ class Settings {
 			'wbam-settings'
 		);
 
-		add_settings_field(
-			'require_consent_adsense',
-			__( 'Require Consent for AdSense', 'wb-ads-rotator-with-split-test' ),
-			array( $this, 'render_checkbox_field' ),
-			'wbam-settings',
-			'wbam_privacy',
-			array(
-				'id'          => 'require_consent_adsense',
-				'description' => __( 'Only load AdSense scripts after user consent. Works with Cookie Notice, CookieYes, Complianz, and other consent plugins.', 'wb-ads-rotator-with-split-test' ),
-			)
-		);
-
-		add_settings_field(
-			'anonymize_ip',
-			__( 'Anonymize IP Addresses', 'wb-ads-rotator-with-split-test' ),
-			array( $this, 'render_checkbox_field' ),
-			'wbam-settings',
-			'wbam_privacy',
-			array(
-				'id'          => 'anonymize_ip',
-				'description' => __( 'Store anonymized IP hashes instead of raw IP addresses. Recommended for GDPR compliance.', 'wb-ads-rotator-with-split-test' ),
-			)
-		);
+		// Owner decision (3.2.0): with PRO active, PRO's own
+		// `wbam_pro_settings[gdpr_anonymize_ip]` is the ONE Anonymize IP
+		// switch shown (Privacy & Data section) — this field is not
+		// registered at all in that case, so it never renders anywhere.
+		// FREE's stored `anonymize_ip` value is left exactly as-is: no
+		// contract hidden input for it means no settings write ever touches
+		// it (see sanitize_settings()'s array_intersect_key() merge), and a
+		// FREE-only site keeps rendering and saving this switch normally.
+		if ( ! defined( 'WBAM_PRO_VERSION' ) ) {
+			add_settings_field(
+				'anonymize_ip',
+				__( 'Anonymize IP Addresses', 'wb-ads-rotator-with-split-test' ),
+				array( $this, 'render_checkbox_field' ),
+				'wbam-settings',
+				'wbam_privacy',
+				array(
+					'id'          => 'anonymize_ip',
+					'description' => __( 'Store anonymized IP hashes instead of raw IP addresses. Recommended for GDPR compliance.', 'wb-ads-rotator-with-split-test' ),
+				)
+			);
+		}
 
 		// Advanced Section.
 		add_settings_section(
@@ -945,11 +954,20 @@ class Settings {
 
 		$sections = $this->get_sections();
 
-		// Some old URLs (e.g. Email Captures) now point at content rendered
-		// *inside* another section rather than a section of their own. Map
-		// those here so both the nav highlight and the body agree on which
-		// section is "current" — see render_tools_section().
-		$aliases = array( 'email-captures' => 'tools' );
+		// Old section slugs (pre-3.2.0 layout, or PRO's retired horizontal
+		// tabs) that now render somewhere else — either merged into another
+		// section's body (Email Captures, License) or simply renamed
+		// (Ad Display, Geolocation, Advertising). Map those here so both the
+		// nav highlight and the body agree on which section is "current".
+		//
+		// @param array<string,string> $aliases Old slug => current slug.
+		$aliases = (array) apply_filters(
+			'wbam_settings_section_aliases',
+			array(
+				'email-captures' => 'tools',
+				'ad-display'     => 'ads-display',
+			)
+		);
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only section selector, no state change.
 		$requested = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : '';
@@ -957,14 +975,19 @@ class Settings {
 
 		if ( ! isset( $sections[ $current ] ) ) {
 			$keys    = array_keys( $sections );
-			$current = isset( $keys[0] ) ? $keys[0] : 'ad-display';
+			$current = isset( $keys[0] ) ? $keys[0] : 'ads-display';
 		}
+
+		$icons  = self::nav_icons();
+		$groups = self::nav_groups();
 
 		$nav_items = array();
 		foreach ( $sections as $slug => $section ) {
 			$nav_items[ $slug ] = array(
 				'label' => $section['label'],
 				'url'   => \WBAM\Core\Admin_Links::settings( $slug ),
+				'icon'  => isset( $icons[ $slug ] ) ? $icons[ $slug ] : 'circle',
+				'group' => isset( $groups[ $slug ] ) ? $groups[ $slug ] : '',
 			);
 		}
 		?>
@@ -1001,30 +1024,64 @@ class Settings {
 	/**
 	 * Sections this plugin contributes to the one Settings screen on its own.
 	 *
+	 * 'general' (the Features card, 16 module switches) is FREE-only —
+	 * PRO's General section already covers the same ground (Site Mode,
+	 * Modules, Currency, Pages) once PRO is active, so FREE steps aside
+	 * rather than rendering a second "General" entry — see
+	 * `Pro_Admin::map_settings_sections()`.
+	 *
+	 * 'links', 'location' and 'privacy' are always registered here, and PRO
+	 * appends its own card(s) into the same section when active (auto-linking
+	 * onto Links, classified maps onto Location, GDPR/analytics onto
+	 * Privacy) — again see `map_settings_sections()`.
+	 *
 	 * @since 3.2.0
 	 * @return array<string,array{label:string,render:callable}>
 	 */
 	private function default_sections() {
-		return array(
-			'ad-display' => array(
-				'label'  => __( 'Ad Display', 'wb-ads-rotator-with-split-test' ),
-				'render' => array( $this, 'render_ad_display_section' ),
-			),
-			'tools'      => array(
-				'label'  => __( 'Tools', 'wb-ads-rotator-with-split-test' ),
-				'render' => array( $this, 'render_tools_section' ),
-			),
+		$sections = array();
+
+		if ( ! defined( 'WBAM_PRO_VERSION' ) ) {
+			$sections['general'] = array(
+				'label'  => __( 'General', 'wb-ads-rotator-with-split-test' ),
+				'render' => array( $this, 'render_general_page' ),
+			);
+		}
+
+		$sections['ads-display'] = array(
+			'label'  => __( 'Ads & Display', 'wb-ads-rotator-with-split-test' ),
+			'render' => array( $this, 'render_ads_display_page' ),
 		);
+
+		$sections['links'] = array(
+			'label'  => __( 'Links', 'wb-ads-rotator-with-split-test' ),
+			'render' => array( $this, 'render_links_page' ),
+		);
+
+		$sections['location'] = array(
+			'label'  => __( 'Location', 'wb-ads-rotator-with-split-test' ),
+			'render' => array( $this, 'render_location_page' ),
+		);
+
+		$sections['privacy'] = array(
+			'label'  => __( 'Privacy & Data', 'wb-ads-rotator-with-split-test' ),
+			'render' => array( $this, 'render_privacy_page' ),
+		);
+
+		$sections['tools'] = array(
+			'label'  => __( 'Tools & License', 'wb-ads-rotator-with-split-test' ),
+			'render' => array( $this, 'render_tools_section' ),
+		);
+
+		return $sections;
 	}
 
 	/**
 	 * The full, ordered sidebar section list for the Settings screen.
 	 *
-	 * Free supplies 'ad-display' (this plugin's own display settings) and
-	 * 'tools' (demo-data / maintenance utilities + Email Captures). PRO maps
-	 * its own settings tabs (general, classifieds, credits, emails, links,
-	 * geolocation, privacy, license, ...) into this same list via the filter
-	 * — see `WBAM_Pro\Core\Pro_Admin::map_settings_sections()`.
+	 * PRO maps its own settings tabs (general, advertisers-billing,
+	 * classifieds, credits, emails, license, ...) into this same list via the
+	 * filter — see `WBAM_Pro\Core\Pro_Admin::map_settings_sections()`.
 	 *
 	 * @since 3.2.0
 	 * @return array<string,array{label:string,render:callable}>
@@ -1040,23 +1097,66 @@ class Settings {
 	}
 
 	/**
-	 * Render the "Ad Display" section: this plugin's existing settings form.
+	 * One Lucide icon per known section slug, for the settings rail.
 	 *
-	 * Still ONE form and ONE `sanitize_settings()` round-trip — the sub-nav
-	 * only toggles which `.wbam-card` is visible via CSS/JS; every field stays
-	 * in the DOM (and therefore in the POST) regardless of which sub-section
-	 * is showing, so the `_fields[]` contract in sanitize_settings() keeps
-	 * seeing every field this form owns on every save.
+	 * A slug this map does not know (a 3rd-party section added via the
+	 * `wbam_settings_sections` filter) falls back to a plain circle in
+	 * render_page() rather than rendering with no icon at all.
+	 *
+	 * @since 3.2.0
+	 * @return array<string,string>
+	 */
+	private static function nav_icons() {
+		return array(
+			'general'             => 'settings',
+			'ads-display'         => 'monitor',
+			'advertisers-billing' => 'briefcase',
+			'credits'             => 'ticket',
+			'classifieds'         => 'tag',
+			'links'               => 'link',
+			'location'            => 'map-pin',
+			'privacy'             => 'shield',
+			'emails'              => 'mail',
+			'tools'               => 'wrench',
+		);
+	}
+
+	/**
+	 * Group heading each known section slug renders under on the settings
+	 * rail. A slug this map does not know renders ungrouped (ordered last,
+	 * no heading above it) rather than being dropped.
+	 *
+	 * @since 3.2.0
+	 * @return array<string,string>
+	 */
+	private static function nav_groups() {
+		return array(
+			'general'             => __( 'Setup', 'wb-ads-rotator-with-split-test' ),
+			'ads-display'         => __( 'Setup', 'wb-ads-rotator-with-split-test' ),
+			'advertisers-billing' => __( 'Money', 'wb-ads-rotator-with-split-test' ),
+			'credits'             => __( 'Money', 'wb-ads-rotator-with-split-test' ),
+			'classifieds'         => __( 'Content', 'wb-ads-rotator-with-split-test' ),
+			'links'               => __( 'Content', 'wb-ads-rotator-with-split-test' ),
+			'location'            => __( 'Content', 'wb-ads-rotator-with-split-test' ),
+			'privacy'             => __( 'System', 'wb-ads-rotator-with-split-test' ),
+			'emails'              => __( 'System', 'wb-ads-rotator-with-split-test' ),
+			'tools'               => __( 'System', 'wb-ads-rotator-with-split-test' ),
+		);
+	}
+
+	/**
+	 * Render the "General" section (FREE-only): the Features card. See
+	 * default_sections() — PRO's own General section covers this same
+	 * ground once PRO is active, so this never double-renders.
 	 *
 	 * @since 3.2.0
 	 */
-	public function render_ad_display_section() {
+	public function render_general_page() {
 		?>
-		<form action="options.php" method="post" class="wbam-settings-form" id="wbam-ad-display-form">
+		<form action="options.php" method="post" class="wbam-settings-form">
 			<?php
 			settings_fields( 'wbam_settings_group' );
-			$this->render_ad_display_subnav();
-			$this->render_ad_display_subsections();
+			$this->render_settings_page_sections( array( 'wbam_features' ) );
 			submit_button();
 			?>
 		</form>
@@ -1064,59 +1164,133 @@ class Settings {
 	}
 
 	/**
-	 * Render the pill sub-nav above the Ad Display sections.
+	 * Render the "Ads & Display" section: who sees ads, label/wrapper,
+	 * placements + format matching, and AdSense.
 	 *
-	 * Pure progressive enhancement: without JS these buttons do nothing (all
-	 * sections are already visible), so no `<noscript>` fallback is needed.
+	 * One form and one `sanitize_settings()` round-trip for every card here —
+	 * see render_settings_page_sections().
 	 *
 	 * @since 3.2.0
 	 */
-	private function render_ad_display_subnav() {
-		global $wp_settings_sections;
-
-		if ( empty( $wp_settings_sections['wbam-settings'] ) ) {
-			return;
-		}
-
-		echo '<div class="wbam-ad-display-subnav" role="tablist">';
-		$first = true;
-		foreach ( (array) $wp_settings_sections['wbam-settings'] as $section ) {
-			printf(
-				'<button type="button" class="wbam-ad-display-subnav__item%s" data-subsection="%s" role="tab">%s</button>',
-				$first ? ' is-active' : '',
-				esc_attr( $section['id'] ),
-				esc_html( $section['title'] )
-			);
-			$first = false;
-		}
-		echo '</div>';
+	public function render_ads_display_page() {
+		?>
+		<form action="options.php" method="post" class="wbam-settings-form" id="wbam-ads-display-form">
+			<?php
+			settings_fields( 'wbam_settings_group' );
+			$this->render_settings_page_sections( array( 'wbam_general', 'wbam_display', 'wbam_placements', 'wbam_adsense' ) );
+			submit_button();
+			?>
+		</form>
+		<?php
 	}
 
 	/**
-	 * Render every registered `wbam-settings` section, each wrapped in its
-	 * own `.wbam-card` with a `data-subsection` hook for the sub-nav JS.
-	 *
-	 * Re-implements `do_settings_sections( 'wbam-settings' )` rather than
-	 * calling it directly, purely to add that wrapper — the section/field
-	 * registration (register_settings()) is untouched.
+	 * Render the "Links" section: this plugin's cloaking settings. PRO
+	 * appends its own auto-linking/scanner card via `wbam_settings_links_content`
+	 * when active — see `Pro_Admin::map_settings_sections()`.
 	 *
 	 * @since 3.2.0
 	 */
-	private function render_ad_display_subsections() {
+	public function render_links_page() {
+		?>
+		<form action="options.php" method="post" class="wbam-settings-form">
+			<?php
+			settings_fields( 'wbam_settings_group' );
+			$this->render_settings_page_sections( array( 'wbam_links' ) );
+			submit_button();
+			?>
+		</form>
+		<?php
+		/**
+		 * Fires inside the Links section, after cloaking settings.
+		 *
+		 * @since 3.2.0
+		 */
+		do_action( 'wbam_settings_links_content' );
+	}
+
+	/**
+	 * Render the "Location" section: visitor geolocation for ad targeting.
+	 * PRO appends its own classified-maps card via `wbam_settings_location_content`
+	 * when active — see `Pro_Admin::map_settings_sections()`.
+	 *
+	 * @since 3.2.0
+	 */
+	public function render_location_page() {
+		?>
+		<form action="options.php" method="post" class="wbam-settings-form">
+			<?php
+			settings_fields( 'wbam_settings_group' );
+			$this->render_settings_page_sections( array( 'wbam_geo' ) );
+			submit_button();
+			?>
+		</form>
+		<?php
+		/**
+		 * Fires inside the Location section, after visitor geolocation.
+		 *
+		 * @since 3.2.0
+		 */
+		do_action( 'wbam_settings_location_content' );
+	}
+
+	/**
+	 * Render the "Privacy & Data" section: this plugin's Anonymize IP switch
+	 * (FREE-only sites — see register_general_settings()) and Delete Data on
+	 * Uninstall. PRO appends its own analytics/GDPR card via
+	 * `wbam_settings_privacy_content` when active — see
+	 * `Pro_Admin::map_settings_sections()`.
+	 *
+	 * @since 3.2.0
+	 */
+	public function render_privacy_page() {
+		$ids = defined( 'WBAM_PRO_VERSION' ) ? array( 'wbam_advanced' ) : array( 'wbam_privacy', 'wbam_advanced' );
+		?>
+		<form action="options.php" method="post" class="wbam-settings-form">
+			<?php
+			settings_fields( 'wbam_settings_group' );
+			$this->render_settings_page_sections( $ids );
+			submit_button();
+			?>
+		</form>
+		<?php
+		/**
+		 * Fires inside the Privacy & Data section, after FREE's own cards.
+		 *
+		 * @since 3.2.0
+		 */
+		do_action( 'wbam_settings_privacy_content' );
+	}
+
+	/**
+	 * Render a whitelisted subset of the registered `wbam-settings` page's
+	 * WP Settings API sections, each wrapped in its own always-visible
+	 * `.wbam-card` — no tabs, no JS-toggled subsections. Every one of these
+	 * top-level settings pages posts through the same `<form>`/
+	 * `settings_fields( 'wbam_settings_group' )`/`sanitize_settings()`
+	 * round-trip; `$ids` only decides which registered fields show up on
+	 * which page.
+	 *
+	 * @since 3.2.0 Replaces render_ad_display_subsections() — the sub-nav
+	 *              pills it drove are gone now that each former pill is its
+	 *              own top-level section.
+	 * @param string[] $ids WP Settings API section ids to render, e.g.
+	 *                       array( 'wbam_general', 'wbam_display' ).
+	 * @return void
+	 */
+	private function render_settings_page_sections( array $ids ) {
 		global $wp_settings_sections, $wp_settings_fields;
 
 		if ( empty( $wp_settings_sections['wbam-settings'] ) ) {
 			return;
 		}
 
-		echo '<div id="wbam-ad-display-sections" class="wbam-ad-display-sections">';
-		$first = true;
 		foreach ( (array) $wp_settings_sections['wbam-settings'] as $section ) {
-			printf(
-				'<div class="wbam-card wbam-ad-display-subsection%s" data-subsection="%s">',
-				$first ? ' is-active' : '',
-				esc_attr( $section['id'] )
-			);
+			if ( ! in_array( $section['id'], $ids, true ) ) {
+				continue;
+			}
+
+			echo '<div class="wbam-card">';
 			if ( $section['title'] ) {
 				echo '<h2>' . esc_html( $section['title'] ) . '</h2>';
 			}
@@ -1129,16 +1303,16 @@ class Settings {
 				echo '</table>';
 			}
 			echo '</div>';
-			$first = false;
 		}
-		echo '</div>';
 	}
 
 	/**
-	 * Render the "Tools" section: demo-data/maintenance utilities (PRO, via
-	 * the `wbam_settings_tools_content` action) plus this plugin's own Email
-	 * Captures list. The old `wbam-email-captures` URL redirects to
-	 * `?section=email-captures`, which render_page() aliases to this section.
+	 * Render the "Tools & License" section: demo-data/maintenance utilities
+	 * and license activation (PRO, via the `wbam_settings_tools_content`
+	 * action) plus this plugin's own Email Captures list. The old
+	 * `wbam-email-captures` and `wbam-pro-settings&tab=license` URLs both
+	 * redirect here — see render_page()'s `$aliases` and
+	 * `Pro_Admin::legacy_settings_tab_map()`.
 	 *
 	 * @since 3.2.0
 	 */

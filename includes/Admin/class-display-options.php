@@ -572,7 +572,7 @@ class Display_Options {
 						printf(
 							/* translators: %s: link to the Geo Targeting settings. */
 							esc_html__( 'Geolocation is off site-wide, so any rules below have no effect yet. %s', 'wb-ads-rotator-with-split-test' ),
-							'<a href="' . esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-settings' ) . '#wbam_geo' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Turn it on in Settings', 'wb-ads-rotator-with-split-test' ) . '</a>'
+							'<a href="' . esc_url( \WBAM\Core\Admin_Links::settings( 'location' ) ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Turn it on in Settings', 'wb-ads-rotator-with-split-test' ) . '</a>'
 						);
 						?>
 					</p>
