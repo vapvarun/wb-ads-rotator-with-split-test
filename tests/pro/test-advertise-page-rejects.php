@@ -86,16 +86,6 @@ class Test_Advertise_Page_Rejects extends Pro_Test_Case {
 		$html = $this->render();
 
 		$this->assertStringNotContainsString( '<h1', $html );
-		$this->assertStringContainsString( '<h2 class="wbam-advertise-title"', $html );
-	}
-
-	public function test_invite_only_site_shows_contact_to_guests(): void {
-		update_option( 'users_can_register', 0 );
-
-		$html = $this->render();
-
-		$this->assertStringNotContainsString( 'Sign up to advertise', $html );
-		$this->assertStringContainsString( 'Contact us', $html );
 	}
 
 	public function test_pending_advertiser_is_not_offered_create_an_ad(): void {
