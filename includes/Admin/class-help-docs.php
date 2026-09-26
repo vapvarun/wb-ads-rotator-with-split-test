@@ -290,10 +290,28 @@ class Help_Docs {
 			<?php /* translators: %s: version label (FREE or PRO) */ ?>
 			<h2><?php printf( esc_html__( 'Features (%s Version)', 'wb-ads-rotator-with-split-test' ), esc_html( $version_label ) ); ?></h2>
 
+			<?php
+			// Counts the live registry (Free's 5 built-in types, plus Pro's
+			// Video Ad when Pro is active) instead of a number that drifts
+			// out of sync the next time a type is added.
+			$ad_type_count = count( \WBAM\Modules\Placements\Placement_Engine::get_instance()->get_ad_types() );
+			?>
 			<div class="wbam-doc-section">
 				<h3><?php esc_html_e( 'Ad Management', 'wb-ads-rotator-with-split-test' ); ?></h3>
 				<ul>
-					<li><strong><?php esc_html_e( '5 ad types:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Image, Rich Content (HTML editor), HTML/JS Code, Google AdSense, and Email Capture (inline subscribe form).', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li>
+						<strong>
+							<?php
+							/* translators: %d: number of ad types available */
+							printf( esc_html( _n( '%d ad type:', '%d ad types:', $ad_type_count, 'wb-ads-rotator-with-split-test' ) ), (int) $ad_type_count );
+							?>
+						</strong>
+						<?php if ( $this->is_pro_active ) : ?>
+							<?php esc_html_e( 'Image, Rich Content (HTML editor), HTML/JS Code, Google AdSense, Email Capture (inline subscribe form), and Video (Pro).', 'wb-ads-rotator-with-split-test' ); ?>
+						<?php else : ?>
+							<?php esc_html_e( 'Image, Rich Content (HTML editor), HTML/JS Code, Google AdSense, and Email Capture (inline subscribe form).', 'wb-ads-rotator-with-split-test' ); ?>
+						<?php endif; ?>
+					</li>
 					<li><strong><?php esc_html_e( 'Weighted rotation:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Assign each ad a 1-10 priority slider; higher priorities win more often in the same placement.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><strong><?php esc_html_e( 'A/B comparison metabox:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Side-by-side impressions / clicks / CTR across ads sharing a placement, with an automatic "winner" badge at 100+ impressions.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><strong><?php esc_html_e( 'Frequency control:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Per-ad session impression cap + global max-ads-per-page, plus lazy loading for below-the-fold ads.', 'wb-ads-rotator-with-split-test' ); ?></li>
