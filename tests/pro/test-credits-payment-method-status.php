@@ -19,6 +19,7 @@ class Test_Credits_Payment_Method_Status extends Pro_Test_Case {
 
 	public function set_up(): void {
 		parent::set_up();
+		delete_option( 'wbam_credits_payment_method' );
 
 		$this->admin_id = (int) self::factory()->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $this->admin_id );

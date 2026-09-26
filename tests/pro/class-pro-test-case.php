@@ -31,6 +31,12 @@ abstract class Pro_Test_Case extends WP_UnitTestCase {
 		self::truncate_credits_ledger();
 		self::truncate_membership_tables();
 		self::clear_advertisers();
+
+		// A site that sells ads has a way to take payment. Paid flows are
+		// refused without one (Credits_Bridge::paid_features_error()), so
+		// tests start from a manual top-up site; a test about the 'none'
+		// state deletes this option in its own set_up().
+		update_option( 'wbam_credits_payment_method', 'manual' );
 	}
 
 	public function tear_down(): void {

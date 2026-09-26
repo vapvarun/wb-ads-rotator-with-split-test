@@ -16,6 +16,7 @@ class Test_Setup_Wizard_Payment_Step extends Pro_Test_Case {
 
 	public function set_up(): void {
 		parent::set_up();
+		delete_option( 'wbam_credits_payment_method' );
 
 		// The step renderers are plain functions declared inside the
 		// template file, only loaded when the wizard controller includes
