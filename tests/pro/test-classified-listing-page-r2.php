@@ -63,7 +63,9 @@ class Test_Classified_Listing_Page_R2 extends Pro_Test_Case {
 		$this->go_to( get_permalink( $this->classified->post_id ) );
 		set_query_var( 'wbam_advertiser', $this->advertiser );
 
-		// Block themes in the test suite ship no header.php / footer.php.
+		// Render under a block theme (no header.php / footer.php) whatever
+		// theme the test install defaults to; the rollback restores it.
+		switch_theme( 'twentytwentyfive' );
 		$this->setExpectedDeprecated( 'Theme without header.php' );
 		$this->setExpectedDeprecated( 'Theme without footer.php' );
 
