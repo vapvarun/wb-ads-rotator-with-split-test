@@ -15,9 +15,23 @@ use WP_UnitTestCase;
 
 class Test_Ad_Editor_Code_Editor extends WP_UnitTestCase {
 
+	/** @var \WP_Scripts|null */
+	private $saved_scripts;
+
+	/** @var \WP_Styles|null */
+	private $saved_styles;
+
+	public function set_up(): void {
+		parent::set_up();
+		// enqueue_assets() enqueues the whole admin set; restore both
+		// registries whole so nothing leaks into a later test that prints.
+		$this->saved_scripts = isset( $GLOBALS['wp_scripts'] ) ? clone $GLOBALS['wp_scripts'] : null;
+		$this->saved_styles  = isset( $GLOBALS['wp_styles'] ) ? clone $GLOBALS['wp_styles'] : null;
+	}
+
 	public function tear_down(): void {
-		wp_dequeue_script( 'wbam-admin' );
-		wp_deregister_script( 'wbam-admin' );
+		$GLOBALS['wp_scripts'] = $this->saved_scripts;
+		$GLOBALS['wp_styles']  = $this->saved_styles;
 		set_current_screen( 'front' );
 		parent::tear_down();
 	}
