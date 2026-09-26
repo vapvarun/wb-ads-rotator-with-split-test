@@ -91,9 +91,26 @@ class Test_Asset_Suffix_Registered_Handles extends Pro_Test_Case {
 			do_action( 'admin_enqueue_scripts', $hook );
 		}
 
-		// Settings > Tools, gated on $_GET['section'].
-		$_GET['section'] = 'tools';
-		do_action( 'admin_enqueue_scripts', 'wbam-ad_page_wbam-settings' );
+		// Settings > Tools and > Credits, gated on $_GET['section']; the
+		// field tooltips are gated on $_GET['page'] starting with wbam-.
+		// Both hook in from admin-only boot (is_admin() is false under
+		// PHPUnit): register them the way a real admin load does.
+		require_once WBAM_PRO_PATH . 'includes/Admin/class-field-tooltips.php'; // Admin-only load in production.
+		\WBAM_Pro\Admin\Field_Tooltips::register();
+		$credits = new \WBAM_Pro\Admin\Credits_Settings();
+		$_GET['page'] = 'wbam-settings';
+		foreach ( array( 'tools', 'credits' ) as $section ) {
+			$_GET['section'] = $section;
+			do_action( 'admin_enqueue_scripts', 'wbam-ad_page_wbam-settings' );
+		}
+		$this->assertArrayHasKey( 'wbam-pro-field-tooltips', wp_scripts()->registered, 'The tooltip gate must actually run here.' );
+		$this->assertContains( 'wbam-lucide', wp_scripts()->queue, 'Settings > Credits must enqueue the bundled Lucide.' );
+		remove_action( 'admin_enqueue_scripts', array( $credits, 'maybe_enqueue_lucide' ) );
+
+		// No third-party CDN: every script comes from a plugin or core.
+		foreach ( wp_scripts()->registered as $handle => $dependency ) {
+			$this->assertStringNotContainsString( 'unpkg.com', (string) $dependency->src, "Handle '{$handle}' loads from a CDN." );
+		}
 
 		// The ad edit screen, gated on get_current_screen()->post_type.
 		set_current_screen( 'post.php' );
