@@ -6,8 +6,9 @@
  * though a transaction plainly happened.
  *
  * Both are recorded as `unclassified` (the Revenue screen's "Other" tile),
- * signed the same way charge()/credit() already are: the revenue row is the
- * ledger row's own signed delta, flipped — see the docblocks on topup() and
+ * which is neither revenue nor usage. A grant is negative (value given, no
+ * cash in) and a debit is negative too: it reduces, never adds, because
+ * revenue is only recognised at top-up. See the docblocks on topup() and
  * adjust().
  *
  * @package WBAM\Tests
@@ -65,14 +66,14 @@ class Test_Credits_Bridge_Manual_Adjustment_Revenue extends Pro_Test_Case {
 		$this->assertSame( '-250', $row->amount );
 	}
 
-	public function test_adjust_negative_writes_positive_revenue_row(): void {
+	public function test_adjust_negative_writes_negative_revenue_row(): void {
 		$ledger_id = Credits_Bridge::adjust( $this->advertiser->id, -2.50, 'QA Adjust Balance -2.50' );
 		$this->assertNotWPError( $ledger_id );
 
 		$row = $this->revenue_row_for_ledger( (int) $ledger_id );
 		$this->assertNotNull( $row );
 		$this->assertSame( Revenue_Ledger::SOURCE_UNCLASSIFIED, $row->source );
-		$this->assertSame( '250', $row->amount, 'Taking credits back is positive revenue, opposite of a grant.' );
+		$this->assertSame( '-250', $row->amount, 'A debit reduces, never adds: revenue is only recognised at top-up (owner decision 11).' );
 	}
 
 	public function test_manual_adjustments_are_idempotent_per_ledger_row(): void {

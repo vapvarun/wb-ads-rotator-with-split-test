@@ -100,9 +100,8 @@ class Test_First_Run_3_2_Payments extends Pro_Test_Case {
 	}
 
 	/**
-	 * A debit ignores $revenue_source entirely - it always takes back value
-	 * already given, so it is always positive revenue regardless of which
-	 * radio (if any) was posted.
+	 * A debit ignores $revenue_source entirely: it is never revenue, and its
+	 * row reduces rather than adds, whichever radio (if any) was posted.
 	 */
 	public function test_debit_ignores_revenue_source(): void {
 		Advertiser_Manager::get_instance()->adjust_balance( $this->advertiser->id, 25.00, 'debit-setup', Revenue_Ledger::SOURCE_OFFLINE_PAYMENT );
@@ -117,7 +116,7 @@ class Test_First_Run_3_2_Payments extends Pro_Test_Case {
 		$this->assertTrue( $result );
 		$amount = $this->revenue_amount_minor_for_note( 'debit-test' );
 		$this->assertNotNull( $amount, 'A revenue row must be written.' );
-		$this->assertGreaterThan( 0, $amount, 'A debit must record positive revenue regardless of $revenue_source.' );
+		$this->assertLessThan( 0, $amount, 'A debit must never add revenue, whatever $revenue_source says.' );
 	}
 
 	/**
