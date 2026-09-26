@@ -49,6 +49,14 @@ class Links_Admin {
 
 	/**
 	 * Add menu pages.
+	 *
+	 * Card 10342783654 step 9: Links used to be its own top-level menu,
+	 * alongside Pro's Classifieds and Advertisers menus and the main WB Ad
+	 * Manager menu - 4 top-level entries for one plugin. Now a submenu of
+	 * $this->parent_slug (WB Ad Manager's own CPT menu), same as Pro's four
+	 * Links pages (Link Analytics, Keywords, Health, Import) and
+	 * Partnership_Admin's Partnerships page. Every page keeps its slug, so
+	 * no bookmarked or saved admin.php?page= URL changes.
 	 */
 	public function add_submenu() {
 		// A site that does not use links switches the module off and loses the
@@ -58,21 +66,9 @@ class Links_Admin {
 			return;
 		}
 
-		// Links - Separate top-level menu.
-		add_menu_page(
-			__( 'Links', 'wb-ads-rotator-with-split-test' ),
-			__( 'Links', 'wb-ads-rotator-with-split-test' ),
-			$this->capability,
-			'wbam-links',
-			array( $this, 'render_page' ),
-			'dashicons-admin-links',
-			25.3 // Right after Advertisers (25.2)
-		);
-
-		// All Links (rename default submenu).
 		add_submenu_page(
-			'wbam-links',
-			__( 'All Links', 'wb-ads-rotator-with-split-test' ),
+			$this->parent_slug,
+			__( 'Links', 'wb-ads-rotator-with-split-test' ),
 			__( 'All Links', 'wb-ads-rotator-with-split-test' ),
 			$this->capability,
 			'wbam-links',
@@ -81,9 +77,9 @@ class Links_Admin {
 
 		// Categories.
 		add_submenu_page(
-			'wbam-links',
+			$this->parent_slug,
 			__( 'Link Categories', 'wb-ads-rotator-with-split-test' ),
-			__( 'Categories', 'wb-ads-rotator-with-split-test' ),
+			__( 'Link Categories', 'wb-ads-rotator-with-split-test' ),
 			$this->capability,
 			'wbam-link-categories',
 			array( $this, 'render_categories_page' )
@@ -96,7 +92,7 @@ class Links_Admin {
 	 * @param string $hook Page hook.
 	 */
 	public function enqueue_scripts( $hook ) {
-		if ( ! in_array( $hook, array( 'toplevel_page_wbam-links', 'links_page_wbam-link-categories' ), true ) ) {
+		if ( ! in_array( $hook, array( 'wbam-ad_page_wbam-links', 'wbam-ad_page_wbam-link-categories' ), true ) ) {
 			return;
 		}
 

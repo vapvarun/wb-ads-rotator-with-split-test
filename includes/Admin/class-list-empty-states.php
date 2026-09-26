@@ -180,7 +180,7 @@ class List_Empty_States {
 	 */
 	public function enqueue_shared_styles( $hook ) {
 		$shared_css_hooks = array(
-			'toplevel_page_wbam-links',
+			'wbam-ad_page_wbam-links',
 		);
 
 		if ( ! in_array( $hook, $shared_css_hooks, true ) ) {

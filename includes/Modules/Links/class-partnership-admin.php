@@ -58,7 +58,7 @@ class Partnership_Admin {
 		}
 
 		add_submenu_page(
-			'wbam-links',
+			'edit.php?post_type=wbam-ad',
 			__( 'Partnership Inquiries', 'wb-ads-rotator-with-split-test' ),
 			__( 'Partnerships', 'wb-ads-rotator-with-split-test' ),
 			'manage_options',
@@ -74,19 +74,19 @@ class Partnership_Admin {
 		global $menu, $submenu;
 
 		// Bail before the count query when there is no menu to badge.
-		if ( ! isset( $submenu['wbam-links'] ) ) {
+		if ( ! isset( $submenu['edit.php?post_type=wbam-ad'] ) ) {
 			return;
 		}
 
 		$pending_count = $this->manager->count_partnerships( array( 'status' => 'pending' ) );
 
-		if ( $pending_count > 0 && isset( $submenu['wbam-links'] ) ) {
-			foreach ( $submenu['wbam-links'] as $key => $item ) {
+		if ( $pending_count > 0 && isset( $submenu['edit.php?post_type=wbam-ad'] ) ) {
+			foreach ( $submenu['edit.php?post_type=wbam-ad'] as $key => $item ) {
 				if ( isset( $item[2] ) && 'wbam-partnerships' === $item[2] ) {
 					// Mutating $submenu is the standard WP pattern for injecting
 					// a pending-count badge onto a submenu item (e.g. Posts → "3").
 					// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional $submenu[label][0] edit to add pending-count badge.
-					$submenu['wbam-links'][ $key ][0] .= sprintf(
+					$submenu['edit.php?post_type=wbam-ad'][ $key ][0] .= sprintf(
 						' <span class="awaiting-mod count-%d"><span class="pending-count">%d</span></span>',
 						$pending_count,
 						$pending_count
