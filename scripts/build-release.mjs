@@ -40,7 +40,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, mkdirSync, readdirSync, statSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, mkdirSync, readdirSync, statSync, rmSync, renameSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -203,12 +203,26 @@ function regeneratePot( domain ) {
 	console.log( BOLD( '\nRegenerate .pot' ) );
 	mkdirSync( 'languages', { recursive: true } );
 	const potFile = `languages/${ domain }.pot`;
+	const tmpFile = `${ potFile }.tmp`;
 	execOrDie(
 		'wp',
-		[ 'i18n', 'make-pot', '.', potFile, `--slug=${ domain }`, `--domain=${ domain }`, `--exclude=${ MAKEPOT_EXCLUDE.join( ',' ) }` ],
+		[ 'i18n', 'make-pot', '.', tmpFile, `--slug=${ domain }`, `--domain=${ domain }`, `--exclude=${ MAKEPOT_EXCLUDE.join( ',' ) }` ],
 		'wp i18n make-pot failed. Is WP-CLI ("wp") installed and on PATH?'
 	);
-	console.log( DIM( `  make-pot   -> ${ potFile }` ) );
+	// POT-Creation-Date is a timestamp make-pot stamps on every run, even
+	// when not one translatable string changed. Compare with it stripped so
+	// a re-run with no real content change doesn't touch the file (and so
+	// requireCleanGeneratedFiles() below doesn't fail the build over a
+	// timestamp nobody needs to review or commit).
+	const stripTimestamp = ( s ) => s.replace( /^"POT-Creation-Date:.*$/m, '' );
+	const changed = ! existsSync( potFile ) || stripTimestamp( readFileSync( potFile, 'utf8' ) ) !== stripTimestamp( readFileSync( tmpFile, 'utf8' ) );
+	if ( changed ) {
+		renameSync( tmpFile, potFile );
+		console.log( DIM( `  make-pot   -> ${ potFile } (content changed)` ) );
+	} else {
+		rmSync( tmpFile );
+		console.log( DIM( `  make-pot   -> ${ potFile } (no string changes)` ) );
+	}
 }
 
 // A release must never ship a regenerated .min/.pot/-rtl.css that nobody
