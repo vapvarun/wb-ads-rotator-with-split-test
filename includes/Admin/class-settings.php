@@ -113,8 +113,10 @@ class Settings {
 		// render_geo_section()), so this global hook only needs to cover
 		// the Dashboard - showing it here too would repeat it on that one
 		// page (the QA reject this fixes).
+		// Match the All Ads screen by id: every WBAM submenu page lives under
+		// edit.php?post_type=wbam-ad, so post_type alone matches all of them.
 		$screen = get_current_screen();
-		if ( ! $screen || 'wbam-ad' !== $screen->post_type ) {
+		if ( ! $screen || 'edit-wbam-ad' !== $screen->id ) {
 			return;
 		}
 

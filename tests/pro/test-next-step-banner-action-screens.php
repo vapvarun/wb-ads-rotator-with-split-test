@@ -57,6 +57,9 @@ class Test_Next_Step_Banner_Action_Screens extends Pro_Test_Case {
 	public function test_banner_is_hidden_on_a_screen_that_is_not_the_steps_target(): void {
 		unset( $_GET['action'] );
 		set_current_screen( 'wbam-ad_page_wbam-classifieds' );
+		// Every WBAM submenu lives under edit.php?post_type=wbam-ad, so on a
+		// real request its screen carries post_type=wbam-ad too.
+		get_current_screen()->post_type = 'wbam-ad';
 
 		ob_start();
 		Next_Step_Banner::maybe_render();

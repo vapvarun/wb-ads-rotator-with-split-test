@@ -303,6 +303,7 @@ class Test_Settings_One_Page_3_2 extends WP_UnitTestCase {
 		$settings->register_settings();
 
 		set_current_screen( 'wbam-ad_page_wbam-settings' );
+		get_current_screen()->post_type = 'wbam-ad'; // As on a real request.
 		$_GET['section'] = 'location';
 
 		ob_start();
@@ -333,5 +334,19 @@ class Test_Settings_One_Page_3_2 extends WP_UnitTestCase {
 		$html = ob_get_clean();
 
 		$this->assertStringContainsString( 'ip-api.com', $html );
+	}
+
+	/** Not on any other WBAM screen, even though they all carry post_type=wbam-ad. */
+	public function test_legacy_geo_notice_is_hidden_on_other_wbam_screens(): void {
+		update_option( 'wbam_settings', array( 'geo_primary_provider' => 'ip-api' ) );
+		$settings = Settings::get_instance();
+		$settings->register_settings();
+
+		set_current_screen( 'wbam-ad_page_wbam-campaigns' );
+		get_current_screen()->post_type = 'wbam-ad';
+
+		ob_start();
+		$settings->maybe_render_legacy_geo_notice();
+		$this->assertSame( '', ob_get_clean() );
 	}
 }
