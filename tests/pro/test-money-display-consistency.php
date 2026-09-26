@@ -32,7 +32,11 @@ class Test_Money_Display_Consistency extends Pro_Test_Case {
 		$this->assertSame( 'Adjustments', Revenue_Query::source_label( Revenue_Ledger::SOURCE_UNCLASSIFIED ) );
 	}
 
-	public function test_wallet_net_for_money_returned_reads_as_money_back(): void {
+	/**
+	 * A credit grant is money in, not spending: "Where your credits went"
+	 * does not list it (owner decision 2026-09-26, card 10340185077).
+	 */
+	public function test_wallet_by_type_does_not_list_a_credit_grant(): void {
 		global $wpdb;
 		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'wbam_revenue' ); // phpcs:ignore WordPress.DB -- test isolation.
 
@@ -45,6 +49,7 @@ class Test_Money_Display_Consistency extends Pro_Test_Case {
 		include WBAM_PRO_PATH . 'templates/portal/tabs/wallet.php';
 		$html = ob_get_clean();
 
-		$this->assertStringContainsString( '$5.00 back to you', $html );
+		$this->assertStringNotContainsString( '$5.00 back to you', $html );
+		$this->assertStringNotContainsString( '<th scope="row" class="wbam-campaign-spend__name">Adjustments</th>', $html );
 	}
 }
