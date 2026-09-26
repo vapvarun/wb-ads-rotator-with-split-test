@@ -20,6 +20,8 @@ class Test_Paid_Ads_First extends Pro_Test_Case {
 		parent::set_up();
 		// Earlier tests' renders count toward one "page" in this process.
 		Factory::reset_page_ads();
+		// Keep sample retirement (its own test) out of the draws.
+		update_option( \WBAM_Pro\Core\Pro_Plugin::SAMPLES_RETIRED_OPTION, 0 );
 	}
 
 	private function make_ad( string $title, array $meta = array() ): int {
@@ -67,5 +69,30 @@ class Test_Paid_Ads_First extends Pro_Test_Case {
 
 		update_post_meta( $house, '_wbam_enabled', '0' );
 		$this->assertSame( array( $sample ), $this->winners( 5 ), 'A sample ad still fills a slot nothing else can serve.' );
+	}
+
+	public function test_demo_ad_with_an_advertiser_never_outranks_a_real_paid_ad(): void {
+		// A demo import attaches its ads to demo advertisers and campaigns.
+		$this->make_ad( 'Demo paid ad', array( '_wbam_is_demo' => 1, '_wbam_advertiser_id' => 3, '_wbam_campaign_id' => 2, '_wbam_priority' => 10 ) );
+		$paid = $this->make_ad( 'Real paid ad', array( '_wbam_advertiser_id' => 7, '_wbam_priority' => 1 ) );
+
+		$this->assertSame( array( $paid ), $this->winners( 30 ), 'Demo ads are samples, whatever advertiser or campaign they carry.' );
+	}
+
+	public function test_stack_mode_shows_only_the_top_tier(): void {
+		$this->make_ad( 'House ad' );
+		$this->make_ad( 'Sample ad', array( '_wbam_sample_ad' => '1' ) );
+		$paid_a = $this->make_ad( 'Paid A', array( '_wbam_advertiser_id' => 7 ) );
+		$paid_b = $this->make_ad( 'Paid B', array( '_wbam_campaign_id' => 8 ) );
+
+		$stack = static function () {
+			return 'stack';
+		};
+		add_filter( 'wbam_placement_render_mode', $stack );
+		$won = $this->winners( 30 );
+		remove_filter( 'wbam_placement_render_mode', $stack );
+
+		$this->assertNotEmpty( $won );
+		$this->assertSame( array(), array_diff( $won, array( $paid_a, $paid_b ) ), 'A stacked slot lists paid ads only while they can serve.' );
 	}
 }

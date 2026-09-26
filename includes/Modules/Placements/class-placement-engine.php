@@ -409,24 +409,28 @@ class Placement_Engine {
 		// returning 'stack' for their slug.
 		$render_mode = apply_filters( 'wbam_placement_render_mode', 'rotate', $placement_id );
 
-		if ( 'rotate' === $render_mode && count( $filtered ) > 1 ) {
+		if ( count( $filtered ) > 1 ) {
 			// The highest tier with a renderable ad wins the slot; a lower
-			// tier only fills it when nothing above can serve.
+			// tier only fills it when nothing above can serve. Rotate picks
+			// one winner from that tier, stack keeps all of its ads.
 			$pools = array();
 			foreach ( $filtered as $ad_id ) {
 				$pools[ $tiers[ $ad_id ] ][] = (int) $ad_id;
 			}
 			krsort( $pools );
 
-			$winner = null;
+			$winners = array();
 			foreach ( $pools as $tier => $pool ) {
-				$winner = $this->pick_winner( array_values( array_unique( $pool ) ), $placement_id, (int) $tier );
-				if ( null !== $winner ) {
+				$pool    = array_values( array_unique( $pool ) );
+				$winners = 'rotate' === $render_mode
+					? array_filter( array( $this->pick_winner( $pool, $placement_id, (int) $tier ) ) )
+					: array_values( array_filter( $pool, array( $this, 'ad_is_renderable' ) ) );
+				if ( $winners ) {
 					break;
 				}
 			}
 
-			$filtered = null === $winner ? array() : array( $winner );
+			$filtered = array_values( $winners );
 		}
 
 		/**

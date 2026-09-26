@@ -48,4 +48,20 @@ class Test_Sample_Ads_Retire_On_First_Paid extends Pro_Test_Case {
 		$this->ad( array( '_wbam_campaign_id' => 9 ) );
 		$this->assertSame( '1', get_post_meta( $sample, '_wbam_enabled', true ) );
 	}
+
+	public function test_existing_ad_given_an_advertiser_switches_sample_ads_off(): void {
+		delete_option( Pro_Plugin::SAMPLES_RETIRED_OPTION );
+		$sample = $this->ad( array( '_wbam_sample_ad' => '1' ) );
+
+		// A published demo ad with a demo advertiser is not a real paid ad.
+		$this->ad( array( '_wbam_is_demo' => '1', '_wbam_advertiser_id' => 3 ) );
+		$this->assertSame( '1', get_post_meta( $sample, '_wbam_enabled', true ), 'Demo ads are samples, not paid ads.' );
+
+		// A live house ad whose advertiser field was saved as 0, then set.
+		$ad = $this->ad( array( '_wbam_advertiser_id' => 0 ) );
+		$this->assertSame( '1', get_post_meta( $sample, '_wbam_enabled', true ) );
+
+		update_post_meta( $ad, '_wbam_advertiser_id', 5 );
+		$this->assertSame( '0', get_post_meta( $sample, '_wbam_enabled', true ), 'Setting a real advertiser on a live ad makes it paid.' );
+	}
 }
