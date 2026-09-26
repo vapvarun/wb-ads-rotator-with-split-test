@@ -296,7 +296,7 @@ class Test_Report_Shell extends Pro_Test_Case {
 		$this->assertSame( wp_date( 'M j', strtotime( '2026-01-01 12:00:00' ) ), $series['labels'][0] );
 	}
 
-	public function test_wbam_report_range_presets_filter_adds_removes_relabels_and_validates(): void {
+	public function test_wbam_report_range_presets_filter_adds_removes_and_relabels(): void {
 		// Unfiltered: the 5 defaults, unchanged.
 		$this->assertSame(
 			array( '7d', '30d', '90d', 'month', 'ytd' ),
@@ -306,7 +306,7 @@ class Test_Report_Shell extends Pro_Test_Case {
 		$callback = static function ( $presets ) {
 			unset( $presets['90d'] );
 			$presets['7d']      = 'Last week';
-			$presets['quarter'] = 'This quarter';
+			$presets['quarter'] = 'This quarter'; // Label only: deliberately no window.
 			return $presets;
 		};
 		add_filter( 'wbam_report_range_presets', $callback );
@@ -316,10 +316,83 @@ class Test_Report_Shell extends Pro_Test_Case {
 		$this->assertSame( 'Last week', $presets['7d'], 'A site can relabel a default preset.' );
 		$this->assertArrayHasKey( 'quarter', $presets, 'A site can add a new preset.' );
 
-		// range() must not silently reset an unrecognised-but-filter-added
-		// slug back to '30d' before it even reaches the caller.
+		remove_filter( 'wbam_report_range_presets', $callback );
+	}
+
+	public function test_a_filter_added_preset_with_a_relative_string_window_computes_and_renders_its_own_dates(): void {
+		$tz             = wp_timezone();
+		$today          = new \DateTime( current_time( 'Y-m-d' ), $tz );
+		$expected_start = ( clone $today )->modify( '-10 days' )->format( 'Y-m-d' );
+		$expected_end   = ( clone $today )->modify( '-5 days' )->format( 'Y-m-d' );
+
+		$callback = static function ( $presets ) {
+			$presets['quarter'] = array(
+				'label' => 'This quarter',
+				'start' => '-10 days',
+				'end'   => '-5 days',
+			);
+			return $presets;
+		};
+		add_filter( 'wbam_report_range_presets', $callback );
+
+		// range() resolves the same window a direct ?range=quarter visit would get.
 		$range = Report_Shell::range( array( 'range' => 'quarter' ) );
 		$this->assertSame( 'quarter', $range['preset'] );
+		$this->assertSame( $expected_start, $range['start'] );
+		$this->assertSame( $expected_end, $range['end'] );
+
+		// range_presets() prints the matching data-start/data-end, not the 30d fallback.
+		ob_start();
+		Report_Shell::range_presets( array( 'current' => 'quarter' ) );
+		$html = ob_get_clean();
+		$this->assertStringContainsString( 'data-range="quarter"', $html );
+		$this->assertStringContainsString( 'data-start="' . $expected_start . '"', $html );
+		$this->assertStringContainsString( 'data-end="' . $expected_end . '"', $html );
+		$this->assertStringContainsString( '>This quarter<', $html );
+
+		remove_filter( 'wbam_report_range_presets', $callback );
+	}
+
+	public function test_a_filter_added_preset_with_a_callable_window_computes_its_dates_and_labels_from_the_slug(): void {
+		$callback = static function ( $presets ) {
+			$presets['launch'] = static function () {
+				return array( '2026-01-01', '2026-01-31' );
+			};
+			return $presets;
+		};
+		add_filter( 'wbam_report_range_presets', $callback );
+
+		$range = Report_Shell::range( array( 'range' => 'launch' ) );
+		$this->assertSame( 'launch', $range['preset'] );
+		$this->assertSame( '2026-01-01', $range['start'] );
+		$this->assertSame( '2026-01-31', $range['end'] );
+		$this->assertSame(
+			'Launch',
+			Report_Shell::preset_labels()['launch'],
+			'A bare callable has no label slot; falls back to a title-cased slug.'
+		);
+
+		remove_filter( 'wbam_report_range_presets', $callback );
+	}
+
+	public function test_a_filter_added_preset_with_an_unresolvable_window_falls_back_to_30d_with_a_notice(): void {
+		$callback = static function ( $presets ) {
+			$presets['broken'] = array(
+				'label' => 'Broken',
+				'start' => 'not a real date at all',
+				'end'   => 'today',
+			);
+			return $presets;
+		};
+		add_filter( 'wbam_report_range_presets', $callback );
+
+		$this->setExpectedIncorrectUsage( 'Report_Shell::range' );
+
+		$range   = Report_Shell::range( array( 'range' => 'broken' ) );
+		$thirty  = Report_Shell::range( array( 'range' => '30d' ) );
+		$this->assertSame( '30d', $range['preset'] );
+		$this->assertSame( $thirty['start'], $range['start'] );
+		$this->assertSame( $thirty['end'], $range['end'] );
 
 		remove_filter( 'wbam_report_range_presets', $callback );
 	}
