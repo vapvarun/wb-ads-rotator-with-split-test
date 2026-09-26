@@ -41,4 +41,14 @@ class Test_Settings_Sections_Flat_Cards extends Pro_Test_Case {
 			$this->assertSame( 0, $xpath->query( "//*[{$card}]//h2" )->length, "{$slug}: section headings belong outside the card, as on General." );
 		}
 	}
+
+	/** Owner review: no empty 'Classifieds Settings' heading directly above 'Label & URL'. */
+	public function test_classifieds_has_no_empty_heading(): void {
+		$sections = ( new Pro_Admin() )->map_settings_sections( array() );
+		ob_start();
+		call_user_func( $sections['classifieds']['render'] );
+		$html = ob_get_clean();
+
+		$this->assertDoesNotMatchRegularExpression( '#</h2>\s*<h2#', $html, 'A heading with nothing under it before the next heading.' );
+	}
 }
