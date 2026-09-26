@@ -1,53 +1,39 @@
 /**
- * Settings screen: Ad Display sub-nav pills + Geo Targeting field toggles.
+ * Settings screen: mobile section `<select>` auto-submit + Geo Targeting
+ * field toggles.
  *
  * Pure progressive enhancement — every field this script hides stays in the
  * DOM and keeps posting its stored value either way (see
- * WBAM\Admin\Settings::render_ad_display_subsections() /
  * render_geo_provider_field()); this script only narrows what's visible.
  *
  * @package WB_Ad_Manager
  * @since   3.2.0
+ * @since   3.2.0 The Ad Display sub-nav pills this file also used to drive
+ *          were removed — each former pill is now its own top-level
+ *          settings section (General, Ads & Display, Links, Location, ...),
+ *          so there is no in-page tab bar left to enhance.
  */
 ( function () {
 	'use strict';
 
-	function initAdDisplaySubnav() {
-		var wrap = document.getElementById( 'wbam-ad-display-sections' );
-		var nav  = document.querySelector( '.wbam-ad-display-subnav' );
+	/**
+	 * Mobile settings-rail `<select>` (UX::settings_nav()). The `<select>`
+	 * lives in a plain GET `<form>` with its own "Go" submit button, so
+	 * navigation works with JS off. With JS on, auto-submit on change and
+	 * hide the now-redundant button — no inline `onchange` attribute.
+	 */
+	function initSettingsNavSelect() {
+		var form   = document.querySelector( '.wbam-settings-nav__form' );
+		var select = form && form.querySelector( '.wbam-settings-nav__select' );
 
-		if ( ! wrap || ! nav ) {
+		if ( ! form || ! select ) {
 			return;
 		}
 
-		wrap.classList.add( 'wbam-js-enhanced' );
-
-		function activate( target ) {
-			nav.querySelectorAll( '.wbam-ad-display-subnav__item' ).forEach( function ( item ) {
-				item.classList.toggle( 'is-active', item.getAttribute( 'data-subsection' ) === target );
-			} );
-
-			wrap.querySelectorAll( '.wbam-ad-display-subsection' ).forEach( function ( section ) {
-				section.classList.toggle( 'is-active', section.getAttribute( 'data-subsection' ) === target );
-			} );
-		}
-
-		nav.addEventListener( 'click', function ( event ) {
-			var button = event.target.closest( '.wbam-ad-display-subnav__item' );
-			if ( ! button ) {
-				return;
-			}
-
-			activate( button.getAttribute( 'data-subsection' ) );
+		form.classList.add( 'wbam-js-enhanced' );
+		select.addEventListener( 'change', function () {
+			form.submit();
 		} );
-
-		// Deep link support, e.g. the legacy-geo-provider admin notice
-		// linking straight to "#wbam_geo" (Settings\get_legacy_geo_provider_notice()).
-		// Falls back to whichever pill server-rendered as .is-active.
-		var requested = window.location.hash.replace( '#', '' );
-		if ( requested && wrap.querySelector( '.wbam-ad-display-subsection[data-subsection="' + requested + '"]' ) ) {
-			activate( requested );
-		}
 	}
 
 	/**
@@ -103,7 +89,7 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', function () {
-		initAdDisplaySubnav();
+		initSettingsNavSelect();
 		initGeoProviderToggle();
 	} );
 }() );

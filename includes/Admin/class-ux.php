@@ -392,41 +392,91 @@ class UX {
 	/**
 	 * Render a left-hand section nav for a multi-section admin screen.
 	 *
-	 * Used by the one-page Settings screen (General, Ad Display, Classifieds,
-	 * Credits, ...) so every section lives behind one URL with `?section=`
-	 * instead of one submenu page per section. Renders a `<ul>` for desktop
-	 * and a `<select>` that navigates on change for narrow screens — CSS in
-	 * admin-family.css swaps between them at 390px, no JS required for the
-	 * `<select>` to work (plain navigation via onchange).
+	 * Used by the one-page Settings screen (General, Ads & Display,
+	 * Classifieds, Credits, ...) so every section lives behind one URL with
+	 * `?section=` instead of one submenu page per section. Renders a
+	 * grouped `<ul>` for desktop — a real surface with an icon per item,
+	 * matching `.wbam-card` — and a `<select>` (groups become `<optgroup>`)
+	 * inside a plain GET `<form>` for narrow screens. CSS in
+	 * admin-family.css swaps between them at 782px, matching WP core's own
+	 * admin-menu collapse point. No inline JS: the form's own "Go" submit
+	 * button makes the `<select>` work with JS off; admin-settings-nav.js
+	 * progressively auto-submits on change and hides that button.
 	 *
 	 * @since 3.2.0
-	 * @param array<string,array{label:string,url:string}> $sections Ordered
-	 *        map of section slug => { label, url }.
-	 * @param string                                        $current  Active section slug.
+	 * @since 3.2.0 Owner correction: rail redesigned as a card-like surface
+	 *              with per-item Lucide icons and group headings; mobile
+	 *              `<select>` moved off inline `onchange` into a real GET
+	 *              form + external JS.
+	 * @param array<string,array{label:string,url:string,icon?:string,group?:string}> $sections
+	 *        Ordered map of section slug => { label, url, icon, group }.
+	 * @param string                                                                  $current Active section slug.
 	 * @return void
 	 */
 	public static function settings_nav( array $sections, string $current ) {
 		if ( empty( $sections ) ) {
 			return;
 		}
+
+		// Group while preserving the order sections were handed in, and the
+		// order groups are first seen in — no separate sort pass needed.
+		$groups = array();
+		foreach ( $sections as $slug => $section ) {
+			$group                     = isset( $section['group'] ) ? $section['group'] : '';
+			$groups[ $group ][ $slug ] = $section;
+		}
 		?>
 		<nav class="wbam-settings-nav" aria-label="<?php esc_attr_e( 'Settings sections', 'wb-ads-rotator-with-split-test' ); ?>">
-			<select class="wbam-settings-nav__select" onchange="if(this.value)window.location.href=this.value;">
-				<?php foreach ( $sections as $slug => $section ) : ?>
-					<option value="<?php echo esc_url( $section['url'] ); ?>" <?php selected( $slug, $current ); ?>>
-						<?php echo esc_html( $section['label'] ); ?>
-					</option>
+			<form method="get" action="<?php echo esc_url( admin_url( 'edit.php' ) ); ?>" class="wbam-settings-nav__form">
+				<input type="hidden" name="post_type" value="<?php echo esc_attr( \WBAM\Core\Admin_Links::POST_TYPE ); ?>" />
+				<input type="hidden" name="page" value="wbam-settings" />
+				<label class="screen-reader-text" for="wbam-settings-nav-select">
+					<?php esc_html_e( 'Settings sections', 'wb-ads-rotator-with-split-test' ); ?>
+				</label>
+				<select id="wbam-settings-nav-select" class="wbam-settings-nav__select" name="section" aria-label="<?php esc_attr_e( 'Settings sections', 'wb-ads-rotator-with-split-test' ); ?>">
+					<?php foreach ( $groups as $group_label => $items ) : ?>
+						<?php if ( '' !== $group_label ) : ?>
+							<optgroup label="<?php echo esc_attr( $group_label ); ?>">
+						<?php endif; ?>
+						<?php foreach ( $items as $slug => $section ) : ?>
+							<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $slug, $current ); ?>>
+								<?php echo esc_html( $section['label'] ); ?>
+							</option>
+						<?php endforeach; ?>
+						<?php if ( '' !== $group_label ) : ?>
+							</optgroup>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</select>
+				<button type="submit" class="button wbam-settings-nav__go"><?php esc_html_e( 'Go', 'wb-ads-rotator-with-split-test' ); ?></button>
+			</form>
+			<div class="wbam-settings-nav__list">
+				<?php foreach ( $groups as $group_label => $items ) : ?>
+					<?php if ( '' !== $group_label ) : ?>
+						<p class="wbam-settings-nav__group"><?php echo esc_html( $group_label ); ?></p>
+					<?php endif; ?>
+					<ul class="wbam-settings-nav__group-list">
+						<?php foreach ( $items as $slug => $section ) : ?>
+							<?php $is_current = $slug === $current; ?>
+							<li>
+								<a
+									href="<?php echo esc_url( $section['url'] ); ?>"
+									class="wbam-settings-nav__link<?php echo $is_current ? ' is-active' : ''; ?>"
+									<?php echo $is_current ? ' aria-current="page"' : ''; ?>
+								>
+									<?php if ( ! empty( $section['icon'] ) && function_exists( 'wbam_icon' ) ) : ?>
+										<?php
+										// wbam_icon() pre-escapes its own markup.
+										echo wbam_icon( $section['icon'], array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+										?>
+									<?php endif; ?>
+									<span class="wbam-settings-nav__label"><?php echo esc_html( $section['label'] ); ?></span>
+								</a>
+							</li>
+						<?php endforeach; ?>
+					</ul>
 				<?php endforeach; ?>
-			</select>
-			<ul class="wbam-settings-nav__list">
-				<?php foreach ( $sections as $slug => $section ) : ?>
-					<li>
-						<a href="<?php echo esc_url( $section['url'] ); ?>" class="wbam-settings-nav__link<?php echo $slug === $current ? ' is-active' : ''; ?>" <?php echo $slug === $current ? 'aria-current="page"' : ''; ?>>
-							<?php echo esc_html( $section['label'] ); ?>
-						</a>
-					</li>
-				<?php endforeach; ?>
-			</ul>
+			</div>
 		</nav>
 		<?php
 	}

@@ -635,87 +635,126 @@
    Settings screen: left sidebar nav (UX::settings_nav()) + content.
    One `wbam-settings` page for both plugins, sections registered
    through the `wbam_settings_sections` filter. See WBAM\Admin\Settings.
+
+   Owner correction (3.2.0): the rail is a surface like `.wbam-card` —
+   same background/border/radius/shadow tokens — not a bare list next to
+   a styled content card. Sticky on scroll, one Lucide icon per item,
+   grouped under small uppercase headings, accent-tinted active state
+   with an inline-start bar. `<select>` swap point matches WP core's own
+   admin-menu collapse breakpoint (782px) so the rail and wp-admin fold
+   at the same width.
    ============================================================ */
 .wbam-settings-layout {
 	display:               grid;
 	/* minmax(0, 1fr), not 1fr: a bare 1fr track grows to its content's
 	   min-content width, so one wide row (e.g. License's button row) pushed
 	   the whole screen past a 390px viewport. */
-	grid-template-columns: 200px minmax(0, 1fr);
+	grid-template-columns: 240px minmax(0, 1fr);
 	gap:                   var(--wbam-space-6);
 	align-items:           start;
 }
 
+.wbam-settings-nav__form {
+	display:     none;
+	align-items: center;
+	gap:         var(--wbam-space-2);
+	margin:      0 0 var(--wbam-space-4);
+}
+
 .wbam-settings-nav__select {
+	width: 100%;
+}
+
+/* Visible (no-JS-required) fallback; admin-settings-nav.js hides it and
+   auto-submits the form on change once JS is confirmed running. */
+.wbam-settings-nav__go {
+	flex-shrink: 0;
+}
+
+.wbam-settings-nav__form.wbam-js-enhanced .wbam-settings-nav__go {
 	display: none;
-	width:   100%;
+}
+
+.wbam-settings-nav {
+	display: block;
 }
 
 .wbam-settings-nav__list {
+	position:      sticky;
+	/* Clears the fixed wp-admin bar (32px desktop) plus a little breathing
+	   room, so the rail never renders under it while scrolled. */
+	top:           calc(var(--wp-admin--admin-bar--height, 32px) + var(--wbam-space-4));
+	padding:       var(--wbam-space-3);
+	background:    var(--wbam-bg);
+	border:        1px solid var(--wbam-border);
+	border-radius: var(--wbam-r-lg);
+	box-shadow:    var(--wbam-shadow-sm);
+	max-height:    calc(100vh - var(--wp-admin--admin-bar--height, 32px) - var(--wbam-space-8));
+	overflow-y:    auto;
+}
+
+.wbam-settings-nav__group {
+	margin:        var(--wbam-space-4) 0 var(--wbam-space-1);
+	padding:       0 var(--wbam-space-3);
+	font-size:     var(--wbam-font-size-xs);
+	font-weight:   var(--wbam-weight-semibold);
+	color:         var(--wbam-text-subtle);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.wbam-settings-nav__group:first-child {
+	margin-top: 0;
+}
+
+.wbam-settings-nav__group-list {
 	display:    flex;
 	flex-direction: column;
-	gap:        var(--wbam-space-1);
+	gap:        2px;
 	margin:     0;
 	padding:    0;
 	list-style: none;
-	position:   sticky;
-	top:        var(--wbam-space-4);
 }
 
 .wbam-settings-nav__link {
-	display:       block;
-	padding:       var(--wbam-space-2) var(--wbam-space-3);
-	border-radius: var(--wbam-r-md);
-	color:         var(--wbam-text);
+	display:         flex;
+	align-items:     center;
+	gap:             var(--wbam-space-2);
+	min-height:      40px;
+	padding:         var(--wbam-space-2) var(--wbam-space-3);
+	border-radius:   var(--wbam-r-md);
+	color:           var(--wbam-text);
 	text-decoration: none;
+	border-inline-start: 3px solid transparent;
+	transition:      background var(--wbam-transition), color var(--wbam-transition), border-color var(--wbam-transition);
+}
+
+.wbam-settings-nav__link .wbam-icon {
+	color: var(--wbam-text-muted);
 }
 
 .wbam-settings-nav__link:hover {
-	background: var(--wbam-bg-subtle);
+	background: var(--wbam-surface);
+}
+
+.wbam-settings-nav__link:focus-visible {
+	outline:        2px solid var(--wbam-accent);
+	outline-offset: 2px;
 }
 
 .wbam-settings-nav__link.is-active {
-	background:  var(--wbam-primary-subtle, var(--wbam-bg-subtle));
-	color:       var(--wbam-primary);
-	font-weight: 600;
+	background:          var(--wbam-accent-light);
+	border-inline-start-color: var(--wbam-accent);
+	color:               var(--wbam-accent);
+	font-weight:         var(--wbam-weight-semibold);
+}
+
+.wbam-settings-nav__link.is-active .wbam-icon {
+	color: var(--wbam-accent);
 }
 
 .wbam-settings-content .wbam-card:last-child {
 	margin-bottom: 0;
-}
-
-/* Ad Display leaf: sub-nav pills that toggle .wbam-ad-display-subsection via
-   JS (admin-settings-nav.js). Every subsection stays in the DOM either way,
-   so the whole form still posts on save regardless of which pill is active. */
-.wbam-ad-display-subnav {
-	display:  flex;
-	flex-wrap: wrap;
-	gap:      var(--wbam-space-2);
-	margin:   0 0 var(--wbam-space-4);
-}
-
-.wbam-ad-display-subnav__item {
-	padding:       var(--wbam-space-1) var(--wbam-space-3);
-	border:        1px solid var(--wbam-border);
-	border-radius: var(--wbam-r-pill);
-	background:    var(--wbam-bg);
-	color:         var(--wbam-text);
-	cursor:        pointer;
-	font-size:     var(--wbam-font-size-xs);
-}
-
-.wbam-ad-display-subnav__item.is-active {
-	background:  var(--wbam-primary);
-	border-color: var(--wbam-primary);
-	color:       #fff;
-}
-
-#wbam-ad-display-sections.wbam-js-enhanced .wbam-ad-display-subsection {
-	display: none;
-}
-
-#wbam-ad-display-sections.wbam-js-enhanced .wbam-ad-display-subsection.is-active {
-	display: block;
 }
 
 /* Geo Targeting section: provider picker + its per-provider field rows
@@ -749,21 +788,20 @@
 	display: none;
 }
 
-@media screen and (max-width: 390px) {
+/* Matches WP core's own admin-menu collapse breakpoint, so the settings
+   rail folds to a <select> (optgroups for the group headings) at the same
+   width wp-admin already folds its own left menu. */
+@media screen and (max-width: 782px) {
 	.wbam-settings-layout {
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	.wbam-settings-nav__select {
-		display: block;
+	.wbam-settings-nav__form {
+		display: flex;
 	}
 
 	.wbam-settings-nav__list {
-		display:  none;
-	}
-
-	.wbam-ad-display-subnav {
-		flex-direction: column;
+		display: none;
 	}
 }
 
