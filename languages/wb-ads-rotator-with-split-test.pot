@@ -3,725 +3,645 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Wbcom Designs - WB Ad Manager 3.2.0\n"
-"Report-Msgid-Bugs-To: https://wbcomdesigns.com/support/\n"
-"POT-Creation-Date: 2026-09-26 13:17:38+00:00\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wb-ads-rotator-with-split-test\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Wbcom Designs <developer@wbcomdesigns.com>\n"
-"Language-Team: Wbcom Designs <developer@wbcomdesigns.com>\n"
-"Language: en\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Country: United States\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: "
-"__;_e;_x:1,2c;_ex:1,2c;_n:1,2;_nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_"
-"attr__;esc_html__;esc_attr_e;esc_html_e;esc_attr_x:1,2c;esc_html_x:1,2c;\n"
-"X-Poedit-Basepath: ../\n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Poedit-Bookmarks: \n"
-"X-Textdomain-Support: yes\n"
-"X-Generator: grunt-wp-i18n 1.0.4\n"
+"POT-Creation-Date: 2026-09-26T13:44:18+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: wb-ads-rotator-with-split-test\n"
 
-#: includes/API/class-ads-api.php:229 includes/API/class-analytics-api.php:157
-#: includes/API/class-links-api.php:249 includes/API/class-settings-api.php:115
-#: includes/Admin/class-demo-data-cleaner.php:105
-#: includes/Admin/class-setup-wizard.php:144
-msgid "You do not have permission to perform this action."
+#. Plugin Name of the plugin
+#: wb-ads-rotator-with-split-test.php
+msgid "Wbcom Designs - WB Ad Manager"
 msgstr ""
 
-#: includes/API/class-ads-api.php:303 includes/API/class-ads-api.php:364
-#: includes/API/class-ads-api.php:413 includes/API/class-ads-api.php:539
-#: includes/API/class-ads-api.php:566 includes/API/class-ads-api.php:596
-#: includes/API/class-analytics-api.php:195
-#: includes/API/class-analytics-api.php:304
-#: includes/Core/class-abilities.php:910 includes/Core/class-abilities.php:1008
-#: includes/Core/class-abilities.php:1058
-#: includes/Core/class-abilities.php:1231
-msgid "Ad not found."
+#. Plugin URI of the plugin
+#: wb-ads-rotator-with-split-test.php
+msgid "https://wbcomdesigns.com/downloads/wb-ad-manager-pro/"
 msgstr ""
 
-#: includes/API/class-ads-api.php:323 includes/Core/class-abilities.php:944
-msgid "Ad title is required."
+#. Description of the plugin
+#: wb-ads-rotator-with-split-test.php
+msgid "Comprehensive ad management for WordPress with ad rotation, split testing, multiple placements, Google AdSense, BuddyPress and bbPress integration."
 msgstr ""
 
-#: includes/API/class-ads-api.php:340 includes/Core/class-abilities.php:966
-msgid "Could not create ad."
+#. Author of the plugin
+#: wb-ads-rotator-with-split-test.php
+msgid "Wbcom Designs"
 msgstr ""
 
-#: includes/API/class-ads-api.php:389
-msgid "Could not update ad."
+#. Author URI of the plugin
+#: wb-ads-rotator-with-split-test.php
+msgid "https://wbcomdesigns.com"
 msgstr ""
 
-#: includes/API/class-ads-api.php:423 includes/Core/class-abilities.php:1064
-msgid "Could not delete ad."
-msgstr ""
-
-#: includes/API/class-ads-api.php:451
-msgid "Placement parameter is required."
-msgstr ""
-
-#: includes/API/class-ads-api.php:529 includes/API/class-analytics-api.php:295
-#: includes/API/class-links-api.php:576
-#: includes/Frontend/class-frontend.php:170
-#: includes/Frontend/class-frontend.php:439
-#: includes/Modules/Links/class-links-module.php:155
-msgid "Too many requests. Please try again later."
-msgstr ""
-
-#: includes/API/class-ads-api.php:606
-#. translators: %s: original ad title
-msgid "%s (Copy)"
-msgstr ""
-
-#: includes/API/class-ads-api.php:618
-msgid "Could not duplicate ad."
-msgstr ""
-
-#: includes/API/class-links-api.php:308 includes/API/class-links-api.php:394
-#: includes/API/class-links-api.php:464 includes/API/class-links-api.php:502
-#: includes/API/class-links-api.php:566 includes/Core/class-abilities.php:1361
-#: includes/Core/class-abilities.php:1413
-#: includes/Core/class-abilities.php:1445
-#: includes/Modules/Links/class-links-admin.php:234
-msgid "Link not found."
-msgstr ""
-
-#: includes/API/class-links-api.php:371 includes/Core/class-abilities.php:1324
-msgid "Could not create link."
-msgstr ""
-
-#: includes/API/class-links-api.php:441
-msgid "Could not update link."
-msgstr ""
-
-#: includes/API/class-links-api.php:474 includes/Core/class-abilities.php:1419
-msgid "Could not delete link."
-msgstr ""
-
-#: includes/API/class-links-api.php:653
-msgid "Category name is required."
-msgstr ""
-
-#: includes/API/class-links-api.php:673
-msgid "Could not create category."
-msgstr ""
-
-#: includes/API/class-links-api.php:741
-#: includes/Modules/Links/class-partnership-admin.php:599
-msgid "Partnership not found."
-msgstr ""
-
-#: includes/API/class-links-api.php:774
-msgid "Could not update partnership."
-msgstr ""
-
-#: includes/API/class-settings-api.php:153
-#: includes/API/class-settings-api.php:220
-msgid "Settings must be a valid object."
-msgstr ""
-
-#: includes/API/class-settings-api.php:172
-msgid "Could not save settings."
-msgstr ""
-
-#: includes/API/class-settings-api.php:236
-msgid "No valid display setting keys provided."
-msgstr ""
-
-#: includes/Admin/class-admin.php:133 includes/Admin/class-help-docs.php:612
+#: includes/Admin/class-admin.php:131
+#: includes/Admin/class-help-docs.php:614
 msgid "Ads"
 msgstr ""
 
-#: includes/Admin/class-admin.php:134
+#: includes/Admin/class-admin.php:132
 msgid "Every ad running on your site."
 msgstr ""
 
-#: includes/Admin/class-admin.php:136 includes/Core/class-plugin.php:329
+#: includes/Admin/class-admin.php:134
+#: includes/Core/class-plugin.php:329
 msgid "Add New"
 msgstr ""
 
-#: includes/Admin/class-admin.php:145 includes/Core/class-plugin.php:328
+#: includes/Admin/class-admin.php:143
+#: includes/Core/class-plugin.php:328
 msgid "Add New Ad"
 msgstr ""
 
-#: includes/Admin/class-admin.php:146
+#: includes/Admin/class-admin.php:144
 msgid "Choose an ad type below and fill in its settings."
 msgstr ""
 
-#: includes/Admin/class-admin.php:149 includes/Admin/class-ux.php:65
-#: includes/Modules/Links/class-partnership-admin.php:608
+#: includes/Admin/class-admin.php:147
+#: includes/Admin/class-admin.php:162
+#: includes/Admin/class-ux.php:65
+#: includes/Modules/Links/class-partnership-admin.php:619
 msgid "Back to list"
 msgstr ""
 
-#: includes/Admin/class-admin.php:158 includes/Core/class-plugin.php:390
-msgid "Ad Tags"
+#: includes/Admin/class-admin.php:158
+#: includes/Core/class-plugin.php:331
+msgid "Edit Ad"
 msgstr ""
 
 #: includes/Admin/class-admin.php:159
+msgid "Update this ad's content, sizing and placements."
+msgstr ""
+
+#: includes/Admin/class-admin.php:171
+#: includes/Core/class-plugin.php:390
+msgid "Ad Tags"
+msgstr ""
+
+#: includes/Admin/class-admin.php:172
 msgid "Group ads by tag for use in shortcodes and blocks."
 msgstr ""
 
-#: includes/Admin/class-admin.php:177 includes/Admin/class-admin.php:950
-#: includes/Admin/class-help-docs.php:202 includes/Admin/class-settings.php:148
-#: includes/Admin/class-settings.php:1002
+#: includes/Admin/class-admin.php:190
+#: includes/Admin/class-admin.php:917
+#: includes/Admin/class-help-docs.php:204
+#: includes/Admin/class-settings.php:156
+#: includes/Admin/class-settings.php:1015
 #: includes/Admin/class-setup-wizard.php:759
 msgid "Settings"
 msgstr ""
 
-#: includes/Admin/class-admin.php:226
+#: includes/Admin/class-admin.php:239
 msgid "Enable ads"
 msgstr ""
 
-#: includes/Admin/class-admin.php:227
+#: includes/Admin/class-admin.php:240
 msgid "Disable ads"
 msgstr ""
 
-#: includes/Admin/class-admin.php:304
 #. translators: %d: number of ads
+#: includes/Admin/class-admin.php:317
+#, php-format
 msgid "%d ad enabled."
 msgid_plural "%d ads enabled."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-admin.php:306
 #. translators: %d: number of ads
+#: includes/Admin/class-admin.php:319
+#, php-format
 msgid "%d ad disabled."
 msgid_plural "%d ads disabled."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-admin.php:344
-#. translators: %s: comma-separated list of placement names
-msgid "This ad's size doesn't fit: %s. It was not saved for those placements."
+#: includes/Admin/class-admin.php:360
+msgid "Ads and placements now declare a shape (Banner, Box or Tower) so oversize creatives stop breaking your layout. Your site keeps serving exactly as it does today until you turn this on."
 msgstr ""
 
-#: includes/Admin/class-admin.php:384
-msgid ""
-"Ads and placements now declare a shape (Banner, Box or Tower) so oversize "
-"creatives stop breaking your layout. Your site keeps serving exactly as it "
-"does today until you turn this on."
-msgstr ""
-
-#: includes/Admin/class-admin.php:388
-#. translators: 1: number of ads that don't fit their placement, 2:
-#. comma-separated list of up to 10 ad titles
+#. translators: 1: number of ads that don't fit their placement, 2: comma-separated list of up to 10 ad titles
+#: includes/Admin/class-admin.php:364
+#, php-format
 msgid "%1$d ad does not fit its placement under the new rule: %2$s."
 msgid_plural "%1$d ads do not fit their placements under the new rule: %2$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-admin.php:403
+#: includes/Admin/class-admin.php:384
 msgid "New: placement sizes by shape"
 msgstr ""
 
-#: includes/Admin/class-admin.php:406
-msgid "Turn on size matching"
+#: includes/Admin/class-admin.php:387
+msgid "Go to the Format Matching setting"
 msgstr ""
 
-#: includes/Admin/class-admin.php:407
+#: includes/Admin/class-admin.php:388
 msgid "Dismiss"
 msgstr ""
 
-#: includes/Admin/class-admin.php:418 includes/Admin/class-admin.php:435
+#: includes/Admin/class-admin.php:402
 msgid "Not allowed."
 msgstr ""
 
-#: includes/Admin/class-admin.php:481
+#: includes/Admin/class-admin.php:448
 msgid "Disable"
 msgstr ""
 
-#: includes/Admin/class-admin.php:482
+#: includes/Admin/class-admin.php:449
 msgid "Enable"
 msgstr ""
 
-#: includes/Admin/class-admin.php:509
+#: includes/Admin/class-admin.php:476
 msgid "Filter by enabled status"
 msgstr ""
 
-#: includes/Admin/class-admin.php:512
+#: includes/Admin/class-admin.php:479
 msgid "All statuses"
 msgstr ""
 
-#: includes/Admin/class-admin.php:513 includes/Admin/class-admin.php:1781
-#: includes/Admin/class-admin.php:3017
+#: includes/Admin/class-admin.php:480
+#: includes/Admin/class-admin.php:1897
+#: includes/Admin/class-admin.php:3147
 msgid "Enabled"
 msgstr ""
 
-#: includes/Admin/class-admin.php:514 includes/Admin/class-admin.php:1785
-#: includes/Admin/class-admin.php:3017
+#: includes/Admin/class-admin.php:481
+#: includes/Admin/class-admin.php:1901
+#: includes/Admin/class-admin.php:3147
 msgid "Disabled"
 msgstr ""
 
-#: includes/Admin/class-admin.php:523
+#: includes/Admin/class-admin.php:490
 msgid "Filter by ad type"
 msgstr ""
 
-#: includes/Admin/class-admin.php:525
+#: includes/Admin/class-admin.php:492
 msgid "All types"
 msgstr ""
 
-#: includes/Admin/class-admin.php:530
+#: includes/Admin/class-admin.php:497
 msgid "Filter by placement"
 msgstr ""
 
-#: includes/Admin/class-admin.php:532
+#: includes/Admin/class-admin.php:499
 msgid "All placements"
 msgstr ""
 
-#: includes/Admin/class-admin.php:592
+#: includes/Admin/class-admin.php:559
 msgid "All ad tags"
 msgstr ""
 
-#: includes/Admin/class-admin.php:723 includes/Admin/class-admin.php:775
+#: includes/Admin/class-admin.php:690
+#: includes/Admin/class-admin.php:742
 #: includes/Admin/class-demo-data-cleaner.php:114
 #: includes/Admin/class-setup-wizard.php:217
 #: includes/Frontend/class-frontend.php:447
 #: includes/Modules/Links/class-links-module.php:160
-#: includes/Modules/Links/class-partnership-admin.php:170
-#: includes/Modules/Links/class-partnership-admin.php:213
+#: includes/Modules/Links/class-partnership-admin.php:181
+#: includes/Modules/Links/class-partnership-admin.php:224
 #: includes/Modules/Links/class-partnership-form.php:485
 msgid "Security check failed."
 msgstr ""
 
-#: includes/Admin/class-admin.php:750
 #. translators: %s: Ad title
+#: includes/Admin/class-admin.php:717
+#, php-format
 msgid "Ad \"%s\" has been disabled."
 msgstr ""
 
-#: includes/Admin/class-admin.php:946
+#: includes/Admin/class-admin.php:913
 msgid "Delivery"
 msgstr ""
 
-#: includes/Admin/class-admin.php:947
+#: includes/Admin/class-admin.php:914
 msgid "Campaigns"
 msgstr ""
 
-#: includes/Admin/class-admin.php:948 includes/Admin/class-help-docs.php:203
-#: includes/Admin/class-help-docs.php:639
-#: includes/Admin/class-settings.php:1061
+#: includes/Admin/class-admin.php:915
+#: includes/Admin/class-help-docs.php:205
+#: includes/Admin/class-help-docs.php:641
+#: includes/Admin/class-settings.php:1074
 #: includes/Modules/Links/class-links-admin.php:71
-#: includes/Modules/Links/class-links-admin.php:182
 msgid "Links"
 msgstr ""
 
-#: includes/Admin/class-admin.php:949
+#: includes/Admin/class-admin.php:916
 msgid "Reports"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1157
+#: includes/Admin/class-admin.php:1124
 msgid "Select Image"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1158
+#: includes/Admin/class-admin.php:1125
 msgid "Use This Image"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1159
+#: includes/Admin/class-admin.php:1126
 msgid "No matches."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1160
+#: includes/Admin/class-admin.php:1127
 msgid "selected"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1193
-#. translators: %d is replaced client-side with the active ad count for the
-#. slot being closed.
+#. translators: %d is replaced client-side with the active ad count for the slot being closed.
+#: includes/Admin/class-admin.php:1160
+#, php-format
 msgid "%d active ad(s) will stop rendering in this slot. Continue?"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1273
+#: includes/Admin/class-admin.php:1240
 msgid "Ad Settings"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1286
+#: includes/Admin/class-admin.php:1253
 msgid "Preview"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1296 includes/Admin/class-admin.php:1544
-#: includes/Admin/class-admin.php:2975 includes/Admin/class-settings.php:334
+#: includes/Admin/class-admin.php:1263
+#: includes/Admin/class-admin.php:1540
+#: includes/Admin/class-admin.php:3083
+#: includes/Admin/class-settings.php:342
 msgid "Placements"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1306
+#: includes/Admin/class-admin.php:1273
 msgid "Use this ad"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1320
+#: includes/Admin/class-admin.php:1287
 msgid "Ad Status"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1334
+#: includes/Admin/class-admin.php:1301
 msgid "Ad Performance Comparison"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1379
+#: includes/Admin/class-admin.php:1346
 msgid "Paste this shortcode into any post, page or text widget:"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1381
+#: includes/Admin/class-admin.php:1348
 #: includes/Modules/Links/class-links-admin.php:650
 #: includes/Modules/Placements/class-shortcode-placement.php:25
 msgid "Shortcode"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1382
+#: includes/Admin/class-admin.php:1349
 #: includes/Modules/Links/class-links-admin.php:645
 msgid "Copy"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1385
+#: includes/Admin/class-admin.php:1352
 msgid "In the block editor, add the WB Ad block and pick this ad."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1389
-msgid ""
-"Or add the WB Ad Manager widget to a sidebar under Appearance, Widgets and "
-"pick this ad."
+#: includes/Admin/class-admin.php:1356
+msgid "Or add the WB Ad Manager widget to a sidebar under Appearance, Widgets and pick this ad."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1538
-msgid ""
-"This ad type is not assigned to a placement. It plays inside protected "
-"lesson videos (pre-roll, mid-roll, post-roll) or as a standalone player, "
-"delivered by the video engine. Ticking boxes below has no effect."
+#: includes/Admin/class-admin.php:1378
+#: includes/Admin/class-admin.php:1395
+msgid "Ad type"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1578
+#: includes/Admin/class-admin.php:1534
+msgid "This ad type is not assigned to a placement. It plays inside protected lesson videos (pre-roll, mid-roll, post-roll) or as a standalone player, delivered by the video engine. Ticking boxes below has no effect."
+msgstr ""
+
 #. translators: %s: placement name, e.g. "Popup/Modal".
+#: includes/Admin/class-admin.php:1586
+#, php-format
 msgid "%s settings"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1589
+#: includes/Admin/class-admin.php:1597
 msgid "Paragraph Settings"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1591
+#: includes/Admin/class-admin.php:1599
 msgid "Insert after paragraph:"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1597
+#: includes/Admin/class-admin.php:1605
 msgid "Repeat after every X paragraphs"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1603
+#: includes/Admin/class-admin.php:1611
 msgid "Activity Stream Settings"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1605
+#: includes/Admin/class-admin.php:1613
 msgid "Insert after activity:"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1611
+#: includes/Admin/class-admin.php:1619
 msgid "Repeat after every X activities"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1704
-msgid ""
-"No other enabled ad shares this ad's placements, so it gets every "
-"impression there."
+#: includes/Admin/class-admin.php:1820
+msgid "No other enabled ad shares this ad's placements, so it gets every impression there."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1723
-#. translators: %1$d: number of other ads in the same placements. %2$d: this
-#. ad's share of impressions, in percent.
-msgid ""
-"This ad shares its placements with %1$d other ad and wins about %2$d%% of "
-"impressions at this priority."
-msgid_plural ""
-"This ad shares its placements with %1$d other ads and wins about %2$d%% of "
-"impressions at this priority."
+#. translators: %1$d: number of other ads in the same placements. %2$d: this ad's share of impressions, in percent.
+#: includes/Admin/class-admin.php:1839
+#, php-format
+msgid "This ad shares its placements with %1$d other ad and wins about %2$d%% of impressions at this priority."
+msgid_plural "This ad shares its placements with %1$d other ads and wins about %2$d%% of impressions at this priority."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-admin.php:1790
+#: includes/Admin/class-admin.php:1906
 msgid "Priority"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1793
-msgid ""
-"Higher priority = bigger share when multiple ads compete for the same slot. "
-"Default is 5."
+#: includes/Admin/class-admin.php:1909
+msgid "Higher priority = bigger share when multiple ads compete for the same slot. Default is 5."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1798
+#: includes/Admin/class-admin.php:1914
 msgid "Max views per visitor per day"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1799
+#: includes/Admin/class-admin.php:1915
 #: includes/Admin/class-display-options.php:398
 msgid "Unlimited"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1800
+#: includes/Admin/class-admin.php:1916
 msgid "Max views per visitor session. Leave empty for unlimited."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1804
-msgid ""
-"This ad type has no fixed size. It plays inside protected lesson videos or "
-"as a standalone player, not in a sized slot."
+#: includes/Admin/class-admin.php:1920
+msgid "This ad type has no fixed size. It plays inside protected lesson videos or as a standalone player, not in a sized slot."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1809
+#: includes/Admin/class-admin.php:1925
 msgid "Sizing"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1810
+#: includes/Admin/class-admin.php:1926
 msgid "Controls where this ad can render."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1813
+#: includes/Admin/class-admin.php:1929
 msgid "Ad sizing mode"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1816
+#: includes/Admin/class-admin.php:1932
 msgid "Responsive"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1817
+#: includes/Admin/class-admin.php:1933
 msgid "Fills any slot. Best for AdSense auto and fluid HTML."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1821
+#: includes/Admin/class-admin.php:1937
 msgid "Fixed size"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1822
+#: includes/Admin/class-admin.php:1938
 msgid "Known width and height. Matches only compatible slots."
 msgstr ""
 
-#: includes/Admin/class-admin.php:1830
+#: includes/Admin/class-admin.php:1946
 msgid "Format"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1832
+#: includes/Admin/class-admin.php:1948
 msgid "Auto-detect from image"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1845
+#: includes/Admin/class-admin.php:1961
 msgid "Dimensions"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1846
+#: includes/Admin/class-admin.php:1962
 msgid "Width in pixels"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1848
+#: includes/Admin/class-admin.php:1964
 msgid "Height in pixels"
 msgstr ""
 
-#: includes/Admin/class-admin.php:1849
+#: includes/Admin/class-admin.php:1965
 msgid "px"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2090
+#: includes/Admin/class-admin.php:2206
 msgid "Save the ad first to see a preview."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2096
-msgid ""
-"Approximate render. Final appearance depends on the theme and placement "
-"wrapper. Save the ad to refresh this preview."
+#: includes/Admin/class-admin.php:2212
+msgid "Approximate render. Final appearance depends on the theme and placement wrapper. Save the ad to refresh this preview."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2122
 #. translators: %s: ad type slug
+#: includes/Admin/class-admin.php:2238
+#, php-format
 msgid "Preview not available for ad type: %s"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2140
+#: includes/Admin/class-admin.php:2256
 msgid "No image selected."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2173
+#: includes/Admin/class-admin.php:2289
 msgid "No content yet."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2193
+#: includes/Admin/class-admin.php:2309
 msgid "No code pasted yet."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2223 includes/Admin/class-settings.php:417
+#: includes/Admin/class-admin.php:2339
+#: includes/Admin/class-settings.php:425
 #: includes/Modules/AdTypes/class-ad-sense-ad.php:81
 msgid "Google AdSense"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2235
 #. translators: %s: AdSense format (auto, horizontal, etc.)
+#: includes/Admin/class-admin.php:2351
+#, php-format
 msgid "Format: %s. Real AdSense renders only on approved public pages."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2250
+#: includes/Admin/class-admin.php:2366
 #: includes/Modules/AdTypes/class-email-capture-ad.php:97
 #: includes/Modules/AdTypes/class-email-capture-ad.php:357
 msgid "Subscribe to our Newsletter"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2252
+#: includes/Admin/class-admin.php:2368
 #: includes/Modules/AdTypes/class-email-capture-ad.php:99
 #: includes/Modules/AdTypes/class-email-capture-ad.php:359
 #: includes/Modules/AdTypes/class-email-capture-ad.php:470
 msgid "Subscribe"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2269
+#: includes/Admin/class-admin.php:2385
 msgid "Your name"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2269
+#: includes/Admin/class-admin.php:2385
 msgid "Name field preview"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2271
+#: includes/Admin/class-admin.php:2387
 msgid "you@example.com"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2271
+#: includes/Admin/class-admin.php:2387
 msgid "Email field preview"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2294
+#: includes/Admin/class-admin.php:2410
 msgid "No placements assigned to this ad."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2330
-msgid ""
-"No other enabled ads are using the same placements. Enable more ads to "
-"compare performance."
+#: includes/Admin/class-admin.php:2446
+msgid "No other enabled ads are using the same placements. Enable more ads to compare performance."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2410
+#: includes/Admin/class-admin.php:2526
 #: includes/Admin/class-email-captures-list-table.php:57
 #: includes/Core/class-plugin.php:340
+#: blocks/editor.js:113
+#: blocks/editor.js:114
+#: blocks/editor.js:130
 msgid "Ad"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2411 includes/Admin/class-admin.php:2976
+#: includes/Admin/class-admin.php:2527
+#: includes/Admin/class-admin.php:3084
 msgid "Impressions"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2412 includes/Admin/class-admin.php:2977
+#: includes/Admin/class-admin.php:2528
+#: includes/Admin/class-admin.php:3085
 #: includes/Modules/Links/class-links-list-table.php:78
 msgid "Clicks"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2413
+#: includes/Admin/class-admin.php:2529
 msgid "CTR"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2414
+#: includes/Admin/class-admin.php:2530
 msgid "Performance"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2424
+#: includes/Admin/class-admin.php:2540
 msgid "This Ad"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2431
+#: includes/Admin/class-admin.php:2547
 msgid "Winner"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2447
-msgid ""
-"Disable this underperforming ad? Visitors will stop seeing it in this "
-"placement."
+#: includes/Admin/class-admin.php:2563
+msgid "Disable this underperforming ad? Visitors will stop seeing it in this placement."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2449
+#: includes/Admin/class-admin.php:2565
 msgid "Disable this ad"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2463
-msgid ""
-"The top two ads are still within noise of each other. Keep the test running "
-"until one pulls clearly ahead."
+#: includes/Admin/class-admin.php:2579
+msgid "The top two ads are still within noise of each other. Keep the test running until one pulls clearly ahead."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2465
-msgid ""
-"No winner yet. Each ad needs at least 100 impressions before a fair "
-"comparison."
+#: includes/Admin/class-admin.php:2581
+msgid "No winner yet. Each ad needs at least 100 impressions before a fair comparison."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2468
-msgid ""
-"Only one ad has enough data so far. Keep the rotation running to compare "
-"against the others."
+#: includes/Admin/class-admin.php:2584
+msgid "Only one ad has enough data so far. Keep the rotation running to compare against the others."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2470
-msgid ""
-"Winner has a clear lead in CTR over the runner-up with enough data to trust "
-"the result."
+#: includes/Admin/class-admin.php:2586
+msgid "Winner has a clear lead in CTR over the runner-up with enough data to trust the result."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2735
+#: includes/Admin/class-admin.php:2843
 msgid "Auto-detected from your image on save."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2736
+#: includes/Admin/class-admin.php:2844
 msgid "Enter width x height to see matches."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2737
+#: includes/Admin/class-admin.php:2845
 msgid "No placements match this size yet."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2738
+#: includes/Admin/class-admin.php:2846
 msgid "Every placement."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2741
+#: includes/Admin/class-admin.php:2849
 msgid "Will render in:"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2744
+#: includes/Admin/class-admin.php:2852
 msgid "Could render in:"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2747
+#: includes/Admin/class-admin.php:2855
 msgid "Placement fit:"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2748
+#: includes/Admin/class-admin.php:2856
 msgid "Tick a placement below to enable rendering."
 msgstr ""
 
-#: includes/Admin/class-admin.php:2749
+#: includes/Admin/class-admin.php:2857
 msgid "Wrong size for:"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2750
+#: includes/Admin/class-admin.php:2858
 msgid "None of the selected placements accept this size:"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2974
+#: includes/Admin/class-admin.php:3082
 #: includes/Modules/Links/class-links-list-table.php:77
-#: includes/Modules/Links/class-partnership-admin.php:341
-#: includes/Modules/Links/class-partnership-admin.php:656
+#: includes/Modules/Links/class-partnership-admin.php:352
+#: includes/Modules/Links/class-partnership-admin.php:667
 msgid "Type"
 msgstr ""
 
-#: includes/Admin/class-admin.php:2978
+#: includes/Admin/class-admin.php:3086
 #: includes/Modules/Links/class-links-admin.php:512
 #: includes/Modules/Links/class-links-list-table.php:79
-#: includes/Modules/Links/class-partnership-admin.php:343
+#: includes/Modules/Links/class-partnership-admin.php:354
 msgid "Status"
 msgstr ""
 
-#: includes/Admin/class-admin.php:3031
+#: includes/Admin/class-admin.php:3137
+msgid "Pending review"
+msgstr ""
+
+#: includes/Admin/class-admin.php:3141
+msgid "Draft"
+msgstr ""
+
+#: includes/Admin/class-admin.php:3161
 msgid "This ad is skipped by delivery until its creative is restored."
 msgstr ""
 
-#: includes/Admin/class-admin.php:3032
+#: includes/Admin/class-admin.php:3162
 msgid "Creative missing"
 msgstr ""
 
-#: includes/Admin/class-admin.php:3158
 #. translators: %s: number of further placements
+#: includes/Admin/class-admin.php:3288
+#, php-format
 msgid "+%s more"
 msgid_plural "+%s more"
 msgstr[0] ""
@@ -733,6 +653,15 @@ msgstr ""
 
 #: includes/Admin/class-demo-data-cleaner.php:94
 msgid "Remove the sample ads created by the setup wizard."
+msgstr ""
+
+#: includes/Admin/class-demo-data-cleaner.php:105
+#: includes/Admin/class-setup-wizard.php:144
+#: includes/API/class-ads-api.php:229
+#: includes/API/class-analytics-api.php:157
+#: includes/API/class-links-api.php:249
+#: includes/API/class-settings-api.php:115
+msgid "You do not have permission to perform this action."
 msgstr ""
 
 #: includes/Admin/class-demo-data-cleaner.php:106
@@ -747,29 +676,33 @@ msgstr ""
 msgid "Remove demo data"
 msgstr ""
 
-#: includes/Admin/class-demo-data-cleaner.php:272
 #. translators: %d: number of demo items that will be removed.
+#: includes/Admin/class-demo-data-cleaner.php:272
+#, php-format
 msgid "Remove %d demo item created by the setup wizard? This cannot be undone."
 msgid_plural "Remove %d demo items created by the setup wizard? This cannot be undone."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-demo-data-cleaner.php:316
 #. translators: %d: number of ads removed.
+#: includes/Admin/class-demo-data-cleaner.php:316
+#, php-format
 msgid "%d ad"
 msgid_plural "%d ads"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-demo-data-cleaner.php:320
 #. translators: %d: number of pages removed.
+#: includes/Admin/class-demo-data-cleaner.php:320
+#, php-format
 msgid "%d page"
 msgid_plural "%d pages"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-demo-data-cleaner.php:324
 #. translators: %d: number of links removed.
+#: includes/Admin/class-demo-data-cleaner.php:324
+#, php-format
 msgid "%d link"
 msgid_plural "%d links"
 msgstr[0] ""
@@ -779,19 +712,17 @@ msgstr[1] ""
 msgid "No demo items needed to be removed."
 msgstr ""
 
-#: includes/Admin/class-demo-data-cleaner.php:331
 #. translators: %s: comma-separated list, e.g. "3 ads, 1 page".
+#: includes/Admin/class-demo-data-cleaner.php:331
+#, php-format
 msgid "Demo data removed: %s."
 msgstr ""
 
-#: includes/Admin/class-demo-data-cleaner.php:339
 #. translators: %d: number of skipped items.
-msgid ""
-"%d item was skipped because it no longer has the demo marker (possibly "
-"edited by you)."
-msgid_plural ""
-"%d items were skipped because they no longer have the demo marker (possibly "
-"edited by you)."
+#: includes/Admin/class-demo-data-cleaner.php:339
+#, php-format
+msgid "%d item was skipped because it no longer has the demo marker (possibly edited by you)."
+msgid_plural "%d items were skipped because they no longer have the demo marker (possibly edited by you)."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -808,7 +739,7 @@ msgid "Visitor Conditions"
 msgstr ""
 
 #: includes/Admin/class-display-options.php:67
-#: includes/Admin/class-settings.php:355
+#: includes/Admin/class-settings.php:363
 msgid "Geo Targeting"
 msgstr ""
 
@@ -988,13 +919,12 @@ msgid "Total Impressions"
 msgstr ""
 
 #: includes/Admin/class-display-options.php:400
-msgid ""
-"Stop showing this ad once it has been displayed this many times in total, "
-"across every visitor and placement. Leave empty for unlimited."
+msgid "Stop showing this ad once it has been displayed this many times in total, across every visitor and placement. Leave empty for unlimited."
 msgstr ""
 
-#: includes/Admin/class-display-options.php:407
 #. translators: 1: impressions delivered, 2: total cap, 3: percentage used.
+#: includes/Admin/class-display-options.php:407
+#, php-format
 msgid "Delivered: %1$s of %2$s (%3$s%% used)."
 msgstr ""
 
@@ -1050,14 +980,15 @@ msgstr ""
 msgid "Limit to specific roles. Leave all unchecked to show to all roles."
 msgstr ""
 
+#. translators: 1: role display name, 2: role slug (shown only when two roles share the same display name).
 #: includes/Admin/class-display-options.php:507
-#. translators: 1: role display name, 2: role slug (shown only when two roles
-#. share the same display name).
+#, php-format
 msgid "%1$s (%2$s)"
 msgstr ""
 
-#: includes/Admin/class-display-options.php:574
 #. translators: %s: link to the Geo Targeting settings.
+#: includes/Admin/class-display-options.php:574
+#, php-format
 msgid "Geolocation is off site-wide, so any rules below have no effect yet. %s"
 msgstr ""
 
@@ -1098,9 +1029,7 @@ msgstr ""
 
 #: includes/Admin/class-display-options.php:618
 #: includes/Admin/class-display-options.php:654
-msgid ""
-"The ad will only be shown to visitors in these countries. Leave empty to "
-"show in all countries."
+msgid "The ad will only be shown to visitors in these countries. Leave empty to show in all countries."
 msgstr ""
 
 #: includes/Admin/class-display-options.php:622
@@ -1116,7 +1045,7 @@ msgid "When location cannot be determined (e.g., VPN, local IP)."
 msgstr ""
 
 #: includes/Admin/class-email-captures-list-table.php:55
-#: includes/Modules/Links/class-partnership-admin.php:626
+#: includes/Modules/Links/class-partnership-admin.php:637
 msgid "Email"
 msgstr ""
 
@@ -1125,7 +1054,7 @@ msgstr ""
 #: includes/Modules/Links/class-links-admin.php:840
 #: includes/Modules/Links/class-links-admin.php:936
 #: includes/Modules/Links/class-links-list-table.php:74
-#: includes/Modules/Links/class-partnership-admin.php:622
+#: includes/Modules/Links/class-partnership-admin.php:633
 msgid "Name"
 msgstr ""
 
@@ -1134,14 +1063,15 @@ msgid "IP"
 msgstr ""
 
 #: includes/Admin/class-email-captures-list-table.php:59
-#: includes/Modules/Links/class-partnership-admin.php:344
+#: includes/Modules/Links/class-partnership-admin.php:355
 msgid "Date"
 msgstr ""
 
+#. translators: %s: name of the item being selected
 #: includes/Admin/class-email-captures-list-table.php:95
 #: includes/Modules/Links/class-links-list-table.php:323
-#: includes/Modules/Links/class-partnership-admin.php:368
-#. translators: %s: name of the item being selected
+#: includes/Modules/Links/class-partnership-admin.php:379
+#, php-format
 msgid "Select %s"
 msgstr ""
 
@@ -1154,8 +1084,8 @@ msgstr ""
 #: includes/Modules/Links/class-links-admin.php:865
 #: includes/Modules/Links/class-links-list-table.php:105
 #: includes/Modules/Links/class-links-list-table.php:366
-#: includes/Modules/Links/class-partnership-admin.php:528
-#: includes/Modules/Links/class-partnership-admin.php:582
+#: includes/Modules/Links/class-partnership-admin.php:539
+#: includes/Modules/Links/class-partnership-admin.php:593
 msgid "Delete"
 msgstr ""
 
@@ -1190,15 +1120,17 @@ msgstr ""
 msgid "Email Captures"
 msgstr ""
 
-#: includes/Admin/class-email-captures.php:214
 #. translators: %s: number of captured emails
+#: includes/Admin/class-email-captures.php:214
+#, php-format
 msgid "%s captured email address."
 msgid_plural "%s captured email addresses."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-email-captures.php:223
 #. translators: %s: number of deleted captures
+#: includes/Admin/class-email-captures.php:223
+#, php-format
 msgid "%s capture deleted."
 msgid_plural "%s captures deleted."
 msgstr[0] ""
@@ -1218,28 +1150,19 @@ msgid "You do not have permission to delete captures."
 msgstr ""
 
 #: includes/Admin/class-field-tooltips.php:96
-msgid ""
-"Caps how many times one visitor sees this ad per day, counted in a browser "
-"cookie. 0 or empty means unlimited. Pairs with Pro advertiser-level caps if "
-"installed."
+msgid "Caps how many times one visitor sees this ad per day, counted in a browser cookie. 0 or empty means unlimited. Pairs with Pro advertiser-level caps if installed."
 msgstr ""
 
 #: includes/Admin/class-field-tooltips.php:97
-msgid ""
-"Weighted rotation: an ad with priority 10 appears twice as often as one "
-"with priority 5. Default 5 is neutral."
+msgid "Weighted rotation: an ad with priority 10 appears twice as often as one with priority 5. Default 5 is neutral."
 msgstr ""
 
 #: includes/Admin/class-field-tooltips.php:98
-msgid ""
-"Responsive fits any slot and suits AdSense auto or fluid HTML. Fixed size "
-"matches only placements that accept your exact width and height."
+msgid "Responsive fits any slot and suits AdSense auto or fluid HTML. Fixed size matches only placements that accept your exact width and height."
 msgstr ""
 
 #: includes/Admin/class-field-tooltips.php:99
-msgid ""
-"Width and height in pixels are matched against each placement exactly. Only "
-"placements that accept these dimensions will render this ad."
+msgid "Width and height in pixels are matched against each placement exactly. Only placements that accept these dimensions will render this ad."
 msgstr ""
 
 #: includes/Admin/class-field-tooltips.php:131
@@ -1251,9 +1174,7 @@ msgid "Pick how this ad is sized"
 msgstr ""
 
 #: includes/Admin/class-first-install-pointers.php:196
-msgid ""
-"Responsive ads fill any slot. Fixed-size ads only render where the size "
-"matches. The system auto-filters placements below based on your choice."
+msgid "Responsive ads fill any slot. Fixed-size ads only render where the size matches. The system auto-filters placements below based on your choice."
 msgstr ""
 
 #: includes/Admin/class-first-install-pointers.php:202
@@ -1261,28 +1182,21 @@ msgid "Priority controls your win share"
 msgstr ""
 
 #: includes/Admin/class-first-install-pointers.php:203
-msgid ""
-"When multiple ads compete for the same slot, higher priority wins a bigger "
-"share. Default is 5. Live hint below shows the exact win percentage in a "
-"three-way tie."
+msgid "When multiple ads compete for the same slot, higher priority wins a bigger share. Default is 5. Live hint below shows the exact win percentage in a three-way tie."
 msgstr ""
 
-#: includes/Admin/class-first-install-pointers.php:209
+#: includes/Admin/class-first-install-pointers.php:216
 msgid "Where your ad can render"
 msgstr ""
 
-#: includes/Admin/class-first-install-pointers.php:210
-msgid ""
-"These are the placement slots this ad qualifies for. Pick one or more. The "
-"rotation engine will decide which slot fires on each page load."
+#: includes/Admin/class-first-install-pointers.php:217
+msgid "These are the placement slots this ad qualifies for. Pick one or more. The rotation engine will decide which slot fires on each page load."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:61 includes/Admin/class-help-docs.php:62
-msgid "Help & Docs"
-msgstr ""
-
+#: includes/Admin/class-help-docs.php:61
+#: includes/Admin/class-help-docs.php:62
 #: includes/Admin/class-help-docs.php:98
-msgid "Help & Documentation"
+msgid "Help & Docs"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:99
@@ -1294,7 +1208,8 @@ msgid "Getting Started"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:112
-#: includes/Admin/class-help-docs.php:297 includes/Admin/class-settings.php:193
+#: includes/Admin/class-help-docs.php:299
+#: includes/Admin/class-settings.php:201
 msgid "Features"
 msgstr ""
 
@@ -1310,960 +1225,849 @@ msgstr ""
 msgid "FAQ"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:165
+#: includes/Admin/class-help-docs.php:128
+msgid "Help topics"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:167
 msgid "If you just installed the plugin"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:170
-#. translators: 1: opening anchor tag to the setup wizard, 2: closing anchor
-#. tag
-msgid ""
-"Run the %1$sSetup Wizard%2$s. It takes under a minute and seeds three "
-"sample ads (header banner, sidebar code, in-content promo) so you can see "
-"how placements work. Remove the samples any time from Tools."
+#. translators: 1: opening anchor tag to the setup wizard, 2: closing anchor tag
+#: includes/Admin/class-help-docs.php:172
+#, php-format
+msgid "Run the %1$sSetup Wizard%2$s. It takes under a minute and seeds three sample ads (header banner, sidebar code, in-content promo) so you can see how placements work. Remove the samples any time from Tools."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:179
-#: includes/Admin/class-help-docs.php:224
+#: includes/Admin/class-help-docs.php:181
+#: includes/Admin/class-help-docs.php:226
 msgid "Publish your first ad"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:185
 #. translators: 1: opening anchor tag, 2: closing anchor tag
+#: includes/Admin/class-help-docs.php:187
+#, php-format
 msgid "Go to %1$sAdd New Ad%2$s and give it a title (visitors never see this)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:191
-msgid ""
-"Pick an ad type (Image, Rich Content, HTML/JS Code, Google AdSense, or "
-"Email Capture) and fill in its content."
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:192
-msgid ""
-"Check one or more placements in the Placements box (header, footer, after "
-"paragraph X, sidebar widget, popup, sticky bar, etc.)."
-msgstr ""
-
 #: includes/Admin/class-help-docs.php:193
-msgid ""
-"Set Priority 1 to 10 in the Ad Status box. When several ads share a "
-"placement, higher-priority ads are shown more often."
+msgid "Pick an ad type (Image, Rich Content, HTML/JS Code, Google AdSense, or Email Capture) and fill in its content."
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:194
-msgid ""
-"Publish. The ad starts appearing immediately in every placement you "
-"selected."
+msgid "Check one or more placements in the Placements box (header, footer, after paragraph X, sidebar widget, popup, sticky bar, etc.)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:199
-msgid "Where things live"
+#: includes/Admin/class-help-docs.php:195
+msgid "Set Priority 1 to 10 in the Ad Status box. When several ads share a placement, higher-priority ads are shown more often."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:201 includes/Core/class-plugin.php:327
-msgid "All Ads"
+#: includes/Admin/class-help-docs.php:196
+msgid "Publish. The ad starts appearing immediately in every placement you selected."
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:201
-msgid "the ad list with impression and click counts, plus status filters."
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:202
-msgid "global display options, AdSense publisher ID, geo-provider, privacy toggles."
+msgid "Where things live"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:203
+#: includes/Core/class-plugin.php:327
+msgid "All Ads"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:203
+msgid "the ad list with impression and click counts, plus status filters."
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:204
+msgid "global display options, AdSense publisher ID, geo-provider, privacy toggles."
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:205
 msgid "cloaked affiliate URLs and the [wbam_partnership_inquiry] admin queue."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:209
+#: includes/Admin/class-help-docs.php:211
 msgid "Integrations"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:214
 #. translators: 1: opening link to Jetonomy store page, 2: closing link tag
-msgid ""
-"Running a community forum? Install %1$sJetonomy%2$s to unlock seven more "
-"placement positions (sidebar, topic, and reply injection points)."
+#: includes/Admin/class-help-docs.php:216
+#, php-format
+msgid "Running a community forum? Install %1$sJetonomy%2$s to unlock seven more placement positions (sidebar, topic, and reply injection points)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:230
 #. translators: 1: opening anchor tag, 2: closing anchor tag
+#: includes/Admin/class-help-docs.php:232
+#, php-format
 msgid "Go to %1$sAdd New Ad%2$s. Pick an ad type and fill in the content."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:236
+#: includes/Admin/class-help-docs.php:238
 msgid "Assign placements and priority, then publish."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:241
+#: includes/Admin/class-help-docs.php:243
 msgid "Pro-only admin areas"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:247
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-msgid ""
-"Seed demo data from %1$sTools%2$s. Creates sample ads, classifieds, "
-"advertisers, and 30 days of analytics so you can explore every Pro screen "
-"with real numbers. The itemized \"Remove\" button wipes them when you are "
-"done."
+#: includes/Admin/class-help-docs.php:249
+#, php-format
+msgid "Seed demo data from %1$sTools%2$s. Creates sample ads, classifieds, advertisers, and 30 days of analytics so you can explore every Pro screen with real numbers. The itemized \"Remove\" button wipes them when you are done."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:257
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-msgid ""
-"Turn modules on or off in %1$sSettings > General%2$s (Classifieds, "
-"Campaigns, Wallet, A/B Testing, etc.). Each module adds its own submenu "
-"under WB Ad Manager."
+#: includes/Admin/class-help-docs.php:259
+#, php-format
+msgid "Turn modules on or off in %1$sSettings > General%2$s (Classifieds, Campaigns, Wallet, A/B Testing, etc.). Each module adds its own submenu under WB Ad Manager."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:268
+#: includes/Admin/class-help-docs.php:270
 msgid "Need help?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:273
-#. translators: 1: opening anchor tag for WP.org forum, 2: closing tag, 3:
-#. opening anchor tag for Wbcom contact, 4: closing tag
-msgid ""
-"Free users: %1$sWordPress.org support forum%2$s. Pro customers: %3$sopen a "
-"priority ticket%4$s with Wbcom Designs."
+#. translators: 1: opening anchor tag for WP.org forum, 2: closing tag, 3: opening anchor tag for Wbcom contact, 4: closing tag
+#: includes/Admin/class-help-docs.php:275
+#, php-format
+msgid "Free users: %1$sWordPress.org support forum%2$s. Pro customers: %3$sopen a priority ticket%4$s with Wbcom Designs."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:306
+#: includes/Admin/class-help-docs.php:308
 #: includes/Admin/class-upgrade-pro.php:111
 #: includes/Core/class-abilities.php:57
 msgid "Ad Management"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:312
 #. translators: %d: number of ad types available
+#: includes/Admin/class-help-docs.php:314
+#, php-format
 msgid "%d ad type:"
 msgid_plural "%d ad types:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-help-docs.php:316
-msgid ""
-"Image, Rich Content (HTML editor), HTML/JS Code, Google AdSense, Email "
-"Capture (inline subscribe form), and Video (Pro)."
-msgstr ""
-
 #: includes/Admin/class-help-docs.php:318
-msgid ""
-"Image, Rich Content (HTML editor), HTML/JS Code, Google AdSense, and Email "
-"Capture (inline subscribe form)."
+msgid "Image, Rich Content (HTML editor), HTML/JS Code, Google AdSense, Email Capture (inline subscribe form), and Video (Pro)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:321
+#: includes/Admin/class-help-docs.php:320
+msgid "Image, Rich Content (HTML editor), HTML/JS Code, Google AdSense, and Email Capture (inline subscribe form)."
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:323
 msgid "Weighted rotation:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:321
-msgid ""
-"Assign each ad a 1-10 priority slider; higher priorities win more often in "
-"the same placement."
+#: includes/Admin/class-help-docs.php:323
+msgid "Assign each ad a 1-10 priority slider; higher priorities win more often in the same placement."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:322
+#: includes/Admin/class-help-docs.php:324
 msgid "A/B comparison box:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:322
-msgid ""
-"Side-by-side impressions / clicks / CTR across ads sharing a placement, "
-"with an automatic \"winner\" badge at 100+ impressions."
+#: includes/Admin/class-help-docs.php:324
+msgid "Side-by-side impressions / clicks / CTR across ads sharing a placement, with an automatic \"winner\" badge at 100+ impressions."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:323
+#: includes/Admin/class-help-docs.php:325
 msgid "Frequency control:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:323
-msgid ""
-"Per-ad session impression cap + global max-ads-per-page, plus lazy loading "
-"for below-the-fold ads."
+#: includes/Admin/class-help-docs.php:325
+msgid "Per-ad session impression cap + global max-ads-per-page, plus lazy loading for below-the-fold ads."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:328
+#: includes/Admin/class-help-docs.php:330
 msgid "Placements. 16+ positions"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:329
-msgid ""
-"Each ad can be assigned to as many placements as you want, across standard "
-"WordPress and three community plugins."
+#: includes/Admin/class-help-docs.php:331
+msgid "Each ad can be assigned to as many placements as you want, across standard WordPress and three community plugins."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:331
+#: includes/Admin/class-help-docs.php:333
 msgid "Page positions:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:331
-msgid ""
-"Header, footer, before / after content, after paragraph X, before / after "
-"archive loop."
+#: includes/Admin/class-help-docs.php:333
+msgid "Header, footer, before / after content, after paragraph X, before / after archive loop."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:332
+#: includes/Admin/class-help-docs.php:334
 msgid "Overlays:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:332
-msgid ""
-"Popup / modal (delay, scroll %, or exit-intent triggers) and sticky bar (4 "
-"positions: top-bar, bottom-bar, bottom-right, bottom-left)."
+#: includes/Admin/class-help-docs.php:334
+msgid "Popup / modal (delay, scroll %, or exit-intent triggers) and sticky bar (4 positions: top-bar, bottom-bar, bottom-right, bottom-left)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:333
+#: includes/Admin/class-help-docs.php:335
 msgid "Widgets & shortcode:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:333
-msgid ""
-"Sidebar widget plus a [wbam_ad id=\"123\"] shortcode for exact placement "
-"control."
+#: includes/Admin/class-help-docs.php:335
+msgid "Sidebar widget plus a [wbam_ad id=\"123\"] shortcode for exact placement control."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:334
+#: includes/Admin/class-help-docs.php:336
 msgid "BuddyPress:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:334
+#: includes/Admin/class-help-docs.php:336
 msgid "Activity stream + 4 directory positions (before / after members and groups)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:335
+#: includes/Admin/class-help-docs.php:337
 msgid "bbPress:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:335
-msgid ""
-"7 positions including between-replies with a configurable frequency (every "
-"N replies, repeating or once)."
+#: includes/Admin/class-help-docs.php:337
+msgid "7 positions including between-replies with a configurable frequency (every N replies, repeating or once)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:336
+#: includes/Admin/class-help-docs.php:338
 msgid "Jetonomy:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:336
-msgid ""
-"7 positions: sidebar top / bottom / after-about, after topic body, before / "
-"between / after replies."
+#: includes/Admin/class-help-docs.php:338
+msgid "7 positions: sidebar top / bottom / after-about, after topic body, before / between / after replies."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:341
+#: includes/Admin/class-help-docs.php:343
 msgid "Targeting & Scheduling"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:343
+#: includes/Admin/class-help-docs.php:345
 msgid "Visitor targeting:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:343
-msgid ""
-"Device (desktop / tablet / mobile), user status (logged in / out), and user "
-"role (Administrator, Editor, Author, Subscriber, or any custom role)."
+#: includes/Admin/class-help-docs.php:345
+msgid "Device (desktop / tablet / mobile), user status (logged in / out), and user role (Administrator, Editor, Author, Subscriber, or any custom role)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:344
+#: includes/Admin/class-help-docs.php:346
 msgid "Content targeting:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:344
-msgid ""
-"Include / exclude by specific post, page, category, tag, post type, or page "
-"template."
+#: includes/Admin/class-help-docs.php:346
+msgid "Include / exclude by specific post, page, category, tag, post type, or page template."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:345
+#: includes/Admin/class-help-docs.php:347
 msgid "Geo targeting:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:345
-msgid ""
-"Country-level targeting via ip-api.com, ipinfo.io, or ipapi.co with "
-"automatic provider fallback."
+#: includes/Admin/class-help-docs.php:347
+msgid "Country-level targeting via ip-api.com, ipinfo.io, or ipapi.co with automatic provider fallback."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:346
+#: includes/Admin/class-help-docs.php:348
 msgid "Scheduling:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:346
-msgid ""
-"Start / end dates, specific days of the week, and time-of-day ranges (using "
-"your WordPress timezone)."
+#: includes/Admin/class-help-docs.php:348
+msgid "Start / end dates, specific days of the week, and time-of-day ranges (using your WordPress timezone)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:351
+#: includes/Admin/class-help-docs.php:353
 #: includes/Admin/class-upgrade-pro.php:171
 #: includes/Core/class-abilities.php:73
 msgid "Link Management"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:352
-msgid ""
-"Turn long affiliate URLs into short, trackable links on your own domain. "
-"Redirects are 307 by default, cloaked through /go/slug, and every click is "
-"counted."
+#: includes/Admin/class-help-docs.php:354
+msgid "Turn long affiliate URLs into short, trackable links on your own domain. Redirects are 307 by default, cloaked through /go/slug, and every click is counted."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:354
+#: includes/Admin/class-help-docs.php:356
 msgid "Cloaked URLs + click tracking:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:354
+#: includes/Admin/class-help-docs.php:356
 msgid "yoursite.com/go/book → destination, with per-link click counts in the list."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:355
+#: includes/Admin/class-help-docs.php:357
 msgid "Categories & filtering:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:355
-msgid ""
-"Group links (e.g. \"Amazon\", \"Software deals\"), filter the list table, "
-"or render a category list with [wbam_links category=\"slug\"]."
+#: includes/Admin/class-help-docs.php:357
+msgid "Group links (e.g. \"Amazon\", \"Software deals\"), filter the list table, or render a category list with [wbam_links category=\"slug\"]."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:356
+#: includes/Admin/class-help-docs.php:358
 msgid "SEO controls:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:356
-msgid ""
-"rel=\"nofollow\" and rel=\"sponsored\" toggles per link; 301 / 302 / 307 "
-"redirect type per link."
+#: includes/Admin/class-help-docs.php:358
+msgid "rel=\"nofollow\" and rel=\"sponsored\" toggles per link; 301 / 302 / 307 redirect type per link."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:357
+#: includes/Admin/class-help-docs.php:359
 msgid "Expiration dates:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:357
+#: includes/Admin/class-help-docs.php:359
 msgid "Optional expiry so time-limited offers stop redirecting automatically."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:358
+#: includes/Admin/class-help-docs.php:360
 msgid "Link Partnerships:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:358
-msgid ""
-"Drop [wbam_partnership_inquiry] on any page to accept paid-link / exchange "
-"/ sponsored-post inquiries with accept-reject workflow and auto emails."
+#: includes/Admin/class-help-docs.php:360
+msgid "Drop [wbam_partnership_inquiry] on any page to accept paid-link / exchange / sponsored-post inquiries with accept-reject workflow and auto emails."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:363 includes/Admin/class-settings.php:468
+#: includes/Admin/class-help-docs.php:365
+#: includes/Admin/class-settings.php:476
 msgid "Privacy & GDPR"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:365
+#: includes/Admin/class-help-docs.php:367
 msgid "IP anonymization:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:365
+#: includes/Admin/class-help-docs.php:367
 msgid "Raw IPs are hashed before storage in the analytics table."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:366
+#: includes/Admin/class-help-docs.php:368
 msgid "Consent-gated AdSense:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:366
-msgid ""
-"Opt-in flag that delays AdSense script loading until a cookie consent "
-"plugin signals consent."
+#: includes/Admin/class-help-docs.php:368
+msgid "Opt-in flag that delays AdSense script loading until a cookie consent plugin signals consent."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:367
+#: includes/Admin/class-help-docs.php:369
 msgid "Opt-in delete on uninstall:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:367
-msgid ""
-"Plugin preserves your data by default; enable the setting for a full wipe "
-"when you uninstall."
+#: includes/Admin/class-help-docs.php:369
+msgid "Plugin preserves your data by default; enable the setting for a full wipe when you uninstall."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:372
+#: includes/Admin/class-help-docs.php:374
 msgid "Developer API"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:374
+#: includes/Admin/class-help-docs.php:376
 msgid "REST API:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:374
-msgid ""
-"Endpoints under /wp-json/wbam/v1/ covering ads, analytics, links, "
-"partnerships, settings, and email captures."
+#: includes/Admin/class-help-docs.php:376
+msgid "Endpoints under /wp-json/wbam/v1/ covering ads, analytics, links, partnerships, settings, and email captures."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:375
+#: includes/Admin/class-help-docs.php:377
 msgid "Hooks & filters:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:375
-msgid ""
-"100+ action and filter hooks on every write operation, with custom ad-type "
-"and placement extension points."
+#: includes/Admin/class-help-docs.php:377
+msgid "100+ action and filter hooks on every write operation, with custom ad-type and placement extension points."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:376
+#: includes/Admin/class-help-docs.php:378
 msgid "Abilities API (WP 6.9+):"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:376
+#: includes/Admin/class-help-docs.php:378
 msgid "15 named abilities for AI and headless consumers of the ads data."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:377
+#: includes/Admin/class-help-docs.php:379
 msgid "i18n ready:"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:377
+#: includes/Admin/class-help-docs.php:379
 msgid "POT file ships in /languages; every user-facing string is translatable."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:383
+#: includes/Admin/class-help-docs.php:385
 msgid "Unlock PRO"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:384
-msgid ""
-"Turn your site into an ad marketplace. Pro adds an advertiser portal, "
-"wallet & payments, classifieds, campaigns with budgets, advanced analytics, "
-"and more. Keep all the Free features. Add revenue on top."
+#: includes/Admin/class-help-docs.php:386
+msgid "Turn your site into an ad marketplace. Pro adds an advertiser portal, wallet & payments, classifieds, campaigns with budgets, advanced analytics, and more. Keep all the Free features. Add revenue on top."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:387
+#: includes/Admin/class-help-docs.php:389
 msgid "See PRO Features"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:390
-#: includes/Admin/class-help-docs.php:593
+#: includes/Admin/class-help-docs.php:392
+#: includes/Admin/class-help-docs.php:595
 msgid "Full Free vs PRO Comparison"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:409
+#: includes/Admin/class-help-docs.php:411
 msgid "PRO Features Guide"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:412
-#: includes/Admin/class-help-docs.php:545
+#: includes/Admin/class-help-docs.php:414
+#: includes/Admin/class-help-docs.php:547
 #: includes/Admin/class-upgrade-pro.php:316
 #: includes/Admin/class-upgrade-pro.php:426
 msgid "Classifieds Marketplace"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:413
+#: includes/Admin/class-help-docs.php:415
 msgid "A full-featured classifieds system for your site."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:415
+#: includes/Admin/class-help-docs.php:417
 msgid "Users post and browse classified listings with images"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:416
+#: includes/Admin/class-help-docs.php:418
 msgid "Category and location filters with sidebar search"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:417
+#: includes/Admin/class-help-docs.php:419
 msgid "Listing upgrades: Featured, Highlighted, Urgent, Bump"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:418
+#: includes/Admin/class-help-docs.php:420
 msgid "Inquiry system for buyer-seller communication"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:419
+#: includes/Admin/class-help-docs.php:421
 msgid "Reviews and ratings for sellers"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:420
-#: includes/Admin/class-help-docs.php:552
+#: includes/Admin/class-help-docs.php:422
+#: includes/Admin/class-help-docs.php:554
 msgid "Custom fields builder for category-specific data"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:425
-#: includes/Admin/class-help-docs.php:515
+#: includes/Admin/class-help-docs.php:427
+#: includes/Admin/class-help-docs.php:517
 #: includes/Admin/class-upgrade-pro.php:221
 #: includes/Admin/class-upgrade-pro.php:408
 msgid "Advertiser Portal"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:426
+#: includes/Admin/class-help-docs.php:428
 msgid "A self-service dashboard for advertisers with 14 tabs."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:428
+#: includes/Admin/class-help-docs.php:430
 msgid "Overview, My Ads, Campaigns, Classifieds, Inquiries"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:429
+#: includes/Admin/class-help-docs.php:431
 msgid "Favorites, Following, Messages, Link Partnerships"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:430
+#: includes/Admin/class-help-docs.php:432
 msgid "Wallet (credit balance and transaction history)"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:431
+#: includes/Admin/class-help-docs.php:433
 msgid "Membership plans, Analytics, Share of Voice, Profile"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:436
+#: includes/Admin/class-help-docs.php:438
 msgid "Credits & Wallet System"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:437
+#: includes/Admin/class-help-docs.php:439
 msgid "Built-in credit system advertisers use to pay for ads and listings."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:439
+#: includes/Admin/class-help-docs.php:441
 msgid "Advertisers purchase credits to pay for ads and listings"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:440
+#: includes/Admin/class-help-docs.php:442
 msgid "Supports WooCommerce, Stripe, PayPal, and manual payments"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:441
+#: includes/Admin/class-help-docs.php:443
 msgid "Hold > Deduct > Refund lifecycle for safe billing"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:442
+#: includes/Admin/class-help-docs.php:444
 msgid "Full transaction ledger with audit trail"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:447
-#: includes/Admin/class-help-docs.php:535
+#: includes/Admin/class-help-docs.php:449
+#: includes/Admin/class-help-docs.php:537
 msgid "Campaigns & Packages"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:449
+#: includes/Admin/class-help-docs.php:451
 msgid "Create ad packages with pricing, duration, and impression limits"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:450
+#: includes/Admin/class-help-docs.php:452
 msgid "Flat, CPM, and CPC pricing models"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:451
+#: includes/Admin/class-help-docs.php:453
 msgid "Campaign scheduling with start/end dates and budget caps"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:452
-#: includes/Admin/class-help-docs.php:539
+#: includes/Admin/class-help-docs.php:454
+#: includes/Admin/class-help-docs.php:541
 msgid "Budget-aware pacing and per-advertiser session caps"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:457
+#: includes/Admin/class-help-docs.php:459
 #: includes/Admin/class-upgrade-pro.php:438
 msgid "Advanced Analytics"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:459
+#: includes/Admin/class-help-docs.php:461
 msgid "Impressions, clicks, and CTR tracking with daily aggregation"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:460
+#: includes/Admin/class-help-docs.php:462
 msgid "Geographic and device breakdown"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:461
+#: includes/Admin/class-help-docs.php:463
 msgid "Revenue dashboard and billing-proof ledger"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:462
+#: includes/Admin/class-help-docs.php:464
 msgid "Slot inventory view (AdSense-style capacity overview)"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:463
-#: includes/Admin/class-help-docs.php:563
+#: includes/Admin/class-help-docs.php:465
+#: includes/Admin/class-help-docs.php:565
 msgid "Share of Voice analysis per advertiser"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:468
+#: includes/Admin/class-help-docs.php:470
 msgid "A/B Testing & Rotation"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:470
+#: includes/Admin/class-help-docs.php:472
 msgid "Test ad variations with traffic splitting"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:471
+#: includes/Admin/class-help-docs.php:473
 msgid "Fair rotation engine with equal-share distribution"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:472
+#: includes/Admin/class-help-docs.php:474
 msgid "Frequency caps per advertiser and campaign"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:477
+#: includes/Admin/class-help-docs.php:479
 msgid "Membership Plans"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:479
+#: includes/Admin/class-help-docs.php:481
 msgid "Create subscription plans with listing limits and billing cycles"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:480
+#: includes/Admin/class-help-docs.php:482
 msgid "Monthly, quarterly, and yearly billing"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:481
+#: includes/Admin/class-help-docs.php:483
 msgid "Automatic renewal and expiration notifications"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:486
+#: includes/Admin/class-help-docs.php:488
 msgid "Link Management (PRO)"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:488
+#: includes/Admin/class-help-docs.php:490
 msgid "Auto-linking keywords in your content"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:489
+#: includes/Admin/class-help-docs.php:491
 msgid "Link health checker (broken links, redirects)"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:490
+#: includes/Admin/class-help-docs.php:492
 msgid "Link Scanner. Find monetization opportunities in existing content"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:491
-#: includes/Admin/class-help-docs.php:573
+#: includes/Admin/class-help-docs.php:493
+#: includes/Admin/class-help-docs.php:575
 msgid "CSV bulk import for links and keywords"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:509
+#: includes/Admin/class-help-docs.php:511
 msgid "What's in WB Ad Manager PRO"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:511
-msgid ""
-"PRO keeps everything you have in the Free plugin and adds a full "
-"monetization layer. Advertiser portal, wallet, campaigns, classifieds, and "
-"revenue analytics. Here's what you get when you upgrade."
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:516
-msgid ""
-"Let advertisers sign up, submit, and manage their own ads. You review & "
-"approve."
+#: includes/Admin/class-help-docs.php:513
+msgid "PRO keeps everything you have in the Free plugin and adds a full monetization layer. Advertiser portal, wallet, campaigns, classifieds, and revenue analytics. Here's what you get when you upgrade."
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:518
-msgid ""
-"Advertiser registration and dedicated dashboard (14 tabs: Overview, My Ads, "
-"Campaigns, Classifieds, Inquiries, Favorites, Following, Messages, Link "
-"Partnerships, Wallet, Membership, Analytics, Share of Voice, Profile)"
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:519
-msgid "Self-service ad submission with admin review queue"
+msgid "Let advertisers sign up, submit, and manage their own ads. You review & approve."
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:520
+msgid "Advertiser registration and dedicated dashboard (14 tabs: Overview, My Ads, Campaigns, Classifieds, Inquiries, Favorites, Following, Messages, Link Partnerships, Wallet, Membership, Analytics, Share of Voice, Profile)"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:521
+msgid "Self-service ad submission with admin review queue"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:522
 msgid "Per-advertiser caps and share-of-voice reporting"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:525
+#: includes/Admin/class-help-docs.php:527
 msgid "Wallet, Credits & Payments"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:527
+#: includes/Admin/class-help-docs.php:529
 msgid "Prepaid credit wallet per advertiser (hold → deduct → refund lifecycle)"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:528
+#: includes/Admin/class-help-docs.php:530
 msgid "WooCommerce, Stripe, PayPal, and manual top-up integrations"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:529
+#: includes/Admin/class-help-docs.php:531
 msgid "Full transaction ledger with audit trail and CSV export"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:530
+#: includes/Admin/class-help-docs.php:532
 msgid "CPM, CPC, and flat-rate billing models"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:537
+#: includes/Admin/class-help-docs.php:539
 msgid "Ad packages with price, duration, and impression limits"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:538
+#: includes/Admin/class-help-docs.php:540
 msgid "Campaign scheduling with start / end dates and budget caps"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:540
-msgid ""
-"Membership plans (monthly / quarterly / yearly) with listing limits and "
-"auto-renewal"
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:547
-msgid "Full classified listings system with image galleries"
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:548
-msgid "Category + location taxonomies with sidebar search"
+#: includes/Admin/class-help-docs.php:542
+msgid "Membership plans (monthly / quarterly / yearly) with listing limits and auto-renewal"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:549
-msgid "Paid upgrades: Featured, Highlighted, Urgent, Bump to top"
+msgid "Full classified listings system with image galleries"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:550
-msgid "Multiple price types: fixed, negotiable, free"
+msgid "Category + location taxonomies with sidebar search"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:551
-msgid ""
-"Buyer inquiry system, favorites / saved listings, seller profiles with "
-"reviews and ratings"
+msgid "Paid upgrades: Featured, Highlighted, Urgent, Bump to top"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:557
-msgid "Advanced Analytics & A/B Testing"
+#: includes/Admin/class-help-docs.php:552
+msgid "Multiple price types: fixed, negotiable, free"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:553
+msgid "Buyer inquiry system, favorites / saved listings, seller profiles with reviews and ratings"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:559
-msgid "Daily impression & click aggregation with time-series reports"
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:560
-msgid "CTR and revenue reports, geo + device breakdowns, CSV export"
+msgid "Advanced Analytics & A/B Testing"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:561
-msgid "A/B testing with statistical significance and traffic splitting"
+msgid "Daily impression & click aggregation with time-series reports"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:562
+msgid "CTR and revenue reports, geo + device breakdowns, CSV export"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:563
+msgid "A/B testing with statistical significance and traffic splitting"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:564
 msgid "Slot inventory view. AdSense-style capacity overview"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:568
+#: includes/Admin/class-help-docs.php:570
 msgid "Advanced Link Management"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:570
+#: includes/Admin/class-help-docs.php:572
 msgid "Keyword auto-linking. Automatically link mentions of your keywords"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:571
+#: includes/Admin/class-help-docs.php:573
 msgid "Link Scanner. Find monetization opportunities in existing posts"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:572
+#: includes/Admin/class-help-docs.php:574
 msgid "Broken-link detection and redirect management"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:574
+#: includes/Admin/class-help-docs.php:576
 msgid "Advanced link analytics (referrer, device, country)"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:579
+#: includes/Admin/class-help-docs.php:581
 msgid "Community & Developer Extras"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:581
-msgid ""
-"Enhanced BuddyPress integration. Seller profiles in member directory, "
-"activity stream for listings, following/favorites system"
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:582
-msgid "Admin audit logs of every ad / credit / campaign action"
-msgstr ""
-
 #: includes/Admin/class-help-docs.php:583
-msgid "Ad review queue with approval workflow"
+msgid "Enhanced BuddyPress integration. Seller profiles in member directory, activity stream for listings, following/favorites system"
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:584
+msgid "Admin audit logs of every ad / credit / campaign action"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:585
+msgid "Ad review queue with approval workflow"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:586
 msgid "Priority support from Wbcom Designs"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:589
+#: includes/Admin/class-help-docs.php:591
 msgid "Ready to turn your site into a revenue engine?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:590
+#: includes/Admin/class-help-docs.php:592
 msgid "See the full side-by-side comparison and pick your plan."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:596
+#: includes/Admin/class-help-docs.php:598
 msgid "View Pricing on wbcomdesigns.com"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:610
+#: includes/Admin/class-help-docs.php:612
 msgid "Frequently Asked Questions"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:615
+#: includes/Admin/class-help-docs.php:617
 msgid "How do I display an ad?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:616
-msgid ""
-"Create an ad under WB Ad Manager > Add New, select a placement (header, "
-"footer, sidebar, before/after content), and publish. The ad appears "
-"automatically in that position on your site."
+#: includes/Admin/class-help-docs.php:618
+msgid "Create an ad under WB Ad Manager > Add New, select a placement (header, footer, sidebar, before/after content), and publish. The ad appears automatically in that position on your site."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:620
+#: includes/Admin/class-help-docs.php:622
 msgid "Can I show different ads on different pages?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:621
-msgid ""
-"Yes. Use the Display Rules box when editing an ad. You can target specific "
-"pages, categories, post types, or user roles."
+#: includes/Admin/class-help-docs.php:623
+msgid "Yes. Use the Display Rules box when editing an ad. You can target specific pages, categories, post types, or user roles."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:625
+#: includes/Admin/class-help-docs.php:627
 msgid "What ad types are supported?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:626
-msgid ""
-"Five ad types: Image (with click URL and alt text), Rich Content "
-"(HTML-editor), HTML/JavaScript Code, Google AdSense, and Email Capture "
-"(inline newsletter form)."
+#: includes/Admin/class-help-docs.php:628
+msgid "Five ad types: Image (with click URL and alt text), Rich Content (HTML-editor), HTML/JavaScript Code, Google AdSense, and Email Capture (inline newsletter form)."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:630
+#: includes/Admin/class-help-docs.php:632
 msgid "How does the Email Capture ad type work?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:631
-msgid ""
-"Email Capture renders an inline subscribe form anywhere you assign it as a "
-"placement. You control the headline, description, button text, colours, and "
-"success message. Submissions fire the wbam_email_captured action so you can "
-"forward them to Mailchimp, ConvertKit, or any webhook. There's no external "
-"service tie-in."
+#: includes/Admin/class-help-docs.php:633
+msgid "Email Capture renders an inline subscribe form anywhere you assign it as a placement. You control the headline, description, button text, colours, and success message. Submissions fire the wbam_email_captured action so you can forward them to Mailchimp, ConvertKit, or any webhook. There's no external service tie-in."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:635
+#: includes/Admin/class-help-docs.php:637
 msgid "Can I accept partnership / paid link inquiries from my site?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:636
-msgid ""
-"Yes. Drop [wbam_partnership_inquiry] on any page. Visitors fill out a "
-"structured form (partnership type, budget, target page, anchor text). "
-"Inquiries appear under WB Ad Manager → Link Partnerships with accept / "
-"reject workflow and automatic email notifications."
+#: includes/Admin/class-help-docs.php:638
+msgid "Yes. Drop [wbam_partnership_inquiry] on any page. Visitors fill out a structured form (partnership type, budget, target page, anchor text). Inquiries appear under WB Ad Manager → Link Partnerships with accept / reject workflow and automatic email notifications."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:642
+#: includes/Admin/class-help-docs.php:644
 msgid "How do cloaked links work?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:643
-msgid ""
-"Cloaked links redirect visitors through your domain (e.g., "
-"yoursite.com/go/amazon) to the destination URL. This makes links cleaner "
-"and enables click tracking."
+#: includes/Admin/class-help-docs.php:645
+msgid "Cloaked links redirect visitors through your domain (e.g., yoursite.com/go/amazon) to the destination URL. This makes links cleaner and enables click tracking."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:647
+#: includes/Admin/class-help-docs.php:649
 msgid "My cloaked links show a 404 page. How do I fix this?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:648
-msgid ""
-"Go to Settings > Permalinks and click \"Save Changes\" to flush the rewrite "
-"rules. This resolves the issue."
+#: includes/Admin/class-help-docs.php:650
+msgid "Go to Settings > Permalinks and click \"Save Changes\" to flush the rewrite rules. This resolves the issue."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:652
+#: includes/Admin/class-help-docs.php:654
 msgid "Classifieds"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:655
+#: includes/Admin/class-help-docs.php:657
 msgid "How do users post classifieds?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:656
-msgid ""
-"Users visit the Advertiser Dashboard page and use the Classifieds tab to "
-"submit listings. The multi-step wizard guides them through title, "
-"description, images, category, price, and contact info. Listings can "
-"require admin approval before going live."
+#: includes/Admin/class-help-docs.php:658
+msgid "Users visit the Advertiser Dashboard page and use the Classifieds tab to submit listings. The multi-step wizard guides them through title, description, images, category, price, and contact info. Listings can require admin approval before going live."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:660
+#: includes/Admin/class-help-docs.php:662
 msgid "How does the credit/wallet system work?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:661
-msgid ""
-"Advertisers purchase credits which are used to pay for ad submissions, "
-"classified listings, and upgrades. Credits are held when a listing is "
-"submitted and deducted when approved (or refunded if rejected). Configure "
-"payment methods in Settings > Credits."
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:665
-msgid "Where is the Advertiser Dashboard?"
+#: includes/Admin/class-help-docs.php:663
+msgid "Advertisers purchase credits which are used to pay for ad submissions, classified listings, and upgrades. Credits are held when a listing is submitted and deducted when approved (or refunded if rejected). Configure payment methods in Settings > Credits."
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:667
-msgid ""
-"The dashboard is created automatically on plugin activation. You can find "
-"or reassign it in"
+msgid "Where is the Advertiser Dashboard?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:668
+#: includes/Admin/class-help-docs.php:669
+msgid "The dashboard is created automatically on plugin activation. You can find or reassign it in"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:670
 msgid "Settings > General > Pages"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:672
+#: includes/Admin/class-help-docs.php:674
 msgid "Demo Data"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:675
+#: includes/Admin/class-help-docs.php:677
 msgid "How do I import demo data?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:677
+#: includes/Admin/class-help-docs.php:679
 msgid "Go to"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:678
+#: includes/Admin/class-help-docs.php:680
 msgid "WB Ad Manager > Tools"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:679
-msgid ""
-"and click \"Import Demo Data\". This creates sample ads, classifieds, "
-"advertisers, campaigns, and 30 days of analytics."
+#: includes/Admin/class-help-docs.php:681
+msgid "and click \"Import Demo Data\". This creates sample ads, classifieds, advertisers, campaigns, and 30 days of analytics."
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:684
+#: includes/Admin/class-help-docs.php:686
 msgid "How do I remove demo data?"
 msgstr ""
 
-#: includes/Admin/class-help-docs.php:685
-msgid ""
-"After importing, the Tools page shows a \"Remove All Demo Data\" button "
-"with an itemized list of what will be deleted. Your real content is never "
-"touched. Every item is verified against the demo flag before removal."
-msgstr ""
-
-#: includes/Admin/class-help-docs.php:690
-msgid "Still have questions?"
+#: includes/Admin/class-help-docs.php:687
+msgid "After importing, the Tools page shows a \"Remove All Demo Data\" button with an itemized list of what will be deleted. Your real content is never touched. Every item is verified against the demo flag before removal."
 msgstr ""
 
 #: includes/Admin/class-help-docs.php:692
+msgid "Still have questions?"
+msgstr ""
+
+#: includes/Admin/class-help-docs.php:694
 msgid "Contact Support"
 msgstr ""
 
@@ -2272,9 +2076,7 @@ msgid "No ads yet"
 msgstr ""
 
 #: includes/Admin/class-list-empty-states.php:67
-msgid ""
-"Ads are the creatives your visitors will see. Create your first ad to "
-"choose where and how it displays."
+msgid "Ads are the creatives your visitors will see. Create your first ad to choose where and how it displays."
 msgstr ""
 
 #: includes/Admin/class-list-empty-states.php:68
@@ -2282,8 +2084,8 @@ msgid "Create your first ad"
 msgstr ""
 
 #: includes/Admin/class-list-empty-states.php:83
-#: includes/Modules/Links/class-partnership-admin.php:495
-#: includes/Modules/Links/class-partnership-admin.php:509
+#: includes/Modules/Links/class-partnership-admin.php:506
+#: includes/Modules/Links/class-partnership-admin.php:520
 msgid "No results match"
 msgstr ""
 
@@ -2296,434 +2098,394 @@ msgid "No links yet"
 msgstr ""
 
 #: includes/Admin/class-list-empty-states.php:166
-msgid ""
-"Cloaked links let you track clicks, shorten destinations, and manage "
-"affiliate URLs. Create your first link to start tracking."
+msgid "Cloaked links let you track clicks, shorten destinations, and manage affiliate URLs. Create your first link to start tracking."
 msgstr ""
 
 #: includes/Admin/class-list-empty-states.php:167
 msgid "Create your first link"
 msgstr ""
 
-#: includes/Admin/class-placement-settings.php:132
+#: includes/Admin/class-placement-settings.php:139
 msgid "Site"
 msgstr ""
 
-#: includes/Admin/class-placement-settings.php:133
+#: includes/Admin/class-placement-settings.php:140
 msgid "Advertisers"
 msgstr ""
 
-#: includes/Admin/class-placement-settings.php:134
+#: includes/Admin/class-placement-settings.php:141
 msgid "Active ads"
 msgstr ""
 
-#: includes/Admin/class-placement-settings.php:140
+#: includes/Admin/class-placement-settings.php:147
 msgid "Slot"
 msgstr ""
 
-#: includes/Admin/class-placement-settings.php:169
+#: includes/Admin/class-placement-settings.php:179
 msgid "Integration inactive"
 msgstr ""
 
-#: includes/Admin/class-placement-settings.php:177
 #. translators: %s: placement name.
+#: includes/Admin/class-placement-settings.php:187
+#, php-format
 msgid "Use %s on this site"
 msgstr ""
 
-#: includes/Admin/class-placement-settings.php:195
 #. translators: %s: placement name.
+#: includes/Admin/class-placement-settings.php:205
+#, php-format
 msgid "Sell %s to advertisers"
 msgstr ""
 
-#: includes/Admin/class-placement-settings.php:220
 #. translators: %s: link to the Upgrade to PRO screen.
+#: includes/Admin/class-placement-settings.php:233
+#, php-format
 msgid "Want to sell these slots to advertisers and take submissions? That needs %s."
 msgstr ""
 
-#: includes/Admin/class-placement-settings.php:221
+#: includes/Admin/class-placement-settings.php:234
 msgid "WB Ad Manager Pro"
 msgstr ""
 
-#: includes/Admin/class-settings.php:128
+#: includes/Admin/class-settings.php:136
 msgid "Open Location settings"
 msgstr ""
 
-#: includes/Admin/class-settings.php:200
+#: includes/Admin/class-settings.php:208
 msgid "Link Manager"
 msgstr ""
 
-#: includes/Admin/class-settings.php:206
+#: includes/Admin/class-settings.php:214
 msgid "Enable the Link Manager"
 msgstr ""
 
-#: includes/Admin/class-settings.php:207
-msgid ""
-"Adds the Links menu for managing outbound and affiliate links, link "
-"categories and partnership inquiries. Turn this off if you only run ads - "
-"your existing link data is kept and reappears if you switch it back on."
+#: includes/Admin/class-settings.php:215
+msgid "Adds the Links menu for managing outbound and affiliate links, link categories and partnership inquiries. Turn this off if you only run ads - your existing link data is kept and reappears if you switch it back on."
 msgstr ""
 
-#: includes/Admin/class-settings.php:221
+#: includes/Admin/class-settings.php:229
 msgid "General Settings"
 msgstr ""
 
-#: includes/Admin/class-settings.php:228
+#: includes/Admin/class-settings.php:236
 msgid "Disable for Logged-in Users"
 msgstr ""
 
-#: includes/Admin/class-settings.php:234
+#: includes/Admin/class-settings.php:242
 msgid "Hide ads for logged-in users."
 msgstr ""
 
-#: includes/Admin/class-settings.php:240
+#: includes/Admin/class-settings.php:248
 msgid "Disable for Admins"
 msgstr ""
 
-#: includes/Admin/class-settings.php:246
+#: includes/Admin/class-settings.php:254
 msgid "Hide ads for administrators."
 msgstr ""
 
-#: includes/Admin/class-settings.php:252
+#: includes/Admin/class-settings.php:260
 msgid "Disable on Post Types"
 msgstr ""
 
-#: includes/Admin/class-settings.php:258
+#: includes/Admin/class-settings.php:266
 msgid "Select post types where ads should be disabled."
 msgstr ""
 
-#: includes/Admin/class-settings.php:264
+#: includes/Admin/class-settings.php:272
 msgid "Maximum Ads Per Page"
 msgstr ""
 
-#: includes/Admin/class-settings.php:271
+#: includes/Admin/class-settings.php:279
 msgid "Maximum number of ads to show per page. Set 0 for unlimited."
 msgstr ""
 
-#: includes/Admin/class-settings.php:278
+#: includes/Admin/class-settings.php:286
 msgid "Display Settings"
 msgstr ""
 
-#: includes/Admin/class-settings.php:285
+#: includes/Admin/class-settings.php:293
 msgid "Ad Label Text"
 msgstr ""
 
-#: includes/Admin/class-settings.php:292
+#: includes/Admin/class-settings.php:300
 msgid "e.g., Advertisement"
 msgstr ""
 
-#: includes/Admin/class-settings.php:293
+#: includes/Admin/class-settings.php:301
 msgid "Optional label to display above/below ads."
 msgstr ""
 
-#: includes/Admin/class-settings.php:299
+#: includes/Admin/class-settings.php:307
 msgid "Label Position"
 msgstr ""
 
-#: includes/Admin/class-settings.php:307
+#: includes/Admin/class-settings.php:315
 msgid "Above Ad"
 msgstr ""
 
-#: includes/Admin/class-settings.php:308
+#: includes/Admin/class-settings.php:316
 msgid "Below Ad"
 msgstr ""
 
-#: includes/Admin/class-settings.php:341
+#: includes/Admin/class-settings.php:349
 msgid "Format Matching"
 msgstr ""
 
-#: includes/Admin/class-settings.php:348
-msgid ""
-"Only show an ad in placements that accept its size format, so oversize "
-"creatives never break the layout."
+#: includes/Admin/class-settings.php:356
+msgid "Only show an ad in placements that accept its size format, so oversize creatives never break the layout."
 msgstr ""
 
-#: includes/Admin/class-settings.php:362
+#: includes/Admin/class-settings.php:370
 msgid "Geolocation"
 msgstr ""
 
-#: includes/Admin/class-settings.php:369
-msgid "Allow country/region lookup for this visitor's IP."
+#: includes/Admin/class-settings.php:377
+msgid "Allow country/region lookup for each visitor's IP address."
 msgstr ""
 
-#: includes/Admin/class-settings.php:375
+#: includes/Admin/class-settings.php:383
 msgid "Provider"
 msgstr ""
 
-#: includes/Admin/class-settings.php:386
+#: includes/Admin/class-settings.php:394
 msgid "MaxMind Database Path"
 msgstr ""
 
-#: includes/Admin/class-settings.php:393
+#: includes/Admin/class-settings.php:401
 msgid "/absolute/path/to/GeoLite2-Country.mmdb"
 msgstr ""
 
-#: includes/Admin/class-settings.php:394
-msgid ""
-"Absolute server path to a GeoLite2 (or GeoIP2) .mmdb file you downloaded "
-"from your own MaxMind account. Nothing is sent anywhere for this provider."
-msgstr ""
-
-#: includes/Admin/class-settings.php:401
-msgid "ipinfo.io API Key"
-msgstr ""
-
-#: includes/Admin/class-settings.php:408
-msgid "Enter your ipinfo.io API key"
+#: includes/Admin/class-settings.php:402
+msgid "Absolute server path to a GeoLite2 (or GeoIP2) .mmdb file you downloaded from your own MaxMind account. Nothing is sent anywhere for this provider."
 msgstr ""
 
 #: includes/Admin/class-settings.php:409
-msgid ""
-"Required. Get a free key from ipinfo.io (50K requests/month). The visitor's "
-"IP is sent to ipinfo.io over HTTPS to resolve it."
+msgid "ipinfo.io API Key"
 msgstr ""
 
-#: includes/Admin/class-settings.php:424
-msgid "Publisher ID"
+#: includes/Admin/class-settings.php:416
+msgid "Enter your ipinfo.io API key"
+msgstr ""
+
+#: includes/Admin/class-settings.php:417
+msgid "Required. Get a free key from ipinfo.io (50K requests/month). The visitor's IP is sent to ipinfo.io over HTTPS to resolve it."
 msgstr ""
 
 #: includes/Admin/class-settings.php:432
-msgid ""
-"Your AdSense Publisher ID (e.g., ca-pub-1234567890123456). Used as default "
-"for all AdSense ads."
+msgid "Publisher ID"
 msgstr ""
 
-#: includes/Admin/class-settings.php:438
+#: includes/Admin/class-settings.php:440
+msgid "Your AdSense Publisher ID (e.g., ca-pub-1234567890123456). Used as default for all AdSense ads."
+msgstr ""
+
+#: includes/Admin/class-settings.php:446
 msgid "Auto Ads"
 msgstr ""
 
-#: includes/Admin/class-settings.php:444
+#: includes/Admin/class-settings.php:452
 msgid "Enable AdSense Auto Ads on your site. Google will automatically place ads."
 msgstr ""
 
-#: includes/Admin/class-settings.php:454
+#: includes/Admin/class-settings.php:462
 msgid "Require Consent for AdSense"
 msgstr ""
 
-#: includes/Admin/class-settings.php:460
-msgid ""
-"Only load AdSense scripts after user consent. Works with Cookie Notice, "
-"CookieYes, Complianz, and other consent plugins."
+#: includes/Admin/class-settings.php:468
+msgid "Only load AdSense scripts after user consent. Works with Cookie Notice, CookieYes, Complianz, and other consent plugins."
 msgstr ""
 
-#: includes/Admin/class-settings.php:484
+#: includes/Admin/class-settings.php:492
 msgid "Anonymize IP Addresses"
 msgstr ""
 
-#: includes/Admin/class-settings.php:490
-msgid ""
-"Store anonymized IP hashes instead of raw IP addresses. Recommended for "
-"GDPR compliance."
-msgstr ""
-
 #: includes/Admin/class-settings.php:498
-msgid "Advanced"
-msgstr ""
-
-#: includes/Admin/class-settings.php:505
-msgid "Delete Data on Uninstall"
+msgid "Store anonymized IP hashes instead of raw IP addresses. Recommended for GDPR compliance."
 msgstr ""
 
 #: includes/Admin/class-settings.php:511
-msgid ""
-"Delete all plugin data (ads, analytics, settings) when the plugin is "
-"uninstalled."
+msgid "Danger Zone"
 msgstr ""
 
-#: includes/Admin/class-settings.php:520
+#: includes/Admin/class-settings.php:518
+msgid "Delete Data on Uninstall"
+msgstr ""
+
+#: includes/Admin/class-settings.php:524
+msgid "Delete all plugin data (ads, analytics, settings) when the plugin is uninstalled."
+msgstr ""
+
+#: includes/Admin/class-settings.php:533
 #: includes/Admin/class-upgrade-pro.php:174
 msgid "Link Cloaking"
 msgstr ""
 
-#: includes/Admin/class-settings.php:527
+#: includes/Admin/class-settings.php:540
 msgid "Link URL Prefix"
 msgstr ""
 
-#: includes/Admin/class-settings.php:536
 #. translators: %s: example cloaked URL
-msgid ""
-"The path segment for your cloaked links, e.g. %s. Changing this updates the "
-"URL every cloaked link uses."
+#: includes/Admin/class-settings.php:549
+#, php-format
+msgid "The path segment for your cloaked links, e.g. %s. Changing this updates the URL every cloaked link uses."
 msgstr ""
 
-#: includes/Admin/class-settings.php:542
+#: includes/Admin/class-settings.php:555
 msgid "Inactive Link Action"
 msgstr ""
 
-#: includes/Admin/class-settings.php:550
+#: includes/Admin/class-settings.php:563
 msgid "Show 404 page"
 msgstr ""
 
-#: includes/Admin/class-settings.php:551
+#: includes/Admin/class-settings.php:564
 msgid "Redirect to homepage"
 msgstr ""
 
-#: includes/Admin/class-settings.php:552
+#: includes/Admin/class-settings.php:565
 msgid "Redirect to custom URL"
 msgstr ""
 
-#: includes/Admin/class-settings.php:554
+#: includes/Admin/class-settings.php:567
 msgid "What happens when an inactive or expired cloaked link is accessed."
 msgstr ""
 
-#: includes/Admin/class-settings.php:560
+#: includes/Admin/class-settings.php:573
 msgid "Inactive Link URL"
 msgstr ""
 
-#: includes/Admin/class-settings.php:568
+#: includes/Admin/class-settings.php:581
 msgid "Used only when the action above is \"Redirect to custom URL\"."
 msgstr ""
 
-#: includes/Admin/class-settings.php:577
-msgid ""
-"Cloaked links send visitors through your own site (e.g. "
-"yoursite.com/go/deal) before redirecting to the real destination, so the "
-"long affiliate or tracking URL never shows in your content. Control how "
-"that URL looks and how inactive links behave."
+#: includes/Admin/class-settings.php:590
+msgid "Cloaked links send visitors through your own site (e.g. yoursite.com/go/deal) before redirecting to the real destination, so the long affiliate or tracking URL never shows in your content. Control how that URL looks and how inactive links behave."
 msgstr ""
 
-#: includes/Admin/class-settings.php:940
+#: includes/Admin/class-settings.php:953
 msgid "Settings saved."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1007
+#: includes/Admin/class-settings.php:1020
 msgid "Ad display, billing, notifications and modules for this site."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1008
+#: includes/Admin/class-settings.php:1021
 msgid "Ad display and general settings for this site."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1050
+#: includes/Admin/class-settings.php:1063
 msgid "General"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1056
+#: includes/Admin/class-settings.php:1069
 msgid "Ads & Display"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1066
+#: includes/Admin/class-settings.php:1079
 msgid "Location"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1071
+#: includes/Admin/class-settings.php:1084
 msgid "Privacy & Data"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1076
+#: includes/Admin/class-settings.php:1089
 msgid "Tools & License"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1138
-#: includes/Admin/class-settings.php:1139
+#: includes/Admin/class-settings.php:1151
+#: includes/Admin/class-settings.php:1152
 msgid "Setup"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1140
-#: includes/Admin/class-settings.php:1141
+#: includes/Admin/class-settings.php:1153
+#: includes/Admin/class-settings.php:1154
 msgid "Money"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1142
-#: includes/Admin/class-settings.php:1143
-#: includes/Admin/class-settings.php:1144
+#: includes/Admin/class-settings.php:1155
+#: includes/Admin/class-settings.php:1156
+#: includes/Admin/class-settings.php:1157
 msgid "Content"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1145
-#: includes/Admin/class-settings.php:1146
-#: includes/Admin/class-settings.php:1147
+#: includes/Admin/class-settings.php:1158
+#: includes/Admin/class-settings.php:1159
+#: includes/Admin/class-settings.php:1160
 msgid "System"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1383
+#: includes/Admin/class-settings.php:1428
 msgid "Configure general ad display settings."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1390
+#: includes/Admin/class-settings.php:1435
 msgid "Customize how ads appear on your site."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1409
-msgid ""
-"Choose which slots this site uses, and which of those advertisers may buy. "
-"Unticking Site stops ads rendering in that slot. Unticking Advertisers only "
-"removes it from the advertiser portal - creatives already assigned keep "
-"running."
+#: includes/Admin/class-settings.php:1454
+msgid "Choose which slots this site uses, and which of those advertisers may buy. Unticking Site stops ads rendering in that slot. Unticking Advertisers only removes it from the advertiser portal - creatives already assigned keep running."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1410
-msgid ""
-"Choose which slots this site uses. Unticking a slot stops ads rendering "
-"there."
+#: includes/Admin/class-settings.php:1455
+msgid "Choose which slots this site uses. Unticking a slot stops ads rendering there."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1425
-msgid ""
-"Off by default. No visitor IP address is looked up - or sent anywhere - "
-"until you turn this on and choose a provider below."
+#: includes/Admin/class-settings.php:1481
+msgid "Off by default. No visitor IP address is looked up - or sent anywhere - until you turn this on and choose a provider below."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1426
-msgid ""
-"Turning this on lets ads use country/region rules and lets analytics show "
-"visitor country. A local MaxMind database keeps everything on your server; "
-"the HTTPS API option sends the visitor's IP address to that provider using "
-"your own key."
+#: includes/Admin/class-settings.php:1482
+msgid "Turning this on lets ads use country/region rules and lets analytics show visitor country. A local MaxMind database keeps everything on your server; the HTTPS API option sends the visitor's IP address to that provider using your own key."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1456
 #. translators: %s: legacy provider display name, e.g. "ip-api.com".
-msgid ""
-"This site is still using %s from before geolocation required an explicit "
-"provider choice. It keeps working, but we recommend switching to the local "
-"MaxMind database or the HTTPS API option below."
+#: includes/Admin/class-settings.php:1512
+#, php-format
+msgid "This site is still using %s from before geolocation required an explicit provider choice. It keeps working, but we recommend switching to the local MaxMind database or the HTTPS API option below."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1480
-msgid ""
-"Configure Google AdSense integration. The AdSense script will only be "
-"loaded once, even with multiple ad units on a page."
+#: includes/Admin/class-settings.php:1536
+msgid "Configure Google AdSense integration. The AdSense script will only be loaded once, even with multiple ad units on a page."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1487
-msgid ""
-"Configure privacy and GDPR compliance settings. These options help ensure "
-"your site respects user privacy."
+#: includes/Admin/class-settings.php:1543
+msgid "Configure privacy and GDPR compliance settings. These options help ensure your site respects user privacy."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1494
-msgid "Advanced plugin settings."
+#: includes/Admin/class-settings.php:1550
+msgid "Destructive and rarely-used. Double-check before saving."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1516
+#: includes/Admin/class-settings.php:1572
 msgid "MaxMind database (local file)"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1517
+#: includes/Admin/class-settings.php:1573
 msgid "Nothing leaves your site."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1520
+#: includes/Admin/class-settings.php:1576
 msgid "HTTPS API (ipinfo.io)"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1521
+#: includes/Admin/class-settings.php:1577
 msgid "Visitor IP sent to ipinfo.io over HTTPS using your own key."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1529
 #. translators: %s: legacy provider display name, e.g. "ip-api.com".
+#: includes/Admin/class-settings.php:1585
+#, php-format
 msgid "%s (legacy - not offered for new setups)"
 msgstr ""
 
-#: includes/Admin/class-settings.php:1530
+#: includes/Admin/class-settings.php:1586
 msgid "Already in use on this site from before this choice existed."
 msgstr ""
 
-#: includes/Admin/class-settings.php:1552
-msgid ""
-"Switch off anything this site does not use. Turning a feature off only "
-"hides its admin menu - no data is deleted."
+#: includes/Admin/class-settings.php:1608
+msgid "Switch off anything this site does not use. Turning a feature off only hides its admin menu - no data is deleted."
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:112
@@ -2732,9 +2494,7 @@ msgid "Welcome to WB Ad Manager!"
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:113
-msgid ""
-"Get started quickly with our setup wizard to create sample ads and "
-"configure basic settings."
+msgid "Get started quickly with our setup wizard to create sample ads and configure basic settings."
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:117
@@ -2762,7 +2522,8 @@ msgstr ""
 msgid "WB Ad Manager Setup"
 msgstr ""
 
-#: includes/Admin/class-setup-wizard.php:278 includes/Core/class-plugin.php:326
+#: includes/Admin/class-setup-wizard.php:278
+#: includes/Core/class-plugin.php:326
 #: includes/Modules/Placements/class-widget-placement.php:72
 msgid "WB Ad Manager"
 msgstr ""
@@ -2772,9 +2533,7 @@ msgid "Exit Setup Wizard"
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:367
-msgid ""
-"Thank you for installing WB Ad Manager. This quick setup wizard will help "
-"you get started by:"
+msgid "Thank you for installing WB Ad Manager. This quick setup wizard will help you get started by:"
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:369
@@ -2810,9 +2569,7 @@ msgid "Sidebar Widget Ad"
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:409
-msgid ""
-"Text ad for a sidebar. Your theme has no widget areas: show it with the "
-"[wbam_ad] shortcode."
+msgid "Text ad for a sidebar. Your theme has no widget areas: show it with the [wbam_ad] shortcode."
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:410
@@ -2833,9 +2590,7 @@ msgid "Create Sample Ads"
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:430
-msgid ""
-"Select which sample ads you would like to create. These will help you "
-"understand how different ad types and placements work."
+msgid "Select which sample ads you would like to create. These will help you understand how different ad types and placements work."
 msgstr ""
 
 #: includes/Admin/class-setup-wizard.php:470
@@ -2956,9 +2711,7 @@ msgid "Email Capture Forms"
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:124
-msgid ""
-"16+ Placements (Header, Footer, Content, Paragraph, Archive, Popup, Sticky, "
-"Widget, Comments, Shortcode)"
+msgid "16+ Placements (Header, Footer, Content, Paragraph, Archive, Popup, Sticky, Widget, Comments, Shortcode)"
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:129
@@ -3170,9 +2923,7 @@ msgid "Why Upgrade to PRO?"
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:409
-msgid ""
-"Complete self-service dashboard for advertisers to register, submit ads, "
-"manage campaigns, and track performance."
+msgid "Complete self-service dashboard for advertisers to register, submit ads, manage campaigns, and track performance."
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:414
@@ -3180,9 +2931,7 @@ msgid "A/B Testing"
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:415
-msgid ""
-"Test ad variations automatically and let statistics determine the winner. "
-"Optimize your ad performance with data."
+msgid "Test ad variations automatically and let statistics determine the winner. Optimize your ad performance with data."
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:420
@@ -3190,27 +2939,19 @@ msgid "Monetize Your Site"
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:421
-msgid ""
-"Accept payments via Stripe, PayPal, or WooCommerce. Offer CPM, CPC, or "
-"flat-rate ad packages to advertisers."
+msgid "Accept payments via Stripe, PayPal, or WooCommerce. Offer CPM, CPC, or flat-rate ad packages to advertisers."
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:427
-msgid ""
-"Full classified listings with categories, locations, seller profiles, image "
-"galleries, and paid upgrades."
+msgid "Full classified listings with categories, locations, seller profiles, image galleries, and paid upgrades."
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:433
-msgid ""
-"Set up keywords once, and they automatically become affiliate links across "
-"your entire site. Save hours!"
+msgid "Set up keywords once, and they automatically become affiliate links across your entire site. Save hours!"
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:439
-msgid ""
-"Track impressions, clicks, CTR, revenue, geo data, and more. Export reports "
-"to CSV for detailed analysis."
+msgid "Track impressions, clicks, CTR, revenue, geo data, and more. Export reports to CSV for detailed analysis."
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:445
@@ -3218,9 +2959,7 @@ msgid "Ready to Grow Your Revenue?"
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:446
-msgid ""
-"Join thousands of website owners who use WB Ad Manager PRO to maximize "
-"their advertising income."
+msgid "Join thousands of website owners who use WB Ad Manager PRO to maximize their advertising income."
 msgstr ""
 
 #: includes/Admin/class-upgrade-pro.php:450
@@ -3231,39 +2970,159 @@ msgstr ""
 msgid "Nothing here yet"
 msgstr ""
 
-#: includes/Admin/class-ux.php:376
 #. translators: %d: number of additional selected items not listed above
+#: includes/Admin/class-ux.php:376
+#, php-format
 msgid "and %d more"
 msgid_plural "and %d more"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Admin/class-ux.php:475 includes/Admin/class-ux.php:480
-#: includes/Admin/class-ux.php:482
+#: includes/Admin/class-ux.php:462
+msgid "Section navigation"
+msgstr ""
+
+#: includes/Admin/class-ux.php:515
+#: includes/Admin/class-ux.php:520
+#: includes/Admin/class-ux.php:522
 msgid "Settings sections"
 msgstr ""
 
-#: includes/Admin/class-ux.php:497
+#: includes/Admin/class-ux.php:537
 msgid "Go"
 msgstr ""
 
-#: includes/Admin/class-ux.php:563 includes/Admin/class-ux.php:570
-#: includes/Admin/class-ux.php:572
+#: includes/Admin/class-ux.php:603
+#: includes/Admin/class-ux.php:610
+#: includes/Admin/class-ux.php:612
 msgid "On this page"
 msgstr ""
 
-#: includes/Admin/class-ux.php:573
+#: includes/Admin/class-ux.php:613
 msgid "Jump to a card..."
 msgstr ""
 
-#: includes/Admin/class-ux.php:601
+#: includes/Admin/class-ux.php:641
 msgid "Save"
 msgstr ""
 
-#: includes/Admin/class-ux.php:605
+#: includes/Admin/class-ux.php:645
 #: includes/Modules/Links/class-links-admin.php:587
 #: includes/Modules/Links/class-links-admin.php:982
 msgid "Cancel"
+msgstr ""
+
+#: includes/API/class-ads-api.php:303
+#: includes/API/class-ads-api.php:364
+#: includes/API/class-ads-api.php:413
+#: includes/API/class-ads-api.php:539
+#: includes/API/class-ads-api.php:566
+#: includes/API/class-ads-api.php:596
+#: includes/API/class-analytics-api.php:195
+#: includes/API/class-analytics-api.php:304
+#: includes/Core/class-abilities.php:910
+#: includes/Core/class-abilities.php:1011
+#: includes/Core/class-abilities.php:1064
+#: includes/Core/class-abilities.php:1237
+msgid "Ad not found."
+msgstr ""
+
+#: includes/API/class-ads-api.php:323
+#: includes/Core/class-abilities.php:944
+msgid "Ad title is required."
+msgstr ""
+
+#: includes/API/class-ads-api.php:340
+#: includes/Core/class-abilities.php:966
+msgid "Could not create ad."
+msgstr ""
+
+#: includes/API/class-ads-api.php:389
+msgid "Could not update ad."
+msgstr ""
+
+#: includes/API/class-ads-api.php:423
+#: includes/Core/class-abilities.php:1070
+msgid "Could not delete ad."
+msgstr ""
+
+#: includes/API/class-ads-api.php:451
+msgid "Placement parameter is required."
+msgstr ""
+
+#: includes/API/class-ads-api.php:529
+#: includes/API/class-analytics-api.php:295
+#: includes/API/class-links-api.php:576
+#: includes/Frontend/class-frontend.php:170
+#: includes/Frontend/class-frontend.php:439
+#: includes/Modules/Links/class-links-module.php:155
+msgid "Too many requests. Please try again later."
+msgstr ""
+
+#. translators: %s: original ad title
+#: includes/API/class-ads-api.php:606
+#, php-format
+msgid "%s (Copy)"
+msgstr ""
+
+#: includes/API/class-ads-api.php:618
+msgid "Could not duplicate ad."
+msgstr ""
+
+#: includes/API/class-links-api.php:308
+#: includes/API/class-links-api.php:394
+#: includes/API/class-links-api.php:464
+#: includes/API/class-links-api.php:502
+#: includes/API/class-links-api.php:566
+#: includes/Core/class-abilities.php:1367
+#: includes/Core/class-abilities.php:1419
+#: includes/Core/class-abilities.php:1451
+#: includes/Modules/Links/class-links-admin.php:234
+msgid "Link not found."
+msgstr ""
+
+#: includes/API/class-links-api.php:371
+#: includes/Core/class-abilities.php:1330
+msgid "Could not create link."
+msgstr ""
+
+#: includes/API/class-links-api.php:441
+msgid "Could not update link."
+msgstr ""
+
+#: includes/API/class-links-api.php:474
+#: includes/Core/class-abilities.php:1425
+msgid "Could not delete link."
+msgstr ""
+
+#: includes/API/class-links-api.php:653
+msgid "Category name is required."
+msgstr ""
+
+#: includes/API/class-links-api.php:673
+msgid "Could not create category."
+msgstr ""
+
+#: includes/API/class-links-api.php:741
+#: includes/Modules/Links/class-partnership-admin.php:610
+msgid "Partnership not found."
+msgstr ""
+
+#: includes/API/class-links-api.php:774
+msgid "Could not update partnership."
+msgstr ""
+
+#: includes/API/class-settings-api.php:153
+#: includes/API/class-settings-api.php:220
+msgid "Settings must be a valid object."
+msgstr ""
+
+#: includes/API/class-settings-api.php:172
+msgid "Could not save settings."
+msgstr ""
+
+#: includes/API/class-settings-api.php:236
+msgid "No valid display setting keys provided."
 msgstr ""
 
 #: includes/Core/class-abilities.php:58
@@ -3287,9 +3146,7 @@ msgid "List Ads"
 msgstr ""
 
 #: includes/Core/class-abilities.php:111
-msgid ""
-"List all ads with optional filters by type, placement, and status. Returns "
-"ad IDs, titles, types, and enabled status."
+msgid "List all ads with optional filters by type, placement, and status. Returns ad IDs, titles, types, and enabled status."
 msgstr ""
 
 #: includes/Core/class-abilities.php:119
@@ -3308,7 +3165,8 @@ msgstr ""
 msgid "Number of ads per page."
 msgstr ""
 
-#: includes/Core/class-abilities.php:137 includes/Core/class-abilities.php:604
+#: includes/Core/class-abilities.php:137
+#: includes/Core/class-abilities.php:604
 msgid "Page number for pagination."
 msgstr ""
 
@@ -3317,12 +3175,11 @@ msgid "Get Ad Details"
 msgstr ""
 
 #: includes/Core/class-abilities.php:170
-msgid ""
-"Get complete details for a single ad including content, targeting rules, "
-"placements, and performance stats."
+msgid "Get complete details for a single ad including content, targeting rules, placements, and performance stats."
 msgstr ""
 
-#: includes/Core/class-abilities.php:178 includes/Core/class-abilities.php:533
+#: includes/Core/class-abilities.php:178
+#: includes/Core/class-abilities.php:533
 msgid "Ad post ID."
 msgstr ""
 
@@ -3331,9 +3188,7 @@ msgid "Create Ad"
 msgstr ""
 
 #: includes/Core/class-abilities.php:214
-msgid ""
-"Create a new ad with specified type (image, code, rich-content, "
-"email_capture, adsense), content, and placement assignments."
+msgid "Create a new ad with specified type (image, code, rich-content, email_capture, adsense), content, and placement assignments."
 msgstr ""
 
 #: includes/Core/class-abilities.php:222
@@ -3352,18 +3207,18 @@ msgstr ""
 msgid "Placement IDs to assign this ad to."
 msgstr ""
 
-#: includes/Core/class-abilities.php:241 includes/Core/class-abilities.php:294
+#: includes/Core/class-abilities.php:241
+#: includes/Core/class-abilities.php:294
 msgid "Whether the ad is active."
 msgstr ""
 
-#: includes/Core/class-abilities.php:268 includes/Core/class-plugin.php:332
+#: includes/Core/class-abilities.php:268
+#: includes/Core/class-plugin.php:332
 msgid "Update Ad"
 msgstr ""
 
 #: includes/Core/class-abilities.php:269
-msgid ""
-"Update an existing ad's title, content, placements, targeting rules, or "
-"enabled status."
+msgid "Update an existing ad's title, content, placements, targeting rules, or enabled status."
 msgstr ""
 
 #: includes/Core/class-abilities.php:277
@@ -3399,10 +3254,7 @@ msgid "Serve Ad for Placement"
 msgstr ""
 
 #: includes/Core/class-abilities.php:355
-msgid ""
-"Get the best ad for a given placement, applying all targeting rules "
-"(device, geo, frequency, content analysis). Returns rendered HTML ready for "
-"display."
+msgid "Get the best ad for a given placement, applying all targeting rules (device, geo, frequency, content analysis). Returns rendered HTML ready for display."
 msgstr ""
 
 #: includes/Core/class-abilities.php:363
@@ -3422,12 +3274,11 @@ msgid "List Ad Placements"
 msgstr ""
 
 #: includes/Core/class-abilities.php:397
-msgid ""
-"List all available ad placement types (header, footer, content, sidebar, "
-"popup, etc.) with their configuration."
+msgid "List all available ad placement types (header, footer, content, sidebar, popup, etc.) with their configuration."
 msgstr ""
 
-#: includes/Core/class-abilities.php:402 includes/Core/class-abilities.php:437
+#: includes/Core/class-abilities.php:402
+#: includes/Core/class-abilities.php:437
 msgid "No input required."
 msgstr ""
 
@@ -3436,9 +3287,7 @@ msgid "List Ad Types"
 msgstr ""
 
 #: includes/Core/class-abilities.php:432
-msgid ""
-"List all available ad format types (image, code, rich content, email "
-"capture, adsense) with their supported fields."
+msgid "List all available ad format types (image, code, rich content, email capture, adsense) with their supported fields."
 msgstr ""
 
 #: includes/Core/class-abilities.php:476
@@ -3446,17 +3295,17 @@ msgid "Analytics Overview"
 msgstr ""
 
 #: includes/Core/class-abilities.php:477
-msgid ""
-"Get summary analytics including total impressions, clicks, CTR, and top "
-"performing ads for a date range."
+msgid "Get summary analytics including total impressions, clicks, CTR, and top performing ads for a date range."
 msgstr ""
 
-#: includes/Core/class-abilities.php:484 includes/Core/class-abilities.php:537
+#: includes/Core/class-abilities.php:484
+#: includes/Core/class-abilities.php:537
 #: includes/Core/class-abilities.php:795
 msgid "Start date in Y-m-d format."
 msgstr ""
 
-#: includes/Core/class-abilities.php:488 includes/Core/class-abilities.php:541
+#: includes/Core/class-abilities.php:488
+#: includes/Core/class-abilities.php:541
 #: includes/Core/class-abilities.php:799
 msgid "End date in Y-m-d format."
 msgstr ""
@@ -3470,9 +3319,7 @@ msgid "Get Ad Performance Stats"
 msgstr ""
 
 #: includes/Core/class-abilities.php:525
-msgid ""
-"Get detailed performance statistics for a specific ad including "
-"impressions, clicks, CTR, and placement breakdown."
+msgid "Get detailed performance statistics for a specific ad including impressions, clicks, CTR, and placement breakdown."
 msgstr ""
 
 #: includes/Core/class-abilities.php:582
@@ -3501,9 +3348,7 @@ msgid "Create Link"
 msgstr ""
 
 #: includes/Core/class-abilities.php:634
-msgid ""
-"Create a new tracked/cloaked affiliate link with optional category "
-"assignment."
+msgid "Create a new tracked/cloaked affiliate link with optional category assignment."
 msgstr ""
 
 #: includes/Core/class-abilities.php:642
@@ -3518,11 +3363,13 @@ msgstr ""
 msgid "Category ID to assign the link to."
 msgstr ""
 
-#: includes/Core/class-abilities.php:656 includes/Core/class-abilities.php:713
+#: includes/Core/class-abilities.php:656
+#: includes/Core/class-abilities.php:713
 msgid "Add rel=\"nofollow\" to the link."
 msgstr ""
 
-#: includes/Core/class-abilities.php:661 includes/Core/class-abilities.php:717
+#: includes/Core/class-abilities.php:661
+#: includes/Core/class-abilities.php:717
 msgid "Open link in a new tab."
 msgstr ""
 
@@ -3572,18 +3419,17 @@ msgid "Get Link Click Stats"
 msgstr ""
 
 #: includes/Core/class-abilities.php:783
-msgid ""
-"Get click statistics for a specific link including total clicks, unique "
-"clicks, and referrer breakdown."
+msgid "Get click statistics for a specific link including total clicks, unique clicks, and referrer breakdown."
 msgstr ""
 
 #: includes/Core/class-abilities.php:791
 msgid "Link ID."
 msgstr ""
 
-#: includes/Core/class-abilities.php:903 includes/Core/class-abilities.php:1001
-#: includes/Core/class-abilities.php:1051
-#: includes/Core/class-abilities.php:1224
+#: includes/Core/class-abilities.php:903
+#: includes/Core/class-abilities.php:1004
+#: includes/Core/class-abilities.php:1057
+#: includes/Core/class-abilities.php:1230
 msgid "Ad ID is required."
 msgstr ""
 
@@ -3595,21 +3441,21 @@ msgstr ""
 msgid "Ad content is required."
 msgstr ""
 
-#: includes/Core/class-abilities.php:1082
+#: includes/Core/class-abilities.php:1088
 msgid "Placement is required."
 msgstr ""
 
-#: includes/Core/class-abilities.php:1298
+#: includes/Core/class-abilities.php:1304
 msgid "Link name is required."
 msgstr ""
 
-#: includes/Core/class-abilities.php:1301
+#: includes/Core/class-abilities.php:1307
 msgid "Destination URL is required."
 msgstr ""
 
-#: includes/Core/class-abilities.php:1353
-#: includes/Core/class-abilities.php:1405
-#: includes/Core/class-abilities.php:1437
+#: includes/Core/class-abilities.php:1359
+#: includes/Core/class-abilities.php:1411
+#: includes/Core/class-abilities.php:1443
 msgid "Link ID is required."
 msgstr ""
 
@@ -3665,12 +3511,18 @@ msgstr ""
 msgid "Custom size"
 msgstr ""
 
-#: includes/Core/class-plugin.php:330
-msgid "New Ad"
+#: includes/Core/class-plugin.php:324
+msgctxt "Post Type General Name"
+msgid "Ads"
 msgstr ""
 
-#: includes/Core/class-plugin.php:331
-msgid "Edit Ad"
+#: includes/Core/class-plugin.php:325
+msgctxt "Post Type Singular Name"
+msgid "Ad"
+msgstr ""
+
+#: includes/Core/class-plugin.php:330
+msgid "New Ad"
 msgstr ""
 
 #: includes/Core/class-plugin.php:333
@@ -3687,6 +3539,16 @@ msgstr ""
 
 #: includes/Core/class-plugin.php:336
 msgid "Not found in Trash"
+msgstr ""
+
+#: includes/Core/class-plugin.php:388
+msgctxt "Taxonomy General Name"
+msgid "Ad Tags"
+msgstr ""
+
+#: includes/Core/class-plugin.php:389
+msgctxt "Taxonomy Singular Name"
+msgid "Ad Tag"
 msgstr ""
 
 #: includes/Core/class-plugin.php:391
@@ -3761,6 +3623,24 @@ msgstr ""
 msgid "Thank you for subscribing!"
 msgstr ""
 
+#: includes/functions-ad-formats.php:319
+msgid "Any size (not restricted by this site)"
+msgstr ""
+
+#. translators: %s: comma-separated list of pixel sizes, e.g. "728×90, 970×90"
+#: includes/functions-ad-formats.php:323
+#, php-format
+msgid "%s, or responsive"
+msgstr ""
+
+#: includes/functions-ad-formats.php:329
+msgid "Responsive only"
+msgstr ""
+
+#: includes/functions-ad-formats.php:335
+msgid "Restricted (contact the site owner for accepted sizes)"
+msgstr ""
+
 #: includes/Modules/AdTypes/class-ad-sense-ad.php:90
 msgid "Display Google AdSense ads with automatic script management."
 msgstr ""
@@ -3777,15 +3657,14 @@ msgstr ""
 msgid "Publisher ID (Optional)"
 msgstr ""
 
-#: includes/Modules/AdTypes/class-ad-sense-ad.php:286
 #. translators: %s: Publisher ID
+#: includes/Modules/AdTypes/class-ad-sense-ad.php:286
+#, php-format
 msgid "Leave empty to use global Publisher ID: %s"
 msgstr ""
 
 #: includes/Modules/AdTypes/class-ad-sense-ad.php:290
-msgid ""
-"Enter your Publisher ID (e.g., ca-pub-1234567890123456) or set it in plugin "
-"settings."
+msgid "Enter your Publisher ID (e.g., ca-pub-1234567890123456) or set it in plugin settings."
 msgstr ""
 
 #: includes/Modules/AdTypes/class-ad-sense-ad.php:298
@@ -3856,8 +3735,9 @@ msgstr ""
 msgid "Enable full-width responsive"
 msgstr ""
 
-#: includes/Modules/AdTypes/class-ad-sense-ad.php:355
 #. translators: %s: Settings link
+#: includes/Modules/AdTypes/class-ad-sense-ad.php:355
+#, php-format
 msgid "No global Publisher ID configured. %s to set it up for all AdSense ads."
 msgstr ""
 
@@ -3878,9 +3758,7 @@ msgid "Ad Code"
 msgstr ""
 
 #: includes/Modules/AdTypes/class-code-ad.php:227
-msgid ""
-"Paste your ad network code (AdSense, Media.net, etc.) or custom "
-"HTML/JavaScript."
+msgid "Paste your ad network code (AdSense, Media.net, etc.) or custom HTML/JavaScript."
 msgstr ""
 
 #: includes/Modules/AdTypes/class-code-ad.php:235
@@ -3888,9 +3766,7 @@ msgid "Enable Sandbox Mode (Security Isolation)"
 msgstr ""
 
 #: includes/Modules/AdTypes/class-code-ad.php:238
-msgid ""
-"Renders the ad code in a sandboxed iframe for additional security "
-"isolation. Note: Some ad networks may not work properly in sandbox mode."
+msgid "Renders the ad code in a sandboxed iframe for additional security isolation. Note: Some ad networks may not work properly in sandbox mode."
 msgstr ""
 
 #: includes/Modules/AdTypes/class-code-ad.php:244
@@ -3898,10 +3774,7 @@ msgid "Security Notice"
 msgstr ""
 
 #: includes/Modules/AdTypes/class-code-ad.php:247
-msgid ""
-"Code ads execute JavaScript directly on your site. Only paste code from "
-"trusted ad networks. Administrators with \"unfiltered_html\" capability can "
-"save any code."
+msgid "Code ads execute JavaScript directly on your site. Only paste code from trusted ad networks. Administrators with \"unfiltered_html\" capability can save any code."
 msgstr ""
 
 #: includes/Modules/AdTypes/class-email-capture-ad.php:57
@@ -3971,9 +3844,7 @@ msgid "Redirect URL (Optional)"
 msgstr ""
 
 #: includes/Modules/AdTypes/class-email-capture-ad.php:413
-msgid ""
-"Redirect to this URL after subscription. Leave empty to show success "
-"message."
+msgid "Redirect to this URL after subscription. Leave empty to show success message."
 msgstr ""
 
 #: includes/Modules/AdTypes/class-email-capture-ad.php:418
@@ -4084,8 +3955,9 @@ msgstr ""
 msgid "Create ads with the WordPress editor."
 msgstr ""
 
-#: includes/Modules/AdTypes/class-rich-content-ad.php:91
 #. translators: %s: advertiser's website host name.
+#: includes/Modules/AdTypes/class-rich-content-ad.php:91
+#, php-format
 msgid "Visit %s"
 msgstr ""
 
@@ -4098,9 +3970,129 @@ msgid "Enter HTML content for your ad. Basic HTML tags are supported."
 msgstr ""
 
 #: includes/Modules/AdTypes/class-rich-content-ad.php:131
-msgid ""
-"Where users go when clicking the ad. Leave empty if the content has its own "
-"links."
+msgid "Where users go when clicking the ad. Leave empty if the content has its own links."
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:94
+msgid "bbPress Forums"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:103
+msgid "Display ads in bbPress forums, topics, and replies."
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:297
+msgid "Before Forum List"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:298
+msgid "After Forum List"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:299
+msgid "Before Topic List"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:300
+msgid "After Topic List"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:301
+msgid "Before Single Topic"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:302
+msgid "After Single Topic"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:303
+#: includes/Modules/Jetonomy/class-jetonomy-module.php:79
+msgid "Between Replies"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:307
+#: includes/Modules/Placements/class-comment-placement.php:234
+#: includes/Modules/Placements/class-content-placement.php:110
+#: includes/Modules/Placements/class-sticky-placement.php:134
+msgid "Position"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:317
+#: includes/Modules/Jetonomy/class-jetonomy-module.php:258
+#: includes/Modules/Placements/class-comment-placement.php:244
+msgid "Show after every"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:319
+#: includes/Modules/Jetonomy/class-jetonomy-module.php:260
+msgid "replies"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:322
+#: includes/Modules/Placements/class-comment-placement.php:249
+msgid "Repeat"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:388
+msgid "WBAM: bbPress Forum Ad"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:390
+msgid "Display ads on bbPress forum pages."
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:465
+#: includes/Modules/bbPress/class-bb-press-module.php:588
+#: includes/Modules/BuddyPress/class-bp-widgets.php:121
+#: includes/Modules/BuddyPress/class-bp-widgets.php:236
+#: includes/Modules/BuddyPress/class-bp-widgets.php:351
+#: includes/Modules/Placements/class-widget-placement.php:146
+msgid "Title (optional):"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:471
+#: includes/Modules/bbPress/class-bb-press-module.php:594
+#: includes/Modules/BuddyPress/class-bp-widgets.php:127
+#: includes/Modules/BuddyPress/class-bp-widgets.php:242
+#: includes/Modules/BuddyPress/class-bp-widgets.php:357
+#: includes/Modules/Placements/class-widget-placement.php:158
+msgid "Select Ad:"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:474
+#: includes/Modules/bbPress/class-bb-press-module.php:597
+#: includes/Modules/BuddyPress/class-bp-widgets.php:130
+#: includes/Modules/BuddyPress/class-bp-widgets.php:245
+#: includes/Modules/BuddyPress/class-bp-widgets.php:360
+msgid "Select Ad"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:484
+msgid "Show On:"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:487
+msgid "All bbPress Pages"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:488
+msgid "Forum Pages Only"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:489
+msgid "Topic Pages Only"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:523
+msgid "WBAM: bbPress Topic Sidebar Ad"
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:525
+msgid "Display ads in sidebar on single topic pages."
+msgstr ""
+
+#: includes/Modules/bbPress/class-bb-press-module.php:606
+msgid "This widget only displays on single topic pages."
 msgstr ""
 
 #: includes/Modules/Blocks/class-block-registry.php:92
@@ -4153,32 +4145,6 @@ msgstr ""
 
 #: includes/Modules/BuddyPress/class-bp-widgets.php:58
 msgid "Display ads on BuddyPress member profiles."
-msgstr ""
-
-#: includes/Modules/BuddyPress/class-bp-widgets.php:121
-#: includes/Modules/BuddyPress/class-bp-widgets.php:236
-#: includes/Modules/BuddyPress/class-bp-widgets.php:351
-#: includes/Modules/Placements/class-widget-placement.php:146
-#: includes/Modules/bbPress/class-bb-press-module.php:465
-#: includes/Modules/bbPress/class-bb-press-module.php:588
-msgid "Title (optional):"
-msgstr ""
-
-#: includes/Modules/BuddyPress/class-bp-widgets.php:127
-#: includes/Modules/BuddyPress/class-bp-widgets.php:242
-#: includes/Modules/BuddyPress/class-bp-widgets.php:357
-#: includes/Modules/Placements/class-widget-placement.php:158
-#: includes/Modules/bbPress/class-bb-press-module.php:471
-#: includes/Modules/bbPress/class-bb-press-module.php:594
-msgid "Select Ad:"
-msgstr ""
-
-#: includes/Modules/BuddyPress/class-bp-widgets.php:130
-#: includes/Modules/BuddyPress/class-bp-widgets.php:245
-#: includes/Modules/BuddyPress/class-bp-widgets.php:360
-#: includes/Modules/bbPress/class-bb-press-module.php:474
-#: includes/Modules/bbPress/class-bb-press-module.php:597
-msgid "Select Ad"
 msgstr ""
 
 #: includes/Modules/BuddyPress/class-bp-widgets.php:139
@@ -5045,11 +5011,6 @@ msgstr ""
 msgid "Display ads above the replies list on a single topic."
 msgstr ""
 
-#: includes/Modules/Jetonomy/class-jetonomy-module.php:79
-#: includes/Modules/bbPress/class-bb-press-module.php:303
-msgid "Between Replies"
-msgstr ""
-
 #: includes/Modules/Jetonomy/class-jetonomy-module.php:80
 msgid "Display ads after every Nth reply (frequency configurable on each ad)."
 msgstr ""
@@ -5060,17 +5021,6 @@ msgstr ""
 
 #: includes/Modules/Jetonomy/class-jetonomy-module.php:87
 msgid "Display ads below the replies list, above the reply composer."
-msgstr ""
-
-#: includes/Modules/Jetonomy/class-jetonomy-module.php:258
-#: includes/Modules/Placements/class-comment-placement.php:244
-#: includes/Modules/bbPress/class-bb-press-module.php:317
-msgid "Show after every"
-msgstr ""
-
-#: includes/Modules/Jetonomy/class-jetonomy-module.php:260
-#: includes/Modules/bbPress/class-bb-press-module.php:319
-msgid "replies"
 msgstr ""
 
 #: includes/Modules/Jetonomy/class-jetonomy-module.php:263
@@ -5159,7 +5109,7 @@ msgid "Unpaid"
 msgstr ""
 
 #: includes/Modules/Links/class-link.php:453
-#: includes/Modules/Links/class-partnership-admin.php:292
+#: includes/Modules/Links/class-partnership-admin.php:303
 #: includes/Modules/Links/class-partnership.php:267
 msgid "Pending"
 msgstr ""
@@ -5169,6 +5119,7 @@ msgid "Paid"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:72
+#: includes/Modules/Links/class-links-admin.php:182
 msgid "All Links"
 msgstr ""
 
@@ -5198,14 +5149,12 @@ msgid "What a cloaked link does"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:267
-msgid ""
-"Turn a long or ugly destination URL into a clean, branded one on your "
-"domain. Visitors click the short URL on your site and are redirected to the "
-"destination. You see every click in the stats column."
+msgid "Turn a long or ugly destination URL into a clean, branded one on your domain. Visitors click the short URL on your site and are redirected to the destination. You see every click in the stats column."
 msgstr ""
 
-#: includes/Modules/Links/class-links-admin.php:273
 #. translators: 1: raw affiliate URL example, 2: cloaked URL example
+#: includes/Modules/Links/class-links-admin.php:273
+#, php-format
 msgid "Typical use: turn %1$s into %2$s."
 msgstr ""
 
@@ -5218,9 +5167,7 @@ msgid "Pick one of these two ways to put the link in your content."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:302
-msgid ""
-"Cloaking is off for this link, so use the shortcode to place it in your "
-"content."
+msgid "Cloaking is off for this link, so use the shortcode to place it in your content."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:308
@@ -5228,9 +5175,7 @@ msgid "1. Cloaked URL"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:309
-msgid ""
-"Paste this anywhere a link is accepted (posts, menus, widgets). Redirects "
-"to your destination URL."
+msgid "Paste this anywhere a link is accepted (posts, menus, widgets). Redirects to your destination URL."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:312
@@ -5255,9 +5200,7 @@ msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:322
 #: includes/Modules/Links/class-links-admin.php:326
-msgid ""
-"Use this in post content when you want specific anchor text and full "
-"rel-attribute control."
+msgid "Use this in post content when you want specific anchor text and full rel-attribute control."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:325
@@ -5274,9 +5217,7 @@ msgid "Copy Shortcode"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:361
-msgid ""
-"Private label shown only in this admin list (e.g. \"Amazon Book of the "
-"Month\"). Visitors never see it."
+msgid "Private label shown only in this admin list (e.g. \"Amazon Book of the Month\"). Visitors never see it."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:367
@@ -5285,9 +5226,7 @@ msgid "Destination URL"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:372
-msgid ""
-"The real URL visitors end up on after clicking. Include any affiliate / "
-"tracking parameters here. They are invisible to your audience."
+msgid "The real URL visitors end up on after clicking. Include any affiliate / tracking parameters here. They are invisible to your audience."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:378
@@ -5296,8 +5235,9 @@ msgstr ""
 msgid "Slug"
 msgstr ""
 
-#: includes/Modules/Links/class-links-admin.php:388
 #. translators: %s: example URL
+#: includes/Modules/Links/class-links-admin.php:388
+#, php-format
 msgid "Leave empty to auto-generate. Cloaked URL: %s"
 msgstr ""
 
@@ -5306,9 +5246,7 @@ msgid "Link Type"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:408
-msgid ""
-"Labels the link in the admin list so you can filter and report by type. "
-"Does not change how the redirect works."
+msgid "Labels the link in the admin list so you can filter and report by type. Does not change how the redirect works."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:414
@@ -5319,11 +5257,10 @@ msgstr ""
 msgid "No Category"
 msgstr ""
 
-#: includes/Modules/Links/class-links-admin.php:433
 #. translators: %s: link to the categories page
-msgid ""
-"Optional. Group related links (e.g. \"Amazon Books\", \"Software Deals\") "
-"so you can filter the list and show them with %s."
+#: includes/Modules/Links/class-links-admin.php:433
+#, php-format
+msgid "Optional. Group related links (e.g. \"Amazon Books\", \"Software Deals\") so you can filter the list and show them with %s."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:438
@@ -5339,10 +5276,7 @@ msgid "Enable cloaking"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:453
-msgid ""
-"When on, the short URL stays in the address bar while the browser is sent "
-"to the destination. Visitors see your domain, not the target. Turn off only "
-"if you want the raw destination URL in place."
+msgid "When on, the short URL stays in the address bar while the browser is sent to the destination. Visitors see your domain, not the target. Turn off only if you want the raw destination URL in place."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:459
@@ -5350,9 +5284,7 @@ msgid "Add rel=\"nofollow\""
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:462
-msgid ""
-"Tells search engines not to pass link authority to the destination. "
-"Recommended for affiliate and untrusted links."
+msgid "Tells search engines not to pass link authority to the destination. Recommended for affiliate and untrusted links."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:468
@@ -5360,9 +5292,7 @@ msgid "Add rel=\"sponsored\""
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:471
-msgid ""
-"Google now prefers rel=\"sponsored\" (not just nofollow) for paid or "
-"affiliate links. Enable this for any link where you receive compensation."
+msgid "Google now prefers rel=\"sponsored\" (not just nofollow) for paid or affiliate links. Enable this for any link where you receive compensation."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:477
@@ -5370,10 +5300,7 @@ msgid "Open in new tab"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:480
-msgid ""
-"Adds target=\"_blank\" so visitors stay on your site. Only applies when you "
-"use the [wbam_link] shortcode. A raw cloaked URL opens in the same tab "
-"unless you add target yourself."
+msgid "Adds target=\"_blank\" so visitors stay on your site. Only applies when you use the [wbam_link] shortcode. A raw cloaked URL opens in the same tab unless you add target yourself."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:488
@@ -5389,9 +5316,7 @@ msgid "307 Temporary"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:501
-msgid ""
-"Safest default. Browsers and bots always re-check the link, so you stay in "
-"control of where it points."
+msgid "Safest default. Browsers and bots always re-check the link, so you stay in control of where it points."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:503
@@ -5399,16 +5324,11 @@ msgid "302 Found"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:503
-msgid ""
-"Also temporary; older equivalent of 307. Use if a specific destination "
-"rejects 307."
+msgid "Also temporary; older equivalent of 307. Use if a specific destination rejects 307."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:505
-msgid ""
-"Search engines treat the destination as the canonical URL and browsers may "
-"cache the redirect aggressively. Only pick this for permanent moves, never "
-"for affiliate links."
+msgid "Search engines treat the destination as the canonical URL and browsers may cache the redirect aggressively. Only pick this for permanent moves, never for affiliate links."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:523
@@ -5416,10 +5336,7 @@ msgid "The cloaked URL redirects to the destination and clicks are counted."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:525
-msgid ""
-"The cloaked URL returns 404 (or redirects to a fallback if you set one in "
-"Settings). Use to temporarily disable a link without deleting its click "
-"history."
+msgid "The cloaked URL returns 404 (or redirects to a fallback if you set one in Settings). Use to temporarily disable a link without deleting its click history."
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:539
@@ -5476,7 +5393,7 @@ msgid "Count"
 msgstr ""
 
 #: includes/Modules/Links/class-links-admin.php:844
-#: includes/Modules/Links/class-partnership-admin.php:345
+#: includes/Modules/Links/class-partnership-admin.php:356
 msgid "Actions"
 msgstr ""
 
@@ -5565,7 +5482,7 @@ msgid "Deactivate"
 msgstr ""
 
 #: includes/Modules/Links/class-links-list-table.php:133
-#: includes/Modules/Links/class-partnership-admin.php:286
+#: includes/Modules/Links/class-partnership-admin.php:297
 msgid "All"
 msgstr ""
 
@@ -5605,283 +5522,291 @@ msgstr ""
 msgid "Invalid link ID."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:62
+#: includes/Modules/Links/class-partnership-admin.php:73
 msgid "Partnership Inquiries"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:63
-#: includes/Modules/Links/class-partnership-admin.php:275
+#: includes/Modules/Links/class-partnership-admin.php:74
+#: includes/Modules/Links/class-partnership-admin.php:286
 msgid "Partnerships"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:276
+#: includes/Modules/Links/class-partnership-admin.php:287
 msgid "Requests submitted through your partnership form."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:298
+#: includes/Modules/Links/class-partnership-admin.php:309
 #: includes/Modules/Links/class-partnership.php:268
 msgid "Accepted"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:304
+#: includes/Modules/Links/class-partnership-admin.php:315
 #: includes/Modules/Links/class-partnership.php:269
 msgid "Rejected"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:310
+#: includes/Modules/Links/class-partnership-admin.php:321
 #: includes/Modules/Links/class-partnership.php:270
 msgid "Spam"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:322
-#: includes/Modules/Links/class-partnership-admin.php:324
+#: includes/Modules/Links/class-partnership-admin.php:333
+#: includes/Modules/Links/class-partnership-admin.php:335
 msgid "Search"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:338
+#: includes/Modules/Links/class-partnership-admin.php:349
 msgid "Select all"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:339
+#: includes/Modules/Links/class-partnership-admin.php:350
 msgid "Contact"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:340
-#: includes/Modules/Links/class-partnership-admin.php:630
+#: includes/Modules/Links/class-partnership-admin.php:351
+#: includes/Modules/Links/class-partnership-admin.php:641
 msgid "Website"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:342
+#: includes/Modules/Links/class-partnership-admin.php:353
 msgid "Budget"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:403
 #. translators: %s: human-readable time diff, e.g. "3 hours"
+#: includes/Modules/Links/class-partnership-admin.php:414
+#, php-format
 msgid "%s ago"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:438
 #. translators: %s: Number of items
+#: includes/Modules/Links/class-partnership-admin.php:449
+#, php-format
 msgid "%s item"
 msgid_plural "%s items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Modules/Links/class-partnership-admin.php:453
+#: includes/Modules/Links/class-partnership-admin.php:464
 msgid "of"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:487
+#: includes/Modules/Links/class-partnership-admin.php:498
 msgid "No partnership inquiries yet"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:488
+#: includes/Modules/Links/class-partnership-admin.php:499
 msgid "Requests submitted through your partnership form will show up here."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:496
+#: includes/Modules/Links/class-partnership-admin.php:507
 msgid "Try a different search term."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:501
+#: includes/Modules/Links/class-partnership-admin.php:512
 msgid "No pending partnerships"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:502
+#: includes/Modules/Links/class-partnership-admin.php:513
 msgid "No accepted partnerships"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:503
+#: includes/Modules/Links/class-partnership-admin.php:514
 msgid "No rejected partnerships"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:504
+#: includes/Modules/Links/class-partnership-admin.php:515
 msgid "No spam partnerships"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:522
+#: includes/Modules/Links/class-partnership-admin.php:533
 msgid "Bulk action"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:524
+#: includes/Modules/Links/class-partnership-admin.php:535
 msgid "Bulk actions"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:525
-#: includes/Modules/Links/class-partnership-admin.php:556
-#: includes/Modules/Links/class-partnership-admin.php:746
+#: includes/Modules/Links/class-partnership-admin.php:536
+#: includes/Modules/Links/class-partnership-admin.php:567
+#: includes/Modules/Links/class-partnership-admin.php:757
 msgid "Accept"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:526
-#: includes/Modules/Links/class-partnership-admin.php:563
-#: includes/Modules/Links/class-partnership-admin.php:750
+#: includes/Modules/Links/class-partnership-admin.php:537
+#: includes/Modules/Links/class-partnership-admin.php:574
+#: includes/Modules/Links/class-partnership-admin.php:761
 msgid "Reject"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:527
+#: includes/Modules/Links/class-partnership-admin.php:538
 msgid "Mark as spam"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:530
+#: includes/Modules/Links/class-partnership-admin.php:541
 msgid "Apply"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:547
+#: includes/Modules/Links/class-partnership-admin.php:558
 msgid "View Details"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:573
+#: includes/Modules/Links/class-partnership-admin.php:584
 msgid "Mark as Spam"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:583
+#: includes/Modules/Links/class-partnership-admin.php:594
 msgid "Are you sure you want to delete this inquiry?"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:606
+#: includes/Modules/Links/class-partnership-admin.php:617
 msgid "Partnership inquiry details"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:616
+#: includes/Modules/Links/class-partnership-admin.php:627
 msgid "Contact Information"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:641
+#: includes/Modules/Links/class-partnership-admin.php:652
 msgid "IP Address"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:651
+#: includes/Modules/Links/class-partnership-admin.php:662
 msgid "Partnership Details"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:664
+#: includes/Modules/Links/class-partnership-admin.php:675
 msgid "Target Page"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:676
+#: includes/Modules/Links/class-partnership-admin.php:687
 msgid "Anchor Text"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:680
+#: includes/Modules/Links/class-partnership-admin.php:691
 msgid "Budget Range"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:684
+#: includes/Modules/Links/class-partnership-admin.php:695
 msgid "Submitted"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:689
+#: includes/Modules/Links/class-partnership-admin.php:700
 msgid "Responded"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:700
+#: includes/Modules/Links/class-partnership-admin.php:711
 msgid "Message"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:712
+#: includes/Modules/Links/class-partnership-admin.php:723
 msgid "Admin Notes & Actions"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:720
+#: includes/Modules/Links/class-partnership-admin.php:731
 msgid "Admin Notes"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:722
+#: includes/Modules/Links/class-partnership-admin.php:733
 msgid "These notes are for internal use only and are not visible to the requester."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:726
+#: includes/Modules/Links/class-partnership-admin.php:737
 msgid "Update Status"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:728
+#: includes/Modules/Links/class-partnership-admin.php:739
 msgid "No Change"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:740
+#: includes/Modules/Links/class-partnership-admin.php:751
 msgid "Save Notes"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:754
+#: includes/Modules/Links/class-partnership-admin.php:765
 msgid "Re: Partnership Inquiry"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:756
+#: includes/Modules/Links/class-partnership-admin.php:767
 msgid "Email Requester"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:778
+#: includes/Modules/Links/class-partnership-admin.php:789
 msgid "Partnership inquiry accepted."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:779
+#: includes/Modules/Links/class-partnership-admin.php:790
 msgid "Partnership inquiry rejected."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:780
+#: includes/Modules/Links/class-partnership-admin.php:791
 msgid "Partnership inquiry marked as spam."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:781
+#: includes/Modules/Links/class-partnership-admin.php:792
 msgid "Partnership inquiry deleted."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:782
+#: includes/Modules/Links/class-partnership-admin.php:793
 msgid "Partnership inquiry updated."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-admin.php:787
 #. translators: %s: number of inquiries
+#: includes/Modules/Links/class-partnership-admin.php:798
+#, php-format
 msgid "%s inquiry accepted."
 msgid_plural "%s inquiries accepted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Modules/Links/class-partnership-admin.php:789
 #. translators: %s: number of inquiries
+#: includes/Modules/Links/class-partnership-admin.php:800
+#, php-format
 msgid "%s inquiry rejected."
 msgid_plural "%s inquiries rejected."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Modules/Links/class-partnership-admin.php:791
 #. translators: %s: number of inquiries
+#: includes/Modules/Links/class-partnership-admin.php:802
+#, php-format
 msgid "%s inquiry marked as spam."
 msgid_plural "%s inquiries marked as spam."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Modules/Links/class-partnership-admin.php:793
 #. translators: %s: number of inquiries
+#: includes/Modules/Links/class-partnership-admin.php:804
+#, php-format
 msgid "%s inquiry deleted."
 msgid_plural "%s inquiries deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Modules/Links/class-partnership-admin.php:794
+#: includes/Modules/Links/class-partnership-admin.php:805
 msgid "Pick a bulk action and at least one inquiry."
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-emails.php:65
 #. translators: %s: site name
+#: includes/Modules/Links/class-partnership-emails.php:65
+#, php-format
 msgid "[%s] New Link Partnership Inquiry"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-emails.php:88
 #. translators: %s: site name
+#: includes/Modules/Links/class-partnership-emails.php:88
+#, php-format
 msgid "[%s] Your Link Partnership Inquiry Has Been Accepted"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-emails.php:111
 #. translators: %s: site name
+#: includes/Modules/Links/class-partnership-emails.php:111
+#, php-format
 msgid "[%s] Regarding Your Link Partnership Inquiry"
 msgstr ""
 
+#. translators: %1$s: site name, %2$s: contact name, %3$s: email, %4$s: website URL, %5$s: partnership type, %6$s: budget range, %7$s: message, %8$s: admin URL, %9$s: site name again
 #: includes/Modules/Links/class-partnership-emails.php:132
-#. translators: %1$s: site name, %2$s: contact name, %3$s: email, %4$s: website
-#. URL, %5$s: partnership type, %6$s: budget range, %7$s: message, %8$s: admin
-#. URL, %9$s: site name again
+#, php-format
 msgid ""
 "Hello,\n"
 "\n"
@@ -5911,8 +5836,9 @@ msgstr ""
 msgid "(No message provided)"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-emails.php:183
 #. translators: %1$s: requester name, %2$s: site name
+#: includes/Modules/Links/class-partnership-emails.php:183
+#, php-format
 msgid ""
 "Hello %1$s,\n"
 "\n"
@@ -5934,18 +5860,17 @@ msgid ""
 "%5$s"
 msgstr ""
 
-#: includes/Modules/Links/class-partnership-emails.php:226
 #. translators: %1$s: requester name, %2$s: site name
+#: includes/Modules/Links/class-partnership-emails.php:226
+#, php-format
 msgid ""
 "Hello %1$s,\n"
 "\n"
 "Thank you for your interest in partnering with %2$s.\n"
 "\n"
-"After careful review, we have decided not to proceed with your partnership "
-"inquiry at this time.\n"
+"After careful review, we have decided not to proceed with your partnership inquiry at this time.\n"
 "\n"
-"This decision may be due to various factors, and we encourage you to reach "
-"out again in the future if circumstances change.\n"
+"This decision may be due to various factors, and we encourage you to reach out again in the future if circumstances change.\n"
 "\n"
 "Thank you for your understanding.\n"
 "\n"
@@ -5960,16 +5885,12 @@ msgstr ""
 
 #: includes/Modules/Links/class-partnership-form.php:138
 #: includes/Modules/Links/class-partnership-form.php:574
-msgid ""
-"Thank you! Your inquiry has been submitted successfully. We will review it "
-"and get back to you soon."
+msgid "Thank you! Your inquiry has been submitted successfully. We will review it and get back to you soon."
 msgstr ""
 
 #: includes/Modules/Links/class-partnership-form.php:140
 #: includes/Modules/Links/class-partnership-form.php:555
-msgid ""
-"You have already submitted an inquiry recently. Please wait before "
-"submitting again."
+msgid "You have already submitted an inquiry recently. Please wait before submitting again."
 msgstr ""
 
 #: includes/Modules/Links/class-partnership-form.php:141
@@ -5987,9 +5908,7 @@ msgid "Link Partnership Inquiry"
 msgstr ""
 
 #: includes/Modules/Links/class-partnership-form.php:167
-msgid ""
-"Interested in a link partnership? Fill out the form below and we will get "
-"back to you."
+msgid "Interested in a link partnership? Fill out the form below and we will get back to you."
 msgstr ""
 
 #: includes/Modules/Links/class-partnership-form.php:172
@@ -6105,20 +6024,8 @@ msgstr ""
 msgid "Between Comments"
 msgstr ""
 
-#: includes/Modules/Placements/class-comment-placement.php:234
-#: includes/Modules/Placements/class-content-placement.php:110
-#: includes/Modules/Placements/class-sticky-placement.php:134
-#: includes/Modules/bbPress/class-bb-press-module.php:307
-msgid "Position"
-msgstr ""
-
 #: includes/Modules/Placements/class-comment-placement.php:246
 msgid "comments"
-msgstr ""
-
-#: includes/Modules/Placements/class-comment-placement.php:249
-#: includes/Modules/bbPress/class-bb-press-module.php:322
-msgid "Repeat"
 msgstr ""
 
 #: includes/Modules/Placements/class-content-placement.php:25
@@ -6239,8 +6146,9 @@ msgstr ""
 msgid "Select an ad"
 msgstr ""
 
-#: includes/Modules/Placements/class-widget-placement.php:178
 #. translators: %s: URL to create new ad
+#: includes/Modules/Placements/class-widget-placement.php:178
+#, php-format
 msgid "No ads found. %s"
 msgstr ""
 
@@ -6248,112 +6156,83 @@ msgstr ""
 msgid "Create one"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:94
-msgid "bbPress Forums"
+#: blocks/editor.js:104
+msgid "Search ads by title"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:103
-msgid "Display ads in bbPress forums, topics, and replies."
+#: blocks/editor.js:127
+msgid "WB Ad"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:297
-msgid "Before Forum List"
+#: blocks/editor.js:128
+msgid "Choose an ad. Only enabled ads are listed."
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:298
-msgid "After Forum List"
+#: blocks/editor.js:156
+msgid "Select a placement…"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:299
-msgid "Before Topic List"
+#: blocks/editor.js:171
+#: blocks/editor.js:173
+msgid "Placement"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:300
-msgid "After Topic List"
+#: blocks/editor.js:190
+msgid "WB Ad Placement"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:301
-msgid "Before Single Topic"
+#: blocks/editor.js:191
+msgid "Choose a placement. It shows whatever ad the rotation picks for that slot."
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:302
-msgid "After Single Topic"
+#: blocks/wb-ad-placement/block.json
+msgctxt "block title"
+msgid "WB Ad Placement"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:388
-msgid "WBAM: bbPress Forum Ad"
+#: blocks/wb-ad-placement/block.json
+msgctxt "block description"
+msgid "Render a WB Ad Manager placement slot - whichever ad the rotation and targeting rules pick for it."
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:390
-msgid "Display ads on bbPress forum pages."
+#: blocks/wb-ad-placement/block.json
+#: blocks/wb-ad/block.json
+msgctxt "block keyword"
+msgid "ad"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:484
-msgid "Show On:"
+#: blocks/wb-ad-placement/block.json
+msgctxt "block keyword"
+msgid "placement"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:487
-msgid "All bbPress Pages"
+#: blocks/wb-ad-placement/block.json
+msgctxt "block keyword"
+msgid "slot"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:488
-msgid "Forum Pages Only"
+#: blocks/wb-ad-placement/block.json
+#: blocks/wb-ad/block.json
+msgctxt "block keyword"
+msgid "wbam"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:489
-msgid "Topic Pages Only"
+#: blocks/wb-ad/block.json
+msgctxt "block title"
+msgid "WB Ad"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:523
-msgid "WBAM: bbPress Topic Sidebar Ad"
+#: blocks/wb-ad/block.json
+msgctxt "block description"
+msgid "Show one specific ad from WB Ad Manager - the block equivalent of [wbam_ad id=\"…\"]."
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:525
-msgid "Display ads in sidebar on single topic pages."
+#: blocks/wb-ad/block.json
+msgctxt "block keyword"
+msgid "advertisement"
 msgstr ""
 
-#: includes/Modules/bbPress/class-bb-press-module.php:606
-msgid "This widget only displays on single topic pages."
-msgstr ""
-
-#. Plugin Name of the plugin/theme
-msgid "Wbcom Designs - WB Ad Manager"
-msgstr ""
-
-#. Plugin URI of the plugin/theme
-msgid "https://wbcomdesigns.com/downloads/wb-ad-manager-pro/"
-msgstr ""
-
-#. Description of the plugin/theme
-msgid ""
-"Comprehensive ad management for WordPress with ad rotation, split testing, "
-"multiple placements, Google AdSense, BuddyPress and bbPress integration."
-msgstr ""
-
-#. Author of the plugin/theme
-msgid "Wbcom Designs"
-msgstr ""
-
-#. Author URI of the plugin/theme
-msgid "https://wbcomdesigns.com"
-msgstr ""
-
-#: includes/Core/class-plugin.php:324
-msgctxt "Post Type General Name"
-msgid "Ads"
-msgstr ""
-
-#: includes/Core/class-plugin.php:325
-msgctxt "Post Type Singular Name"
-msgid "Ad"
-msgstr ""
-
-#: includes/Core/class-plugin.php:388
-msgctxt "Taxonomy General Name"
-msgid "Ad Tags"
-msgstr ""
-
-#: includes/Core/class-plugin.php:389
-msgctxt "Taxonomy Singular Name"
-msgid "Ad Tag"
+#: blocks/wb-ad/block.json
+msgctxt "block keyword"
+msgid "banner"
 msgstr ""
