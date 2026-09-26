@@ -78,6 +78,7 @@ class Test_Classifieds_Wizard_Rejects extends Pro_Test_Case {
 	 * test is deterministic and offline.
 	 */
 	public function test_typed_address_without_coordinates_is_geocoded_server_side(): void {
+		add_filter( 'wbam_pro_allow_geocoding', '__return_true' ); // Owner opted in.
 		add_filter( 'pre_http_request', array( $this, 'fake_nominatim_response' ), 10, 3 );
 
 		$manager = Classified_Manager::get_instance();
@@ -109,6 +110,7 @@ class Test_Classifieds_Wizard_Rejects extends Pro_Test_Case {
 	 * coordinates.
 	 */
 	public function test_typed_address_is_kept_when_geocoding_fails(): void {
+		add_filter( 'wbam_pro_allow_geocoding', '__return_true' ); // Owner opted in.
 		add_filter( 'pre_http_request', array( $this, 'fake_nominatim_failure' ), 10, 3 );
 
 		$manager = Classified_Manager::get_instance();
