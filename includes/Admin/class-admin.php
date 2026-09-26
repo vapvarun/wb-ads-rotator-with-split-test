@@ -83,6 +83,28 @@ class Admin {
 		// access this page" wp_die() for any $_GET['page'] with no matching
 		// menu entry — redirect there instead of dying.
 		add_action( 'admin_page_access_denied', array( $this, 'redirect_legacy_settings_url' ) );
+
+		// Settings link on the Plugins list row (Pro already has one).
+		add_filter( 'plugin_action_links_' . WBAM_BASENAME, array( $this, 'plugin_action_links' ) );
+	}
+
+	/**
+	 * Add a "Settings" link to this plugin's row on the Plugins screen.
+	 *
+	 * @since 3.2.0
+	 * @param array $links Existing links.
+	 * @return array
+	 */
+	public function plugin_action_links( $links ) {
+		$settings_link = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( \WBAM\Core\Admin_Links::settings() ),
+			__( 'Settings', 'wb-ads-rotator-with-split-test' )
+		);
+
+		array_unshift( $links, $settings_link );
+
+		return $links;
 	}
 
 	/**
