@@ -343,4 +343,31 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 
 		$this->assertTrue( (bool) Settings_Helper::get( 'require_membership_to_post', false ) );
 	}
+
+	/**
+	 * End-to-end: every old `?section=X` slug PRO used to own on its own
+	 * (before this reorg retired/renamed that section) still lands on real
+	 * content for its new home when hit directly on the one wbam-settings
+	 * screen — not a silent fallback to whatever the first sidebar entry
+	 * happens to be.
+	 */
+	public function test_every_old_section_slug_resolves_to_real_content(): void {
+		$settings = \WBAM\Admin\Settings::get_instance();
+		$settings->register_settings();
+
+		$cases = array(
+			'advertising' => 'wbam-site-mode-card',
+			'geolocation' => 'wbam_settings[geo_primary_provider]',
+			'license'     => 'id="email-captures"',
+		);
+
+		foreach ( $cases as $old_slug => $needle ) {
+			$_GET['section'] = $old_slug;
+			ob_start();
+			$settings->render_page();
+			$html = ob_get_clean();
+
+			$this->assertStringContainsString( $needle, $html, "?section={$old_slug} must land on real content." );
+		}
+	}
 }
