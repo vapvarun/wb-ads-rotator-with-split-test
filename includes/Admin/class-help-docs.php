@@ -186,8 +186,8 @@ class Help_Docs {
 							?>
 						</li>
 						<li><?php esc_html_e( 'Pick an ad type (Image, Rich Content, HTML/JS Code, Google AdSense, or Email Capture) and fill in its content.', 'wb-ads-rotator-with-split-test' ); ?></li>
-						<li><?php esc_html_e( 'Check one or more placements in the Placements metabox (header, footer, after paragraph X, sidebar widget, popup, sticky bar, etc.).', 'wb-ads-rotator-with-split-test' ); ?></li>
-						<li><?php esc_html_e( 'Set Priority 1 to 10 in the Ad Status metabox. When several ads share a placement, higher-priority ads are shown more often.', 'wb-ads-rotator-with-split-test' ); ?></li>
+						<li><?php esc_html_e( 'Check one or more placements in the Placements box (header, footer, after paragraph X, sidebar widget, popup, sticky bar, etc.).', 'wb-ads-rotator-with-split-test' ); ?></li>
+						<li><?php esc_html_e( 'Set Priority 1 to 10 in the Ad Status box. When several ads share a placement, higher-priority ads are shown more often.', 'wb-ads-rotator-with-split-test' ); ?></li>
 						<li><?php esc_html_e( 'Publish. The ad starts appearing immediately in every placement you selected.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					</ol>
 				</div>
@@ -284,11 +284,14 @@ class Help_Docs {
 	 * Render Features tab.
 	 */
 	private function render_features_tab() {
-		$version_label = $this->is_pro_active ? __( 'PRO', 'wb-ads-rotator-with-split-test' ) : __( 'FREE', 'wb-ads-rotator-with-split-test' );
 		?>
 		<div class="wbam-help-section">
-			<?php /* translators: %s: version label (FREE or PRO) */ ?>
-			<h2><?php printf( esc_html__( 'Features (%s Version)', 'wb-ads-rotator-with-split-test' ), esc_html( $version_label ) ); ?></h2>
+			<?php
+			// Plain "Features" - "Features (PRO Version)" read as the same
+			// thing as the separate "PRO Features" tab next to it, when this
+			// tab actually covers every feature on the site, Free or Pro.
+			?>
+			<h2><?php esc_html_e( 'Features', 'wb-ads-rotator-with-split-test' ); ?></h2>
 
 			<?php
 			// Counts the live registry (Free's 5 built-in types, plus Pro's
@@ -313,7 +316,7 @@ class Help_Docs {
 						<?php endif; ?>
 					</li>
 					<li><strong><?php esc_html_e( 'Weighted rotation:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Assign each ad a 1-10 priority slider; higher priorities win more often in the same placement.', 'wb-ads-rotator-with-split-test' ); ?></li>
-					<li><strong><?php esc_html_e( 'A/B comparison metabox:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Side-by-side impressions / clicks / CTR across ads sharing a placement, with an automatic "winner" badge at 100+ impressions.', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><strong><?php esc_html_e( 'A/B comparison box:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Side-by-side impressions / clicks / CTR across ads sharing a placement, with an automatic "winner" badge at 100+ impressions.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><strong><?php esc_html_e( 'Frequency control:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Per-ad session impression cap + global max-ads-per-page, plus lazy loading for below-the-fold ads.', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>
 			</div>
@@ -428,7 +431,7 @@ class Help_Docs {
 
 			<div class="wbam-doc-section">
 				<h3><?php esc_html_e( 'Credits & Wallet System', 'wb-ads-rotator-with-split-test' ); ?></h3>
-				<p><?php esc_html_e( 'Built-in credit system powered by Wbcom Credits SDK.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p><?php esc_html_e( 'Built-in credit system advertisers use to pay for ads and listings.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<ul>
 					<li><?php esc_html_e( 'Advertisers purchase credits to pay for ads and listings', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Supports WooCommerce, Stripe, PayPal, and manual payments', 'wb-ads-rotator-with-split-test' ); ?></li>
@@ -612,7 +615,7 @@ class Help_Docs {
 
 			<div class="wbam-faq-item">
 				<h4><?php esc_html_e( 'Can I show different ads on different pages?', 'wb-ads-rotator-with-split-test' ); ?></h4>
-				<p><?php esc_html_e( 'Yes. Use the Display Rules metabox when editing an ad. You can target specific pages, categories, post types, or user roles.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p><?php esc_html_e( 'Yes. Use the Display Rules box when editing an ad. You can target specific pages, categories, post types, or user roles.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 
 			<div class="wbam-faq-item">
