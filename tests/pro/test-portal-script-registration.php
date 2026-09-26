@@ -4,7 +4,7 @@
  *
  * Three places registered `wbam-pro-portal`. WordPress keeps the first
  * registration of a handle, so when the BuddyPress integration or the
- * classifieds form got there first (without `chartjs`), the full
+ * classifieds form got there first (without `wbam-pro-chartjs`), the full
  * registration was ignored: `Chart` was undefined and every portal chart
  * rendered blank while the REST data was there. Each also printed its own
  * short `wbamPortal` config over the full one.
@@ -52,7 +52,7 @@ class Test_Portal_Script_Registration extends Pro_Test_Case {
 		( new Advertiser_Shortcodes() )->register_assets();
 
 		$registered = wp_scripts()->registered['wbam-pro-portal'];
-		$this->assertContains( 'chartjs', $registered->deps, 'Portal charts need Chart.js loaded before portal.js.' );
+		$this->assertContains( 'wbam-pro-chartjs', $registered->deps, 'Portal charts need Chart.js loaded before portal.js.' );
 
 		$config = (string) wp_scripts()->get_data( 'wbam-pro-portal', 'data' );
 		$this->assertSame( 1, substr_count( $config, 'var wbamPortal' ), 'One wbamPortal config, not a short copy printed over the full one.' );
