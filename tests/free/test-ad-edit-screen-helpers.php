@@ -40,7 +40,9 @@ class Test_Ad_Edit_Screen_Helpers extends \WP_UnitTestCase {
 
 		ob_start();
 		$admin->render_usage_metabox( get_post( $ad_id ) );
-		$this->assertStringContainsString( 'data-clipboard="[wbam_ad id=&quot;' . $ad_id . '&quot;]"', ob_get_clean(), 'The shortcode is shown with a copy button.' );
+		$usage = ob_get_clean();
+		$this->assertStringContainsString( 'data-clipboard="[wbam_ad id=&quot;' . $ad_id . '&quot;]"', $usage, 'The shortcode is shown with a copy button.' );
+		$this->assertStringContainsString( 'WB Ad block', $usage, 'Block editor users are pointed at the block.' );
 
 		ob_start();
 		$admin->render_column( 'placements', $ad_id );

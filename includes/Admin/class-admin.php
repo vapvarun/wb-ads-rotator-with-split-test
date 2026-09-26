@@ -1180,6 +1180,9 @@ class Admin {
 			<input type="text" class="code" readonly value="<?php echo esc_attr( $shortcode ); ?>" aria-label="<?php esc_attr_e( 'Shortcode', 'wb-ads-rotator-with-split-test' ); ?>" />
 			<button type="button" class="button wbam-copy-btn" data-clipboard="<?php echo esc_attr( $shortcode ); ?>"><?php esc_html_e( 'Copy', 'wb-ads-rotator-with-split-test' ); ?></button>
 		</p>
+		<p class="description">
+			<?php esc_html_e( 'In the block editor, add the WB Ad block and pick this ad.', 'wb-ads-rotator-with-split-test' ); ?>
+		</p>
 		<?php if ( ! wp_is_block_theme() ) : ?>
 			<p class="description">
 				<?php esc_html_e( 'Or add the WB Ad Manager widget to a sidebar under Appearance, Widgets and pick this ad.', 'wb-ads-rotator-with-split-test' ); ?>
