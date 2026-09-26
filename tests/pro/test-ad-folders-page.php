@@ -240,4 +240,33 @@ class Test_Ad_Folders_Page extends Pro_Test_Case {
 
 		$this->assertStringContainsString( 'Oldest Co', $html );
 	}
+
+	/**
+	 * An advertiser with ads must appear in the rail even when 60 newer
+	 * advertisers with zero ads exist — the rail lists who has ads first (by
+	 * ad count, descending), then fills any remaining slots with the newest
+	 * zero-ad advertisers, instead of the old "newest RAIL_LIMIT" query that
+	 * let 0-ad applicants push out everyone who actually has ads.
+	 */
+	public function test_rail_lists_advertisers_with_ads_before_newer_empty_ones() {
+		$manager = \WBAM_Pro\Modules\Advertisers\Advertiser_Manager::get_instance();
+
+		$with_ads = $manager->get_or_create( self::factory()->user->create() );
+		$manager->update( $with_ads->id, array( 'company_name' => 'Has Ads Co' ) );
+		$this->make_ad( (int) $with_ads->id );
+
+		// 60 newer, zero-ad advertisers — more than RAIL_LIMIT (50) — created
+		// after the advertiser above, so a "newest first" query would drop it.
+		foreach ( range( 1, 60 ) as $i ) {
+			$manager->get_or_create( self::factory()->user->create() );
+		}
+
+		$rail = $this->call_private( 'get_rail_advertisers', array( $this->call_private( 'get_advertiser_ad_counts' ) ) );
+
+		$this->assertLessThanOrEqual( Ad_Folders_Page::RAIL_LIMIT, count( $rail ), 'The rail must stay capped at RAIL_LIMIT.' );
+
+		$ids = wp_list_pluck( $rail, 'id' );
+		$this->assertContains( (int) $with_ads->id, $ids, 'An advertiser with ads must not be pushed out of the rail by newer 0-ad advertisers.' );
+		$this->assertSame( (int) $with_ads->id, (int) $ids[0], 'Advertisers with ads are listed first (by ad count, descending).' );
+	}
 }
