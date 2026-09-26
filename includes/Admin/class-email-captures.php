@@ -209,11 +209,7 @@ class Email_Captures {
 			\WBAM\Admin\UX::page_header(
 				array(
 					'title' => __( 'Email Captures', 'wb-ads-rotator-with-split-test' ),
-					'desc'  => sprintf(
-						/* translators: %s: number of captured emails */
-						_n( '%s captured email address.', '%s captured email addresses.', $total, 'wb-ads-rotator-with-split-test' ),
-						number_format_i18n( $total )
-					),
+					'desc'  => __( 'Email addresses visitors left through your Email Capture ads.', 'wb-ads-rotator-with-split-test' ),
 				)
 			);
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only notice after the delete redirect.

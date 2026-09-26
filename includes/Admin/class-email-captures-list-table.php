@@ -55,7 +55,6 @@ class Email_Captures_List_Table extends \WP_List_Table {
 			'email'      => __( 'Email', 'wb-ads-rotator-with-split-test' ),
 			'name'       => __( 'Name', 'wb-ads-rotator-with-split-test' ),
 			'ad'         => __( 'Ad', 'wb-ads-rotator-with-split-test' ),
-			'ip_address' => __( 'IP', 'wb-ads-rotator-with-split-test' ),
 			'created_at' => __( 'Date', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
