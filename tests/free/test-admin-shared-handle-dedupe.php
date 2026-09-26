@@ -18,11 +18,24 @@ use WP_UnitTestCase;
 
 class Test_Admin_Shared_Handle_Dedupe extends WP_UnitTestCase {
 
+	/** @var \WP_Scripts|null */
+	private $saved_scripts;
+
+	/** @var \WP_Styles|null */
+	private $saved_styles;
+
+	public function set_up(): void {
+		parent::set_up();
+		// The worst-case order below enqueues wbam-links-admin before its
+		// token dependency exists; restore both registries whole so nothing
+		// it enqueues leaks into a later test that prints styles.
+		$this->saved_scripts = isset( $GLOBALS['wp_scripts'] ) ? clone $GLOBALS['wp_scripts'] : null;
+		$this->saved_styles  = isset( $GLOBALS['wp_styles'] ) ? clone $GLOBALS['wp_styles'] : null;
+	}
+
 	public function tear_down(): void {
-		wp_dequeue_script( 'wbam-admin' );
-		wp_deregister_script( 'wbam-admin' );
-		wp_dequeue_style( 'wbam-admin' );
-		wp_deregister_style( 'wbam-admin' );
+		$GLOBALS['wp_scripts'] = $this->saved_scripts;
+		$GLOBALS['wp_styles']  = $this->saved_styles;
 		set_current_screen( 'front' );
 		parent::tear_down();
 	}
