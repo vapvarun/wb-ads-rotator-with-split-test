@@ -65,6 +65,18 @@ add_action( 'wbam_email_captured', function ( $email, $name, $ad_id ) {
 }, 10, 3 );
 ```
 
+## Example: set your own accent colour
+
+Ads, buttons and links take the theme's colours: BuddyX and Reign accents first, then a block theme's button colour from theme.json, then the `primary` palette colour. To pick a different accent, set the `--wbam-accent` CSS variable in your theme or in Appearance > Customize > Additional CSS:
+
+```css
+html:root {
+    --wbam-accent: #0a7d4f;
+}
+```
+
+Text on buttons and Pro's tints follow it. Dark mode follows the theme's own dark switch, not the visitor's operating system.
+
 ## Next steps
 
 - [REST API](00-rest-api.md)

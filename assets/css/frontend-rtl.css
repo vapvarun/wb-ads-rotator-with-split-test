@@ -23,7 +23,11 @@
 	--wbam-text-muted:    var(--bx-color-fg-muted, var(--reign-site-alternate-text-color, var(--text-2, #646970)));
 	--wbam-text-subtle:   #8c8f94;
 	--wbam-text-inverse:  #ffffff;
-	--wbam-accent:        var(--bx-color-accent, var(--reign-colors-theme, var(--brand, var(--wp--preset--color--primary, #2271b1))));
+	/* Block themes: --wbam-theme-button is the theme.json button colour,
+	   printed by Frontend::enqueue_assets() (TT5: contrast). To pick your own
+	   accent, set it in the theme or Customizer CSS:
+	   html:root { --wbam-accent: #0a7d4f; } */
+	--wbam-accent:        var(--bx-color-accent, var(--reign-colors-theme, var(--brand, var(--wbam-theme-button, var(--wp--preset--color--primary, #2271b1)))));
 	/* Last resort derives from the accent, so a block theme's green primary
 	   does not hover blue. */
 	--wbam-accent-hover:  var(--bx-color-link-hover, var(--reign-site-link-hover-color, var(--brand-hover, color-mix(in srgb, var(--wbam-accent) 85%, #000))));
@@ -33,7 +37,7 @@
 	   higher-contrast of the two flips. White here; the @supports block
 	   after the dark palette upgrades it where relative colour works. */
 	--wbam-accent-fg:     #ffffff;
-	--wbam-link:          var(--bx-color-link, var(--reign-site-link-color, var(--brand, #2271b1)));
+	--wbam-link:          var(--bx-color-link, var(--reign-site-link-color, var(--brand, var(--wbam-accent))));
 	--wbam-success:       #00a32a;
 	--wbam-danger:        #d63638;
 	--wbam-danger-bg:     #f8d7da;

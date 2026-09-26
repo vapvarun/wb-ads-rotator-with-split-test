@@ -61,6 +61,11 @@ class Frontend {
 		wp_style_add_data( 'wbam-frontend', 'rtl', 'replace' );
 		wp_style_add_data( 'wbam-frontend', 'suffix', $suffix );
 
+		$theme_button = self::theme_button_color();
+		if ( '' !== $theme_button ) {
+			wp_add_inline_style( 'wbam-frontend', ':root{--wbam-theme-button:' . $theme_button . ';}' );
+		}
+
 		wp_enqueue_script(
 			'wbam-frontend',
 			WBAM_URL . 'assets/js/frontend' . $suffix . '.js',
@@ -80,6 +85,32 @@ class Frontend {
 				'nonce'   => wp_create_nonce( 'wbam_frontend' ),
 			)
 		);
+	}
+
+	/**
+	 * The block theme's button background from theme.json, as a CSS colour,
+	 * so --wbam-accent follows the theme's own buttons. '' on classic
+	 * themes (global styles there return core's default #32373c, not the
+	 * theme's colour) and for gradients or anything that is not a colour.
+	 *
+	 * @return string
+	 */
+	private static function theme_button_color() {
+		if ( ! wp_is_block_theme() ) {
+			return '';
+		}
+
+		$value = wp_get_global_styles( array( 'elements', 'button', 'color', 'background' ) );
+		if ( ! is_string( $value ) ) {
+			return '';
+		}
+
+		// theme.json shorthand: var:preset|color|contrast.
+		if ( preg_match( '/^var:preset\|color\|([a-z0-9-]+)$/', $value, $match ) ) {
+			return 'var(--wp--preset--color--' . $match[1] . ')';
+		}
+
+		return preg_match( '/^(#[0-9a-f]{3,8}|var\(--wp--preset--color--[a-z0-9-]+\))$/i', $value ) ? $value : '';
 	}
 
 	/**
