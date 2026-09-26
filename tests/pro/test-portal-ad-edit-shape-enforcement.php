@@ -102,4 +102,23 @@ class Test_Portal_Ad_Edit_Shape_Enforcement extends Pro_Test_Case {
 
 		$this->assertMatchesRegularExpression( '/wbam-notice-warning[^>]*>(?:(?!<\/div>).)*Header/s', $html );
 	}
+
+	/** A tampered ?wbam_dropped= never echoes an unknown slug or markup. */
+	public function test_dashboard_notice_ignores_unknown_slugs(): void {
+		$get = $_GET;
+		wp_set_current_user( $this->user );
+		$_GET['tab']          = 'ads';
+		$_GET['wbam_notice']  = 'ad-updated';
+		$_GET['wbam_dropped'] = 'bogus_slot,<b>pwned</b>';
+		$none                 = do_shortcode( '[wbam_advertiser_dashboard]' );
+
+		$_GET['wbam_dropped'] = 'header,bogus_slot';
+		$mixed                = do_shortcode( '[wbam_advertiser_dashboard]' );
+		$_GET                 = $get;
+
+		$this->assertStringNotContainsString( 'Removed from', $none, 'No known slug left, so no notice.' );
+		$this->assertStringNotContainsString( 'pwned', $none );
+		$this->assertStringContainsString( 'Header', $mixed );
+		$this->assertStringNotContainsString( 'bogus_slot', $mixed );
+	}
 }

@@ -469,17 +469,19 @@ if ( ! function_exists( 'wbam_placement_fit_label' ) ) {
 	 *
 	 * @since 3.2.0
 	 * @param string $slug Placement slug.
-	 * @return string Plain text; escape on output.
+	 * @return string Plain text; escape on output. '' for a slug no placement is registered under.
 	 */
 	function wbam_placement_fit_label( $slug ) {
 		$slug      = (string) $slug;
 		$placement = \WBAM\Modules\Placements\Placement_Engine::get_instance()->get_placement( $slug );
-		$name      = $placement ? $placement->get_name() : $slug;
+		if ( ! $placement ) {
+			return '';
+		}
 
 		return sprintf(
 			/* translators: 1: placement name, e.g. "Header". 2: the sizes it accepts, e.g. "728×90, 970×90". */
 			__( '%1$s (accepts %2$s)', 'wb-ads-rotator-with-split-test' ),
-			$name,
+			$placement->get_name(),
 			wbam_placement_sizes_label( Ad_Formats::get_placement_accepted_formats( $slug ) )['label']
 		);
 	}
