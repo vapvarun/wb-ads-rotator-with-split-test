@@ -295,4 +295,32 @@ class Test_Report_Shell extends Pro_Test_Case {
 		$this->assertSame( array( 3.0, 4.0 ), $series['n'] );
 		$this->assertSame( wp_date( 'M j', strtotime( '2026-01-01 12:00:00' ) ), $series['labels'][0] );
 	}
+
+	public function test_wbam_report_range_presets_filter_adds_removes_relabels_and_validates(): void {
+		// Unfiltered: the 5 defaults, unchanged.
+		$this->assertSame(
+			array( '7d', '30d', '90d', 'month', 'ytd' ),
+			array_keys( Report_Shell::preset_labels() )
+		);
+
+		$callback = static function ( $presets ) {
+			unset( $presets['90d'] );
+			$presets['7d']      = 'Last week';
+			$presets['quarter'] = 'This quarter';
+			return $presets;
+		};
+		add_filter( 'wbam_report_range_presets', $callback );
+
+		$presets = Report_Shell::preset_labels();
+		$this->assertArrayNotHasKey( '90d', $presets, 'A site can remove a default preset.' );
+		$this->assertSame( 'Last week', $presets['7d'], 'A site can relabel a default preset.' );
+		$this->assertArrayHasKey( 'quarter', $presets, 'A site can add a new preset.' );
+
+		// range() must not silently reset an unrecognised-but-filter-added
+		// slug back to '30d' before it even reaches the caller.
+		$range = Report_Shell::range( array( 'range' => 'quarter' ) );
+		$this->assertSame( 'quarter', $range['preset'] );
+
+		remove_filter( 'wbam_report_range_presets', $callback );
+	}
 }
