@@ -68,6 +68,17 @@
 	--wbam-close-size: 44px;
 	--wbam-transition: 0.2s ease;
 
+	/* Shape height caps (owner decision 13): the box a Banner/Box/Tower
+	   placement reserves never changes size between reloads, no matter
+	   which fitting ad is rotated in — this is what stops the header
+	   jumping between 82px and 219px across page loads. Banner's desktop
+	   cap covers its tallest recommended size (970x250); the mobile
+	   breakpoint below drops to the tallest mobile banner (320x100). */
+	--wbam-shape-banner-h: 250px;
+	--wbam-shape-banner-h-mobile: 100px;
+	--wbam-shape-box-h: 280px;
+	--wbam-shape-tower-h: 600px;
+
 	/* ── Legacy aliases — deprecated, mapped onto the chained semantic tokens
 	   above so older selectors inherit host-theme colours and the dark palette
 	   automatically. Do not introduce new usages. ── */
@@ -308,6 +319,64 @@
 
 .wbam-ad-code ins {
 	display: block !important;
+}
+
+/* ==========================================================================
+   Shape height caps (owner decision 13, card 10343726460)
+
+   Banner placements (header, footer, before/after content, before/after
+   archive) reserve a fixed height regardless of which fitting ad
+   renders — this is what stops the header jumping between 82px and
+   219px across reloads. Images already never crop or stretch
+   (object-fit: contain, below); centering keeps a shorter ad (e.g.
+   320x50 in a Banner box) from looking stuck to one edge.
+
+   ponytail: a text/rich/code ("Any" shape) ad in a Banner slot can in
+   principle be taller than the 250px cap and get clipped by
+   `overflow: hidden` — real house-promo copy is one short line, so this
+   is an accepted simplification, not a redesign of rich-content ad
+   layout. Raise the cap (or exempt rich-content specifically) if a
+   site's copy needs more room.
+   ========================================================================== */
+
+.wbam-placement-header,
+.wbam-placement-footer,
+.wbam-placement-before-content,
+.wbam-placement-after-content,
+.wbam-placement-before-archive,
+.wbam-placement-after-archive {
+	min-height: var(--wbam-shape-banner-h);
+	max-height: var(--wbam-shape-banner-h);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+/* Sidebar takes Box OR Tower (owner decision 13) — a min-height only,
+   not a hard cap: reserving the shorter Box height stops the sidebar
+   collapsing to nothing between ads, without clipping a legitimate
+   600px-tall Tower creative the way a fixed max would. */
+.wbam-placement-widget {
+	min-height: var(--wbam-shape-box-h);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Phone breakpoint matches the rest of this file (480px, see below) — a
+   Banner ad on phones is one of the mobile sizes (320x50/320x100), so the
+   reserved box shrinks to match instead of leaving a 250px-tall gap. */
+@media screen and (max-width: 480px) {
+	.wbam-placement-header,
+	.wbam-placement-footer,
+	.wbam-placement-before-content,
+	.wbam-placement-after-content,
+	.wbam-placement-before-archive,
+	.wbam-placement-after-archive {
+		min-height: var(--wbam-shape-banner-h-mobile);
+		max-height: var(--wbam-shape-banner-h-mobile);
+	}
 }
 
 /* ==========================================================================
