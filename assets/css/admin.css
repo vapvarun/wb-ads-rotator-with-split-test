@@ -731,18 +731,20 @@
 	border-bottom: 1px solid var(--wbam-border-strong);
 }
 
-/* Slot takes the remaining space; the three gate/count columns are narrow
-   and centred so they don't sprawl across the now-full-width table. */
-.wbam-placement-matrix thead th:nth-child(2),
-.wbam-placement-matrix thead th:nth-child(3),
-.wbam-placement-matrix thead th:nth-child(4) {
-	width: 14ch;
+/* Slot takes the remaining space; every gate/count column after it (Pro
+   adds "Ads shown" through wbam_placement_matrix_head) is narrow and
+   centred so the slot name and description keep room to read. */
+.wbam-placement-matrix thead th:nth-child(n+2) {
+	width: 8ch;
 	text-align: center;
 }
 
-.wbam-placement-matrix tbody td:nth-child(2),
-.wbam-placement-matrix tbody td:nth-child(3),
-.wbam-placement-matrix tbody td:nth-child(4) {
+/* "Advertisers" is the longest header; keep it on one line. */
+.wbam-placement-matrix thead th:nth-child(3) {
+	width: 11ch;
+}
+
+.wbam-placement-matrix tbody td:nth-child(n+2) {
 	text-align: center;
 }
 
