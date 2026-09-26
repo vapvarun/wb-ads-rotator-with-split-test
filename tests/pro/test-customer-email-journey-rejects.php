@@ -62,19 +62,26 @@ class Test_Customer_Email_Journey_Rejects extends Pro_Test_Case {
 	}
 
 	public function test_reply_to_keeps_a_name_with_a_comma(): void {
-		Email_Notifications::get_instance()->send_inquiry_to_seller(
-			'seller@example.test',
-			new class() {
-				public function get_title() {
-					return 'Blue bike';
-				}
-			},
-			array(
-				'name'    => 'Smith, John',
-				'email'   => 'john@example.test',
-				'message' => 'Still available?',
-			)
-		);
+		$classified = new class() {
+			public $contact_email = 'seller@example.test';
+			public $advertiser_id = 0;
+			public function get_title() {
+				return 'Blue bike';
+			}
+		};
+		$inquiry    = new class( $classified ) {
+			public $sender_name  = 'Smith, John';
+			public $sender_email = 'john@example.test';
+			public $message      = 'Still available?';
+			private $classified;
+			public function __construct( $classified ) {
+				$this->classified = $classified;
+			}
+			public function get_classified() {
+				return $this->classified;
+			}
+		};
+		Email_Notifications::get_instance()->send_inquiry_notification( $inquiry );
 
 		$this->assertContains( 'Reply-To: "Smith John" <john@example.test>', $this->last_mail()['headers'] );
 	}
