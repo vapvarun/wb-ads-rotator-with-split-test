@@ -189,11 +189,19 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$this->assertStringContainsString( 'wbam_pro_settings[admin_as_advertiser]', $html );
 		$this->assertStringContainsString( 'wbam_pro_settings[trust_system_enabled]', $html );
 		$this->assertStringContainsString( 'wbam_pro_settings[default_pricing_model]', $html );
-		$this->assertStringContainsString( 'wbam_pro_settings[low_balance_threshold]', $html );
+		// low_balance_threshold is plug-and-play (owner decision, same card) —
+		// see Test_Settings_Contract_3_2::test_low_balance_threshold_is_plug_and_play().
+		$this->assertStringNotContainsString( 'wbam_pro_settings[low_balance_threshold]', $html );
 		$this->assertSame( 1, substr_count( $html, '<form' ) );
 	}
 
-	/** Saving Advertisers & Billing must not touch Currency (a sibling card/form on General). */
+	/**
+	 * Saving Advertisers & Billing must not touch Currency (a sibling
+	 * card/form on General). Also proves a programmatic write (REST,
+	 * WP-CLI, a filter) can still set low_balance_threshold directly even
+	 * though no UI field renders it any more — sanitize_settings()'s field
+	 * type map is unchanged, only the UI is gone.
+	 */
 	public function test_advertisers_billing_save_does_not_touch_currency(): void {
 		update_option(
 			'wbam_pro_settings',

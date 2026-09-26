@@ -64,14 +64,25 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 	}
 
 	/**
-	 * D8: the low-balance threshold every reader uses can be set. Moved
-	 * (card 10343706274) from General to Advertisers & Billing, alongside
-	 * the rest of the billing defaults it's a threshold for.
+	 * D8, superseded by the plug-and-play decision on the same card
+	 * (10343706274): the low-balance threshold is no longer a settings
+	 * field at all — Settings_Helper::low_balance_threshold() reads the
+	 * site's already-stored value as the `wbam_pro_low_balance_threshold`
+	 * filter's default. Confirm the field is gone and the filter works.
 	 */
-	public function test_low_balance_threshold_has_a_field(): void {
+	public function test_low_balance_threshold_is_plug_and_play(): void {
 		$html = $this->render( 'render_advertisers_billing_section', Settings_Helper::get() );
+		$this->assertStringNotContainsString( 'name="wbam_pro_settings[low_balance_threshold]"', $html );
 
-		$this->assertStringContainsString( 'name="wbam_pro_settings[low_balance_threshold]"', $html );
+		update_option( 'wbam_pro_settings', array( 'low_balance_threshold' => 7.5 ) );
+		$this->assertSame( 7.5, Settings_Helper::low_balance_threshold(), "Site's stored value is the filter's default." );
+
+		$forced = static function () {
+			return 3.0;
+		};
+		add_filter( 'wbam_pro_low_balance_threshold', $forced );
+		$this->assertSame( 3.0, Settings_Helper::low_balance_threshold(), 'Filter overrides the stored default.' );
+		remove_filter( 'wbam_pro_low_balance_threshold', $forced );
 	}
 
 	/** D10: toggles nothing reads are not rendered. */
