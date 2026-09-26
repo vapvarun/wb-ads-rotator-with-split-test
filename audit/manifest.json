@@ -1738,6 +1738,13 @@
       "purpose": "Filter render mode (single/rotation)"
     },
     {
+      "name": "wbam_ad_not_delivering_reason",
+      "type": "filter",
+      "args": 2,
+      "where": "blocks/wb-ad/render.php",
+      "purpose": "Editor-preview notice for a WB Ad block whose ad renders nothing"
+    },
+    {
       "name": "wbam_placement_ad_count",
       "type": "filter",
       "args": 2,

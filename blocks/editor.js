@@ -136,7 +136,7 @@
 			'div',
 			blockProps,
 			inspector,
-			el( ServerSideRender, { block: 'wb-ads/ad', attributes: attributes } )
+			el( ServerSideRender, { block: 'wb-ads/ad', attributes: attributes, urlQueryArgs: { wbam_preview: 1 } } )
 		);
 	}
 

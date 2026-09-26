@@ -34,6 +34,7 @@ WB Ad Manager fires actions and filters throughout its lifecycle so you can exte
 | `wbam_popup_repeat_days` | Days before a visitor sees a popup ad again (`$days`, `$ad_id`; default 1, 0 = every page until closed). An ad saved with the old 'Show again after' field starts from its stored value |
 | `wbam_popup_skip_mobile_first_view` | Hold a popup ad back on a phone visitor's first page view (`$skip`, `$ad_id`; default false). An ad saved with the old first-view field starts from its stored value |
 | `wbam_ad_output` | The rendered ad HTML |
+| `wbam_ad_not_delivering_reason` | Editor-only notice a WB Ad block shows when its ad renders nothing (`$reason`, `$ad_id`). Pro names a missing or ended campaign |
 | `wbam_placement_render_mode` | Rotate (draw `wbam_placement_ad_count` ads) vs stack (render every ad of the top delivery tier) for a placement |
 | `wbam_placement_ad_count` | Ads a rotating placement shows per page load (`$count`, `$placement_id`; default 1, 0 = every eligible ad). Paid ads take the places first, house and sample ads fill the rest. Pro's "Ads shown" column sets it |
 | `wbam_enforce_page_cap` | Whether the once-per-page cap applies to an ad |
