@@ -310,19 +310,12 @@ class Settings {
 			)
 		);
 
-		add_settings_field(
-			'container_class',
-			__( 'Custom Container Class', 'wb-ads-rotator-with-split-test' ),
-			array( $this, 'render_text_field' ),
-			'wbam-settings',
-			'wbam_display',
-			array(
-				'label_for'   => 'wbam_setting_container_class',
-				'id'          => 'container_class',
-				'placeholder' => __( 'e.g., my-ad-wrapper', 'wb-ads-rotator-with-split-test' ),
-				'description' => __( 'Additional CSS class for ad containers.', 'wb-ads-rotator-with-split-test' ),
-			)
-		);
+		// "Custom Container Class" (container_class) is plug-and-play (owner
+		// decision, card 10343726590): no settings field any more. A site
+		// that already saved a class keeps using it — see
+		// `wbam_ad_container_class` in Placement_Engine::render_placement(),
+		// whose default is this site's already-stored value. A developer who
+		// wants a class on a fresh install uses that filter instead.
 
 		// "Count Impressions When Seen" (viewable_impressions) is plug-and-play
 		// (owner decision, card 10343706274): no settings field any more. A

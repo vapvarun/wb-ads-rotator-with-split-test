@@ -94,12 +94,24 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		 */
 		$data = apply_filters( 'wbam_email_form_data', $data, $ad_id );
 
-		$headline     = isset( $data['headline'] ) ? $data['headline'] : __( 'Subscribe to our Newsletter', 'wb-ads-rotator-with-split-test' );
-		$description  = isset( $data['description'] ) ? $data['description'] : '';
-		$button_text  = isset( $data['button_text'] ) ? $data['button_text'] : __( 'Subscribe', 'wb-ads-rotator-with-split-test' );
-		$success_msg  = isset( $data['success_message'] ) ? $data['success_message'] : __( 'Thank you for subscribing!', 'wb-ads-rotator-with-split-test' );
-		$show_name    = ! empty( $data['show_name_field'] );
-		$cookie_days  = isset( $data['cookie_days'] ) ? absint( $data['cookie_days'] ) : 7;
+		$headline    = isset( $data['headline'] ) ? $data['headline'] : __( 'Subscribe to our Newsletter', 'wb-ads-rotator-with-split-test' );
+		$description = isset( $data['description'] ) ? $data['description'] : '';
+		$button_text = isset( $data['button_text'] ) ? $data['button_text'] : __( 'Subscribe', 'wb-ads-rotator-with-split-test' );
+		$success_msg = isset( $data['success_message'] ) ? $data['success_message'] : __( 'Thank you for subscribing!', 'wb-ads-rotator-with-split-test' );
+		$show_name   = ! empty( $data['show_name_field'] );
+
+		/**
+		 * Filter how many days a dismissed email sign-up ad stays hidden.
+		 *
+		 * Plug and play (owner decision, card 10343726590): no Settings UI
+		 * field any more. This ad's already-stored `cookie_days` is this
+		 * filter's default, so nothing changes silently.
+		 *
+		 * @since 3.2.0
+		 * @param int $days  Days to hide after the visitor closes the form.
+		 * @param int $ad_id Ad ID.
+		 */
+		$cookie_days  = (int) apply_filters( 'wbam_email_capture_cookie_days', isset( $data['cookie_days'] ) ? absint( $data['cookie_days'] ) : 7, $ad_id );
 		$redirect_url = isset( $data['redirect_url'] ) ? $data['redirect_url'] : '';
 		$privacy_text = isset( $data['privacy_text'] ) ? $data['privacy_text'] : '';
 		$button_color = isset( $data['button_color'] ) ? $data['button_color'] : '#2271b1';
@@ -347,7 +359,6 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		$button_text     = isset( $data['button_text'] ) ? $data['button_text'] : __( 'Subscribe', 'wb-ads-rotator-with-split-test' );
 		$success_message = isset( $data['success_message'] ) ? $data['success_message'] : __( 'Thank you for subscribing!', 'wb-ads-rotator-with-split-test' );
 		$show_name       = ! empty( $data['show_name_field'] );
-		$cookie_days     = isset( $data['cookie_days'] ) ? absint( $data['cookie_days'] ) : 7;
 		$redirect_url    = isset( $data['redirect_url'] ) ? $data['redirect_url'] : '';
 		$privacy_text    = isset( $data['privacy_text'] ) ? $data['privacy_text'] : '';
 		$bg_color        = isset( $data['bg_color'] ) ? $data['bg_color'] : '#ffffff';
@@ -404,14 +415,6 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_email_cookie_days"><?php esc_html_e( 'Dismiss Duration (Days)', 'wb-ads-rotator-with-split-test' ); ?></label>
-			<div class="wbam-field-input">
-				<input type="number" id="wbam_email_cookie_days" name="wbam_data[cookie_days]" value="<?php echo esc_attr( $cookie_days ); ?>" min="0" max="365" class="small-text">
-				<p class="description"><?php esc_html_e( 'Days to hide after user closes. 0 = show every visit.', 'wb-ads-rotator-with-split-test' ); ?></p>
-			</div>
-		</div>
-
-		<div class="wbam-field">
 			<label for="wbam_email_privacy_text"><?php esc_html_e( 'Privacy Text', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="text" id="wbam_email_privacy_text" name="wbam_data[privacy_text]" value="<?php echo esc_attr( $privacy_text ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'We respect your privacy. Unsubscribe anytime.', 'wb-ads-rotator-with-split-test' ); ?>">
@@ -441,6 +444,7 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 				<li><code>wbam_email_form_before</code> / <code>after</code> - <?php esc_html_e( 'Before/after form renders', 'wb-ads-rotator-with-split-test' ); ?></li>
 				<li><code>wbam_email_form_after_fields</code> - <?php esc_html_e( 'Add custom fields', 'wb-ads-rotator-with-split-test' ); ?></li>
 				<li><code>wbam_email_form_validation</code> - <?php esc_html_e( 'Custom validation', 'wb-ads-rotator-with-split-test' ); ?></li>
+				<li><code>wbam_email_capture_cookie_days</code> - <?php esc_html_e( 'Days to hide after the visitor closes the form (defaults to 7)', 'wb-ads-rotator-with-split-test' ); ?></li>
 			</ul>
 		</div>
 		<?php
@@ -454,13 +458,19 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 	 * @return array
 	 */
 	public function save( $ad_id, $data ) {
+		// cookie_days has no form field any more (wbam_email_capture_cookie_days
+		// filter, card 10343726590) - carry this ad's already-stored value
+		// through so saving the metabox for any other field does not reset it.
+		$existing             = get_post_meta( $ad_id, '_wbam_ad_data', true );
+		$existing_cookie_days = isset( $existing['cookie_days'] ) ? absint( $existing['cookie_days'] ) : 7;
+
 		return array(
 			'headline'        => isset( $data['headline'] ) ? sanitize_text_field( $data['headline'] ) : '',
 			'description'     => isset( $data['description'] ) ? sanitize_textarea_field( $data['description'] ) : '',
 			'button_text'     => isset( $data['button_text'] ) ? sanitize_text_field( $data['button_text'] ) : __( 'Subscribe', 'wb-ads-rotator-with-split-test' ),
 			'success_message' => isset( $data['success_message'] ) ? sanitize_text_field( $data['success_message'] ) : '',
 			'show_name_field' => ! empty( $data['show_name_field'] ),
-			'cookie_days'     => isset( $data['cookie_days'] ) ? absint( $data['cookie_days'] ) : 7,
+			'cookie_days'     => isset( $data['cookie_days'] ) ? absint( $data['cookie_days'] ) : $existing_cookie_days,
 			'redirect_url'    => isset( $data['redirect_url'] ) ? esc_url_raw( $data['redirect_url'] ) : '',
 			'privacy_text'    => isset( $data['privacy_text'] ) ? sanitize_text_field( $data['privacy_text'] ) : '',
 			'bg_color'        => isset( $data['bg_color'] ) ? sanitize_hex_color( $data['bg_color'] ) : '#ffffff',

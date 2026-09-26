@@ -635,8 +635,20 @@ class Placement_Engine {
 			if ( $is_responsive ) {
 				$classes .= ' wbam-ad-slot--responsive';
 			}
-			// Ad Display > Custom Container Class.
-			$container_class = sanitize_html_class( (string) \WBAM\Core\Settings_Helper::get( 'container_class', '' ) );
+			/**
+			 * Filter the extra CSS class added to every rendered ad's
+			 * container wrapper.
+			 *
+			 * Plug and play (owner decision, card 10343726590): no Settings
+			 * UI field any more. A site's already-stored `container_class`
+			 * is this filter's default, so nothing changes silently; a
+			 * developer who wants a class without a field to click uses
+			 * this filter instead.
+			 *
+			 * @since 3.2.0
+			 * @param string $container_class Extra class, or '' for none.
+			 */
+			$container_class = sanitize_html_class( (string) apply_filters( 'wbam_ad_container_class', \WBAM\Core\Settings_Helper::get( 'container_class', '' ) ) );
 			if ( '' !== $container_class ) {
 				$classes .= ' ' . $container_class;
 			}
