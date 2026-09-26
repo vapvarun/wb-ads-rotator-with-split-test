@@ -104,7 +104,6 @@ class Jetonomy_Module {
 		}
 
 		add_action( 'init', array( $this, 'register_placements' ), 5 );
-		add_action( 'wp_head', array( __CLASS__, 'print_spacing_styles' ) );
 	}
 
 	/**
@@ -127,10 +126,28 @@ class Jetonomy_Module {
 	}
 
 	/**
+	 * Whether print_spacing_styles() has already run this request.
+	 *
+	 * @var bool
+	 */
+	private static $spacing_styles_printed = false;
+
+	/**
 	 * Inline spacing styles so ad wrappers don't collide with Jetonomy
-	 * cards, reply borders, or sidebar widgets. Emitted once per page.
+	 * cards, reply borders, or sidebar widgets.
+	 *
+	 * Printed from Jetonomy_Placement::render(), the moment the first ad
+	 * actually renders - not unconditionally on every page from `wp_head`.
+	 * A raw `<style>` tag applies wherever in the document it lands, so
+	 * there is no "printed too late for the head" concern the way there is
+	 * for `wp_enqueue_style()`. Idempotent per request.
 	 */
 	public static function print_spacing_styles() {
+		if ( self::$spacing_styles_printed ) {
+			return;
+		}
+		self::$spacing_styles_printed = true;
+
 		echo '<style id="wbam-jetonomy-spacing">'
 			. '.wbam-jetonomy-ad{margin:16px 0;padding:4px;box-sizing:border-box;}'
 			. '.wbam-jetonomy-ad img{max-width:100%;height:auto;display:block;margin:0 auto;}'
@@ -230,6 +247,8 @@ class Jetonomy_Placement implements Placement_Interface {
 			if ( empty( $html ) ) {
 				continue;
 			}
+
+			Jetonomy_Module::print_spacing_styles();
 
 			printf(
 				'<div class="wbam-jetonomy-ad wbam-jetonomy-%s">%s</div>',
