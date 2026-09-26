@@ -680,8 +680,11 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 /* WP_List_Table always prints the column headers twice - once as <thead>,
    once as <tfoot> - which is fine across a real page of rows but reads as a
    second copy of the header sandwiching a single "no items" row. Hide the
-   footer repeat only for that empty state; a populated table keeps it. */
-.wp-list-table:has(> tbody > tr.no-items) tfoot {
+   footer repeat only for that empty state; a populated table keeps it.
+   Descendant (not child) combinator: still only ever matches the empty
+   state (a real row can't carry .no-items), and holds regardless of any
+   extra wrapper WP core or a subclass puts between <tbody> and the row. */
+.wp-list-table:has(tr.no-items) tfoot {
 	display: none;
 }
 

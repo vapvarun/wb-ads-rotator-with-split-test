@@ -40,6 +40,13 @@ final class Table_Classes {
 	 * `fixed` is kept. Dropping it switches the column-width algorithm for every
 	 * table at once, which can only be judged per screen against real data.
 	 *
+	 * `wp-list-table` was missing from this list (the class list this method
+	 * builds REPLACES WP_List_Table's own default, it doesn't add to it), so
+	 * every table using it silently lost the class every other admin.css rule
+	 * scoped to `.wp-list-table` (including `.wp-list-table:has(> tbody > tr.no-items)
+	 * tfoot { display: none }`, which is why the empty-state tfoot-repeat fix
+	 * held on stock WP screens but not on these).
+	 *
 	 * @since 3.0.0
 	 * @param string $plural Plural table arg; several screens' CSS and JS key off
 	 *                       the per-table class WordPress generates from it.
@@ -48,7 +55,7 @@ final class Table_Classes {
 	public static function get( $plural = '' ) {
 		return array_values(
 			array_filter(
-				array( 'wbam-admin-table', 'widefat', 'striped', 'fixed', (string) $plural )
+				array( 'wp-list-table', 'wbam-admin-table', 'widefat', 'striped', 'fixed', (string) $plural )
 			)
 		);
 	}
