@@ -272,56 +272,58 @@ class Partnership_Admin {
 			<?php
 			\WBAM\Admin\UX::page_header(
 				array(
-					'title' => __( 'Partnership Inquiries', 'wb-ads-rotator-with-split-test' ),
+					'title' => __( 'Partnerships', 'wb-ads-rotator-with-split-test' ),
 					'desc'  => __( 'Requests submitted through your partnership form.', 'wb-ads-rotator-with-split-test' ),
 				)
 			);
 			?>
 
-			<!-- Status Filter Tabs -->
-			<ul class="subsubsub">
-				<li>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships' ) ); ?>" class="<?php echo '' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'All', 'wb-ads-rotator-with-split-test' ); ?>
-						<span class="count">(<?php echo esc_html( $counts['all'] ); ?>)</span>
-					</a> |
-				</li>
-				<li>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=pending' ) ); ?>" class="<?php echo 'pending' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'Pending', 'wb-ads-rotator-with-split-test' ); ?>
-						<span class="count">(<?php echo esc_html( $counts['pending'] ); ?>)</span>
-					</a> |
-				</li>
-				<li>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=accepted' ) ); ?>" class="<?php echo 'accepted' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'Accepted', 'wb-ads-rotator-with-split-test' ); ?>
-						<span class="count">(<?php echo esc_html( $counts['accepted'] ); ?>)</span>
-					</a> |
-				</li>
-				<li>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=rejected' ) ); ?>" class="<?php echo 'rejected' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'Rejected', 'wb-ads-rotator-with-split-test' ); ?>
-						<span class="count">(<?php echo esc_html( $counts['rejected'] ); ?>)</span>
-					</a> |
-				</li>
-				<li>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=spam' ) ); ?>" class="<?php echo 'spam' === $current_status ? 'current' : ''; ?>">
-						<?php esc_html_e( 'Spam', 'wb-ads-rotator-with-split-test' ); ?>
-						<span class="count">(<?php echo esc_html( $counts['spam'] ); ?>)</span>
-					</a>
-				</li>
-			</ul>
+			<div class="wbam-list-toolbar">
+				<!-- Status Filter Tabs -->
+				<ul class="subsubsub">
+					<li>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships' ) ); ?>" class="<?php echo '' === $current_status ? 'current' : ''; ?>">
+							<?php esc_html_e( 'All', 'wb-ads-rotator-with-split-test' ); ?>
+							<span class="count">(<?php echo esc_html( $counts['all'] ); ?>)</span>
+						</a> |
+					</li>
+					<li>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=pending' ) ); ?>" class="<?php echo 'pending' === $current_status ? 'current' : ''; ?>">
+							<?php esc_html_e( 'Pending', 'wb-ads-rotator-with-split-test' ); ?>
+							<span class="count">(<?php echo esc_html( $counts['pending'] ); ?>)</span>
+						</a> |
+					</li>
+					<li>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=accepted' ) ); ?>" class="<?php echo 'accepted' === $current_status ? 'current' : ''; ?>">
+							<?php esc_html_e( 'Accepted', 'wb-ads-rotator-with-split-test' ); ?>
+							<span class="count">(<?php echo esc_html( $counts['accepted'] ); ?>)</span>
+						</a> |
+					</li>
+					<li>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=rejected' ) ); ?>" class="<?php echo 'rejected' === $current_status ? 'current' : ''; ?>">
+							<?php esc_html_e( 'Rejected', 'wb-ads-rotator-with-split-test' ); ?>
+							<span class="count">(<?php echo esc_html( $counts['rejected'] ); ?>)</span>
+						</a> |
+					</li>
+					<li>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=spam' ) ); ?>" class="<?php echo 'spam' === $current_status ? 'current' : ''; ?>">
+							<?php esc_html_e( 'Spam', 'wb-ads-rotator-with-split-test' ); ?>
+							<span class="count">(<?php echo esc_html( $counts['spam'] ); ?>)</span>
+						</a>
+					</li>
+				</ul>
 
-			<!-- Search Box -->
-			<form method="get" class="search-box">
-				<input type="hidden" name="page" value="wbam-partnerships">
-				<?php if ( $current_status ) : ?>
-					<input type="hidden" name="status" value="<?php echo esc_attr( $current_status ); ?>">
-				<?php endif; ?>
-				<label class="screen-reader-text" for="partnership-search-input"><?php esc_html_e( 'Search', 'wb-ads-rotator-with-split-test' ); ?></label>
-				<input type="search" id="partnership-search-input" name="s" value="<?php echo esc_attr( $search ); ?>">
-				<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search', 'wb-ads-rotator-with-split-test' ); ?>">
-			</form>
+				<!-- Search Box -->
+				<form method="get" class="search-box">
+					<input type="hidden" name="page" value="wbam-partnerships">
+					<?php if ( $current_status ) : ?>
+						<input type="hidden" name="status" value="<?php echo esc_attr( $current_status ); ?>">
+					<?php endif; ?>
+					<label class="screen-reader-text" for="partnership-search-input"><?php esc_html_e( 'Search', 'wb-ads-rotator-with-split-test' ); ?></label>
+					<input type="search" id="partnership-search-input" name="s" value="<?php echo esc_attr( $search ); ?>">
+					<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search', 'wb-ads-rotator-with-split-test' ); ?>">
+				</form>
+			</div>
 
 			<!-- Partnerships Table -->
 			<?php // Not .wp-list-table: core's responsive rules for real list tables mangled this hand-built one on phones. ?>

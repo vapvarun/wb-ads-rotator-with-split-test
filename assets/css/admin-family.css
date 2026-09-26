@@ -15,6 +15,7 @@
  *   .wbam-admin-btn              buttons (+ --primary / --danger / --ghost / --sm)
  *   .wbam-status-badge           status pill (+ --success / --danger / --warn / …)
  *   .wbam-empty-state            the empty / no-results panel
+ *   .wbam-list-toolbar           views (left) + search (right) on one row
  *
  * Use these instead of a bare <h1>, a raw WP `.button`, or an ad-hoc table.
  *
@@ -84,6 +85,60 @@
 .wbam-page-header__back [data-lucide] {
 	width:  14px;
 	height: 14px;
+}
+
+/*
+ * All Ads, Add New Ad, Ad Tags, Categories and Locations are plain
+ * WordPress list-table/term screens - WordPress core prints its own `<h1>`
+ * (+ "Add New" button on the Ads list) before Admin::render_core_screen_header()
+ * / Pro_Admin::render_classified_taxonomy_header()'s `.wbam-page-header` gets
+ * a chance to run. Hiding the native pair here, scoped to exactly these five
+ * screens by admin body class, is the other half of those hooks - the list
+ * table and add-term form underneath are completely untouched.
+ */
+body.edit-php.post-type-wbam-ad .wp-heading-inline,
+body.edit-php.post-type-wbam-ad .page-title-action,
+body.edit-php.post-type-wbam-ad hr.wp-header-end,
+body.post-new-php.post-type-wbam-ad .wp-heading-inline,
+body.post-new-php.post-type-wbam-ad hr.wp-header-end,
+body.edit-tags-php.taxonomy-wbam_ad_tag .wp-heading-inline,
+body.edit-tags-php.taxonomy-wbam_ad_tag hr.wp-header-end,
+body.edit-tags-php.taxonomy-wbam-classified-cat .wp-heading-inline,
+body.edit-tags-php.taxonomy-wbam-classified-cat hr.wp-header-end,
+body.edit-tags-php.taxonomy-wbam-classified-loc .wp-heading-inline,
+body.edit-tags-php.taxonomy-wbam-classified-loc hr.wp-header-end {
+	display: none;
+}
+
+/*
+ * List toolbar: views on the left, search on the right, one row - for the
+ * hand-rolled list screens that don't go through WP_List_Table's own
+ * views()/search_box() nav (which already floats these correctly inside
+ * .tablenav). Wrap the same `<ul class="subsubsub">` + `<form class="search-box">`
+ * pair these screens already print in this instead of letting them fall
+ * onto separate lines.
+ */
+.wbam-list-toolbar {
+	display:         flex;
+	flex-wrap:       wrap;
+	align-items:     center;
+	justify-content: space-between;
+	gap:             var(--wbam-space-3);
+	margin-block-end: var(--wbam-space-3);
+}
+
+.wbam-list-toolbar .subsubsub {
+	margin:  0;
+	float:   none;
+}
+
+.wbam-list-toolbar .search-box {
+	display:     flex;
+	align-items: center;
+	gap:         var(--wbam-space-1);
+	margin:      0;
+	float:       none;
+	white-space: nowrap;
 }
 
 /* ── Action screen: summary + action bar ────────────────────────────────── */
@@ -426,6 +481,75 @@
 	padding: 0 var(--wbam-space-3);
 }
 
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+
+/*
+ * The one tab row every multi-view admin screen uses (Help & Docs, Slot
+ * Inventory's Overview/Impression Audit) — plain `.wbam-tabs` for URL
+ * navigation between full sub-pages. `.wbam-tabs--pills` is the same
+ * component for a same-page picker inside a metabox or narrow card (the ad
+ * editor's ad-type picker), where a filled segment reads better than an
+ * underline. Both always scroll horizontally instead of wrapping to a
+ * ragged second row — see UX::tabs().
+ */
+.wbam-tabs {
+	display:               flex;
+	flex-wrap:              nowrap;
+	align-items:            center;
+	gap:                    var(--wbam-space-1);
+	overflow-x:             auto;
+	-webkit-overflow-scrolling: touch;
+	border-bottom:          1px solid var(--wbam-border);
+	margin-block-end:       var(--wbam-space-5);
+}
+
+.wbam-tabs__link {
+	display:         inline-flex;
+	flex:            none;
+	align-items:     center;
+	gap:             var(--wbam-space-2);
+	padding:         var(--wbam-space-3) var(--wbam-space-4);
+	margin-block-end: -1px;
+	font-size:       var(--wbam-font-size-sm);
+	font-weight:     var(--wbam-weight-medium);
+	color:           var(--wbam-text-muted);
+	white-space:     nowrap;
+	text-decoration: none;
+	border-bottom:   2px solid transparent;
+	transition:      color var(--wbam-transition), border-color var(--wbam-transition);
+}
+
+.wbam-tabs__link:hover {
+	color: var(--wbam-text);
+}
+
+.wbam-tabs__link.is-active {
+	color:         var(--wbam-accent);
+	font-weight:   var(--wbam-weight-semibold);
+	border-bottom-color: var(--wbam-accent);
+}
+
+.wbam-tabs--pills {
+	border-bottom: none;
+	gap:           var(--wbam-space-1);
+	padding:       var(--wbam-space-1);
+	background:    var(--wbam-surface);
+	border-radius: var(--wbam-r-md);
+}
+
+.wbam-tabs--pills .wbam-tabs__link {
+	margin-block-end: 0;
+	padding:          var(--wbam-space-2) var(--wbam-space-3);
+	border-bottom:    none;
+	border-radius:    var(--wbam-r-sm);
+}
+
+.wbam-tabs--pills .wbam-tabs__link.is-active {
+	color:      var(--wbam-text);
+	background: var(--wbam-bg);
+	box-shadow: var(--wbam-shadow-sm);
+}
+
 /* ── Status badge ────────────────────────────────────────────────────────── */
 
 .wbam-status-badge {
@@ -526,6 +650,14 @@
    the row's own padding. */
 .wp-list-table .no-items .wbam-empty-state {
 	margin: var(--wbam-space-4) auto;
+}
+
+/* WP_List_Table always prints the column headers twice - once as <thead>,
+   once as <tfoot> - which is fine across a real page of rows but reads as a
+   second copy of the header sandwiching a single "no items" row. Hide the
+   footer repeat only for that empty state; a populated table keeps it. */
+.wp-list-table:has(> tbody > tr.no-items) tfoot {
+	display: none;
 }
 
 /* ── Settings screens: each <h2> + form-table reads as a labelled card ────── */

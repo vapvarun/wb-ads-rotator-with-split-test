@@ -88,6 +88,66 @@ class Admin {
 
 		// Settings link on the Plugins list row (Pro already has one).
 		add_filter( 'plugin_action_links_' . WBAM_BASENAME, array( $this, 'plugin_action_links' ) );
+
+		// All Ads / Add New Ad / Ad Tags are plain WordPress list-table and
+		// term screens - the family's shared header (title, one-line
+		// description, one primary action) never runs there. Inject it
+		// alongside the stock one instead of forking these screens onto a
+		// custom render callback; CSS hides the native h1/button underneath.
+		add_action( 'in_admin_header', array( $this, 'render_core_screen_header' ) );
+	}
+
+	/**
+	 * Render the shared page header on the plain WordPress screens for the
+	 * Ads post type and its Ad Tags taxonomy, matching every other WB Ad
+	 * Manager admin screen. The native `<h1>`/"Add New" button these screens
+	 * print is left completely alone (so the list table and add-term form
+	 * keep working exactly as before) and only hidden with CSS, scoped by
+	 * admin body class - see the "core screen header" rules in
+	 * admin-family.css.
+	 *
+	 * @since 3.2.0
+	 * @return void
+	 */
+	public function render_core_screen_header() {
+		$screen = get_current_screen();
+		if ( ! $screen ) {
+			return;
+		}
+
+		global $pagenow;
+
+		if ( 'edit-wbam-ad' === $screen->id ) {
+			UX::page_header(
+				array(
+					'title'   => __( 'Ads', 'wb-ads-rotator-with-split-test' ),
+					'desc'    => __( 'Every ad running on your site.', 'wb-ads-rotator-with-split-test' ),
+					'actions' => '<a href="' . esc_url( \WBAM\Core\Admin_Links::ads_new() ) . '" class="wbam-admin-btn wbam-admin-btn--primary">' . esc_html__( 'Add New', 'wb-ads-rotator-with-split-test' ) . '</a>',
+				)
+			);
+			return;
+		}
+
+		if ( 'wbam-ad' === $screen->id && 'post-new.php' === $pagenow ) {
+			UX::page_header(
+				array(
+					'title'      => __( 'Add New Ad', 'wb-ads-rotator-with-split-test' ),
+					'desc'       => __( 'Choose an ad type below and fill in its settings.', 'wb-ads-rotator-with-split-test' ),
+					'back_url'   => \WBAM\Core\Admin_Links::ads_list(),
+					'back_label' => __( 'Back to list', 'wb-ads-rotator-with-split-test' ),
+				)
+			);
+			return;
+		}
+
+		if ( 'edit-wbam_ad_tag' === $screen->id ) {
+			UX::page_header(
+				array(
+					'title' => __( 'Ad Tags', 'wb-ads-rotator-with-split-test' ),
+					'desc'  => __( 'Group ads by tag for use in shortcodes and blocks.', 'wb-ads-rotator-with-split-test' ),
+				)
+			);
+		}
 	}
 
 	/**
@@ -1214,9 +1274,9 @@ class Admin {
 						<?php checked( $ad_type, $type->get_id() ); ?> />
 			<?php endforeach; ?>
 
-			<div class="wbam-adtype-nav">
+			<div class="wbam-tabs wbam-tabs--pills" role="tablist">
 				<?php foreach ( $ad_types as $type ) : ?>
-					<a href="#" class="wbam-adtype-tab<?php echo ( $ad_type === $type->get_id() ) ? ' wbam-adtype-tab-active' : ''; ?>" data-type="<?php echo esc_attr( $type->get_id() ); ?>">
+					<a href="#" class="wbam-tabs__link wbam-adtype-tab<?php echo ( $ad_type === $type->get_id() ) ? ' is-active' : ''; ?>" role="tab" data-type="<?php echo esc_attr( $type->get_id() ); ?>">
 						<span class="dashicons <?php echo esc_attr( $type->get_icon() ); ?>"></span>
 						<?php echo esc_html( $type->get_name() ); ?>
 					</a>
@@ -1279,8 +1339,8 @@ class Admin {
 				e.preventDefault();
 				var typeId = $(this).data('type');
 				$('#wbam-adtype-' + typeId).prop('checked', true);
-				$('.wbam-adtype-tab').removeClass('wbam-adtype-tab-active');
-				$(this).addClass('wbam-adtype-tab-active');
+				$('.wbam-adtype-tab').removeClass('is-active');
+				$(this).addClass('is-active');
 				$('.wbam-adtype-content').hide();
 				$('.wbam-adtype-content[data-type="' + typeId + '"]').show();
 				syncTypeDependentPanels( String( typeId ) );

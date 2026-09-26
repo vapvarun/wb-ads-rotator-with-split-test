@@ -101,28 +101,31 @@ class Help_Docs {
 			);
 			?>
 
-			<nav class="nav-tab-wrapper wbam-nav-tabs">
-				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=getting-started' ) ); ?>"
-					class="nav-tab <?php echo 'getting-started' === $active_tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'Getting Started', 'wb-ads-rotator-with-split-test' ); ?>
-				</a>
-				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=features' ) ); ?>"
-					class="nav-tab <?php echo 'features' === $active_tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'Features', 'wb-ads-rotator-with-split-test' ); ?>
-				</a>
-				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=pro-features' ) ); ?>"
-					class="nav-tab <?php echo 'pro-features' === $active_tab ? 'nav-tab-active' : ''; ?>">
-					<?php
-					echo $this->is_pro_active
-						? esc_html__( 'PRO Features', 'wb-ads-rotator-with-split-test' )
-						: esc_html__( 'What\'s in PRO', 'wb-ads-rotator-with-split-test' );
-					?>
-				</a>
-				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=faq' ) ); ?>"
-					class="nav-tab <?php echo 'faq' === $active_tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'FAQ', 'wb-ads-rotator-with-split-test' ); ?>
-				</a>
-			</nav>
+			<?php
+			\WBAM\Admin\UX::tabs(
+				array(
+					'getting-started' => array(
+						'label' => __( 'Getting Started', 'wb-ads-rotator-with-split-test' ),
+						'url'   => admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=getting-started' ),
+					),
+					'features'        => array(
+						'label' => __( 'Features', 'wb-ads-rotator-with-split-test' ),
+						'url'   => admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=features' ),
+					),
+					'pro-features'    => array(
+						'label' => $this->is_pro_active
+							? __( 'PRO Features', 'wb-ads-rotator-with-split-test' )
+							: __( 'What\'s in PRO', 'wb-ads-rotator-with-split-test' ),
+						'url'   => admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=pro-features' ),
+					),
+					'faq'             => array(
+						'label' => __( 'FAQ', 'wb-ads-rotator-with-split-test' ),
+						'url'   => admin_url( 'edit.php?post_type=wbam-ad&page=wbam-help&tab=faq' ),
+					),
+				),
+				$active_tab
+			);
+			?>
 
 			<div class="wbam-help-content">
 				<?php

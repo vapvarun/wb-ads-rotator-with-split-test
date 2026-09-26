@@ -6,16 +6,9 @@
 
 	$(document).ready(function() {
 
-		// Ad Type Tab Switching
-		$('.wbam-adtype-tab').on('click', function(e) {
-			e.preventDefault();
-			var typeId = $(this).data('type');
-			$('#wbam-adtype-' + typeId).prop('checked', true);
-			$('.wbam-adtype-tab').removeClass('wbam-adtype-tab-active');
-			$(this).addClass('wbam-adtype-tab-active');
-			$('.wbam-adtype-content').hide();
-			$('.wbam-adtype-content[data-type="' + typeId + '"]').show();
-		});
+		// Ad Type Tab Switching lives inline in class-admin.php's
+		// render_settings_metabox() — it also syncs the Sizing/Placements
+		// panels to the selected type, which this file has no access to.
 
 		// Image Upload
 		var wbamMediaFrame = null;

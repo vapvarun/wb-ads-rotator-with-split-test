@@ -46,61 +46,17 @@
 	pointer-events: none;
 }
 
-.wbam-adtype-nav {
-	display: flex;
-	flex-wrap: wrap;
-	border-bottom: 1px solid var(--wbam-border-strong);
-	margin-bottom: 0;
-}
-
-.wbam-adtype-tab {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 12px 20px;
-	color: var(--wbam-text-muted);
-	font-size: 14px;
-	font-weight: 500;
-	cursor: pointer;
-	border: 1px solid transparent;
-	border-bottom: none;
-	margin-bottom: -1px;
-	background: var(--wbam-surface);
-	text-decoration: none;
-	transition: all 0.15s ease;
-}
-
-.wbam-adtype-tab:hover {
-	color: var(--wbam-accent);
-	background: var(--wbam-bg);
-}
-
-.wbam-adtype-tab:focus {
-	box-shadow: none;
-	outline: none;
-}
-
-.wbam-adtype-tab:focus-visible {
-	outline: 2px solid var(--wbam-accent);
-	outline-offset: 2px;
-}
-
-.wbam-adtype-tab-active,
-.wbam-adtype-tab-active:hover {
-	background: var(--wbam-bg);
-	color: var(--wbam-text);
-	border-color: var(--wbam-border-strong);
-	border-bottom-color: var(--wbam-bg);
-}
-
-.wbam-adtype-tab-active .dashicons {
-	color: var(--wbam-accent);
-}
-
-.wbam-adtype-tab .dashicons {
+/* Tab nav/pill styling lives in the shared .wbam-tabs / .wbam-tabs--pills
+   component (admin-family.css) — this file only adds the icon sizing the
+   family's generic tab link doesn't know about. */
+.wbam-tabs__link .dashicons {
 	font-size: var(--wbam-font-size-xl);
 	width: 20px;
 	height: 20px;
+}
+
+.wbam-tabs__link.is-active .dashicons {
+	color: var(--wbam-accent);
 }
 
 .wbam-adtype-content {
@@ -108,7 +64,7 @@
 	padding: 20px;
 	background: var(--wbam-bg);
 	border: 1px solid var(--wbam-border-strong);
-	border-top: none;
+	border-radius: var(--wbam-r-md);
 }
 
 .wbam-adtype-desc {
@@ -118,34 +74,6 @@
 	border-left: 4px solid var(--wbam-accent);
 	color: var(--wbam-text);
 	font-size: var(--wbam-font-size-sm);
-}
-
-@media screen and (max-width: 600px) {
-	.wbam-adtype-nav {
-		flex-direction: column;
-		border-bottom: none;
-	}
-
-	.wbam-adtype-tab {
-		border: 1px solid var(--wbam-border-strong);
-		margin-bottom: -1px;
-		background: var(--wbam-surface);
-	}
-
-	.wbam-adtype-tab-active,
-	.wbam-adtype-tab-active:hover {
-		background: var(--wbam-accent);
-		color: var(--wbam-bg);
-		border-color: var(--wbam-accent);
-	}
-
-	.wbam-adtype-tab-active .dashicons {
-		color: var(--wbam-bg);
-	}
-
-	.wbam-adtype-content {
-		border-top: 1px solid var(--wbam-border-strong);
-	}
 }
 
 /* ==========================================================================

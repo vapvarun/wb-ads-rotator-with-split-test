@@ -12,38 +12,10 @@
 	margin-bottom: 15px;
 }
 
-.wbam-nav-tabs {
-	margin-bottom: 0;
-}
-
-/* Pick up the plugin's own accent colour instead of the bare WordPress
-   core tab look, so this screen reads as part of the same admin, not a
-   plain stock tab strip. */
-.wbam-nav-tabs.nav-tab-wrapper {
-	border-bottom-color: var(--wbam-border-strong);
-}
-
-.wbam-nav-tabs .nav-tab {
-	border-color: var(--wbam-border-strong);
-}
-
-.wbam-nav-tabs .nav-tab:hover {
-	color: var(--wbam-accent);
-}
-
-.wbam-nav-tabs .nav-tab-active,
-.wbam-nav-tabs .nav-tab-active:focus,
-.wbam-nav-tabs .nav-tab-active:focus:active {
-	border-color: var(--wbam-border-strong);
-	color: var(--wbam-accent);
-	background: var(--wbam-bg);
-}
-
 .wbam-help-content {
 	background: var(--wbam-bg);
 	padding: 25px;
 	border: 1px solid var(--wbam-border-strong);
-	border-top: none;
 }
 
 .wbam-help-section h2 {

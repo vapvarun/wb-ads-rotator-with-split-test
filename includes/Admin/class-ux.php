@@ -390,6 +390,42 @@ class UX {
 	}
 
 	/**
+	 * Render a row of same-page or multi-view tabs — the one tab style
+	 * every admin screen with more than one view uses (Help & Docs, Slot
+	 * Inventory's Overview/Impression Audit, ...). Two visual variants of
+	 * the same `.wbam-tabs` component: 'underline' (default) for URL
+	 * navigation between full sub-pages, and 'pills' for a same-page
+	 * picker sitting inside a metabox or narrow card (see admin-family.css).
+	 * Both scroll horizontally instead of wrapping to a ragged second row.
+	 *
+	 * @since 3.2.0
+	 * @param array<string,array{label:string,url:string}> $tabs    Ordered
+	 *        map of tab slug => { label, url }.
+	 * @param string                                        $current Active tab slug.
+	 * @param string                                        $variant 'underline' (default) or 'pills'.
+	 * @return void
+	 */
+	public static function tabs( array $tabs, $current, $variant = 'underline' ) {
+		if ( empty( $tabs ) ) {
+			return;
+		}
+		$class = 'wbam-tabs' . ( 'pills' === $variant ? ' wbam-tabs--pills' : '' );
+		?>
+		<nav class="<?php echo esc_attr( $class ); ?>" role="tablist">
+			<?php foreach ( $tabs as $slug => $tab ) : ?>
+				<?php $is_active = ( (string) $slug === (string) $current ); ?>
+				<a
+					href="<?php echo esc_url( $tab['url'] ); ?>"
+					class="wbam-tabs__link<?php echo $is_active ? ' is-active' : ''; ?>"
+					role="tab"
+					<?php echo $is_active ? ' aria-selected="true"' : ' aria-selected="false"'; ?>
+				><?php echo esc_html( $tab['label'] ); ?></a>
+			<?php endforeach; ?>
+		</nav>
+		<?php
+	}
+
+	/**
 	 * Render a left-hand section nav for a multi-section admin screen.
 	 *
 	 * Used by the one-page Settings screen (General, Ads & Display,
