@@ -43,7 +43,7 @@ class Test_Visitor_Ad_Surfaces extends \WP_UnitTestCase {
 
 			$this->assertNotSame( '', $html );
 			// The only inline style allowed is the slot's own size (render_ad()).
-			$this->assertDoesNotMatchRegularExpression( '/style="(?!--wbam-ad-ar:\d+ \/ \d+;--wbam-ad-w:\d+px")/', $html, 'Colours come from theme tokens, so dark mode works.' );
+			$this->assertDoesNotMatchRegularExpression( '/style="(?!--wbam-ad-ar:\d+ \/ \d+;--wbam-ad-w:\d+px;--wbam-ad-h:\d+px")/', $html, 'Colours come from theme tokens, so dark mode works.' );
 			$this->assertStringNotContainsString( 'placehold.co', $html, 'No hot-linked images.' );
 			$this->assertStringNotContainsString( 'href="#"', $html, 'Every link goes somewhere.' );
 			$this->assertStringNotContainsString( 'paragraph 2', $html, 'No developer copy.' );

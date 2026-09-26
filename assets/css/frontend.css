@@ -202,9 +202,13 @@
    Code Ads (AdSense, etc.)
    ========================================================================== */
 
+/* Horizontal only: a fixed-width tag (a 728px iframe on a phone) must not
+   push the page sideways. Never vertical: clipping a code or AdSense unit
+   hides content and breaks AdSense policy. clip, not hidden, so the box
+   never becomes a scroll container. */
 .wbam-ad-code {
 	display: block;
-	overflow: hidden;
+	overflow-x: clip;
 }
 
 .wbam-ad-code iframe {
@@ -281,22 +285,36 @@
 	min-height: var(--wbam-shape-billboard-h);
 }
 
-/* Known pixel size (render_ad() prints --wbam-ad-ar and --wbam-ad-w on
-   .wbam-ad-slot--sized): the creative reserves exactly its own aspect
-   ratio, never wider than its own width, so a 970x250 in a 650px column
-   reserves the ~168px it scales to, not a fixed 250px. The extra
-   .wbam-ad-slot outranks the phone floor below: that floor exists only
-   because an unsized Banner's phone height is unknown (320x50/320x100),
-   and a known ratio answers that exactly. min-height: auto keeps a taller
-   text/code creative growing instead of clipping. */
-.wbam-placement-before-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad,
-.wbam-placement-after-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad,
-.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad {
+/* Known pixel size (render_ad() prints --wbam-ad-ar, --wbam-ad-w and
+   --wbam-ad-h on .wbam-ad-slot--sized). The extra .wbam-ad-slot outranks
+   the phone floor below: that floor exists only because an unsized
+   Banner's phone height is unknown (320x50/320x100).
+
+   An image creative has known intrinsic media, so it reserves exactly its
+   own aspect ratio, never wider than its own width: a 970x250 in a 650px
+   column reserves the ~168px it scales to, not a fixed 250px.
+
+   Code and AdSense creatives are third-party markup whose real height is
+   decided by the network, so they only get a floor at their declared
+   height: no aspect-ratio, no max-height, no vertical clip, so taller
+   markup always grows. */
+.wbam-placement-before-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image,
+.wbam-placement-after-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image,
+.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image {
 	min-height: auto;
 	aspect-ratio: var(--wbam-ad-ar);
 	width: 100%;
 	max-width: var(--wbam-ad-w);
 	margin-inline: auto;
+}
+
+.wbam-placement-before-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-code,
+.wbam-placement-after-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-code,
+.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-code,
+.wbam-placement-before-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense,
+.wbam-placement-after-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense,
+.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense {
+	min-height: var(--wbam-ad-h);
 }
 
 /* Sidebar takes Box OR Tower (owner decision 13) — a min-height only,

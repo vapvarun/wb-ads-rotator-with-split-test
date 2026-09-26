@@ -678,7 +678,7 @@ class Placement_Engine {
 				$dims = \WBAM\Core\Ad_Formats::get_resolved_dimensions( $ad_id );
 				if ( $dims['width'] > 0 && $dims['height'] > 0 ) {
 					$classes    .= ' wbam-ad-slot--sized';
-					$sized_style = sprintf( ' style="--wbam-ad-ar:%1$d / %2$d;--wbam-ad-w:%1$dpx"', $dims['width'], $dims['height'] );
+					$sized_style = sprintf( ' style="--wbam-ad-ar:%1$d / %2$d;--wbam-ad-w:%1$dpx;--wbam-ad-h:%2$dpx"', $dims['width'], $dims['height'] );
 				}
 			}
 			/**

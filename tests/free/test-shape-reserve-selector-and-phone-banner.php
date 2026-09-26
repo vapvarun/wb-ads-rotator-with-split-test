@@ -153,7 +153,7 @@ class Test_Shape_Reserve_Selector_And_Phone_Banner extends WP_UnitTestCase {
 		);
 		$fluid  = $this->render_sized_ad( array( '_wbam_is_responsive' => '1' ) );
 
-		$this->assertStringContainsString( 'style="--wbam-ad-ar:970 / 250;--wbam-ad-w:970px"', $custom );
+		$this->assertStringContainsString( 'style="--wbam-ad-ar:970 / 250;--wbam-ad-w:970px;--wbam-ad-h:250px"', $custom );
 		$this->assertStringContainsString( 'wbam-ad-slot--sized', $custom );
 		$this->assertStringContainsString( '--wbam-ad-ar:728 / 90;', $named, 'A named format uses its own pixel size.' );
 		$this->assertStringNotContainsString( '--wbam-ad-ar', $fluid, 'Responsive ads keep the default reserve.' );
@@ -162,12 +162,43 @@ class Test_Shape_Reserve_Selector_And_Phone_Banner extends WP_UnitTestCase {
 	/** Between-content sized creatives reserve by aspect ratio, capped at their own width, over the px floors. */
 	public function test_between_content_reserves_by_aspect_ratio(): void {
 		$css   = $this->css();
-		$start = strpos( $css, '.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad' );
+		$start = strpos( $css, '.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image' );
 		$this->assertNotFalse( $start, 'Needs the extra .wbam-ad-slot so it outranks the phone floor.' );
 		$rule = substr( $css, $start, (int) strpos( $css, '}', $start ) - $start );
 
 		$this->assertStringContainsString( 'aspect-ratio: var(--wbam-ad-ar);', $rule );
 		$this->assertStringContainsString( 'max-width: var(--wbam-ad-w);', $rule );
 		$this->assertStringContainsString( 'min-height: auto;', $rule, 'Content taller than the ratio still grows, never clips.' );
+	}
+
+	/**
+	 * Every CSS rule (selector => declarations) whose selector names $class.
+	 *
+	 * @return array<string,string>
+	 */
+	private function rules_for( string $class ): array {
+		preg_match_all( '/([^{}]+)\{([^{}]*)\}/', (string) preg_replace( '#/\*.*?\*/#s', '', $this->css() ), $m, PREG_SET_ORDER );
+		$out = array();
+		foreach ( $m as $rule ) {
+			if ( preg_match( '/' . preg_quote( $class, '/' ) . '(?![\w-])/', $rule[1] ) ) {
+				$out[ trim( $rule[1] ) ] = $rule[2];
+			}
+		}
+		return $out;
+	}
+
+	/** Owner/QA: code and AdSense creatives are never clipped or ratio-locked; image still is. */
+	public function test_code_and_adsense_grow_while_image_keeps_the_ratio(): void {
+		foreach ( array( '.wbam-ad-code', '.wbam-ad-adsense' ) as $class ) {
+			$rules = $this->rules_for( $class );
+			$this->assertNotEmpty( $rules, "{$class} needs its declared-height reserve." );
+			$all = implode( "\n", $rules );
+			$this->assertStringNotContainsString( 'aspect-ratio', $all, "{$class} must not be ratio-locked." );
+			$this->assertStringNotContainsString( 'max-height', $all, "{$class} must not be height-capped." );
+			$this->assertDoesNotMatchRegularExpression( '/overflow(-y)?\s*:\s*(hidden|clip|auto|scroll)/', $all, "{$class} must never clip vertically." );
+			$this->assertStringContainsString( 'min-height: var(--wbam-ad-h);', $all );
+		}
+
+		$this->assertStringContainsString( 'aspect-ratio: var(--wbam-ad-ar);', implode( "\n", $this->rules_for( '.wbam-ad-image' ) ) );
 	}
 }
