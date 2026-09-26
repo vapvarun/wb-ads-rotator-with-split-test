@@ -50,6 +50,15 @@ class Test_Campaign_Pacing_Own_Spend extends Pro_Test_Case {
 		Settings_Helper::update( 'gdpr_require_consent', false );
 		Settings_Helper::update( 'enable_pixel_tracking', false );
 
+		// Smooth pacing (card 10342512361 step, owner decision 2026-09-26)
+		// allows one billable event over the daily target before throttling,
+		// and gives a throttled campaign a random floor chance of delivery
+		// instead of a hard block. Pin both so this file's assertions on
+		// "throttled" / "not throttled" stay deterministic regardless of
+		// what time the test runs or how the dice land.
+		add_filter( 'wbam_pacing_time_of_day_fraction', array( __CLASS__, 'full_day_fraction' ) );
+		add_filter( 'wbam_pacing_minimum_delivery_floor', '__return_zero' );
+
 		$this->ad_id = (int) self::factory()->post->create(
 			array(
 				'post_type'   => 'wbam-ad',
@@ -92,6 +101,9 @@ class Test_Campaign_Pacing_Own_Spend extends Pro_Test_Case {
 		update_option( 'gmt_offset', $this->gmt_offset );
 		$wpdb->query( 'COMMIT' );
 		// phpcs:enable
+
+		remove_filter( 'wbam_pacing_time_of_day_fraction', array( __CLASS__, 'full_day_fraction' ) );
+		remove_filter( 'wbam_pacing_minimum_delivery_floor', '__return_zero' );
 
 		unset( $_COOKIE['wbam_camp_imp'], $_COOKIE['wbam_camp_clk'] );
 		if ( null === $this->user_agent ) {
@@ -146,6 +158,11 @@ class Test_Campaign_Pacing_Own_Spend extends Pro_Test_Case {
 	private function reset_pacing_cache(): void {
 		$prop = new \ReflectionProperty( Campaign_Pacing::class, 'decision_cache' );
 		$prop->setValue( null, array() );
+	}
+
+	/** WP core has no __return_one(). */
+	public static function full_day_fraction(): float {
+		return 1.0;
 	}
 
 	/** A fresh request's pacing decision for the ad. */
@@ -206,7 +223,19 @@ class Test_Campaign_Pacing_Own_Spend extends Pro_Test_Case {
 
 		$this->assertSame( 0, $this->rows( 'click' ), 'Analytics is off: no row.' );
 		$this->assertEqualsWithDelta( 200.0, (float) $this->row()->spent, 0.0001, 'The click was billed.' );
-		$this->assertFalse( $this->paced_through(), 'Billed spend is over the daily budget, so pacing must throttle.' );
+		$this->assertTrue(
+			$this->paced_through(),
+			'One click over the ~100/day target is the one allowed overspend event - the campaign must not go dark.'
+		);
+
+		$this->new_visitor(); // A second visitor: the click dedup cookie is per-visitor, spend is per-campaign.
+		do_action( 'wbam_ad_clicked', $this->ad_id, 'header' );
+
+		$this->assertEqualsWithDelta( 400.0, (float) $this->row()->spent, 0.0001, 'The second click was billed too, still without an analytics row.' );
+		$this->assertFalse(
+			$this->paced_through(),
+			'Billed spend seen without analytics rows is now past the one-event ceiling, so pacing must throttle.'
+		);
 	}
 
 	/**
@@ -236,7 +265,10 @@ class Test_Campaign_Pacing_Own_Spend extends Pro_Test_Case {
 		$row = $this->row();
 		$this->assertSame( $local_today, $row->spent_today_date );
 		$this->assertEqualsWithDelta( 200.0, (float) $row->spent_today, 0.0001, 'The first charge of a new day restarts the counter.' );
-		$this->assertFalse( $this->paced_through() );
+		$this->assertTrue(
+			$this->paced_through(),
+			'One billed click over target is the one allowed overspend event - not dark after a single click.'
+		);
 	}
 
 	/** With analytics on, spend today equals what the old analytics-row math gave. */
