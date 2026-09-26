@@ -65,6 +65,16 @@ class Admin {
 		add_filter( 'bulk_actions-edit-wbam-ad', array( $this, 'register_bulk_actions' ) );
 		add_filter( 'handle_bulk_actions-edit-wbam-ad', array( $this, 'handle_bulk_actions' ), 10, 3 );
 		add_action( 'admin_notices', array( $this, 'render_bulk_action_notice' ) );
+		add_action( 'admin_notices', array( $this, 'render_placement_mismatch_notice' ) );
+		// Free-only surface for the one-time "size matching" opt-in notice
+		// (owner decision 13). Pro ships an equivalent CTA on its own
+		// next-step banner (class-next-step-banner.php) with its own action
+		// name, so a Free+Pro site never runs two handlers for one click —
+		// this notice only renders at all when Pro's banner class is absent
+		// (see render_size_matching_notice()).
+		add_action( 'admin_notices', array( $this, 'render_size_matching_notice' ) );
+		add_action( 'admin_post_wbam_dismiss_size_matching', array( $this, 'handle_dismiss_size_matching_notice' ) );
+		add_action( 'admin_post_wbam_enable_size_matching', array( $this, 'handle_enable_size_matching' ) );
 
 		// Inline row-action link so a single "Disable" or "Enable"
 		// click on a row does not require opening the edit screen.
@@ -299,6 +309,143 @@ class Admin {
 			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
 			esc_html( $message )
 		);
+	}
+
+	/**
+	 * Warn when save_meta() dropped a ticked placement because the ad's
+	 * size doesn't fit it (owner decision 13, card 10343726460). Only
+	 * shows on the ad edit screen the save just happened on — the
+	 * transient is set (and read) per ad ID so two admins editing
+	 * different ads never see each other's notice.
+	 */
+	public function render_placement_mismatch_notice() {
+		$screen = get_current_screen();
+		if ( ! $screen || 'wbam-ad' !== $screen->post_type || 'post' !== $screen->base ) {
+			return;
+		}
+
+		global $post;
+		if ( ! $post ) {
+			return;
+		}
+
+		$rejected = get_transient( 'wbam_placement_mismatch_' . $post->ID );
+		if ( empty( $rejected ) || ! is_array( $rejected ) ) {
+			return;
+		}
+
+		delete_transient( 'wbam_placement_mismatch_' . $post->ID );
+
+		printf(
+			'<div class="notice notice-warning is-dismissible"><p>%s</p></div>',
+			esc_html(
+				sprintf(
+					/* translators: %s: comma-separated list of placement names */
+					__( "This ad's size doesn't fit: %s. It was not saved for those placements.", 'wb-ads-rotator-with-split-test' ),
+					implode( ', ', array_map( 'sanitize_text_field', $rejected ) )
+				)
+			)
+		);
+	}
+
+	/**
+	 * One-time dismissible notice for existing (pre-3.2.0) sites: shape
+	 * matching keeps serving exactly as it does today until the owner
+	 * opts in (owner decision 13, card 10343726460).
+	 *
+	 * Free-only fallback: Pro sites get the richer equivalent on the
+	 * next-step banner (class-next-step-banner.php), which already covers
+	 * this exact step ('enable-format-matching') — this notice steps
+	 * aside for it so a Free+Pro site never shows two.
+	 */
+	public function render_size_matching_notice() {
+		if ( class_exists( '\\WBAM_Pro\\Core\\Next_Step_Banner' ) ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_options' ) || \WBAM\Core\Settings_Helper::format_matching_enabled() ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+		if ( ! $screen || ( 'wbam-ad' !== $screen->post_type && 'edit-wbam-ad' !== $screen->id ) ) {
+			return;
+		}
+
+		if ( in_array( 'wbam_size_matching', (array) get_user_meta( get_current_user_id(), 'wbam_dismissed_notices', true ), true ) ) {
+			return;
+		}
+
+		$mismatched = class_exists( '\\WBAM\\Core\\Placement_Format_Map' ) ? \WBAM\Core\Placement_Format_Map::get_mismatched_ads( 10 ) : array(
+			'count'  => 0,
+			'titles' => array(),
+		);
+
+		$body = __( 'Ads and placements now declare a shape (Banner, Box or Tower) so oversize creatives stop breaking your layout. Your site keeps serving exactly as it does today until you turn this on.', 'wb-ads-rotator-with-split-test' );
+		if ( $mismatched['count'] > 0 ) {
+			$body .= ' ' . sprintf(
+				/* translators: 1: number of ads that don't fit their placement, 2: comma-separated list of up to 10 ad titles */
+				_n(
+					'%1$d ad does not fit its placement under the new rule: %2$s.',
+					'%1$d ads do not fit their placements under the new rule: %2$s.',
+					$mismatched['count'],
+					'wb-ads-rotator-with-split-test'
+				),
+				$mismatched['count'],
+				implode( ', ', array_map( 'esc_html', $mismatched['titles'] ) )
+			);
+		}
+
+		$enable_url  = wp_nonce_url( admin_url( 'admin-post.php?action=wbam_enable_size_matching' ), 'wbam_enable_size_matching' );
+		$dismiss_url = wp_nonce_url( admin_url( 'admin-post.php?action=wbam_dismiss_size_matching' ), 'wbam_dismiss_size_matching' );
+		?>
+		<div class="notice notice-info is-dismissible">
+			<p><strong><?php esc_html_e( 'New: placement sizes by shape', 'wb-ads-rotator-with-split-test' ); ?></strong></p>
+			<p><?php echo esc_html( $body ); ?></p>
+			<p>
+				<a class="button button-primary" href="<?php echo esc_url( $enable_url ); ?>"><?php esc_html_e( 'Turn on size matching', 'wb-ads-rotator-with-split-test' ); ?></a>
+				<a class="button" href="<?php echo esc_url( $dismiss_url ); ?>"><?php esc_html_e( 'Dismiss', 'wb-ads-rotator-with-split-test' ); ?></a>
+			</p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * One-click "Turn on size matching" handler behind the notice above.
+	 */
+	public function handle_enable_size_matching() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Not allowed.', 'wb-ads-rotator-with-split-test' ) );
+		}
+		check_admin_referer( 'wbam_enable_size_matching' );
+		\WBAM\Core\Settings_Helper::update( 'format_matching', true );
+		$referer = wp_get_referer();
+		wp_safe_redirect( $referer ? $referer : admin_url( 'edit.php?post_type=wbam-ad' ) );
+		exit;
+	}
+
+	/**
+	 * Dismiss handler for the notice above — a per-user "seen it" list
+	 * (`wbam_dismissed_notices` user meta) so the notice never nags again
+	 * for that admin, even after they turn size matching on later some
+	 * other way.
+	 */
+	public function handle_dismiss_size_matching_notice() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Not allowed.', 'wb-ads-rotator-with-split-test' ) );
+		}
+		check_admin_referer( 'wbam_dismiss_size_matching' );
+
+		$user_id   = get_current_user_id();
+		$dismissed = (array) get_user_meta( $user_id, 'wbam_dismissed_notices', true );
+		if ( ! in_array( 'wbam_size_matching', $dismissed, true ) ) {
+			$dismissed[] = 'wbam_size_matching';
+			update_user_meta( $user_id, 'wbam_dismissed_notices', $dismissed );
+		}
+
+		$referer = wp_get_referer();
+		wp_safe_redirect( $referer ? $referer : admin_url( 'edit.php?post_type=wbam-ad' ) );
+		exit;
 	}
 
 	/**
@@ -2441,6 +2588,44 @@ class Admin {
 			$unoffered          = array_values( array_diff( $stored_placements, $offered_placements ) );
 
 			$placements = array_values( array_unique( array_merge( $posted_placements, $unoffered ) ) );
+
+			// Owner decision 13 (card 10343726460): every placement the admin
+			// ticks must fit the ad's size, the same rule the advertiser
+			// portal enforces on submission. Gated behind the same flag that
+			// turns on render-time and portal enforcement, so an existing
+			// site that hasn't opted in yet keeps today's behavior (any
+			// ticked placement is saved, whether or not it fits). Only
+			// touches placements THIS save offered (the $unoffered slugs
+			// above are never removed here either).
+			$enforce_format = (bool) apply_filters(
+				'wbam_enforce_format_matching',
+				\WBAM\Core\Settings_Helper::format_matching_enabled(),
+				$post_id
+			);
+
+			if ( $enforce_format && class_exists( '\\WBAM\\Core\\Ad_Formats' ) ) {
+				$rejected = array();
+				$fitting  = array();
+
+				foreach ( $placements as $placement_id ) {
+					if ( in_array( $placement_id, $unoffered, true ) || \WBAM\Core\Ad_Formats::fits( $post_id, $placement_id ) ) {
+						$fitting[] = $placement_id;
+					} else {
+						$rejected[] = $placement_id;
+					}
+				}
+
+				if ( ! empty( $rejected ) ) {
+					$registry       = apply_filters( 'wbam_get_placements', array() );
+					$rejected_names = array();
+					foreach ( $rejected as $slug ) {
+						$rejected_names[] = isset( $registry[ $slug ]['name'] ) ? (string) $registry[ $slug ]['name'] : $slug;
+					}
+					set_transient( 'wbam_placement_mismatch_' . $post_id, $rejected_names, MINUTE_IN_SECONDS );
+					$placements = $fitting;
+				}
+			}
+
 			update_post_meta( $post_id, '_wbam_placements', $placements );
 		}
 

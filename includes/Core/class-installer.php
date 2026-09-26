@@ -26,7 +26,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.9.1';
+	const DB_VERSION = '1.9.2';
 
 	/**
 	 * Option name for database version.
@@ -59,6 +59,7 @@ class Installer {
 
 		$this->maybe_set_onboarding_pointers_default();
 		$this->maybe_set_geo_enabled_default();
+		$this->maybe_set_format_matching_default();
 
 		if ( $is_fresh_install ) {
 			$this->create_tables();
@@ -142,6 +143,45 @@ class Installer {
 			$settings['geo_primary_provider'] = 'ip-api';
 		}
 
+		update_option( 'wbam_settings', $settings );
+	}
+
+	/**
+	 * Stamp `format_matching`'s default exactly once, at install time
+	 * (owner decision 13, card 10343726460, 3.2.0).
+	 *
+	 * A fresh install gets shape-aware placement matching on — a brand
+	 * new site has no live ads to disrupt, so there is nothing to protect
+	 * by leaving it off. An existing site upgrading from a version that
+	 * had no shape rule keeps serving exactly as it does today: this
+	 * method writes nothing for it, so `Settings_Helper::format_matching_enabled()`
+	 * keeps falling back to its current default (false) until the owner
+	 * clicks the one-time "Turn on size matching" notice.
+	 *
+	 * Checks the settings array itself (not a separate flag), same
+	 * pattern as maybe_set_geo_enabled_default(), so re-running install()
+	 * never overwrites an owner's own later choice either way.
+	 *
+	 * @since 1.9.2
+	 */
+	private function maybe_set_format_matching_default() {
+		$stored_db_version = get_option( self::DB_VERSION_OPTION, null );
+		$is_fresh_install  = ( null === $stored_db_version );
+
+		if ( ! $is_fresh_install ) {
+			return; // Existing site — leave format_matching exactly as it is today.
+		}
+
+		$settings = get_option( 'wbam_settings', array() );
+		if ( is_array( $settings ) && array_key_exists( 'format_matching', $settings ) ) {
+			return; // Already decided.
+		}
+
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+
+		$settings['format_matching'] = true;
 		update_option( 'wbam_settings', $settings );
 	}
 
