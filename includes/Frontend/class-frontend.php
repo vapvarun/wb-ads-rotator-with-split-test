@@ -308,14 +308,80 @@ class Frontend {
 			return $output;
 		}
 
-		// Skip if output is empty (no ad rendered).
-		if ( empty( $output ) ) {
+		// Skip if output is empty (no ad rendered), or if the viewability
+		// beacon will count it once it is seen.
+		if ( empty( $output ) || self::defers_impression( $ad_id, $placement ) ) {
 			return $output;
 		}
 
 		$this->record_impression( $ad_id, $placement );
 
 		return $output;
+	}
+
+	/**
+	 * Whether this ad's impression waits for the viewability beacon instead
+	 * of counting at render.
+	 *
+	 * With the owner's "Count Impressions When Seen" setting on, a popup that
+	 * never opens, a closed sticky bar or an empty network unit must not
+	 * count. Those ads carry a beacon URL (see viewable_beacon_url()), and
+	 * frontend.js sends it once at least half the ad has been on screen for
+	 * one second. Every render-time writer (this plugin, and Pro's) skips
+	 * the impression when this returns true.
+	 *
+	 * @since 3.2.0
+	 *
+	 * @param int    $ad_id     Ad ID.
+	 * @param string $placement Placement ID.
+	 * @return bool
+	 */
+	public static function defers_impression( $ad_id, $placement ) {
+		if ( ! Settings_Helper::is_enabled( 'viewable_impressions' ) ) {
+			return false;
+		}
+
+		if ( in_array( $placement, array( 'popup', 'sticky' ), true ) ) {
+			return true;
+		}
+
+		$data = get_post_meta( (int) $ad_id, '_wbam_ad_data', true );
+
+		return is_array( $data ) && in_array( $data['type'] ?? '', array( 'code', 'adsense' ), true );
+	}
+
+	/**
+	 * URL the viewability beacon posts to for one ad.
+	 *
+	 * Defaults to the public POST /wbam/v1/ads/track endpoint (IP rate
+	 * limited). Pro points it at its tracking pixel, which bills and dedups.
+	 *
+	 * @since 3.2.0
+	 *
+	 * @param int    $ad_id     Ad ID.
+	 * @param string $placement Placement ID.
+	 * @return string
+	 */
+	public static function viewable_beacon_url( $ad_id, $placement ) {
+		$url = add_query_arg(
+			array(
+				'ad_id'      => (int) $ad_id,
+				'event_type' => 'impression',
+				'placement'  => rawurlencode( (string) $placement ),
+			),
+			rest_url( 'wbam/v1/ads/track' )
+		);
+
+		/**
+		 * Filters the URL the viewability beacon sends for an ad.
+		 *
+		 * @since 3.2.0
+		 *
+		 * @param string $url       Beacon URL (sent as a POST with no body).
+		 * @param int    $ad_id     Ad ID.
+		 * @param string $placement Placement ID.
+		 */
+		return (string) apply_filters( 'wbam_viewable_beacon_url', $url, (int) $ad_id, (string) $placement );
 	}
 
 	/**

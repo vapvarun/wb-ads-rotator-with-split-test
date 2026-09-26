@@ -1752,6 +1752,13 @@
       "purpose": "Days raw analytics events are kept before roll-up (default 90)"
     },
     {
+      "name": "wbam_viewable_beacon_url",
+      "type": "filter",
+      "args": 3,
+      "where": "includes/Frontend/class-frontend.php",
+      "purpose": "URL the viewability beacon sends for a popup/sticky/code ad when Count Impressions When Seen is on (Pro points it at its billing pixel)"
+    },
+    {
       "name": "wbam_count_visitor_views",
       "type": "filter",
       "args": 2,

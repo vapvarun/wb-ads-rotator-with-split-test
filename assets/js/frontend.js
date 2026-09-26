@@ -540,6 +540,106 @@
 		},
 
 		/**
+		 * Viewable impressions.
+		 *
+		 * With the owner's "Count Impressions When Seen" setting on, popup,
+		 * sticky and code/network ads carry data-wbam-viewable (the beacon
+		 * URL) and are not counted at render. The impression is sent once
+		 * at least half the ad has been on screen for one second (IAB) and
+		 * the ad has a creative: an empty network unit never counts.
+		 */
+		viewable: {
+			/**
+			 * Observe every ad waiting for a viewable impression.
+			 */
+			init: function() {
+				var ads = document.querySelectorAll( '[data-wbam-viewable]' );
+
+				if ( ! ads.length ) {
+					return;
+				}
+
+				if ( ! ( 'IntersectionObserver' in window ) ) {
+					ads.forEach( WBAM.viewable.send );
+					return;
+				}
+
+				var observer = new IntersectionObserver( function( entries ) {
+					entries.forEach( function( entry ) {
+						var ad = entry.target;
+
+						if ( entry.isIntersecting && entry.intersectionRatio >= 0.5 ) {
+							if ( ad.wbamViewTimer ) {
+								return;
+							}
+							// ponytail: re-checks each second while in view, so a
+							// unit that fills late counts about a second after it
+							// fills rather than after exactly one continuous second.
+							var check = function() {
+								if ( document.hidden || ! WBAM.viewable.hasCreative( ad ) ) {
+									ad.wbamViewTimer = setTimeout( check, 1000 );
+									return;
+								}
+								ad.wbamViewTimer = null;
+								observer.unobserve( ad );
+								WBAM.viewable.send( ad );
+							};
+							ad.wbamViewTimer = setTimeout( check, 1000 );
+						} else if ( ad.wbamViewTimer ) {
+							clearTimeout( ad.wbamViewTimer );
+							ad.wbamViewTimer = null;
+						}
+					} );
+				}, {
+					threshold: 0.5
+				} );
+
+				ads.forEach( function( ad ) {
+					observer.observe( ad );
+				} );
+			},
+
+			/**
+			 * Whether the ad shows a creative: an element other than the
+			 * disclosure label with a size, and no unfilled AdSense unit.
+			 *
+			 * @param {Element} ad Ad container element.
+			 * @return {boolean} True when something is on screen.
+			 */
+			hasCreative: function( ad ) {
+				if ( ad.querySelector( '[data-ad-status="unfilled"]' ) ) {
+					return false;
+				}
+
+				for ( var i = 0; i < ad.children.length; i++ ) {
+					var child = ad.children[ i ];
+					if ( ! child.classList.contains( 'wbam-ad-label' ) && child.offsetWidth > 0 && child.offsetHeight > 0 ) {
+						return true;
+					}
+				}
+
+				return false;
+			},
+
+			/**
+			 * Send the impression beacon once.
+			 *
+			 * @param {Element} ad Ad container element.
+			 */
+			send: function( ad ) {
+				var url = ad.getAttribute( 'data-wbam-viewable' );
+
+				if ( ! url || ( navigator.sendBeacon && navigator.sendBeacon( url ) ) ) {
+					return;
+				}
+
+				var xhr = new XMLHttpRequest();
+				xhr.open( 'POST', url, true );
+				xhr.send();
+			}
+		},
+
+		/**
 		 * Click tracking handler.
 		 */
 		clicks: {
@@ -606,6 +706,7 @@
 			this.popup.init();
 			this.lazy.init();
 			this.clicks.init();
+			this.viewable.init();
 			this.emailCapture.init();
 		}
 	};

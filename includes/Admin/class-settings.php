@@ -42,6 +42,8 @@ class Settings {
 		'ad_label'                 => 'Advertisement',
 		'ad_label_position'        => 'above',
 		'container_class'          => '',
+		// Off so an upgrade does not shift existing impression counts.
+		'viewable_impressions'     => false,
 		'disable_on_post_types'    => array(),
 		'max_ads_per_page'         => 10,     // Sensible limit to prevent ad overload.
 		// Geolocation (owner decision 8, 3.2.0): off by default on a fresh
@@ -325,6 +327,18 @@ class Settings {
 				'id'          => 'container_class',
 				'placeholder' => __( 'e.g., my-ad-wrapper', 'wb-ads-rotator-with-split-test' ),
 				'description' => __( 'Additional CSS class for ad containers.', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+
+		add_settings_field(
+			'viewable_impressions',
+			__( 'Count Impressions When Seen', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_checkbox_field' ),
+			'wbam-settings',
+			'wbam_display',
+			array(
+				'id'          => 'viewable_impressions',
+				'description' => __( 'Count popup, sticky and code/AdSense ads only once at least half the ad has been on screen for one second. Other ads count when the page loads.', 'wb-ads-rotator-with-split-test' ),
 			)
 		);
 
@@ -632,6 +646,7 @@ class Settings {
 		$sanitized['ad_label']              = sanitize_text_field( $input['ad_label'] ?? '' );
 		$sanitized['ad_label_position']     = in_array( $input['ad_label_position'] ?? '', array( 'above', 'below' ), true ) ? $input['ad_label_position'] : 'above';
 		$sanitized['container_class']       = sanitize_html_class( $input['container_class'] ?? '' );
+		$sanitized['viewable_impressions']  = ! empty( $input['viewable_impressions'] );
 		$sanitized['max_ads_per_page']      = absint( $input['max_ads_per_page'] ?? 0 );
 
 		// Link cloaking. sanitize_title keeps the prefix rewrite-safe (matches

@@ -271,6 +271,38 @@ class Test_Billing_Independent_Of_Analytics extends Pro_Test_Case {
 		$this->assertSame( 1, $this->billed()['impressions'] );
 	}
 
+	/**
+	 * Viewable impressions (FREE setting, card 10343188140): a code/network
+	 * ad bills when the viewability beacon arrives, not at render. The beacon
+	 * is the pixel URL, so it goes through the pixel dedup and track_event().
+	 */
+	public function test_viewable_mode_bills_the_beacon_not_the_render(): void {
+		Settings_Helper::update( 'enable_analytics', true );
+		Settings_Helper::update( 'enable_pixel_tracking', true );
+		\WBAM\Core\Settings_Helper::update( 'viewable_impressions', true );
+		update_post_meta(
+			$this->ad_id,
+			'_wbam_ad_data',
+			array(
+				'type' => 'code',
+				'code' => '<span>network unit</span>',
+			)
+		);
+
+		$output = $this->render();
+		\WBAM\Core\Settings_Helper::delete( 'viewable_impressions' );
+
+		$this->assertMatchesRegularExpression( '/data-wbam-viewable="[^"]*wbam_track=1[^"]*nonce=/', $output, 'The viewability beacon is the pixel URL.' );
+		$this->assertStringNotContainsString( '<img', $output, 'No load-time pixel: the beacon waits until the ad is seen.' );
+		$this->assertSame( 0, $this->billed()['impressions'], 'Render must not bill a viewable-mode ad.' );
+		$this->assertSame( 0, $this->rows() );
+
+		Pro_Plugin::get_instance()->get_module( 'analytics' )->track_event( $this->ad_id, 'impression', 'header' );
+
+		$this->assertSame( 1, $this->billed()['impressions'] );
+		$this->assertSame( 1, $this->rows() );
+	}
+
 	public function test_repeat_within_session_is_deduped(): void {
 		$this->view_and_click();
 		$this->view_and_click();

@@ -648,12 +648,18 @@ class Placement_Engine {
 				? $output . $label_html
 				: $label_html . $output;
 
+			// Viewable impressions: the beacon frontend.js sends once the ad
+			// has been seen, in place of the render-time count.
+			$viewable = \WBAM\Frontend\Frontend::defers_impression( $ad_id, $placement )
+				? ' data-wbam-viewable="' . esc_url( \WBAM\Frontend\Frontend::viewable_beacon_url( $ad_id, $placement ) ) . '"'
+				: '';
+
 			$output = sprintf(
 				'<div class="%1$s" data-ad-id="%2$d" data-responsive="%3$s"%4$s>%5$s</div>',
 				esc_attr( $classes ),
 				$ad_id,
 				$is_responsive ? '1' : '0',
-				$placement ? ' data-placement="' . esc_attr( $placement ) . '"' : '',
+				( $placement ? ' data-placement="' . esc_attr( $placement ) . '"' : '' ) . $viewable,
 				$inner // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ad rendered upstream by ad type handler; label escaped above.
 			);
 		}
