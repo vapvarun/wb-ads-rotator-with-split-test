@@ -96,6 +96,7 @@ $wbam_options_to_delete = array(
 	'wbam_ad_type_backfilled',
 	'wbam_demo_data_backfilled_v2',
 	'wbam_setup_complete',
+	'wbam_analytics_rolled_before', // Goes with wbam_analytics_daily, dropped above.
 );
 
 foreach ( $wbam_options_to_delete as $wbam_option ) {

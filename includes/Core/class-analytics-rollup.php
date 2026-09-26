@@ -22,8 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * through Action Scheduler when it is loaded, WP-Cron otherwise. Nothing
  * runs on a site without traffic.
  *
- * With Pro active this stays idle: Pro's own daily aggregation and
- * retention own the same tables.
+ * With Pro active this stays idle: Pro's daily aggregation sums through
+ * roll_up_before() and keeps raw rows until the owner confirms retention.
  */
 class Analytics_Rollup {
 
@@ -36,6 +36,14 @@ class Analytics_Rollup {
 	 * Raw rows handled per run.
 	 */
 	const BATCH_SIZE = 5000;
+
+	/**
+	 * Option holding the start ('Y-m-d 00:00:00', site time) of the first
+	 * day not yet summed into wbam_analytics_daily by Pro's daily
+	 * aggregation. Raw rows before it are already counted in the daily
+	 * table even while they are kept (retention not confirmed).
+	 */
+	const ROLLED_OPTION = 'wbam_analytics_rolled_before';
 
 	/**
 	 * Register the job. Called on every request so cron can run it.
@@ -97,7 +105,7 @@ class Analytics_Rollup {
 		list( $raw_where, $raw_args )     = self::range_where( $ad_ids, 'created_at', $start ? $start . ' 00:00:00' : '', $end ? $end . ' 23:59:59' : '' );
 		list( $daily_where, $daily_args ) = self::range_where( $ad_ids, 'date', $start, $end );
 
-		$raw_sql   = "SELECT ad_id, event_type, COUNT(*) AS total FROM {$wpdb->prefix}wbam_analytics WHERE event_type IN ('impression','click'){$raw_where} GROUP BY ad_id, event_type";
+		$raw_sql   = "SELECT ad_id, event_type, COUNT(*) AS total FROM {$wpdb->prefix}wbam_analytics WHERE event_type IN ('impression','click'){$raw_where}" . self::unrolled_sql() . ' GROUP BY ad_id, event_type';
 		$daily_sql = "SELECT ad_id, SUM(impressions) AS impression, SUM(clicks) AS click FROM {$wpdb->prefix}wbam_analytics_daily WHERE 1=1{$daily_where} GROUP BY ad_id";
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- plugin tables; every value bound through prepare(); callers cache.
@@ -258,6 +266,111 @@ class Analytics_Rollup {
 	}
 
 	/**
+	 * Start of the first day whose raw rows are not yet in the daily table,
+	 * or '' when every raw row is uncounted there.
+	 *
+	 * @since 3.2.0
+	 * @return string 'Y-m-d 00:00:00' or ''.
+	 */
+	public static function rolled_before() {
+		$value = (string) get_option( self::ROLLED_OPTION, '' );
+		return preg_match( '/^\d{4}-\d{2}-\d{2} 00:00:00$/', $value ) ? $value : '';
+	}
+
+	/**
+	 * Prepared " AND {column} >= ..." fragment that keeps a raw-events query
+	 * off the rows already summed into the daily table, or ''. Append it to
+	 * any raw query whose result is added to wbam_analytics_daily.
+	 *
+	 * @since 3.2.0
+	 * @param string $column Raw timestamp column, e.g. 'created_at' or 'a.created_at'.
+	 * @return string
+	 */
+	public static function unrolled_sql( $column = 'created_at' ) {
+		global $wpdb;
+
+		$from = self::rolled_before();
+		if ( '' === $from || ! preg_match( '/^([a-z_]+\.)?[a-z_]+$/', $column ) ) {
+			return '';
+		}
+
+		return $wpdb->prepare( " AND {$column} >= %s", $from ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- column whitelisted above.
+	}
+
+	/**
+	 * Sum every raw row before $before into the daily table and advance the
+	 * watermark, keeping the raw rows. One transaction, so a day is either
+	 * summed and marked or neither; running it again for the same $before
+	 * adds nothing. Used by Pro's daily aggregation.
+	 *
+	 * @since 3.2.0
+	 * @param string $before 'Y-m-d 00:00:00', site time.
+	 * @return bool False when the sum failed; the watermark is unchanged.
+	 */
+	public static function roll_up_before( $before ) {
+		global $wpdb;
+
+		$from = self::rolled_before();
+		if ( '' !== $from && $before <= $from ) {
+			return true;
+		}
+
+		$wpdb->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+		if ( false === self::sum_into_daily( $before ) ) {
+			$wpdb->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			return false;
+		}
+
+		update_option( self::ROLLED_OPTION, $before, false );
+		$wpdb->query( 'COMMIT' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+		return true;
+	}
+
+	/**
+	 * Add raw rows before $before (and not already summed, see
+	 * rolled_before()) into wbam_analytics_daily, one row per ad per day.
+	 * Adds to an existing row rather than replacing it. Unique counts take
+	 * the larger of the two, so they are a lower bound when a day is summed
+	 * in parts.
+	 *
+	 * @param string $before Exclusive upper bound on created_at.
+	 * @param int    $max_id Highest raw id to include, 0 for no limit.
+	 * @return int|false Rows affected, false on error.
+	 */
+	private static function sum_into_daily( $before, $max_id = 0 ) {
+		global $wpdb;
+
+		$raw   = $wpdb->prefix . 'wbam_analytics';
+		$daily = $wpdb->prefix . 'wbam_analytics_daily';
+		$where = $wpdb->prepare( 'created_at < %s', $before ) . self::unrolled_sql();
+		if ( $max_id > 0 ) {
+			$where .= $wpdb->prepare( ' AND id <= %d', $max_id );
+		}
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- plugin tables from $wpdb->prefix; $where is prepared above.
+		$result = $wpdb->query(
+			"INSERT INTO {$daily} ( ad_id, campaign_id, date, impressions, clicks, unique_impressions, unique_clicks )
+			SELECT ad_id, MAX(campaign_id), DATE(created_at),
+				SUM( event_type = 'impression' ), SUM( event_type = 'click' ),
+				COUNT( DISTINCT CASE WHEN event_type = 'impression' THEN COALESCE( NULLIF( visitor_hash, '' ), ip_hash ) END ),
+				COUNT( DISTINCT CASE WHEN event_type = 'click' THEN COALESCE( NULLIF( visitor_hash, '' ), ip_hash ) END )
+			FROM {$raw}
+			WHERE {$where}
+			GROUP BY ad_id, DATE(created_at)
+			ON DUPLICATE KEY UPDATE
+				impressions = impressions + VALUES(impressions),
+				clicks = clicks + VALUES(clicks),
+				unique_impressions = GREATEST( unique_impressions, VALUES(unique_impressions) ),
+				unique_clicks = GREATEST( unique_clicks, VALUES(unique_clicks) )"
+		);
+		// phpcs:enable
+
+		return $result;
+	}
+
+	/**
 	 * Cron callback.
 	 *
 	 * @return void
@@ -292,7 +405,6 @@ class Analytics_Rollup {
 		global $wpdb;
 
 		$raw    = $wpdb->prefix . 'wbam_analytics';
-		$daily  = $wpdb->prefix . 'wbam_analytics_daily';
 		$cutoff = wp_date( 'Y-m-d 00:00:00', time() - self::retention_days() * DAY_IN_SECONDS );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- plugin tables from $wpdb->prefix; values bound.
@@ -310,25 +422,9 @@ class Analytics_Rollup {
 
 		$wpdb->query( 'START TRANSACTION' );
 
-		$summed = $wpdb->query(
-			$wpdb->prepare(
-				"INSERT INTO {$daily} ( ad_id, campaign_id, date, impressions, clicks, unique_impressions, unique_clicks )
-				SELECT ad_id, MAX(campaign_id), DATE(created_at),
-					SUM( event_type = 'impression' ), SUM( event_type = 'click' ),
-					COUNT( DISTINCT CASE WHEN event_type = 'impression' THEN COALESCE( NULLIF( visitor_hash, '' ), ip_hash ) END ),
-					COUNT( DISTINCT CASE WHEN event_type = 'click' THEN COALESCE( NULLIF( visitor_hash, '' ), ip_hash ) END )
-				FROM {$raw}
-				WHERE id <= %d AND created_at < %s
-				GROUP BY ad_id, DATE(created_at)
-				ON DUPLICATE KEY UPDATE
-					impressions = impressions + VALUES(impressions),
-					clicks = clicks + VALUES(clicks),
-					unique_impressions = GREATEST( unique_impressions, VALUES(unique_impressions) ),
-					unique_clicks = GREATEST( unique_clicks, VALUES(unique_clicks) )",
-				$max_id,
-				$cutoff
-			)
-		);
+		// Rows before the watermark were summed by Pro's aggregation: delete
+		// them without adding them again.
+		$summed = self::sum_into_daily( $cutoff, $max_id );
 
 		$deleted = false === $summed ? false : $wpdb->query( $wpdb->prepare( "DELETE FROM {$raw} WHERE id <= %d AND created_at < %s", $max_id, $cutoff ) );
 

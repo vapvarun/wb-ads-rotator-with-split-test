@@ -30,6 +30,7 @@ class Test_Analytics_Rollup extends WP_UnitTestCase {
 		$wpdb->delete( $wpdb->prefix . 'wbam_analytics', array( 'ad_id' => $this->ad_id ) );
 		$wpdb->delete( $wpdb->prefix . 'wbam_analytics_daily', array( 'ad_id' => $this->ad_id ) );
 		wp_delete_post( $this->ad_id, true );
+		delete_option( 'wbam_analytics_rolled_before' );
 		$wpdb->query( 'COMMIT' );
 		// phpcs:enable
 
@@ -86,5 +87,54 @@ class Test_Analytics_Rollup extends WP_UnitTestCase {
 		\WBAM\Admin\Admin::flush_event_totals( $this->ad_id );
 		$this->assertSame( 4, $total->invoke( $admin, $this->ad_id, 'impression' ) );
 		$this->assertSame( 1, $total->invoke( $admin, $this->ad_id, 'click' ) );
+	}
+
+	/**
+	 * Pro's daily aggregation sums raw rows into daily totals and keeps them
+	 * until the owner confirms retention, recording how far it has summed.
+	 * Those rows must count once: in the ads list, and again when Free's own
+	 * roll-up takes over after Pro is deactivated.
+	 */
+	public function test_rows_pro_already_summed_are_not_counted_twice(): void {
+		global $wpdb;
+
+		$this->ad_id = Factory::make_ad();
+		$old_day     = wp_date( 'Y-m-d', strtotime( '-200 days' ) );
+
+		$this->event( 'impression', $old_day . ' 09:00:00' );
+		$this->event( 'impression', $old_day . ' 10:00:00' );
+		$this->event( 'click', $old_day . ' 10:05:00' );
+		$this->event( 'impression', wp_date( 'Y-m-d H:i:s', strtotime( '-1 day' ) ) );
+
+		// What Pro's aggregation leaves behind: the day summed, raw rows kept.
+		$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$wpdb->prefix . 'wbam_analytics_daily',
+			array(
+				'ad_id'       => $this->ad_id,
+				'date'        => $old_day,
+				'impressions' => 2,
+				'clicks'      => 1,
+			)
+		);
+		update_option( 'wbam_analytics_rolled_before', wp_date( 'Y-m-d', strtotime( '-199 days' ) ) . ' 00:00:00', false );
+
+		$expected = array(
+			'impression' => 3,
+			'click'      => 1,
+		);
+		$this->assertSame( $expected, Analytics_Rollup::event_totals( array( $this->ad_id ) )[ $this->ad_id ] );
+
+		Analytics_Rollup::rollup_batch();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$daily = $wpdb->get_row( $wpdb->prepare( "SELECT impressions, clicks FROM {$wpdb->prefix}wbam_analytics_daily WHERE ad_id = %d", $this->ad_id ), ARRAY_A );
+		$this->assertSame(
+			array(
+				'impressions' => '2',
+				'clicks'      => '1',
+			),
+			$daily
+		);
+		$this->assertSame( $expected, Analytics_Rollup::event_totals( array( $this->ad_id ) )[ $this->ad_id ] );
 	}
 }
