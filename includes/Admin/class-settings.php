@@ -1509,7 +1509,7 @@ class Settings {
 
 		return sprintf(
 			/* translators: %s: legacy provider display name, e.g. "ip-api.com". */
-			esc_html__( 'This site is still using %s from before geolocation required an explicit provider choice. It keeps working, but we recommend switching to the local MaxMind database or the HTTPS API option below.', 'wb-ads-rotator-with-split-test' ),
+			esc_html__( 'This site is still using %s from before geolocation required an explicit provider choice. It keeps working, but we recommend switching to the local MaxMind database or the HTTPS API (ipinfo.io) provider in Location settings.', 'wb-ads-rotator-with-split-test' ),
 			'<strong>' . esc_html( $legacy[ $provider ] ) . '</strong>'
 		);
 	}

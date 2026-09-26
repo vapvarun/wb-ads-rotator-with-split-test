@@ -82,6 +82,6 @@ class Test_Package_Terms_Metered_Price extends Pro_Test_Case {
 			)
 		);
 
-		$this->assertSame( wbam_format_price( 49 ) . ' / 1 Month', wbam_format_package_terms( $package ) );
+		$this->assertSame( wbam_format_price( 49 ) . ' / 30 days', wbam_format_package_terms( $package ) );
 	}
 }

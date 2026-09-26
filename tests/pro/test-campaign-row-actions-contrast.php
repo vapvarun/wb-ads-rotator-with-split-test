@@ -32,10 +32,12 @@ class Test_Campaign_Row_Actions_Contrast extends Pro_Test_Case {
 		set_current_screen( 'toplevel_page_wbam-campaigns' );
 		$table = new Campaigns_List_Table();
 		$item  = (object) array(
-			'id'     => 7,
-			'name'   => 'Row actions',
-			'status' => $status,
-			'ad_id'  => 0,
+			'id'            => 7,
+			'name'          => 'Row actions',
+			'status'        => $status,
+			'ad_id'         => 0,
+			'pricing_model' => 'flat',
+			'budget'        => 0,
 		);
 
 		$this->assertStringNotContainsString( 'style=', $table->column_name( $item ) );
