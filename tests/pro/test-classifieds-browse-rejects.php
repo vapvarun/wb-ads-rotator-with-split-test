@@ -232,7 +232,7 @@ class Test_Classifieds_Browse_Rejects extends Pro_Test_Case {
 	// ------------------------------------------------------------------
 
 	public function test_geocode_address_resolves_from_mocked_nominatim(): void {
-		add_filter( 'wbam_pro_allow_geocoding', '__return_true' ); // Owner opted in.
+		self::enable_geolocation_opt_in(); // Owner opted in.
 		add_filter( 'pre_http_request', array( $this, 'mock_nominatim_found' ), 10, 3 );
 
 		$result = Geolocation_Manager::get_instance()->geocode_address( 'Springfield, IL' );
@@ -245,7 +245,7 @@ class Test_Classifieds_Browse_Rejects extends Pro_Test_Case {
 	}
 
 	public function test_geocode_address_returns_error_when_not_found(): void {
-		add_filter( 'wbam_pro_allow_geocoding', '__return_true' ); // Owner opted in.
+		self::enable_geolocation_opt_in(); // Owner opted in.
 		add_filter( 'pre_http_request', array( $this, 'mock_nominatim_empty' ), 10, 3 );
 
 		$result = Geolocation_Manager::get_instance()->geocode_address( 'Nowhereville Qaxyz' );

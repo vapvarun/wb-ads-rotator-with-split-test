@@ -79,6 +79,7 @@ class Test_Classifieds_Browse_Empty_Filters extends Pro_Test_Case {
 		$enabled                = Settings_Helper::get( 'enabled_modules', array() );
 		$enabled['geolocation'] = true;
 		Settings_Helper::update( 'enabled_modules', $enabled );
+		self::enable_geolocation_opt_in(); // The radius filter only renders once the owner opts in.
 
 		$_GET['geo_address'] = '';
 		$_GET['geo_lat']     = '';

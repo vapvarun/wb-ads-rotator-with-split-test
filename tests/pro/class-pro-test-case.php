@@ -145,4 +145,16 @@ abstract class Pro_Test_Case extends WP_UnitTestCase {
 			unset( $e );
 		}
 	}
+
+	/**
+	 * Turn on the owner's geolocation opt-in (Free Settings > Geolocation:
+	 * enabled plus a provider), which is what lets classified addresses be
+	 * geocoded. Rolled back with the test's transaction.
+	 */
+	protected static function enable_geolocation_opt_in(): void {
+		$free                         = (array) get_option( 'wbam_settings', array() );
+		$free['geo_enabled']          = true;
+		$free['geo_primary_provider'] = 'ipinfo';
+		update_option( 'wbam_settings', $free );
+	}
 }

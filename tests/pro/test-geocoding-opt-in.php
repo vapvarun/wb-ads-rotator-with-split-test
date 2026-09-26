@@ -1,7 +1,9 @@
 <?php
 /**
- * Classified geocoding makes no outbound lookup until the owner opts in
- * (Basecamp 10343031101, owner decision: no third-party lookups by default).
+ * Classified geocoding follows the owner's geolocation opt-in (Basecamp
+ * 10343031101, owner decision 17): off by default, on when the owner enables
+ * Geolocation and picks a provider. wbam_pro_allow_geocoding can only force
+ * it off. While it's off the browse radius search is not offered.
  *
  * @package WBAM\Tests
  */
@@ -9,8 +11,6 @@
 namespace WBAM\Tests\Pro;
 
 use WBAM_Pro\Core\Settings_Helper;
-use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
-use WBAM_Pro\Modules\Classifieds\Classified_Manager;
 use WBAM_Pro\Modules\Classifieds\Shortcodes\Browse_Shortcode;
 use WBAM_Pro\Modules\Geolocation\Geolocation_Manager;
 
@@ -42,10 +42,6 @@ class Test_Geocoding_Opt_In extends Pro_Test_Case {
 		$enabled['geolocation'] = true;
 		Settings_Helper::update( 'enabled_modules', $enabled );
 
-		$classifieds                     = get_option( 'wbam_pro_classifieds_settings', array() );
-		$classifieds['require_approval'] = false;
-		update_option( 'wbam_pro_classifieds_settings', $classifieds );
-
 		$this->get_backup = $_GET;
 		$this->requests   = array();
 		add_filter( 'pre_http_request', array( $this, 'record_request' ), 10, 3 );
@@ -57,7 +53,7 @@ class Test_Geocoding_Opt_In extends Pro_Test_Case {
 	}
 
 	/**
-	 * Record and short-circuit every outbound request.
+	 * Record and short-circuit every outbound request with a Nominatim match.
 	 */
 	public function record_request( $preempt, $args, $url ) {
 		$this->requests[] = (string) $url;
@@ -68,38 +64,56 @@ class Test_Geocoding_Opt_In extends Pro_Test_Case {
 		);
 	}
 
-	private function make_listing( string $title, string $address ): object {
-		$user       = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
-		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );
-		$classified = Classified_Manager::get_instance()->create(
-			array(
-				'title'         => $title,
-				'description'   => 'Test.',
-				'advertiser_id' => $advertiser->id,
-			)
-		);
-		$this->assertNotWPError( $classified );
-		Geolocation_Manager::get_instance()->save_location( $classified->id, array( 'formatted_address' => $address ) );
-		return $classified;
+	/**
+	 * The browse page HTML for a place search.
+	 */
+	private function browse_html(): string {
+		$_GET['geo_address'] = 'Springfield';
+		return ( new Browse_Shortcode() )->render( array() );
 	}
 
-	public function test_no_outbound_geocode_until_the_owner_opts_in(): void {
+	public function test_off_by_default_no_lookup_and_no_radius_field(): void {
 		$result = Geolocation_Manager::get_instance()->geocode_address( 'Opt In Springfield ' . wp_rand() );
+		$html   = $this->browse_html();
 
 		$this->assertWPError( $result );
 		$this->assertSame( array(), $this->requests, 'A fresh install must not send a typed address to a third-party geocoder.' );
+		$this->assertStringNotContainsString( 'id="wbam-geo-filter-radius"', $html, 'No radius search is offered while geocoding is off.' );
+		$this->assertStringNotContainsString( 'wbam-geo-error', $html );
 	}
 
-	public function test_radius_search_without_geocoding_falls_back_to_a_text_location_match(): void {
-		$this->make_listing( 'Geo optin near listing', 'Springfield, IL' );
-		$this->make_listing( 'Geo optin far listing', 'Chicago, IL' );
+	public function test_enabled_without_a_provider_is_still_off(): void {
+		$free                         = (array) get_option( 'wbam_settings', array() );
+		$free['geo_enabled']          = true;
+		$free['geo_primary_provider'] = '';
+		update_option( 'wbam_settings', $free );
 
-		$_GET['geo_address'] = 'Springfield';
-		$html                = ( new Browse_Shortcode() )->render( array() );
-
+		$this->assertWPError( Geolocation_Manager::get_instance()->geocode_address( 'No Provider ' . wp_rand() ) );
 		$this->assertSame( array(), $this->requests );
-		$this->assertStringContainsString( 'Geo optin near listing', $html );
-		$this->assertStringNotContainsString( 'Geo optin far listing', $html );
-		$this->assertStringNotContainsString( 'wbam-geo-error', $html, 'The fallback is a match, never an error.' );
+	}
+
+	public function test_owner_opt_in_geocodes_and_shows_the_radius_field(): void {
+		self::enable_geolocation_opt_in();
+
+		$result = Geolocation_Manager::get_instance()->geocode_address( 'Opt In Springfield ' . wp_rand() );
+		$html   = $this->browse_html();
+
+		$this->assertIsArray( $result );
+		$this->assertEqualsWithDelta( 39.7817, $result['lat'], 0.001 );
+		$this->assertNotEmpty( $this->requests );
+		$this->assertStringContainsString( 'nominatim.openstreetmap.org', $this->requests[0] );
+		$this->assertStringContainsString( 'id="wbam-geo-filter-radius"', $html );
+	}
+
+	public function test_filter_can_force_geocoding_off(): void {
+		self::enable_geolocation_opt_in();
+		add_filter( 'wbam_pro_allow_geocoding', '__return_false' );
+
+		$result = Geolocation_Manager::get_instance()->geocode_address( 'Forced Off ' . wp_rand() );
+		$html   = $this->browse_html();
+
+		$this->assertWPError( $result );
+		$this->assertSame( array(), $this->requests );
+		$this->assertStringNotContainsString( 'id="wbam-geo-filter-radius"', $html );
 	}
 }
