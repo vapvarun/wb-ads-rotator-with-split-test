@@ -25,6 +25,13 @@ if ( ! $wbam_delete_data ) {
 	return;
 }
 
+// Pro reads this switch from wbam_settings, which is deleted below. If Pro
+// is still installed, leave it a flag so its own uninstall honours the
+// same choice (it deletes the flag).
+if ( file_exists( WP_PLUGIN_DIR . '/wb-ad-manager-pro/uninstall.php' ) ) {
+	update_option( 'wbam_delete_data_on_uninstall', 1, false );
+}
+
 global $wpdb;
 
 // Delete custom post types and their meta.
@@ -72,6 +79,9 @@ $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_analytics_daily" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_email_submissions" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_partnerships" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_rate_limits" );
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_links" );
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_clicks" );
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wbam_link_categories" );
 // phpcs:enable
 
 // Delete options.
@@ -80,6 +90,12 @@ $wbam_options_to_delete = array(
 	'wbam_db_version',
 	'wbam_email_submissions', // Legacy option-based storage.
 	'wbam_activation_redirect',
+	'wbam_link_prefix',
+	'wbam_demo_data_ids',
+	'wbam_onboarding_pointers_enabled',
+	'wbam_ad_type_backfilled',
+	'wbam_demo_data_backfilled_v2',
+	'wbam_setup_complete',
 );
 
 foreach ( $wbam_options_to_delete as $wbam_option ) {
