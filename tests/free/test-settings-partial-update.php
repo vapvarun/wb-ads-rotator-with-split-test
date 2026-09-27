@@ -45,6 +45,7 @@ class Test_Settings_Partial_Update extends WP_UnitTestCase {
 				'ad_label'          => 'Sponsored',
 				'require_consent_adsense'      => false,
 				'adsense_auto_ads'  => true,
+				'adsense_publisher_id' => 'ca-pub-1234567890123456',
 				'link_cloak_prefix' => 'out',
 			)
 		);
@@ -73,6 +74,7 @@ class Test_Settings_Partial_Update extends WP_UnitTestCase {
 		$post = array(
 			'_fields'          => array( 'require_consent_adsense', 'disable_ads_admin', 'disable_on_post_types', 'adsense_auto_ads' ),
 			'adsense_auto_ads' => '1',
+			'adsense_publisher_id' => 'ca-pub-1234567890123456',
 			'ad_label'         => 'Ad',
 			'max_ads_per_page' => '4',
 		);

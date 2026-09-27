@@ -19,13 +19,17 @@ class Test_Demo_Data_Cleaner_Tools_Section extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
-	public function test_renders_nothing_when_no_demo_data_is_tracked(): void {
+	public function test_says_so_when_no_sample_ads_are_tracked(): void {
 		delete_option( Demo_Data_Cleaner::OPTION_IDS );
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
 		ob_start();
 		Demo_Data_Cleaner::render_clear_button_section();
-		$this->assertSame( '', (string) ob_get_clean() );
+		$html = (string) ob_get_clean();
+
+		// Tools is never a blank page (card 10344383905).
+		$this->assertStringContainsString( 'No sample ads to remove.', $html );
+		$this->assertStringNotContainsString( 'wbam_clear_demo_data', $html );
 	}
 
 	public function test_renders_the_button_when_demo_ads_are_tracked(): void {

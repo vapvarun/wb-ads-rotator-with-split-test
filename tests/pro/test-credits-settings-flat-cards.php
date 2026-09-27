@@ -122,6 +122,13 @@ class Test_Credits_Settings_Flat_Cards extends Pro_Test_Case {
 				$key = (string) ( $field['key'] ?? '' );
 				$this->assertNotSame( '', $key, "Gateway {$gateway_id} declared a field with no key." );
 
+				// Never applied in WB Ad Manager: buyers always return to the
+				// Balance tab (card 10344383905), so these are not drawn.
+				if ( in_array( $key, array( 'success_url', 'cancel_url' ), true ) ) {
+					$this->assertStringNotContainsString( sprintf( 'name="wbam_gateways[%s][%s]"', $gateway_id, $key ), $html );
+					continue;
+				}
+
 				$name_attr = sprintf( 'name="wbam_gateways[%s][%s]"', $gateway_id, $key );
 				$this->assertStringContainsString(
 					$name_attr,
