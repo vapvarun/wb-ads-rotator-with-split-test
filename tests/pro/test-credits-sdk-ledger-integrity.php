@@ -35,8 +35,8 @@ class Test_Credits_Sdk_Ledger_Integrity extends Pro_Test_Case {
 		return Credits::get_balance( Credits_Bridge::SLUG, $this->user );
 	}
 
-	public function test_the_bundled_sdk_is_1_9_2(): void {
-		$this->assertSame( '1.9.2', WBCOM_CREDITS_SDK_VERSION );
+	public function test_the_bundled_sdk_is_1_9_4(): void {
+		$this->assertSame( '1.9.4', WBCOM_CREDITS_SDK_VERSION );
 	}
 
 	public function test_an_old_ledger_table_is_upgraded_in_place(): void {
