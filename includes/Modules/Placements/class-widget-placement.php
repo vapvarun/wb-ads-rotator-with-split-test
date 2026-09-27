@@ -84,16 +84,20 @@ class WBAM_Ad_Widget extends \WP_Widget {
 	 * @param array $instance Widget instance.
 	 */
 	public function widget( $args, $instance ) {
-		$ad_id = isset( $instance['ad_id'] ) ? absint( $instance['ad_id'] ) : 0;
+		$ad_id  = isset( $instance['ad_id'] ) ? absint( $instance['ad_id'] ) : 0;
+		$engine = Placement_Engine::get_instance();
 
-		if ( ! $ad_id ) {
-			return;
+		// No ad chosen (the default) rotates every ad assigned to the Widget
+		// placement, advertisers' paid ones included, like the placement
+		// block (card 10344381767). A chosen ad is shown on its own.
+		if ( $ad_id ) {
+			$ad     = $engine->render_ad( $ad_id, array( 'placement' => 'widget' ) );
+			$output = '' === $ad ? '' : '<div class="wbam-placement wbam-placement-widget">' . $ad . '</div>';
+		} else {
+			$output = $engine->render_placement( 'widget' );
 		}
 
-		$engine = Placement_Engine::get_instance();
-		$output = $engine->render_ad( $ad_id, array( 'placement' => 'widget' ) );
-
-		if ( empty( $output ) ) {
+		if ( '' === $output ) {
 			return;
 		}
 
@@ -105,10 +109,8 @@ class WBAM_Ad_Widget extends \WP_Widget {
 			echo $args['before_title'] . esc_html( $instance['title'] ) . $args['after_title'];
 		}
 
-		echo '<div class="wbam-placement wbam-placement-widget">';
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Ad types escape their own output. Code ads require unfiltered_html capability.
 		echo $output;
-		echo '</div>';
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML from theme is trusted.
 		echo $args['after_widget'];
@@ -155,14 +157,14 @@ class WBAM_Ad_Widget extends \WP_Widget {
 		</p>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>">
-				<?php esc_html_e( 'Select Ad:', 'wb-ads-rotator-with-split-test' ); ?>
+				<?php esc_html_e( 'Ad:', 'wb-ads-rotator-with-split-test' ); ?>
 			</label>
 			<select
 				class="widefat"
 				id="<?php echo esc_attr( $this->get_field_id( 'ad_id' ) ); ?>"
 				name="<?php echo esc_attr( $this->get_field_name( 'ad_id' ) ); ?>"
 			>
-				<option value=""><?php esc_html_e( 'Select an ad', 'wb-ads-rotator-with-split-test' ); ?></option>
+				<option value=""><?php esc_html_e( 'Rotate the ads assigned to the Widget placement', 'wb-ads-rotator-with-split-test' ); ?></option>
 				<?php foreach ( $ads as $ad ) : ?>
 					<option value="<?php echo esc_attr( $ad->ID ); ?>" <?php selected( $ad_id, $ad->ID ); ?>>
 						<?php echo esc_html( $ad->post_title ); ?>
@@ -170,6 +172,7 @@ class WBAM_Ad_Widget extends \WP_Widget {
 				<?php endforeach; ?>
 			</select>
 		</p>
+		<p class="description"><?php esc_html_e( 'Rotating includes ads advertisers buy for the Widget placement. Pick one ad to show only that ad here.', 'wb-ads-rotator-with-split-test' ); ?></p>
 		<?php if ( empty( $ads ) ) : ?>
 			<p class="description">
 				<?php
