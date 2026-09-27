@@ -69,28 +69,36 @@ class Demo_Data_Cleaner {
 	}
 
 	/**
-	 * Wrapper for the `wbam_settings_tools_content` action: only prints a
-	 * heading + the button when there is something to remove, so an empty
-	 * section never appears on a site with no seeded demo data.
+	 * How many setup-wizard samples are still recorded (ads, pages, links).
+	 *
+	 * @since 3.2.0
+	 * @return int
+	 */
+	public static function count() {
+		$registry = get_option( self::OPTION_IDS, array() );
+		$total    = 0;
+		foreach ( array( 'ads', 'pages', 'links' ) as $bucket ) {
+			if ( is_array( $registry ) && ! empty( $registry[ $bucket ] ) && is_array( $registry[ $bucket ] ) ) {
+				$total += count( $registry[ $bucket ] );
+			}
+		}
+		return $total;
+	}
+
+	/**
+	 * Wrapper for the `wbam_settings_tools_content` action: the Sample
+	 * content card, only when there is something to remove. With Pro active
+	 * Pro's card lists these samples next to its demo set and its one Remove
+	 * clears both (owner decision, card 10344381767), so this prints nothing.
 	 *
 	 * @since 3.2.0
 	 */
 	public static function render_clear_button_section() {
-		$registry = get_option( self::OPTION_IDS, array() );
-		if ( ! is_array( $registry ) ) {
-			return;
-		}
-		$total = 0;
-		foreach ( array( 'ads', 'pages', 'links' ) as $bucket ) {
-			if ( ! empty( $registry[ $bucket ] ) && is_array( $registry[ $bucket ] ) ) {
-				$total += count( $registry[ $bucket ] );
-			}
-		}
-		if ( $total <= 0 ) {
+		if ( defined( 'WBAM_PRO_VERSION' ) || self::count() <= 0 ) {
 			return;
 		}
 		?>
-		<h2 class="wbam-settings-heading"><?php esc_html_e( 'Sample data', 'wb-ads-rotator-with-split-test' ); ?></h2>
+		<h2 class="wbam-settings-heading"><?php esc_html_e( 'Sample content', 'wb-ads-rotator-with-split-test' ); ?></h2>
 		<div class="wbam-card">
 			<p><?php esc_html_e( 'Remove the sample ads created by the setup wizard.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			<?php self::render_clear_button(); ?>
