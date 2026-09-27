@@ -14,6 +14,7 @@
 namespace WBAM\Tests\Pro;
 
 use WBAM\Tests\Helpers\Factory;
+use Wbcom\Credits\Ledger;
 use WBAM_Pro\Core\Credits_Bridge;
 use WBAM_Pro\Core\Revenue_Ledger;
 use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
@@ -34,17 +35,20 @@ class Test_Credits_Charge_Concurrency extends Pro_Test_Case {
 	 * then refuse, instead of racing it.
 	 */
 	public function test_charge_waits_for_a_charge_already_running_on_the_account(): void {
-		global $wpdb;
-
 		list( $advertiser_id, $user_id ) = $this->make_advertiser( 10000 );
 
-		// A second connection plays the other request, mid-charge.
+		// A second connection plays the other request, mid-charge, holding
+		// the SDK's per-user ledger lock (Credits SDK 1.9.0+).
+		$lock  = 'wbcc_' . substr( md5( Ledger::table_name( Credits_Bridge::PREFIX ) ), 0, 16 ) . '_' . $user_id;
 		$other = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
-		$this->assertSame( '1', (string) $other->get_var( $other->prepare( 'SELECT GET_LOCK(%s, 0)', $wpdb->prefix . 'wbam_credits_' . $user_id ) ) );
+		$this->assertSame( '1', (string) $other->get_var( $other->prepare( 'SELECT GET_LOCK(%s, 0)', $lock ) ) );
 
+		$wait = static fn () => 1;
+		add_filter( 'wbcom_credits_lock_timeout', $wait );
 		$result = Credits_Bridge::charge( $advertiser_id, 10, 1, 'Race probe', false, Revenue_Ledger::SOURCE_AD_PACKAGE );
+		remove_filter( 'wbcom_credits_lock_timeout', $wait );
 
-		$other->query( $other->prepare( 'SELECT RELEASE_LOCK(%s)', $wpdb->prefix . 'wbam_credits_' . $user_id ) );
+		$other->query( $other->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) );
 		$other->close();
 
 		$this->assertWPError( $result );
