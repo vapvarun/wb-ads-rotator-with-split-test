@@ -38,8 +38,7 @@ class Email_Captures {
 	 *              FREE-only site).
 	 */
 	public function init() {
-		// Priority 9: right under Add New, next to the ads it collects for.
-		add_action( 'admin_menu', array( $this, 'add_menu' ), 9 );
+		add_action( 'admin_menu', array( $this, 'add_menu' ) );
 		add_action( 'admin_post_wbam_export_email_captures', array( $this, 'handle_export' ) );
 		add_action( 'admin_post_wbam_delete_email_capture', array( $this, 'handle_delete' ) );
 		add_action( 'admin_init', array( $this, 'handle_bulk_delete' ) );
@@ -57,7 +56,9 @@ class Email_Captures {
 			__( 'Email Captures', 'wb-ads-rotator-with-split-test' ),
 			'manage_options',
 			'wbam-email-captures',
-			array( $this, 'render_page' )
+			array( $this, 'render_page' ),
+			// Right under All Ads / Add New, next to the ads it collects for.
+			2
 		);
 	}
 
