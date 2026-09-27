@@ -195,25 +195,46 @@ class Privacy_Helper {
 	}
 
 	/**
-	 * Check if IP anonymization is enabled in settings.
+	 * IP address for storage: always the salted one-way hash, never the raw
+	 * address (owner decision 6a, card 10344382999). Email captures and
+	 * partnership inquiries store this; there is no setting that stores a
+	 * raw IP.
 	 *
-	 * @return bool True if IP should be anonymized (default), false if raw IP can be stored.
+	 * @return string 64-character hash, or '' when no IP is available.
 	 */
-	public static function should_anonymize_ip() {
-		// Default to true for privacy by default.
-		return Settings_Helper::get( 'anonymize_ip', true );
+	public static function get_storage_ip() {
+		return self::get_anonymized_ip();
 	}
 
 	/**
-	 * Get IP address for storage (anonymized if enabled, raw otherwise).
+	 * Whether the current request looks like a bot or crawler, so it is not
+	 * counted as an impression or billed. One list for Free and Pro.
 	 *
-	 * @return string IP address (anonymized hash or raw based on settings).
+	 * @since 3.2.0
+	 * @return bool
 	 */
-	public static function get_storage_ip() {
-		if ( self::should_anonymize_ip() ) {
-			return self::get_anonymized_ip();
+	public static function is_bot() {
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? strtolower( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) ) : '';
+		if ( '' === $user_agent ) {
+			return true;
 		}
 
-		return self::get_raw_ip();
+		/**
+		 * Filter the user-agent fragments treated as bots.
+		 *
+		 * @param string[] $bot_patterns Lower-case fragments.
+		 */
+		$patterns = apply_filters(
+			'wbam_bot_patterns',
+			array( 'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider', 'yandexbot', 'sogou', 'exabot', 'facebot', 'facebookexternalhit', 'ia_archiver', 'mj12bot', 'semrushbot', 'ahrefsbot', 'dotbot', 'petalbot', 'bytespider', 'applebot', 'twitterbot', 'linkedinbot', 'pinterest', 'crawler', 'spider', 'bot/', 'bot;', 'headless', 'phantomjs', 'selenium', 'puppeteer', 'scraper', 'wget', 'curl/', 'python-requests', 'python-urllib', 'java/', 'httpclient', 'go-http-client', 'apache-httpclient', 'libwww-perl', 'mediapartners', 'lighthouse' )
+		);
+
+		foreach ( (array) $patterns as $pattern ) {
+			if ( '' !== $pattern && false !== strpos( $user_agent, (string) $pattern ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

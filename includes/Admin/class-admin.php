@@ -1179,6 +1179,10 @@ class Admin {
 					'Active ads in this placement: %d. They will stop showing. Continue?',
 					'wb-ads-rotator-with-split-test'
 				),
+				'confirmDeleteData' => __(
+					'When the plugin is deleted, everything listed under this option is removed for good. Keep this on?',
+					'wb-ads-rotator-with-split-test'
+				),
 			)
 		);
 	}

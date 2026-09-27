@@ -26,6 +26,32 @@ use WBAM\Tests\Helpers\Factory;
 
 class Test_Click_Tracking extends WP_UnitTestCase {
 
+	public function set_up(): void {
+		parent::set_up();
+		// A real visitor: bots and admins are not counted (card 10344382999).
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 Chrome/126.0 Safari/537.36';
+	}
+
+	public function tear_down(): void {
+		unset( $_SERVER['HTTP_USER_AGENT'] );
+		parent::tear_down();
+	}
+
+	public function test_bots_and_admins_are_not_counted(): void {
+		$ad_id = Factory::make_ad();
+
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
+		$this->assertFalse( $this->frontend()->record_analytics( $ad_id, 'impression', 'header' ) );
+
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh) Chrome/126.0 Safari/537.36';
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$this->assertFalse( $this->frontend()->record_analytics( $ad_id, 'impression', 'header' ) );
+
+		add_filter( 'wbam_count_analytics_event', '__return_true' );
+		$this->assertNotFalse( $this->frontend()->record_analytics( $ad_id, 'impression', 'header' ), 'A site can count its own admins.' );
+		remove_filter( 'wbam_count_analytics_event', '__return_true' );
+	}
+
 	private function frontend(): \WBAM\Frontend\Frontend {
 		return new \WBAM\Frontend\Frontend();
 	}

@@ -1017,6 +1017,27 @@
       "purpose": "Whether visitor views of an ad are counted in the wbam_ad_views cookie (Pro advertiser/campaign caps)"
     },
     {
+      "name": "wbam_bot_patterns",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Core/class-privacy-helper.php",
+      "purpose": "User-agent fragments treated as bots: not counted in Free reports, not counted or billed in Pro (Privacy_Helper::is_bot, one list for both)"
+    },
+    {
+      "name": "wbam_count_analytics_event",
+      "type": "filter",
+      "args": 4,
+      "where": "includes/Frontend/class-frontend.php",
+      "purpose": "Whether a Free impression/click is counted; false for bots and logged-in admins by default"
+    },
+    {
+      "name": "wbam_uninstall_data_items",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-settings.php",
+      "purpose": "Plain-language list shown under Delete Data on Uninstall; Pro adds its own data"
+    },
+    {
       "name": "wbam_currency_code",
       "type": "filter",
       "args": 1,

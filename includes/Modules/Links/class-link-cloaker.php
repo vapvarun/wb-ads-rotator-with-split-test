@@ -58,15 +58,24 @@ class Link_Cloaker {
 	public function add_rewrite_rules() {
 		$prefix = $this->get_cloak_prefix();
 
-		add_rewrite_rule(
-			'^' . preg_quote( $prefix, '/' ) . '/([^/]+)/?$',
-			'index.php?wbam_link=$matches[1]',
-			'top'
-		);
+		// Links published under an earlier prefix keep redirecting after the
+		// owner changes it (card 10344382999, owner decision 7b).
+		$previous = (array) get_option( 'wbam_link_prefix_history', array() );
+		$current  = get_option( 'wbam_link_prefix', '' );
+		if ( '' !== $current && $current !== $prefix && ! in_array( $current, $previous, true ) ) {
+			$previous[] = $current;
+			update_option( 'wbam_link_prefix_history', $previous, false );
+		}
 
-		// Check if rules need flushing.
-		$current_prefix = get_option( 'wbam_link_prefix', '' );
-		if ( $current_prefix !== $prefix ) {
+		foreach ( array_unique( array_merge( array( $prefix ), $previous ) ) as $each ) {
+			add_rewrite_rule(
+				'^' . preg_quote( $each, '/' ) . '/([^/]+)/?$',
+				'index.php?wbam_link=$matches[1]',
+				'top'
+			);
+		}
+
+		if ( $current !== $prefix ) {
 			flush_rewrite_rules( false );
 			update_option( 'wbam_link_prefix', $prefix );
 		}

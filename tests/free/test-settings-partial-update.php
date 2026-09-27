@@ -4,7 +4,7 @@
  *
  * Regression: on a fresh install the first PRO Modules save (which goes
  * through Settings_Helper::update( 'modules', ... )) blanked ad_label,
- * switched anonymize_ip off and zeroed max_ads_per_page, because the
+ * and zeroed max_ads_per_page, because the
  * register_setting sanitizer rebuilt every field from the partial input.
  *
  * @package WBAM\Tests
@@ -34,7 +34,6 @@ class Test_Settings_Partial_Update extends WP_UnitTestCase {
 
 		$stored = get_option( 'wbam_settings' );
 		$this->assertSame( 'Advertisement', $stored['ad_label'] );
-		$this->assertTrue( $stored['anonymize_ip'], 'GDPR IP anonymisation must stay on.' );
 		$this->assertSame( 10, $stored['max_ads_per_page'] );
 		$this->assertFalse( $stored['modules']['links'] );
 	}
@@ -44,7 +43,7 @@ class Test_Settings_Partial_Update extends WP_UnitTestCase {
 			'wbam_settings',
 			array(
 				'ad_label'          => 'Sponsored',
-				'anonymize_ip'      => false,
+				'require_consent_adsense'      => false,
 				'adsense_auto_ads'  => true,
 				'link_cloak_prefix' => 'out',
 			)
@@ -55,7 +54,7 @@ class Test_Settings_Partial_Update extends WP_UnitTestCase {
 		$stored = get_option( 'wbam_settings' );
 		$this->assertSame( 3, $stored['max_ads_per_page'] );
 		$this->assertSame( 'Sponsored', $stored['ad_label'] );
-		$this->assertFalse( $stored['anonymize_ip'] );
+		$this->assertFalse( $stored['require_consent_adsense'] );
 		$this->assertTrue( $stored['adsense_auto_ads'] );
 		$this->assertSame( 'out', $stored['link_cloak_prefix'] );
 	}
@@ -64,7 +63,7 @@ class Test_Settings_Partial_Update extends WP_UnitTestCase {
 		update_option(
 			'wbam_settings',
 			array(
-				'anonymize_ip'          => true,
+				'require_consent_adsense'          => true,
 				'disable_ads_admin'     => true,
 				'disable_on_post_types' => array( 'page' ),
 			)
@@ -72,7 +71,7 @@ class Test_Settings_Partial_Update extends WP_UnitTestCase {
 
 		// The form names every checkbox it drew; the cleared ones are absent.
 		$post = array(
-			'_fields'          => array( 'anonymize_ip', 'disable_ads_admin', 'disable_on_post_types', 'adsense_auto_ads' ),
+			'_fields'          => array( 'require_consent_adsense', 'disable_ads_admin', 'disable_on_post_types', 'adsense_auto_ads' ),
 			'adsense_auto_ads' => '1',
 			'ad_label'         => 'Ad',
 			'max_ads_per_page' => '4',
@@ -80,7 +79,7 @@ class Test_Settings_Partial_Update extends WP_UnitTestCase {
 		update_option( 'wbam_settings', $post );
 
 		$stored = get_option( 'wbam_settings' );
-		$this->assertFalse( $stored['anonymize_ip'] );
+		$this->assertFalse( $stored['require_consent_adsense'] );
 		$this->assertFalse( $stored['disable_ads_admin'] );
 		$this->assertSame( array(), $stored['disable_on_post_types'] );
 		$this->assertTrue( $stored['adsense_auto_ads'] );
@@ -91,9 +90,9 @@ class Test_Settings_Partial_Update extends WP_UnitTestCase {
 
 	public function test_rendered_checkbox_declares_itself_in_the_contract(): void {
 		ob_start();
-		( new \WBAM\Admin\Settings() )->render_checkbox_field( array( 'id' => 'anonymize_ip' ) );
+		( new \WBAM\Admin\Settings() )->render_checkbox_field( array( 'id' => 'require_consent_adsense' ) );
 		$html = ob_get_clean();
 
-		$this->assertStringContainsString( 'name="wbam_settings[_fields][]" value="anonymize_ip"', $html );
+		$this->assertStringContainsString( 'name="wbam_settings[_fields][]" value="require_consent_adsense"', $html );
 	}
 }

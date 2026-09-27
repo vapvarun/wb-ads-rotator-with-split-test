@@ -388,6 +388,24 @@ class Frontend {
 	public function record_analytics( $ad_id, $event_type, $placement = '' ) {
 		global $wpdb;
 
+		// Bots and the site's own admins are not visitors, so their views and
+		// clicks are not counted (card 10344382999). One writer for every
+		// entry point: render, beacon, REST and click.
+		$counts = ! Privacy_Helper::is_bot() && ! current_user_can( 'manage_options' );
+
+		/**
+		 * Filter whether this analytics event is counted.
+		 *
+		 * @since 3.2.0
+		 * @param bool   $counts     False for bots and logged-in admins.
+		 * @param int    $ad_id      Ad ID.
+		 * @param string $event_type impression or click.
+		 * @param string $placement  Placement ID.
+		 */
+		if ( ! apply_filters( 'wbam_count_analytics_event', $counts, $ad_id, $event_type, $placement ) ) {
+			return false;
+		}
+
 		$table_name = $wpdb->prefix . 'wbam_analytics';
 
 		// Check if table exists (cached to avoid repeated queries).

@@ -54,7 +54,8 @@ See [Google AdSense](../integrations/30-google-adsense.md).
 | Setting | What it does | Default |
 |---------|--------------|---------|
 | Require consent for AdSense | Load AdSense scripts only after visitor consent (works with common consent plugins) | Off |
-| Anonymize IP | Store anonymized IP hashes instead of raw IPs | On |
+
+IP addresses are always stored as a one-way hash, never the raw address. Views and clicks from bots and logged-in administrators are not counted.
 
 ## Advanced
 

@@ -1,5 +1,6 @@
 /**
- * Placements settings matrix.
+ * Settings-page behaviours: the placements matrix, the Delete Data
+ * confirmation and the Inactive Link URL row.
  *
  * Two behaviours: an advertiser gate can never outlive its site gate, and
  * closing a slot that carries live creatives asks first. Both are
@@ -7,6 +8,35 @@
  */
 ( function () {
 	'use strict';
+
+	// Ticking Delete Data on Uninstall asks first (card 10344382999).
+	var deleteData = document.getElementById( 'wbam_setting_delete_data_on_uninstall' );
+	if ( deleteData && window.wbamToast ) {
+		deleteData.addEventListener( 'change', function () {
+			if ( deleteData.checked ) {
+				window.wbamToast.confirm( window.wbamPlacementSettings.confirmDeleteData, function () {}, function () {
+					deleteData.checked = false;
+				} );
+			}
+		} );
+	}
+
+	// The Inactive Link URL only matters for "Redirect to custom URL", and is
+	// required then.
+	var inactiveAction = document.getElementById( 'wbam_setting_link_inactive_action' );
+	var inactiveUrl = document.getElementById( 'wbam_setting_link_inactive_url' );
+	if ( inactiveAction && inactiveUrl ) {
+		var syncInactiveUrl = function () {
+			var custom = 'custom' === inactiveAction.value;
+			var row = inactiveUrl.closest( 'tr' );
+			if ( row ) {
+				row.hidden = ! custom;
+			}
+			inactiveUrl.required = custom;
+		};
+		inactiveAction.addEventListener( 'change', syncInactiveUrl );
+		syncInactiveUrl();
+	}
 
 	var table = document.querySelector( '.wbam-placement-matrix' );
 	if ( ! table ) {

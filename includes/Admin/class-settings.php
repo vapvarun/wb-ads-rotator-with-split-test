@@ -61,7 +61,6 @@ class Settings {
 		'adsense_publisher_id'     => '',
 		'adsense_auto_ads'         => false,
 		'require_consent_adsense'  => false,  // Require consent before loading AdSense.
-		'anonymize_ip'             => true,   // Anonymize IP addresses in stored data.
 		'delete_data_on_uninstall' => false,
 		// Link cloaking. Read at runtime by Link_Cloaker but previously had no
 		// UI (the wbam_settings_tabs/_fields filter framework was never applied),
@@ -212,7 +211,7 @@ class Settings {
 			array(
 				'id'          => 'links',
 				'label'       => __( 'Enable the Link Manager', 'wb-ads-rotator-with-split-test' ),
-				'description' => __( 'Adds the Links menu for managing outbound and affiliate links, link categories and partnership inquiries. Turn this off if you only run ads - your existing link data is kept and reappears if you switch it back on.', 'wb-ads-rotator-with-split-test' ),
+				'description' => __( 'Adds the Links menu for managing outbound and affiliate links, link categories and partnership inquiries. Turn this off if you only run ads: links you already published keep redirecting, and your link data is kept for when you switch it back on.', 'wb-ads-rotator-with-split-test' ),
 			)
 		);
 	}
@@ -454,9 +453,7 @@ class Settings {
 		);
 
 		// Grouped with AdSense (not a separate Privacy card) since consent
-		// only gates AdSense's own script load — see sanitize_settings(),
-		// unchanged: still `anonymize_ip`'s neighbour there, only where it
-		// renders moved.
+		// only gates AdSense's own script load.
 		add_settings_field(
 			'require_consent_adsense',
 			__( 'Require Consent for AdSense', 'wb-ads-rotator-with-split-test' ),
@@ -477,28 +474,6 @@ class Settings {
 			array( $this, 'render_privacy_section' ),
 			'wbam-settings'
 		);
-
-		// Owner decision (3.2.0): with PRO active, PRO's own
-		// `wbam_pro_settings[gdpr_anonymize_ip]` is the ONE Anonymize IP
-		// switch shown (Privacy & Data section) — this field is not
-		// registered at all in that case, so it never renders anywhere.
-		// FREE's stored `anonymize_ip` value is left exactly as-is: no
-		// contract hidden input for it means no settings write ever touches
-		// it (see sanitize_settings()'s array_intersect_key() merge), and a
-		// FREE-only site keeps rendering and saving this switch normally.
-		if ( ! defined( 'WBAM_PRO_VERSION' ) ) {
-			add_settings_field(
-				'anonymize_ip',
-				__( 'Anonymize IP Addresses', 'wb-ads-rotator-with-split-test' ),
-				array( $this, 'render_checkbox_field' ),
-				'wbam-settings',
-				'wbam_privacy',
-				array(
-					'id'          => 'anonymize_ip',
-					'description' => __( 'Store anonymized IP hashes instead of raw IP addresses. Recommended for GDPR compliance.', 'wb-ads-rotator-with-split-test' ),
-				)
-			);
-		}
 
 		// Danger Zone section (formerly "Advanced" - the only field here is
 		// destructive, so the card is styled and ordered as one). Rendered
@@ -521,7 +496,7 @@ class Settings {
 			'wbam_advanced',
 			array(
 				'id'          => 'delete_data_on_uninstall',
-				'description' => __( 'Delete all plugin data (ads, analytics, settings) when the plugin is uninstalled.', 'wb-ads-rotator-with-split-test' ),
+				'description' => $this->uninstall_data_description(),
 			)
 		);
 
@@ -545,8 +520,8 @@ class Settings {
 				'label_for'   => 'wbam_setting_link_cloak_prefix',
 				'id'          => 'link_cloak_prefix',
 				'placeholder' => 'go',
-				/* translators: %s: example cloaked URL */
-				'description' => sprintf( __( 'The path segment for your cloaked links, e.g. %s. Changing this updates the URL every cloaked link uses.', 'wb-ads-rotator-with-split-test' ), home_url( '/go/your-link' ) ),
+				/* translators: %s: example cloaked URL built from the current prefix */
+				'description' => sprintf( __( 'The path segment for your cloaked links, e.g. %s. Links already published under an earlier prefix keep working after you change it.', 'wb-ads-rotator-with-split-test' ), home_url( '/' . \WBAM\Modules\Links\Link_Cloaker::get_instance()->get_cloak_prefix() . '/your-link' ) ),
 			)
 		);
 
@@ -578,8 +553,41 @@ class Settings {
 				'label_for'   => 'wbam_setting_link_inactive_url',
 				'id'          => 'link_inactive_url',
 				'placeholder' => 'https://example.com/gone',
-				'description' => __( 'Used only when the action above is "Redirect to custom URL".', 'wb-ads-rotator-with-split-test' ),
+				'description' => __( 'Where visitors go when the action above is "Redirect to custom URL".', 'wb-ads-rotator-with-split-test' ),
 			)
+		);
+	}
+
+	/**
+	 * What 'Delete Data on Uninstall' removes, in words (card 10344382999,
+	 * owner decision 6b). Pro adds its own data through the filter, since
+	 * this one switch also clears Pro's tables.
+	 *
+	 * @since 3.2.0
+	 * @return string
+	 */
+	private function uninstall_data_description() {
+		/**
+		 * Filter the list of data 'Delete Data on Uninstall' removes.
+		 *
+		 * @since 3.2.0
+		 * @param string[] $items Plain-language items.
+		 */
+		$items = (array) apply_filters(
+			'wbam_uninstall_data_items',
+			array(
+				__( 'every ad and ad tag', 'wb-ads-rotator-with-split-test' ),
+				__( 'ad reports', 'wb-ads-rotator-with-split-test' ),
+				__( 'links, link categories and partnership inquiries', 'wb-ads-rotator-with-split-test' ),
+				__( 'email sign-ups', 'wb-ads-rotator-with-split-test' ),
+				__( 'all settings', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+
+		return sprintf(
+			/* translators: %s: comma-separated list of what is deleted */
+			__( 'When the plugin is deleted, permanently remove: %s. This cannot be undone.', 'wb-ads-rotator-with-split-test' ),
+			implode( ', ', $items )
 		);
 	}
 
@@ -713,7 +721,6 @@ class Settings {
 
 		// Privacy settings.
 		$sanitized['require_consent_adsense'] = ! empty( $input['require_consent_adsense'] );
-		$sanitized['anonymize_ip']            = ! empty( $input['anonymize_ip'] );
 
 		// Advanced settings.
 		$sanitized['delete_data_on_uninstall'] = ! empty( $input['delete_data_on_uninstall'] );
@@ -1090,10 +1097,13 @@ class Settings {
 			'render' => array( $this, 'render_ads_display_page' ),
 		);
 
-		$sections['links'] = array(
-			'label'  => __( 'Links', 'wb-ads-rotator-with-split-test' ),
-			'render' => array( $this, 'render_links_page' ),
-		);
+		// Settings > Links follows the Link Manager switch (card 10344382999).
+		if ( \WBAM\Core\Settings_Helper::is_module_enabled( 'links' ) ) {
+			$sections['links'] = array(
+				'label'  => __( 'Links', 'wb-ads-rotator-with-split-test' ),
+				'render' => array( $this, 'render_links_page' ),
+			);
+		}
 
 		$sections['location'] = array(
 			'label'  => __( 'Location', 'wb-ads-rotator-with-split-test' ),
@@ -1560,7 +1570,7 @@ class Settings {
 	 * Render privacy section.
 	 */
 	public function render_privacy_section() {
-		echo '<p>' . esc_html__( 'Configure privacy and GDPR compliance settings. These options help ensure your site respects user privacy.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+		echo '<p>' . esc_html__( 'IP addresses are always stored as a one-way hash, never the raw address, for email sign-ups and partnership inquiries alike.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 	}
 
 	/**
@@ -1625,7 +1635,7 @@ class Settings {
 	 * Render the Features section intro.
 	 */
 	public function render_features_section() {
-		echo '<p>' . esc_html__( 'Switch off anything this site does not use. Turning a feature off only hides its admin menu - no data is deleted.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+		echo '<p>' . esc_html__( 'Turn off what this site does not use. Its data is kept.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 	}
 
 	/**

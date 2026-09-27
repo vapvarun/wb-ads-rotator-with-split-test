@@ -266,6 +266,9 @@ inventory in `audit/manifest.json`.
 | `wbam_code_ad_sandbox_attrs` | $sandbox_attrs, $ad_id | Filter the sandbox attributes for code ad iframes. allow-same-origin is dropped whenever allow-scripts is present. |
 | `wbam_code_ad_use_sandbox` | $use_sandbox, $ad_id, $code | Filter whether to use iframe sandbox for this code ad. When enabled, the ad code will be rendered in a sandboxed iframe for additional security isolation. |
 | `wbam_count_visitor_views` | $counts, $ad_id | Filters whether visitor views of an ad are counted. Return true when a cap outside the ad's own daily limit reads get_ad_views() for this ad. |
+| `wbam_bot_patterns` | $bot_patterns | User-agent fragments treated as bots. Bots are not counted in reports and, with Pro, not billed. |
+| `wbam_count_analytics_event` | $counts, $ad_id, $event_type, $placement | Whether an impression or click is counted. False for bots and logged-in admins by default. |
+| `wbam_uninstall_data_items` | $items | The list shown under Delete Data on Uninstall. |
 | `wbam_currency_code` | $currency | The site currency code (USD unless Pro sets its Credits currency). |
 | `wbam_currency_symbol` | $symbol, $currency | Change the symbol for a currency code. The symbol otherwise follows the code. |
 | `wbam_detected_device` | $device, $user_agent | Filter the detected device type. Allows themes/plugins to override device detection for custom logic. |

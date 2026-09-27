@@ -76,55 +76,46 @@ class Links_Module {
 	 * Initialize the module.
 	 */
 	public function init() {
-		// The site owner's Links module switch (Settings > Modules) is the
-		// single gate for this feature: off means no admin menu, no
-		// cloaking/redirect handling, no shortcodes, and - the reason this
-		// check lives here rather than only in Links_Admin/Partnership_Admin
-		// - no frontend links-frontend.js/partnership-form.css/js either.
-		// Plugin::init_hooks() instantiates this class unconditionally, so
-		// gating at the top of init() is the one place every consumer of
-		// the module (frontend and admin) routes through.
-		if ( ! \WBAM\Core\Settings_Helper::is_module_enabled( 'links' ) ) {
-			return;
-		}
-
-		// Initialize manager (available everywhere).
+		// Links already published keep working whatever the Link Manager
+		// switch says: cloaked /go/ redirects, the link shortcodes and click
+		// counting. Turning it off used to unload all of this, so every
+		// existing cloaked link fell through to the homepage (card
+		// 10344382999, owner decision 7a).
 		$this->manager = Link_Manager::get_instance();
 
-		// Initialize cloaker for frontend redirects.
 		$this->cloaker = Link_Cloaker::get_instance();
 		$this->cloaker->init();
 
-		// Initialize shortcodes.
 		$this->shortcodes = Link_Shortcodes::get_instance();
 		$this->shortcodes->init();
 
-		// Initialize partnership form (frontend shortcode).
+		if ( ! is_admin() ) {
+			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts' ) );
+		}
+		add_action( 'wp_ajax_wbam_track_link_click', array( $this, 'ajax_track_click' ) );
+		add_action( 'wp_ajax_nopriv_wbam_track_link_click', array( $this, 'ajax_track_click' ) );
+
+		// Off hides the feature itself: the admin screens, Settings > Links,
+		// new partnership inquiries and Pro's link tools. A published
+		// partnership form prints nothing rather than its raw shortcode.
+		if ( ! \WBAM\Core\Settings_Helper::is_module_enabled( 'links' ) ) {
+			add_shortcode( 'wbam_partnership_inquiry', '__return_empty_string' );
+			return;
+		}
+
 		$this->partnership_form = Partnership_Form::get_instance();
 		$this->partnership_form->init();
 
-		// Initialize partnership email notifications.
 		$this->partnership_emails = Partnership_Emails::get_instance();
 		$this->partnership_emails->init();
 
-		// Initialize admin.
 		if ( is_admin() ) {
 			$this->admin = Links_Admin::get_instance();
 			$this->admin->init();
 
-			// Initialize partnership admin.
 			$this->partnership_admin = Partnership_Admin::get_instance();
 			$this->partnership_admin->init();
 		}
-
-		// Frontend scripts for click tracking.
-		if ( ! is_admin() ) {
-			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts' ) );
-		}
-
-		// AJAX handlers for click tracking.
-		add_action( 'wp_ajax_wbam_track_link_click', array( $this, 'ajax_track_click' ) );
-		add_action( 'wp_ajax_nopriv_wbam_track_link_click', array( $this, 'ajax_track_click' ) );
 
 		/**
 		 * Fires after the Links module has wired its own hooks, so an
