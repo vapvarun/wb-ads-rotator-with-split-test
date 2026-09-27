@@ -76,6 +76,7 @@ class Admin {
 		add_action( 'admin_notices', array( $this, 'render_save_notice' ) );
 		add_filter( 'wp_insert_post_data', array( $this, 'keep_incomplete_ad_draft' ), 10, 2 );
 		add_filter( 'redirect_post_location', array( $this, 'draft_saved_message' ), 10, 2 );
+		add_filter( 'post_updated_messages', array( $this, 'ad_updated_messages' ) );
 		// Free-only surface for the one-time "size matching" opt-in notice
 		// (owner decision 13). Pro ships an equivalent CTA on its own
 		// next-step banner (class-next-step-banner.php) with its own action
@@ -2933,6 +2934,19 @@ class Admin {
 		}
 
 
+		// Soft warning, never a block (card 10344381767): a published ad with
+		// nothing to show, or no placement, appears nowhere by itself.
+		if ( 'publish' === get_post_status( $post_id ) ) {
+			$handler    = Placement_Engine::get_instance()->get_ad_type( $submitted_ad_type );
+			$placements = (array) get_post_meta( $post_id, '_wbam_placements', true );
+			if ( $handler && method_exists( $handler, 'has_creative' ) && ! $handler->has_creative( $post_id ) && ! method_exists( $handler, 'missing_setting' ) ) {
+				self::add_save_notice( $post_id, 'warning', __( 'This ad has nothing to show yet, so it won\'t appear anywhere until you add it.', 'wb-ads-rotator-with-split-test' ) );
+			}
+			if ( ! array_filter( $placements ) && ! in_array( $submitted_ad_type, self::ad_types_without_placements(), true ) ) {
+				self::add_save_notice( $post_id, 'warning', __( 'No placement is ticked, so this ad only appears where you add it yourself (shortcode, block or widget).', 'wb-ads-rotator-with-split-test' ) );
+			}
+		}
+
 		/**
 		 * Action fired after ad meta is saved.
 		 *
@@ -2940,6 +2954,33 @@ class Admin {
 		 * @param int $post_id Post ID.
 		 */
 		do_action( 'wbam_save_ad_meta', $post_id );
+	}
+
+	/**
+	 * Say 'Ad published.' instead of 'Post published.', with no View link
+	 * (an ad has no page of its own).
+	 *
+	 * @param array $messages Messages per post type.
+	 * @return array
+	 */
+	public function ad_updated_messages( $messages ) {
+		$post = get_post();
+
+		$messages['wbam-ad'] = array(
+			0  => '',
+			1  => __( 'Ad updated.', 'wb-ads-rotator-with-split-test' ),
+			4  => __( 'Ad updated.', 'wb-ads-rotator-with-split-test' ),
+			6  => __( 'Ad published.', 'wb-ads-rotator-with-split-test' ),
+			7  => __( 'Ad saved.', 'wb-ads-rotator-with-split-test' ),
+			8  => __( 'Ad submitted.', 'wb-ads-rotator-with-split-test' ),
+			9  => $post
+				/* translators: %s: date and time the ad is scheduled to publish */
+				? sprintf( __( 'Ad scheduled for %s.', 'wb-ads-rotator-with-split-test' ), wbam_format_datetime( $post->post_date_gmt, get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ) )
+				: __( 'Ad scheduled.', 'wb-ads-rotator-with-split-test' ),
+			10 => __( 'Ad draft updated.', 'wb-ads-rotator-with-split-test' ),
+		);
+
+		return $messages;
 	}
 
 	/**

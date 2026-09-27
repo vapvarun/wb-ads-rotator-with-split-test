@@ -99,6 +99,40 @@ class Demo_Data_Cleaner {
 	}
 
 	/**
+	 * Remove the WB Ad Manager widgets that showed one of these ads (the
+	 * setup wizard's sample widget), so removing the samples leaves no
+	 * orphan widget behind (card 10344381767).
+	 *
+	 * @param int[] $ad_ids Removed ad IDs.
+	 */
+	private static function remove_widgets_for( array $ad_ids ) {
+		$instances = get_option( 'widget_wbam_ad_widget', array() );
+		if ( ! $ad_ids || ! is_array( $instances ) ) {
+			return;
+		}
+
+		$gone = array();
+		foreach ( $instances as $number => $instance ) {
+			if ( is_array( $instance ) && in_array( (int) ( $instance['ad_id'] ?? 0 ), $ad_ids, true ) ) {
+				unset( $instances[ $number ] );
+				$gone[] = 'wbam_ad_widget-' . $number;
+			}
+		}
+		if ( ! $gone ) {
+			return;
+		}
+		update_option( 'widget_wbam_ad_widget', $instances );
+
+		$sidebars = wp_get_sidebars_widgets();
+		foreach ( $sidebars as $sidebar_id => $widgets ) {
+			if ( is_array( $widgets ) ) {
+				$sidebars[ $sidebar_id ] = array_values( array_diff( $widgets, $gone ) );
+			}
+		}
+		wp_set_sidebars_widgets( $sidebars );
+	}
+
+	/**
 	 * Handle the admin-post clear request.
 	 */
 	public static function handle_clear_request() {
@@ -167,6 +201,8 @@ class Demo_Data_Cleaner {
 			'skipped' => 0,
 		);
 
+		$removed_ads = array();
+
 		// Post-backed buckets: ads + pages.
 		foreach ( array( 'ads', 'pages' ) as $bucket ) {
 			if ( empty( $registry[ $bucket ] ) || ! is_array( $registry[ $bucket ] ) ) {
@@ -198,6 +234,9 @@ class Demo_Data_Cleaner {
 				$deleted = wp_delete_post( $post_id, true );
 				if ( $deleted ) {
 					++$counts[ $bucket ];
+					if ( 'ads' === $bucket ) {
+						$removed_ads[] = $post_id;
+					}
 				}
 			}
 		}
@@ -220,6 +259,8 @@ class Demo_Data_Cleaner {
 				}
 			}
 		}
+
+		self::remove_widgets_for( $removed_ads );
 
 		delete_option( self::OPTION_IDS );
 

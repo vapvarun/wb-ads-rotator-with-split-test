@@ -41,7 +41,7 @@ class Rich_Content_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Create ads with the WordPress editor.', 'wb-ads-rotator-with-split-test' );
+		return __( 'Write the ad in HTML: text, links, images and basic formatting.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**

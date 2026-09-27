@@ -451,7 +451,7 @@ class Links_Admin {
 								<?php esc_html_e( 'Enable cloaking', 'wb-ads-rotator-with-split-test' ); ?>
 							</label>
 							<p class="description" style="margin:4px 0 10px 24px;">
-								<?php esc_html_e( 'When on, the short URL stays in the address bar while the browser is sent to the destination. Visitors see your domain, not the target. Turn off only if you want the raw destination URL in place.', 'wb-ads-rotator-with-split-test' ); ?>
+								<?php esc_html_e( 'When on, the link uses your short URL, which redirects the visitor to the destination (the destination then shows in the address bar). When off, the link points straight to the destination.', 'wb-ads-rotator-with-split-test' ); ?>
 							</p>
 
 							<label>

@@ -52,6 +52,7 @@ class Setup_Wizard {
 			add_action( 'admin_init', array( $this, 'setup_wizard' ) );
 			add_action( 'admin_notices', array( $this, 'show_setup_notice' ) );
 			add_action( 'wp_ajax_wbam_dismiss_setup', array( $this, 'dismiss_setup' ) );
+			add_action( 'admin_post_wbam_skip_setup', array( $this, 'skip_setup' ) );
 		}
 	}
 
@@ -100,7 +101,9 @@ class Setup_Wizard {
 	 * Show setup notice.
 	 */
 	public function show_setup_notice() {
-		if ( self::is_setup_complete() ) {
+		// Only people who can run or dismiss the wizard see it; an editor
+		// used to get a notice whose dismiss was refused (card 10344381767).
+		if ( self::is_setup_complete() || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
@@ -123,7 +126,7 @@ class Setup_Wizard {
 				<a href="<?php echo esc_url( $wizard_url ); ?>" class="button button-primary">
 					<?php esc_html_e( 'Run Setup Wizard', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
-				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad' ) ); ?>" class="button">
+				<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=wbam_skip_setup' ), 'wbam_skip_setup' ) ); ?>" class="button">
 					<?php esc_html_e( 'Skip Setup', 'wb-ads-rotator-with-split-test' ); ?>
 				</a>
 			</p>
@@ -153,6 +156,21 @@ class Setup_Wizard {
 
 		update_option( 'wbam_setup_dismissed', true );
 		wp_send_json_success();
+	}
+
+	/**
+	 * 'Skip Setup': remember the choice (it used to only open the Ads list,
+	 * so the notice came back on every screen), then go to the Ads list.
+	 */
+	public function skip_setup() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'wb-ads-rotator-with-split-test' ), '', array( 'response' => 403 ) );
+		}
+		check_admin_referer( 'wbam_skip_setup' );
+
+		update_option( 'wbam_setup_dismissed', true );
+		wp_safe_redirect( admin_url( 'edit.php?post_type=wbam-ad' ) );
+		exit;
 	}
 
 	/**
@@ -544,6 +562,13 @@ class Setup_Wizard {
 	 */
 	private function place_sample_widget( $ad_id ) {
 		global $wp_registered_sidebars;
+
+		// A block theme may register a sidebar its templates never show
+		// (TT5), so the sample would sit where no visitor sees it (owner
+		// decision: no widget sample on themes without widget areas).
+		if ( wp_is_block_theme() ) {
+			return;
+		}
 
 		$sidebar_ids = array_diff( array_keys( (array) $wp_registered_sidebars ), array( 'wp_inactive_widgets' ) );
 		if ( empty( $sidebar_ids ) ) {

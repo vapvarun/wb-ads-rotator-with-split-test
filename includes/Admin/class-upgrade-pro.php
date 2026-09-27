@@ -121,7 +121,7 @@ class Upgrade_Pro {
 							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 						</tr>
 						<tr>
-							<td><?php esc_html_e( '16+ Placements (Header, Footer, Content, Paragraph, Archive, Popup, Sticky, Widget, Comments, Shortcode)', 'wb-ads-rotator-with-split-test' ); ?></td>
+							<td><?php esc_html_e( '11 placements (Header, Footer, Before/After Content, After Paragraph, Before/After Archive, Popup, Sticky, Widget, Comments, Shortcode), plus BuddyPress and bbPress placements when those plugins are active', 'wb-ads-rotator-with-split-test' ); ?></td>
 							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 						</tr>
@@ -141,7 +141,7 @@ class Upgrade_Pro {
 							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 						</tr>
 						<tr>
-							<td><?php esc_html_e( 'Geo-Targeting (Country, Region)', 'wb-ads-rotator-with-split-test' ); ?></td>
+							<td><?php esc_html_e( 'Geo-Targeting by Country', 'wb-ads-rotator-with-split-test' ); ?></td>
 							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 						</tr>
@@ -187,7 +187,7 @@ class Upgrade_Pro {
 						</tr>
 						<tr>
 							<td><?php esc_html_e( 'Broken Link Detection', 'wb-ads-rotator-with-split-test' ); ?></td>
-							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
+							<td class="wbam-cross"><?php echo wbam_icon( 'minus', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 							<td class="wbam-check"><?php echo wbam_icon( 'check-circle', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?></td>
 						</tr>
 						<tr>
@@ -443,7 +443,7 @@ class Upgrade_Pro {
 
 			<div class="wbam-cta-section">
 				<h2><?php esc_html_e( 'Ready to Grow Your Revenue?', 'wb-ads-rotator-with-split-test' ); ?></h2>
-				<p><?php esc_html_e( 'Join thousands of website owners who use WB Ad Manager PRO to maximize their advertising income.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p><?php esc_html_e( 'PRO lets advertisers sign up, pay and manage their own ads, on top of everything in the free plugin.', 'wb-ads-rotator-with-split-test' ); ?></p>
 
 				<div class="wbam-cta-buttons">
 					<a href="https://wbcomdesigns.com/downloads/wb-ad-manager-pro/" target="_blank" class="button button-primary button-hero">

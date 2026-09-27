@@ -217,7 +217,7 @@ class Help_Docs {
 						<li><?php esc_html_e( 'Pick an ad type (Image, Rich Content, HTML/JS Code, Google AdSense, or Email Capture) and fill in its content.', 'wb-ads-rotator-with-split-test' ); ?></li>
 						<li><?php esc_html_e( 'Check one or more placements in the Placements box (header, footer, after paragraph X, sidebar widget, popup, sticky bar, etc.).', 'wb-ads-rotator-with-split-test' ); ?></li>
 						<li><?php esc_html_e( 'Set Priority 1 to 10 in the Ad Status box. When several ads share a placement, higher-priority ads are shown more often.', 'wb-ads-rotator-with-split-test' ); ?></li>
-						<li><?php esc_html_e( 'Publish. The ad starts appearing immediately in every placement you selected.', 'wb-ads-rotator-with-split-test' ); ?></li>
+						<li><?php esc_html_e( 'Publish. The ad shows in the placements you selected from the next page load, or from its start date if you set one. A page cache can delay it until the cache refreshes.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					</ol>
 				</div>
 
@@ -348,7 +348,7 @@ class Help_Docs {
 					</li>
 					<li><strong><?php esc_html_e( 'Weighted rotation:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Assign each ad a 1-10 priority slider; higher priorities win more often in the same placement.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><strong><?php esc_html_e( 'A/B comparison box:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Side-by-side impressions / clicks / CTR across ads sharing a placement, with an automatic "winner" badge at 100+ impressions.', 'wb-ads-rotator-with-split-test' ); ?></li>
-					<li><strong><?php esc_html_e( 'Frequency control:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Per-ad session impression cap + global max-ads-per-page, plus lazy loading for below-the-fold ads.', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><strong><?php esc_html_e( 'Frequency control:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Per-ad session impression cap + global max-ads-per-page.', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>
 			</div>
 
@@ -370,7 +370,7 @@ class Help_Docs {
 				<ul>
 					<li><strong><?php esc_html_e( 'Visitor targeting:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Device (desktop / tablet / mobile), user status (logged in / out), and user role (Administrator, Editor, Author, Subscriber, or any custom role).', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><strong><?php esc_html_e( 'Content targeting:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Include / exclude by specific post, page, category, tag, post type, or page template.', 'wb-ads-rotator-with-split-test' ); ?></li>
-					<li><strong><?php esc_html_e( 'Geo targeting:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Country-level targeting via ip-api.com, ipinfo.io, or ipapi.co with automatic provider fallback.', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><strong><?php esc_html_e( 'Geo targeting:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Country-level targeting with the provider you choose: a MaxMind GeoLite2 file on your server (nothing leaves your site) or ipinfo.io with your own key. There is no fallback to another service.', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><strong><?php esc_html_e( 'Scheduling:', 'wb-ads-rotator-with-split-test' ); ?></strong> <?php esc_html_e( 'Start / end dates, specific days of the week, and time-of-day ranges (using your WordPress timezone).', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>
 			</div>
@@ -661,7 +661,7 @@ class Help_Docs {
 
 			<div class="wbam-faq-item">
 				<h4><?php esc_html_e( 'Can I accept partnership / paid link inquiries from my site?', 'wb-ads-rotator-with-split-test' ); ?></h4>
-				<p><?php esc_html_e( 'Yes. Drop [wbam_partnership_inquiry] on any page. Visitors fill out a structured form (partnership type, budget, target page, anchor text). Inquiries appear under WB Ad Manager → Link Partnerships with accept / reject workflow and automatic email notifications.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p><?php esc_html_e( 'Yes. Drop [wbam_partnership_inquiry] on any page. Visitors fill out a structured form (partnership type, budget, target page, anchor text). Inquiries appear under WB Ad Manager → Partnerships with accept / reject workflow and automatic email notifications.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 
 			<h3><?php esc_html_e( 'Links', 'wb-ads-rotator-with-split-test' ); ?></h3>
