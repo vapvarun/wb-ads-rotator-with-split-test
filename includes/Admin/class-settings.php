@@ -1545,11 +1545,17 @@ class Settings {
 			return '';
 		}
 
-		return sprintf(
+		$message = sprintf(
 			/* translators: %s: legacy provider display name, e.g. "ip-api.com". */
 			esc_html__( 'This site is still using %s from before geolocation required an explicit provider choice. It keeps working, but we recommend switching to the local MaxMind database or the HTTPS API (ipinfo.io) provider in Location settings.', 'wb-ads-rotator-with-split-test' ),
 			'<strong>' . esc_html( $legacy[ $provider ] ) . '</strong>'
 		);
+		// ip-api.com's free tier has no HTTPS, so say what that means.
+		if ( 'ip-api' === $provider ) {
+			$message .= ' ' . esc_html__( 'It sends visitors\' IP addresses over plain, unencrypted HTTP.', 'wb-ads-rotator-with-split-test' );
+		}
+
+		return $message;
 	}
 
 	/**

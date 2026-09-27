@@ -82,6 +82,6 @@
 	</rule>
 
 	<!-- Minimum supported PHP version -->
-	<config name="minimum_supported_wp_version" value="5.8"/>
-	<config name="testVersion" value="7.4-"/>
+	<config name="minimum_supported_wp_version" value="6.9"/>
+	<config name="testVersion" value="8.1-"/>
 </ruleset>

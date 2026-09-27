@@ -542,3 +542,21 @@ if ( ! function_exists( 'wbam_ad_uses_placements' ) ) {
 		return ! in_array( $type, wbam_ad_types_without_placements(), true );
 	}
 }
+
+if ( ! function_exists( 'wbam_sidebars_widgets' ) ) {
+	/**
+	 * Widget area => widget ids, as saved. Reads the option instead of core's
+	 * wp_get_sidebars_widgets(), which is marked private and refused by the
+	 * WordPress.org Plugin Check.
+	 *
+	 * @since 3.2.0
+	 * @return array<string, string[]>
+	 */
+	function wbam_sidebars_widgets() {
+		$sidebars = get_option( 'sidebars_widgets', array() );
+		$sidebars = is_array( $sidebars ) ? $sidebars : array();
+		unset( $sidebars['array_version'] );
+
+		return $sidebars;
+	}
+}

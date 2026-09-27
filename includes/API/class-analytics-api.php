@@ -231,11 +231,12 @@ class Analytics_API {
 
 		$where_sql = implode( ' AND ', $where );
 
+		$day_sql = wbam_sql_site_date( 'created_at' ); // Static SQL fragment (int offset).
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-				"SELECT " . wbam_sql_site_date( 'created_at' ) . " as day, event_type, COUNT(*) as count FROM {$table} WHERE {$where_sql} GROUP BY day, event_type ORDER BY day ASC",
+				"SELECT {$day_sql} as day, event_type, COUNT(*) as count FROM {$table} WHERE {$where_sql} GROUP BY day, event_type ORDER BY day ASC",
 				$values
 			)
 		);

@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['8.1', '8.2', '8.3', '8.4']
+        php-version: ['8.1', '8.2', '8.3', '8.4', '8.5']
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -63,7 +63,7 @@ jobs:
       - run: npx eslint@8 assets/js/ || true
 
   php-compatibility:
-    name: PHP Compatibility (7.4-8.4)
+    name: PHP Compatibility (8.1-8.5)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -79,7 +79,7 @@ jobs:
           COMPOSER_HOME=$(composer global config home)
           phpcs --config-set installed_paths \
             "$COMPOSER_HOME/vendor/phpcompatibility/php-compatibility,$COMPOSER_HOME/vendor/phpcompatibility/phpcompatibility-paragonie,$COMPOSER_HOME/vendor/phpcompatibility/phpcompatibility-wp,$COMPOSER_HOME/vendor/wp-coding-standards/wpcs,$COMPOSER_HOME/vendor/phpcsstandards/phpcsutils"
-      - run: phpcs --standard=PHPCompatibilityWP --extensions=php --ignore=vendor,node_modules,.wordpress-org --runtime-set testVersion 7.4-8.4 -n .
+      - run: phpcs --standard=PHPCompatibilityWP --extensions=php --ignore=vendor,node_modules,.wordpress-org --runtime-set testVersion 8.1-8.5 -n .
 
   security:
     name: Composer Security Audit

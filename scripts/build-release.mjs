@@ -259,12 +259,28 @@ function requireHooksDocumented() {
 	}
 }
 
+// WordPress.org gate: Plugin Check on the shipped files, fail on any ERROR
+// (card 10344483894). WBAM_SKIP_PLUGIN_CHECK=1 bypasses it only where no
+// WordPress with plugin-check exists; never for a directory release.
+function requirePluginCheck() {
+	if ( process.env.WBAM_SKIP_PLUGIN_CHECK === '1' ) {
+		console.log( 'Plugin Check SKIPPED (WBAM_SKIP_PLUGIN_CHECK=1) - not for a WordPress.org release.' );
+		return;
+	}
+	try {
+		run('bash', ['bin/plugin-check-gate.sh'], { stdio: 'inherit' });
+	} catch (e) {
+		die(1, 'Plugin Check reported errors on the shipped files (or could not run) - fix them, commit, then release.');
+	}
+}
+
 function main() {
 	const { mainFile, slug, releaseName, version } = parseMainPlugin();
 	console.log(BOLD(`\nBuilding release: ${releaseName} ${version}`));
 
 	requireHooksDocumented();
 	requireDatesInUtc();
+	requirePluginCheck();
 	regenerateRtlStylesheets();
 	minifyAssets();
 	regeneratePot( slug );

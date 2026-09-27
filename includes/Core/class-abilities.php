@@ -1515,12 +1515,14 @@ class Abilities {
 			)
 		);
 
-		// Daily breakdown.
+		// Daily breakdown. The site-day expression is a static fragment
+		// (wbam_sql_site_date() returns SQL built from an int offset).
+		$day_sql = wbam_sql_site_date( 'clicked_at' );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- WBAM custom table name from $wpdb->prefix, not user input.
 		$by_date_raw = $wpdb->get_results(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-				"SELECT " . wbam_sql_site_date( 'clicked_at' ) . " as day, COUNT(*) as clicks, COUNT(DISTINCT visitor_hash) as unique_clicks FROM {$clicks_table} WHERE {$where_sql} GROUP BY day ORDER BY day ASC",
+				"SELECT {$day_sql} as day, COUNT(*) as clicks, COUNT(DISTINCT visitor_hash) as unique_clicks FROM {$clicks_table} WHERE {$where_sql} GROUP BY day ORDER BY day ASC",
 				$values
 			)
 		);

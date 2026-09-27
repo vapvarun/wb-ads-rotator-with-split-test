@@ -246,7 +246,7 @@ final class Ad_Status {
 		$in_use = (bool) is_active_widget( false, false, 'wbam_ad_widget', true );
 		if ( ! $in_use ) {
 			$blocks = (array) get_option( 'widget_block', array() );
-			foreach ( wp_get_sidebars_widgets() as $sidebar => $widget_ids ) {
+			foreach ( wbam_sidebars_widgets() as $sidebar => $widget_ids ) {
 				if ( 'wp_inactive_widgets' === $sidebar ) {
 					continue;
 				}

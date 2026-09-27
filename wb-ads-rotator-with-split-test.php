@@ -17,11 +17,32 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       wb-ads-rotator-with-split-test
  * Domain Path:       /languages
+ * Requires at least: 6.9
+ * Requires PHP:      8.1
  */
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
+}
+
+// Stop before loading anything on a site below the supported floor, with a
+// notice instead of a fatal. Kept to syntax any PHP can parse.
+if ( version_compare( PHP_VERSION, '8.1', '<' ) || version_compare( get_bloginfo( 'version' ), '6.9', '<' ) ) {
+	add_action(
+		'admin_notices',
+		function () {
+			echo '<div class="notice notice-error"><p>' . esc_html(
+				sprintf(
+					/* translators: 1: required PHP version, 2: required WordPress version */
+					__( 'WB Ad Manager needs PHP %1$s and WordPress %2$s or newer, so it is not running. Ask your host to update PHP, or update WordPress.', 'wb-ads-rotator-with-split-test' ),
+					'8.1',
+					'6.9'
+				)
+			) . '</p></div>';
+		}
+	);
+	return;
 }
 
 /**

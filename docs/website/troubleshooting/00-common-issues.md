@@ -11,8 +11,8 @@ Work through the quick fixes first, then the specific sections.
 
 ## Plugin will not activate
 
-- Confirm PHP 7.4+ (**Tools -> Site Health -> Info -> Server**).
-- Confirm WordPress 5.8+.
+- Confirm PHP 8.1+ (**Tools -> Site Health -> Info -> Server**).
+- Confirm WordPress 6.9+.
 - Raise the PHP memory limit to 128MB+.
 - Check the error log for the specific fatal message.
 

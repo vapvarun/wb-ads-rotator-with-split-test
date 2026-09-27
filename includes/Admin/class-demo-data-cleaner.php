@@ -144,7 +144,7 @@ class Demo_Data_Cleaner {
 		}
 		update_option( 'widget_wbam_ad_widget', $instances );
 
-		$sidebars = wp_get_sidebars_widgets();
+		$sidebars = wbam_sidebars_widgets();
 		foreach ( $sidebars as $sidebar_id => $widgets ) {
 			if ( is_array( $widgets ) ) {
 				$sidebars[ $sidebar_id ] = array_values( array_diff( $widgets, $gone ) );

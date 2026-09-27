@@ -2,9 +2,9 @@
 Contributors: vapvarun, wbcomdesigns
 Donate link: https://wbcomdesigns.com/
 Tags: ads, ad manager, ad rotation, split test, adsense
-Requires at least: 5.8
-Tested up to: 7.0
-Requires PHP: 7.4
+Requires at least: 6.9
+Tested up to: 7.1
+Requires PHP: 8.1
 Stable tag: 3.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -27,13 +27,13 @@ WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. 
 * **BuddyPress Integration** - Activity stream + 4 directory positions (members + groups)
 * **bbPress Integration** - 7 positions (forums, topics, between replies with configurable frequency)
 * **Jetonomy Integration** - 7 positions: sidebar (top / after About / bottom), after topic body, before/between/after replies (requires [Jetonomy](https://store.wbcomdesigns.com/jetonomy/) v1.3.0+)
-* **Geo-Targeting** - Target ads by country using IP geolocation (ip-api.com, ipinfo.io, ipapi.co)
+* **Geo-Targeting** - Target ads by country, using a MaxMind database file on your own server or the ipinfo.io API with your own key (off until you turn it on)
 * **Device Targeting** - Desktop, tablet, or mobile specific ads
 * **Scheduling** - Start/end dates, day-of-week, and time-of-day targeting
-* **Frequency Control** - Limit ad impressions per session (cookie-based)
+* **Frequency Control** - Limit how often one visitor sees an ad per day (cookie-based, resets at midnight site time)
 * **Setup Wizard** - Easy first-time configuration with sample ads + one-click demo-data cleanup
 * **REST API** - Endpoints for ads, analytics, links, partnerships, and email captures
-* **Privacy & GDPR** - IP anonymization, consent-gated AdSense, opt-in delete on uninstall
+* **Privacy & GDPR** - Visitor IP addresses are only ever stored as a one-way hash, consent-gated AdSense, opt-in delete on uninstall
 
 **Ad Types:**
 
@@ -139,6 +139,16 @@ Let advertisers sign up, submit ads, track performance, and manage billing thems
 
 [Learn more about WB Ad Manager Pro](https://wbcomdesigns.com/downloads/wb-ad-manager-pro/)
 
+== External services ==
+
+The plugin works without any outside service. It contacts one only when you set up a feature that needs it:
+
+* **ipinfo.io** (geolocation, only when you choose the "HTTPS API" provider in Settings > Location). To match country rules, the visitor's IP address is sent to ipinfo.io over HTTPS with your own API key, at most once per IP address per day (the result is cached for 24 hours). [Terms](https://ipinfo.io/terms-of-service), [Privacy policy](https://ipinfo.io/privacy-policy).
+* **ip-api.com** (geolocation, legacy: only on sites upgraded from before 3.2.0 that already used it and have not switched). The visitor's IP address is sent to ip-api.com over plain HTTP, because its free tier offers no HTTPS; the settings screen recommends switching to MaxMind or ipinfo.io. [Terms and privacy](https://ip-api.com/docs/legal).
+* **ipapi.co** (geolocation, legacy: only on sites upgraded from before 3.2.0 that already used it). The visitor's IP address is sent to ipapi.co over HTTPS. [Terms](https://ipapi.co/terms/), [Privacy policy](https://ipapi.co/privacy/).
+* **MaxMind GeoLite2** (geolocation, when you choose the local database). No request is made: you download the .mmdb file from your own MaxMind account and upload it here, and lookups read that file on your server. [GeoLite2 license](https://www.maxmind.com/en/geolite2/eula), [Privacy policy](https://www.maxmind.com/en/privacy-policy).
+* **Google AdSense** (only when you publish an AdSense ad or turn on Auto Ads). Visitors' browsers load `pagead2.googlesyndication.com/pagead/js/adsbygoogle.js` and Google serves the ads; with "Require Consent for AdSense" on, the script waits for the visitor's consent. [Google Terms of Service](https://policies.google.com/terms), [Privacy policy](https://policies.google.com/privacy).
+
 == Installation ==
 
 1. Upload the plugin files to `/wp-content/plugins/wb-ad-manager/` directory, or install through WordPress plugins screen.
@@ -173,7 +183,7 @@ Yes, you can set start/end dates, specific days of the week, and time-of-day ran
 
 = What geo-targeting providers are supported? =
 
-The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for IP geolocation.
+Two: a MaxMind GeoLite2 database file kept on your own server (nothing is sent anywhere), or the ipinfo.io API with your own key. Geolocation is off until you turn it on. Sites upgraded from before 3.2.0 keep the provider they already used (ip-api.com or ipapi.co) until they switch; the settings screen recommends switching.
 
 == Screenshots ==
 
@@ -276,7 +286,6 @@ Frontend dark mode that follows your active theme, plus RTL support.
 
 = 2.7.0 =
 * Improvement: Updated translation strings
-* Compatibility: Tested up to WordPress 6.9
 
 = 2.6.0 =
 * New: Complete rewrite of upgrade page with comprehensive Free vs Pro comparison

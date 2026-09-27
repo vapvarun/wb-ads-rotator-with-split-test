@@ -588,7 +588,7 @@ class Setup_Wizard {
 		$instances['_multiwidget'] = 1;
 		update_option( 'widget_wbam_ad_widget', $instances );
 
-		$sidebars                = wp_get_sidebars_widgets();
+		$sidebars                = wbam_sidebars_widgets();
 		$sidebars[ $sidebar_id ] = isset( $sidebars[ $sidebar_id ] ) ? (array) $sidebars[ $sidebar_id ] : array();
 		array_unshift( $sidebars[ $sidebar_id ], 'wbam_ad_widget-' . $number );
 		wp_set_sidebars_widgets( $sidebars );

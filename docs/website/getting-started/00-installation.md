@@ -6,8 +6,8 @@ WB Ad Manager is the free ad-management plugin from Wbcom Designs. This guide ta
 
 | Requirement | Minimum |
 |-------------|---------|
-| WordPress | 5.8 or higher |
-| PHP | 7.4 or higher |
+| WordPress | 6.9 or higher |
+| PHP | 8.1 or higher |
 | User role | Administrator (`manage_options`) |
 
 ## Install from the WordPress dashboard
@@ -57,4 +57,4 @@ You will see a **WB Ad Manager** menu in the admin sidebar with:
 
 ## Troubleshooting
 
-If the plugin will not activate, confirm PHP 7.4+ and WordPress 5.8+, then check the error log. See [Common Issues](../troubleshooting/00-common-issues.md).
+If the plugin will not activate, confirm PHP 8.1+ and WordPress 6.9+, then check the error log. See [Common Issues](../troubleshooting/00-common-issues.md).

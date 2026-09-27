@@ -967,12 +967,13 @@ class Link_Manager {
 		$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $this->clicks_table ) );
 
 		if ( $table_exists ) {
+			$day_sql = wbam_sql_site_date( 'clicked_at' ); // Static SQL fragment (int offset).
 			$results = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT " . wbam_sql_site_date( 'clicked_at' ) . " as date, COUNT(*) as clicks
+					"SELECT {$day_sql} as date, COUNT(*) as clicks
 					 FROM {$this->clicks_table}
 					 WHERE clicked_at >= %s AND clicked_at <= %s
-					 GROUP BY " . wbam_sql_site_date( 'clicked_at' ) . "
+					 GROUP BY {$day_sql}
 					 ORDER BY date ASC",
 					gmdate( 'Y-m-d', $start ),
 					gmdate( 'Y-m-d', $end ) . ' 23:59:59'
