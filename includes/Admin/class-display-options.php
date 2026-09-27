@@ -114,6 +114,7 @@ class Display_Options {
 
 			<div class="wbam-rule-section wbam-conditional-section" data-show-when="specific">
 				<label class="wbam-section-label"><?php esc_html_e( 'Target by:', 'wb-ads-rotator-with-split-test' ); ?></label>
+				<p class="description"><?php esc_html_e( 'The ad shows where ANY of these match. Pick at least one, or it shows nowhere.', 'wb-ads-rotator-with-split-test' ); ?></p>
 
 				<?php // Specific Pages - Most specific targeting first. ?>
 				<div class="wbam-rule-row">

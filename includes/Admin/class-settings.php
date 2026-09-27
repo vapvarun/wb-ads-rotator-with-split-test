@@ -82,6 +82,7 @@ class Settings {
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 25 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_notices', array( $this, 'maybe_render_legacy_geo_notice' ) );
+		add_action( 'wp_ajax_wbam_upload_geo_db', array( $this, 'ajax_upload_geo_db' ) );
 	}
 
 	/**
@@ -222,60 +223,36 @@ class Settings {
 	 * @since 2.9.2
 	 */
 	private function register_general_settings() {
-		// General Section.
+		// Who sees ads. Pro adds its role and member-type rows to this same
+		// card (card 10344383905), so there is one place to answer it.
 		add_settings_section(
 			'wbam_general',
-			__( 'General Settings', 'wb-ads-rotator-with-split-test' ),
+			__( 'Who sees ads', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_general_section' ),
 			'wbam-settings'
 		);
 
 		add_settings_field(
 			'disable_ads_logged_in',
-			__( 'Disable for Logged-in Users', 'wb-ads-rotator-with-split-test' ),
+			__( 'Hide from logged-in users', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_checkbox_field' ),
 			'wbam-settings',
 			'wbam_general',
 			array(
 				'id'          => 'disable_ads_logged_in',
-				'description' => __( 'Hide ads for logged-in users.', 'wb-ads-rotator-with-split-test' ),
+				'description' => __( 'Only visitors who are not logged in see ads.', 'wb-ads-rotator-with-split-test' ),
 			)
 		);
 
 		add_settings_field(
 			'disable_ads_admin',
-			__( 'Disable for Admins', 'wb-ads-rotator-with-split-test' ),
+			__( 'Hide from administrators', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_checkbox_field' ),
 			'wbam-settings',
 			'wbam_general',
 			array(
 				'id'          => 'disable_ads_admin',
-				'description' => __( 'Hide ads for administrators.', 'wb-ads-rotator-with-split-test' ),
-			)
-		);
-
-		add_settings_field(
-			'disable_on_post_types',
-			__( 'Disable on Post Types', 'wb-ads-rotator-with-split-test' ),
-			array( $this, 'render_post_types_field' ),
-			'wbam-settings',
-			'wbam_general',
-			array(
-				'id'          => 'disable_on_post_types',
-				'description' => __( 'Select post types where ads should be disabled.', 'wb-ads-rotator-with-split-test' ),
-			)
-		);
-
-		add_settings_field(
-			'max_ads_per_page',
-			__( 'Maximum Ads Per Page', 'wb-ads-rotator-with-split-test' ),
-			array( $this, 'render_number_field' ),
-			'wbam-settings',
-			'wbam_general',
-			array(
-				'label_for'   => 'wbam_setting_max_ads_per_page',
-				'id'          => 'max_ads_per_page',
-				'description' => __( 'Maximum number of ads to show per page. Set 0 for unlimited.', 'wb-ads-rotator-with-split-test' ),
+				'description' => __( 'Site administrators browse without ads.', 'wb-ads-rotator-with-split-test' ),
 			)
 		);
 
@@ -285,6 +262,31 @@ class Settings {
 			__( 'Display Settings', 'wb-ads-rotator-with-split-test' ),
 			array( $this, 'render_display_section' ),
 			'wbam-settings'
+		);
+
+		add_settings_field(
+			'disable_on_post_types',
+			__( 'Hide ads on single pages of these types', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_post_types_field' ),
+			'wbam-settings',
+			'wbam_display',
+			array(
+				'id'          => 'disable_on_post_types',
+				'description' => __( 'A single post, page or item of a ticked type shows no ads. Archives and lists still do.', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+
+		add_settings_field(
+			'max_ads_per_page',
+			__( 'Maximum Ads Per Page', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_number_field' ),
+			'wbam-settings',
+			'wbam_display',
+			array(
+				'label_for'   => 'wbam_setting_max_ads_per_page',
+				'id'          => 'max_ads_per_page',
+				'description' => __( 'The most ads one page shows, counted across every placement, widget and shortcode. Limits set per placement still apply inside it. 0 means no limit.', 'wb-ads-rotator-with-split-test' ),
+			)
 		);
 
 		add_settings_field(
@@ -390,15 +392,15 @@ class Settings {
 
 		add_settings_field(
 			'geo_maxmind_db_path',
-			__( 'MaxMind Database Path', 'wb-ads-rotator-with-split-test' ),
-			array( $this, 'render_text_field' ),
+			__( 'MaxMind Database', 'wb-ads-rotator-with-split-test' ),
+			array( $this, 'render_maxmind_field' ),
 			'wbam-settings',
 			'wbam_geo',
 			array(
 				'label_for'   => 'wbam_setting_geo_maxmind_db_path',
 				'id'          => 'geo_maxmind_db_path',
 				'placeholder' => __( '/absolute/path/to/GeoLite2-Country.mmdb', 'wb-ads-rotator-with-split-test' ),
-				'description' => __( 'Absolute server path to a GeoLite2 (or GeoIP2) .mmdb file you downloaded from your own MaxMind account. Nothing is sent anywhere for this provider.', 'wb-ads-rotator-with-split-test' ),
+				'description' => __( 'Upload the GeoLite2 Country (.mmdb) file from your free MaxMind account. It stays on your server and nothing is sent anywhere.', 'wb-ads-rotator-with-split-test' ),
 				'wrapper'     => 'wbam-geo-provider-field wbam-geo-provider-maxmind',
 			)
 		);
@@ -413,6 +415,7 @@ class Settings {
 				'label_for'   => 'wbam_setting_geo_ipinfo_key',
 				'id'          => 'geo_ipinfo_key',
 				'placeholder' => __( 'Enter your ipinfo.io API key', 'wb-ads-rotator-with-split-test' ),
+				'type'        => 'password',
 				'description' => __( 'Required. Get a free key from ipinfo.io (50K requests/month). The visitor\'s IP is sent to ipinfo.io over HTTPS to resolve it.', 'wb-ads-rotator-with-split-test' ),
 				'wrapper'     => 'wbam-geo-provider-field wbam-geo-provider-ipinfo',
 			)
@@ -448,7 +451,7 @@ class Settings {
 			'wbam_adsense',
 			array(
 				'id'          => 'adsense_auto_ads',
-				'description' => __( 'Enable AdSense Auto Ads on your site. Google will automatically place ads.', 'wb-ads-rotator-with-split-test' ),
+				'description' => __( 'Google places ads across your site on its own. Needs the Publisher ID above.', 'wb-ads-rotator-with-split-test' ),
 			)
 		);
 
@@ -716,6 +719,12 @@ class Settings {
 		// AdSense settings.
 		$sanitized['adsense_publisher_id'] = sanitize_text_field( $input['adsense_publisher_id'] ?? '' );
 		$sanitized['adsense_auto_ads']     = ! empty( $input['adsense_auto_ads'] );
+		// Auto Ads loads nothing without a Publisher ID, so it is not left
+		// looking on (card 10344383905).
+		if ( $sanitized['adsense_auto_ads'] && '' === $sanitized['adsense_publisher_id'] ) {
+			$sanitized['adsense_auto_ads'] = false;
+			add_settings_error( 'wbam_messages', 'wbam_adsense_auto_ads', __( 'Auto Ads was left off: add your AdSense Publisher ID first.', 'wb-ads-rotator-with-split-test' ) );
+		}
 
 		$sanitized['format_matching'] = ! empty( $input['format_matching'] );
 
@@ -1212,8 +1221,8 @@ class Settings {
 
 	/**
 	 * Render the "Ads & Display" section: who sees ads, label/wrapper,
-	 * placements + format matching, and AdSense. PRO appends its Ad
-	 * Visibility by Role/Member Type and Ad Rotation cards via
+	 * placements + format matching, and AdSense. PRO adds its role and
+	 * member-type rows to "Who sees ads", and appends its Ad Rotation card via
 	 * `wbam_settings_ads_display_content` when active — see
 	 * `Pro_Admin::render_ads_display_content_card()`.
 	 *
@@ -1234,8 +1243,7 @@ class Settings {
 			 * Fires inside the Ads & Display section's one `<form>`, after
 			 * FREE's own cards and before the single Save button (card
 			 * 10343706274: one form, one Save per section) - PRO hooks its Ad
-			 * Visibility by Role/Member Type card and (when the rotation
-			 * module is active) its Ad Rotation card here. PRO's fields post
+			 * Rotation card here (when the rotation module is active). PRO's fields post
 			 * through this same `options.php` submission because
 			 * `wbam_pro_settings` is also registered under this page's
 			 * `wbam_settings_group` (see Pro_Admin::register_settings()) -
@@ -1455,7 +1463,7 @@ class Settings {
 	 * Render general section.
 	 */
 	public function render_general_section() {
-		echo '<p>' . esc_html__( 'Configure general ad display settings.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+		echo '<p>' . esc_html__( 'Everyone sees ads unless you hide them from someone here.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 	}
 
 	/**
@@ -1509,7 +1517,7 @@ class Settings {
 	 */
 	public function render_geo_section() {
 		echo '<p>' . esc_html__( 'Off by default. No visitor IP address is looked up - or sent anywhere - until you turn this on and choose a provider below.', 'wb-ads-rotator-with-split-test' ) . '</p>';
-		echo '<p class="description">' . esc_html__( 'Turning this on lets ads use country/region rules and lets analytics show visitor country. A local MaxMind database keeps everything on your server; the HTTPS API option sends the visitor\'s IP address to that provider using your own key.', 'wb-ads-rotator-with-split-test' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Turning this on lets ads use country/region rules. A local MaxMind database keeps everything on your server; the HTTPS API option sends the visitor\'s IP address to that provider using your own key.', 'wb-ads-rotator-with-split-test' ) . '</p>';
 
 		$legacy_notice = $this->get_legacy_geo_provider_notice();
 		if ( $legacy_notice ) {
@@ -1632,6 +1640,85 @@ class Settings {
 	}
 
 	/**
+	 * MaxMind database: an upload that fills the path, so nobody has to
+	 * know a server path (card 10344383905). The path stays editable for
+	 * a file placed on the server by other means.
+	 *
+	 * @since 3.2.0
+	 * @param array $args Field arguments.
+	 */
+	public function render_maxmind_field( $args ) {
+		$this->render_text_field( $args );
+		?>
+		<div class="wbam-geo-upload" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wbam_upload_geo_db' ) ); ?>" data-ajax="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" data-failed="<?php esc_attr_e( 'Upload failed. The file may be larger than this server accepts.', 'wb-ads-rotator-with-split-test' ); ?>">
+			<label class="button" for="wbam-geo-db-file"><?php esc_html_e( 'Upload .mmdb file', 'wb-ads-rotator-with-split-test' ); ?></label>
+			<input type="file" id="wbam-geo-db-file" class="screen-reader-text" accept=".mmdb" />
+			<span class="wbam-geo-upload__status" role="status" aria-live="polite"></span>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Store an uploaded MaxMind database under uploads/wbam-geo/ and return
+	 * its path for the MaxMind Database field.
+	 *
+	 * @since 3.2.0
+	 */
+	public function ajax_upload_geo_db() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission to do this.', 'wb-ads-rotator-with-split-test' ) ), 403 );
+		}
+		check_ajax_referer( 'wbam_upload_geo_db', 'nonce' );
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- file array, checked below and moved by wp_handle_upload().
+		$file = isset( $_FILES['mmdb'] ) && is_array( $_FILES['mmdb'] ) ? $_FILES['mmdb'] : array();
+		$name = isset( $file['name'] ) ? sanitize_file_name( (string) $file['name'] ) : '';
+		$tmp  = isset( $file['tmp_name'] ) ? (string) $file['tmp_name'] : '';
+
+		// A real MaxMind database ends with its metadata marker.
+		$tail = ( $tmp && is_uploaded_file( $tmp ) ) ? (string) file_get_contents( $tmp, false, null, max( 0, filesize( $tmp ) - 131072 ) ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local temp file.
+		if ( '.mmdb' !== strtolower( substr( $name, -5 ) ) || false === strpos( $tail, "\xAB\xCD\xEFMaxMind.com" ) ) {
+			wp_send_json_error( array( 'message' => __( 'That is not a MaxMind .mmdb database file.', 'wb-ads-rotator-with-split-test' ) ) );
+		}
+
+		$to_geo_dir = static function ( $dirs ) {
+			$dirs['subdir'] = '/wbam-geo';
+			$dirs['path']   = $dirs['basedir'] . '/wbam-geo';
+			$dirs['url']    = $dirs['baseurl'] . '/wbam-geo';
+			return $dirs;
+		};
+		add_filter( 'upload_dir', $to_geo_dir );
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		$moved = wp_handle_upload(
+			$file,
+			array(
+				'test_form' => false,
+				'mimes'     => array( 'mmdb' => 'application/octet-stream' ),
+				'test_type' => false,
+			)
+		);
+		remove_filter( 'upload_dir', $to_geo_dir );
+
+		if ( empty( $moved['file'] ) ) {
+			wp_send_json_error( array( 'message' => isset( $moved['error'] ) ? (string) $moved['error'] : __( 'The file could not be saved.', 'wb-ads-rotator-with-split-test' ) ) );
+		}
+
+		// Not for download: only this site reads it.
+		$dir = dirname( $moved['file'] );
+		if ( ! file_exists( $dir . '/.htaccess' ) ) {
+			file_put_contents( $dir . '/.htaccess', "Require all denied\nDeny from all\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- tiny guard file in our own uploads folder.
+			file_put_contents( $dir . '/index.php', "<?php\n// Silence is golden.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- same.
+		}
+
+		wp_send_json_success(
+			array(
+				'path'    => $moved['file'],
+				'message' => __( 'Uploaded. Click Save Changes to use it.', 'wb-ads-rotator-with-split-test' ),
+			)
+		);
+	}
+
+	/**
 	 * Render the Features section intro.
 	 */
 	public function render_features_section() {
@@ -1708,11 +1795,12 @@ class Settings {
 		// Optional wrapper class so JS can show/hide a field row (e.g. per
 		// selected geo provider) without an inline style attribute.
 		$wrapper = $args['wrapper'] ?? '';
+		$type    = 'password' === ( $args['type'] ?? '' ) ? 'password' : 'text';
 		if ( $wrapper ) {
 			echo '<div class="' . esc_attr( $wrapper ) . '">';
 		}
 		?>
-		<input type="text" id="wbam_setting_<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( self::OPTION_NAME . '[' . $id . ']' ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>" class="regular-text" />
+		<input type="<?php echo esc_attr( $type ); ?>" autocomplete="off" id="wbam_setting_<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( self::OPTION_NAME . '[' . $id . ']' ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="<?php echo esc_attr( $placeholder ); ?>" class="regular-text" />
 		<?php if ( ! empty( $args['description'] ) ) : ?>
 			<p class="description"><?php echo esc_html( $args['description'] ); ?></p>
 		<?php endif; ?>

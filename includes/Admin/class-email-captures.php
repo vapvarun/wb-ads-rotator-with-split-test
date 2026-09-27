@@ -38,7 +38,8 @@ class Email_Captures {
 	 *              FREE-only site).
 	 */
 	public function init() {
-		add_action( 'admin_menu', array( $this, 'add_menu' ) );
+		// Priority 9: right under Add New, next to the ads it collects for.
+		add_action( 'admin_menu', array( $this, 'add_menu' ), 9 );
 		add_action( 'admin_post_wbam_export_email_captures', array( $this, 'handle_export' ) );
 		add_action( 'admin_post_wbam_delete_email_capture', array( $this, 'handle_delete' ) );
 		add_action( 'admin_init', array( $this, 'handle_bulk_delete' ) );
@@ -266,7 +267,7 @@ class Email_Captures {
 	 */
 	public function stream_csv( $handle, array $args ) {
 		$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
-		wbam_fputcsv( $handle, array( 'Email', 'Name', 'Ad', 'Ad ID', 'IP', 'Date' ) );
+		wbam_fputcsv( $handle, array( 'Email', 'Name', 'Ad', 'Ad ID', 'Visitor hash', 'Date' ) ); // IPs are stored only as a one-way hash.
 
 		$page = 1;
 		do {

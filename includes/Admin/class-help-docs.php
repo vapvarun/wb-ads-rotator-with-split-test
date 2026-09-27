@@ -651,7 +651,13 @@ class Help_Docs {
 
 			<div class="wbam-faq-item">
 				<h4><?php esc_html_e( 'What ad types are supported?', 'wb-ads-rotator-with-split-test' ); ?></h4>
-				<p><?php esc_html_e( 'Five ad types: Image (with click URL and alt text), Rich Content (HTML-editor), HTML/JavaScript Code, Google AdSense, and Email Capture (inline newsletter form).', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<?php // Listed from the registered types, so an add-on's type (Pro's Video) is counted. ?>
+				<p>
+					<?php
+					/* translators: %s: comma-separated ad type names */
+					printf( esc_html__( 'This site can create: %s.', 'wb-ads-rotator-with-split-test' ), esc_html( implode( ', ', array_map( static fn( $type ) => $type->get_name(), \WBAM\Modules\Placements\Placement_Engine::get_instance()->get_ad_types() ) ) ) );
+					?>
+				</p>
 			</div>
 
 			<div class="wbam-faq-item">

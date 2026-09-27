@@ -111,9 +111,50 @@
 		refresh();
 	}
 
+	/**
+	 * MaxMind upload: send the chosen .mmdb to admin-ajax and put the
+	 * stored path in the MaxMind Database field.
+	 */
+	function initGeoDbUpload() {
+		var box   = document.querySelector( '.wbam-geo-upload' );
+		var input = box && box.querySelector( 'input[type="file"]' );
+		var path  = document.getElementById( 'wbam_setting_geo_maxmind_db_path' );
+		if ( ! input || ! path || ! window.fetch || ! window.FormData ) {
+			return;
+		}
+		var status = box.querySelector( '.wbam-geo-upload__status' );
+
+		input.addEventListener( 'change', function () {
+			if ( ! input.files.length ) {
+				return;
+			}
+			var data = new FormData();
+			data.append( 'action', 'wbam_upload_geo_db' );
+			data.append( 'nonce', box.getAttribute( 'data-nonce' ) );
+			data.append( 'mmdb', input.files[ 0 ] );
+			status.textContent = '…';
+
+			fetch( box.getAttribute( 'data-ajax' ), { method: 'POST', body: data, credentials: 'same-origin' } )
+				.then( function ( response ) {
+					return response.json();
+				} )
+				.then( function ( json ) {
+					if ( json && json.success ) {
+						path.value = json.data.path;
+					}
+					status.textContent = ( json && json.data && json.data.message ) || box.getAttribute( 'data-failed' );
+				} )
+				.catch( function () {
+					status.textContent = box.getAttribute( 'data-failed' );
+				} );
+			input.value = '';
+		} );
+	}
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		initSettingsNavSelect();
 		initPageJumpNav();
 		initGeoProviderToggle();
+		initGeoDbUpload();
 	} );
 }() );

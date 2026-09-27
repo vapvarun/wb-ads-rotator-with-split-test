@@ -246,6 +246,15 @@
   },
   "ajax": [
     {
+      "action": "wbam_upload_geo_db",
+      "nopriv": false,
+      "handler": "WBAM\\Admin\\Settings::ajax_upload_geo_db",
+      "nonce": "wbam_upload_geo_db",
+      "capability": "manage_options",
+      "where": "includes/Admin/class-settings.php",
+      "purpose": "Store an uploaded MaxMind .mmdb under uploads/wbam-geo/ and return its path"
+    },
+    {
       "action": "wbam_dismiss_notice",
       "nopriv": false,
       "handler": "WBAM\\Core\\Plugin::ajax_dismiss_notice",
@@ -889,6 +898,13 @@
       "args": 2,
       "where": "includes/Admin/class-admin.php",
       "purpose": "The ad editor's priority hint; Pro explains that a paid ad's share comes from its campaign rotation"
+    },
+    {
+      "name": "wbam_show_ad_label",
+      "type": "filter",
+      "args": 3,
+      "where": "includes/Modules/Placements/class-placement-engine.php",
+      "purpose": "Whether an ad carries the disclosure label; off for Email Capture by default"
     },
     {
       "name": "wbam_sample_ad_link",

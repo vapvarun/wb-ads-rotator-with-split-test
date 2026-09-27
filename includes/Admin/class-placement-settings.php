@@ -35,10 +35,13 @@ class Placement_Settings {
 	 * runs through Placement_Engine::get_ads_for_placement(), whose
 	 * get_posts() call defaults to post_status=publish. Counting drafts,
 	 * pending, private or scheduled ads here would overstate the damage and
-	 * make the warning untrustworthy.
+	 * make the warning untrustworthy. The same goes for a published ad that
+	 * cannot show (ended, scheduled, no image, no live campaign in Pro) or
+	 * whose size does not fit the placement: only Ad_Status "Live" counts,
+	 * and only in the placements its size fits (card 10344383905).
 	 *
 	 * @since 2.11.0
-	 * @return array<string,int> Placement ID => enabled ad count.
+	 * @return array<string,int> Placement ID => live ad count.
 	 */
 	public static function get_ad_counts() {
 		global $wpdb;
@@ -50,8 +53,8 @@ class Placement_Settings {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- aggregate for an
 		// admin screen, cached below and invalidated on wbam_save_ad_meta.
-		$rows = $wpdb->get_col(
-			"SELECT pm.meta_value
+		$rows = $wpdb->get_results(
+			"SELECT pm.post_id, pm.meta_value
 			   FROM {$wpdb->postmeta} pm
 			   JOIN {$wpdb->postmeta} en
 			     ON en.post_id = pm.post_id
@@ -65,9 +68,18 @@ class Placement_Settings {
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
+		\WBAM\Core\Ad_Status::prime( wp_list_pluck( (array) $rows, 'post_id' ) );
+
 		$counts = array();
 		foreach ( (array) $rows as $row ) {
-			foreach ( (array) maybe_unserialize( $row ) as $slug ) {
+			if ( \WBAM\Core\Ad_Status::LIVE !== \WBAM\Core\Ad_Status::get( (int) $row->post_id )['state'] ) {
+				continue;
+			}
+			$slugs = array_values( array_filter( (array) maybe_unserialize( $row->meta_value ) ) );
+			if ( $slugs && function_exists( 'wbam_split_placements_by_fit' ) ) {
+				$slugs = wbam_split_placements_by_fit( (int) $row->post_id, $slugs )['kept'];
+			}
+			foreach ( $slugs as $slug ) {
 				$slug = sanitize_key( (string) $slug );
 				if ( '' === $slug ) {
 					continue;
@@ -136,9 +148,9 @@ class Placement_Settings {
 		// the `data-label` attribute + a CSS `content: attr()` rule below
 		// 782px — see .wbam-placement-matrix in assets/css/admin.css).
 		// Fetched once so the <thead> and every stacked row agree.
-		$label_site = __( 'Site', 'wb-ads-rotator-with-split-test' );
+		$label_site = __( 'On', 'wb-ads-rotator-with-split-test' );
 		$label_adv  = __( 'Advertisers', 'wb-ads-rotator-with-split-test' );
-		$label_ads  = __( 'Active ads', 'wb-ads-rotator-with-split-test' );
+		$label_ads  = __( 'Live ads', 'wb-ads-rotator-with-split-test' );
 		?>
 		<div class="wbam-placement-matrix__scroll">
 		<table class="widefat wbam-placement-matrix" role="table">
@@ -168,7 +180,7 @@ class Placement_Settings {
 			<tbody role="rowgroup">
 			<?php foreach ( $grouped as $group => $placements ) : ?>
 				<tr class="wbam-placement-matrix__group" role="row">
-					<th colspan="<?php echo (int) ( 3 + $show_adv + $show_extra ); ?>" scope="colgroup" role="columnheader"><?php echo esc_html( ucfirst( (string) $group ) ); ?></th>
+					<th colspan="<?php echo (int) ( 3 + $show_adv + $show_extra ); ?>" scope="colgroup" role="columnheader"><?php echo esc_html( \WBAM\Modules\Placements\Placement_Engine::group_label( (string) $group ) ); ?></th>
 				</tr>
 				<?php
 				foreach ( $placements as $id => $placement ) :
@@ -230,7 +242,7 @@ class Placement_Settings {
 							<?php
 							/**
 							 * Fires once per placement row in the matrix, after the
-							 * built-in "Active ads" cell, when an active add-on has
+							 * built-in "Live ads" cell, when an active add-on has
 							 * registered a callback here (see wbam_placement_matrix_head
 							 * for the matching header cell). Echo one <td> matching the
 							 * extra header column.

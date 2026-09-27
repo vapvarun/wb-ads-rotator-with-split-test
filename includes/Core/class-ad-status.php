@@ -200,6 +200,16 @@ final class Ad_Status {
 			return self::make( self::NOT_SHOWING, $missing . '.' );
 		}
 
+		// Display rules that can never match (card 10344383905).
+		$rules = get_post_meta( $ad_id, '_wbam_display_rules', true );
+		if ( is_array( $rules ) && 'specific' === ( $rules['display_on'] ?? '' ) && ! array_filter( array_intersect_key( $rules, array_flip( array( 'posts', 'post_types', 'categories', 'tags', 'page_types' ) ) ) ) ) {
+			return self::make( self::NOT_SHOWING, __( 'Display Rules say "Specific pages" but nothing is picked.', 'wb-ads-rotator-with-split-test' ) );
+		}
+		$visitors = get_post_meta( $ad_id, '_wbam_visitor_conditions', true );
+		if ( is_array( $visitors ) && 'logged_in' === ( $visitors['user_status'] ?? '' ) && Settings_Helper::get( 'disable_ads_logged_in' ) ) {
+			return self::make( self::NOT_SHOWING, __( 'It is for logged-in visitors only, but Settings hides ads from logged-in users.', 'wb-ads-rotator-with-split-test' ) );
+		}
+
 		$frequency = Frequency_Manager::get_instance();
 		if ( $frequency->cap_reached( $ad_id ) ) {
 			/* translators: %s: impression cap */

@@ -135,7 +135,8 @@
 
 .wbam-adtype-content {
 	display: none;
-	padding: 20px;
+	margin-top: var(--wbam-space-4);
+	padding: var(--wbam-space-5);
 	background: var(--wbam-bg);
 	border: 1px solid var(--wbam-border-strong);
 	border-radius: var(--wbam-r-md);

@@ -434,19 +434,15 @@ class Email_Capture_Ad implements Ad_Type_Interface {
 			<input type="color" id="wbam_email_button_color" name="wbam_data[button_color]" value="<?php echo esc_attr( $button_color ); ?>">
 		</div>
 
-		<div class="wbam-field">
-			<h4><?php esc_html_e( 'Developer Hooks', 'wb-ads-rotator-with-split-test' ); ?></h4>
-			<p class="description">
-				<?php esc_html_e( 'Available hooks for developers:', 'wb-ads-rotator-with-split-test' ); ?>
-			</p>
-			<ul class="wbam-hooks-list" style="margin-left: 20px; font-size: 12px;">
-				<li><code>wbam_email_captured</code> - <?php esc_html_e( 'After email is submitted (integrate with Mailchimp, etc.)', 'wb-ads-rotator-with-split-test' ); ?></li>
-				<li><code>wbam_email_form_before</code> / <code>after</code> - <?php esc_html_e( 'Before/after form renders', 'wb-ads-rotator-with-split-test' ); ?></li>
-				<li><code>wbam_email_form_after_fields</code> - <?php esc_html_e( 'Add custom fields', 'wb-ads-rotator-with-split-test' ); ?></li>
-				<li><code>wbam_email_form_validation</code> - <?php esc_html_e( 'Custom validation', 'wb-ads-rotator-with-split-test' ); ?></li>
-				<li><code>wbam_email_capture_cookie_days</code> - <?php esc_html_e( 'Days to hide after the visitor closes the form (defaults to 7)', 'wb-ads-rotator-with-split-test' ); ?></li>
-			</ul>
-		</div>
+		<p class="description">
+			<?php
+			printf(
+				/* translators: %s: link to the Email Captures screen */
+				esc_html__( 'Emails are saved under %s, where you can export them as CSV.', 'wb-ads-rotator-with-split-test' ),
+				'<a href="' . esc_url( \WBAM\Core\Admin_Links::email_captures() ) . '">' . esc_html__( 'Email Captures', 'wb-ads-rotator-with-split-test' ) . '</a>'
+			);
+			?>
+		</p>
 		<?php
 	}
 

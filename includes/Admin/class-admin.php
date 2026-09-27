@@ -1175,9 +1175,9 @@ class Admin {
 			'wbam-placement-settings',
 			'wbamPlacementSettings',
 			array(
-				/* translators: %d is replaced client-side with the active ad count for the placement being turned off. */
+				/* translators: %d is replaced client-side with the live ad count for the placement being turned off. */
 				'confirmDisable' => __(
-					'Active ads in this placement: %d. They will stop showing. Continue?',
+					'Live ads in this placement: %d. They will stop showing. Continue?',
 					'wb-ads-rotator-with-split-test'
 				),
 				'confirmDeleteData' => __(
@@ -1425,6 +1425,11 @@ class Admin {
 		$data    = get_post_meta( $post->ID, '_wbam_ad_data', true );
 		$data    = is_array( $data ) ? $data : array();
 		$ad_type = isset( $data['type'] ) ? $data['type'] : 'image';
+		// A new ad can open on a type (the Email Captures empty state links here).
+		$wanted = isset( $_GET['wbam_type'] ) ? sanitize_key( wp_unslash( $_GET['wbam_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only preselect on a new-post screen.
+		if ( empty( $data['type'] ) && '' !== $wanted && Placement_Engine::get_instance()->get_ad_type( $wanted ) ) {
+			$ad_type = $wanted;
+		}
 
 		$engine   = Placement_Engine::get_instance();
 		$ad_types = $engine->get_ad_types();
@@ -1617,7 +1622,7 @@ class Admin {
 			</div>
 			<?php foreach ( $all_places as $group => $group_placements ) : ?>
 				<div class="wbam-placement-group">
-					<h4><?php echo esc_html( ucfirst( $group ) ); ?> <?php esc_html_e( 'Placements', 'wb-ads-rotator-with-split-test' ); ?></h4>
+					<h4><?php echo esc_html( \WBAM\Modules\Placements\Placement_Engine::group_label( $group ) ); ?> <?php esc_html_e( 'Placements', 'wb-ads-rotator-with-split-test' ); ?></h4>
 					<div class="wbam-placement-options">
 						<?php
 						foreach ( $group_placements as $placement ) :
@@ -1911,9 +1916,10 @@ class Admin {
 		 * metabox.
 		 *
 		 * @since 2.10.0
-		 * @param string[] $types Ad type IDs to exclude from sizing. Default `array( 'video' )`.
+		 * @param string[] $types Ad type IDs to exclude from sizing. Default `array( 'video', 'email_capture' )`.
 		 */
-		return (array) apply_filters( 'wbam_ad_types_without_sizing', array( 'video' ) );
+		// A signup form sizes to its content; a fixed box only clips it.
+		return (array) apply_filters( 'wbam_ad_types_without_sizing', array( 'video', 'email_capture' ) );
 	}
 
 	/**
@@ -2110,7 +2116,7 @@ class Admin {
 			<div class="wbam-session-limit-field">
 				<label for="wbam_session_limit"><?php esc_html_e( 'Max views per visitor per day', 'wb-ads-rotator-with-split-test' ); ?><?php echo Field_Tooltips::tip_for( 'session_limit' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped HTML. ?></label>
 				<input type="number" id="wbam_session_limit" name="wbam_session_limit" min="0" value="<?php echo esc_attr( $session_limit ); ?>" placeholder="<?php esc_attr_e( 'Unlimited', 'wb-ads-rotator-with-split-test' ); ?>" />
-				<p class="description"><?php esc_html_e( 'Max views per visitor session. Leave empty for unlimited.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Counts reset at midnight (site time). Leave empty for no limit.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 		</div>
 		<script>
@@ -2206,7 +2212,7 @@ class Admin {
 		?>
 		<div class="wbam-metabox">
 			<p class="wbam-sizing-unavailable-notice"<?php echo $sizing_hidden ? '' : ' hidden'; ?>>
-				<?php esc_html_e( 'This ad type has no fixed size. It plays inside protected lesson videos or as a standalone player, not in a sized placement.', 'wb-ads-rotator-with-split-test' ); ?>
+				<?php esc_html_e( 'This ad type sizes itself to fit where it shows, so it has no fixed size.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 
 			<div class="wbam-sizing-section" data-no-sizing-types="<?php echo esc_attr( (string) wp_json_encode( array_values( self::ad_types_without_sizing() ) ) ); ?>"<?php echo $sizing_hidden ? ' hidden' : ''; ?>>

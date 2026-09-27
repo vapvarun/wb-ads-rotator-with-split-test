@@ -59,7 +59,9 @@ final class Pointer_Emitter {
 		// Allowed Formats), so a couple of sentences of guidance wrap into
 		// a box tall enough to cover the fields underneath it. Widen it so
 		// the same copy needs fewer lines.
-		wp_add_inline_style( 'wp-pointer', '.wp-pointer{width:420px;max-width:90vw;}' );
+		// A pointer over controls (`passthrough`) lets clicks reach them;
+		// only its own Close button takes clicks.
+		wp_add_inline_style( 'wp-pointer', '.wp-pointer{width:420px;max-width:90vw;}.wp-pointer.is-passthrough{pointer-events:none;}.wp-pointer.is-passthrough .wp-pointer-buttons{pointer-events:auto;}' );
 
 		$inline  = 'jQuery(function($){';
 		$inline .= 'var pointers = ' . wp_json_encode( $pointers ) . ';';
@@ -87,7 +89,7 @@ final class Pointer_Emitter {
 		// a narrower box via `width`; wp-pointer.js applies `pointerWidth`
 		// as an inline style, which wins over the shared class rule below.
 		$inline .= 'pointerWidth: p.width || 420,';
-		$inline .= 'pointerClass: ' . wp_json_encode( 'wp-pointer ' . $pointer_class ) . ',';
+		$inline .= 'pointerClass: ' . wp_json_encode( 'wp-pointer ' . $pointer_class ) . ' + (p.passthrough ? " is-passthrough" : ""),';
 		$inline .= 'close: function(){';
 		$inline .= '$.post(ajaxUrl, { action: ajaxAction, pointer: slug, _ajax_nonce: nonce });';
 		$inline .= 'showNext(keys);';

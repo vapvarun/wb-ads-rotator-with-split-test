@@ -101,14 +101,20 @@ class Demo_Data_Cleaner {
 		 * @since 3.2.0
 		 * @param bool $owned Default false.
 		 */
-		if ( apply_filters( 'wbam_sample_content_card_owned', false ) || self::count() <= 0 ) {
+		if ( apply_filters( 'wbam_sample_content_card_owned', false ) ) {
 			return;
 		}
+		// Said plainly when there is nothing, so Tools is never a blank page.
+		$has_samples = self::count() > 0;
 		?>
 		<h2 class="wbam-settings-heading"><?php esc_html_e( 'Sample content', 'wb-ads-rotator-with-split-test' ); ?></h2>
 		<div class="wbam-card">
-			<p><?php esc_html_e( 'Remove the sample ads created by the setup wizard.', 'wb-ads-rotator-with-split-test' ); ?></p>
-			<?php self::render_clear_button(); ?>
+			<?php if ( $has_samples ) : ?>
+				<p><?php esc_html_e( 'Remove the sample ads created by the setup wizard.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<?php self::render_clear_button(); ?>
+			<?php else : ?>
+				<p><?php esc_html_e( 'No sample ads to remove.', 'wb-ads-rotator-with-split-test' ); ?></p>
+			<?php endif; ?>
 		</div>
 		<?php
 	}

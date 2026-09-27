@@ -232,6 +232,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 					'icon'    => 'mail',
 					'title'   => __( 'No email captures yet', 'wb-ads-rotator-with-split-test' ),
 					'message' => __( 'Submissions from the Email Capture ad type appear here.', 'wb-ads-rotator-with-split-test' ),
+					'actions' => '<a class="button button-primary" href="' . esc_url( admin_url( 'post-new.php?post_type=wbam-ad&wbam_type=email_capture' ) ) . '">' . esc_html__( 'Create an Email Capture ad', 'wb-ads-rotator-with-split-test' ) . '</a>',
 				)
 			)
 		);

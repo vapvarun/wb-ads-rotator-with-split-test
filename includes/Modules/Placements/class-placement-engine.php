@@ -271,6 +271,28 @@ class Placement_Engine {
 	}
 
 	/**
+	 * A placement group's heading. Group ids are raw keys ('buddypress',
+	 * 'advanced'); owners see names ('BuddyPress', 'Overlay').
+	 *
+	 * @since 3.2.0
+	 * @param string $group Group id from Placement_Interface::get_group().
+	 * @return string
+	 */
+	public static function group_label( $group ) {
+		$labels = array(
+			'wordpress'  => __( 'WordPress', 'wb-ads-rotator-with-split-test' ),
+			'advanced'   => __( 'Overlay', 'wb-ads-rotator-with-split-test' ),
+			'content'    => __( 'Comments', 'wb-ads-rotator-with-split-test' ),
+			'buddypress' => __( 'BuddyPress', 'wb-ads-rotator-with-split-test' ),
+			'bbpress'    => __( 'bbPress', 'wb-ads-rotator-with-split-test' ),
+			'jetonomy'   => __( 'Jetonomy', 'wb-ads-rotator-with-split-test' ),
+		);
+		$key    = strtolower( (string) $group );
+
+		return $labels[ $key ] ?? ucfirst( (string) $group );
+	}
+
+	/**
 	 * get_selectable_placements() grouped by Placement_Interface::get_group().
 	 *
 	 * @since 2.11.0
@@ -747,7 +769,18 @@ class Placement_Engine {
 			$label_text = trim( (string) \WBAM\Core\Settings_Helper::get( 'ad_label', __( 'Advertisement', 'wb-ads-rotator-with-split-test' ) ) );
 			$label_pos  = 'below' === \WBAM\Core\Settings_Helper::get( 'ad_label_position', 'above' ) ? 'below' : 'above';
 			$label_html = '';
-			if ( '' !== $label_text ) {
+			/**
+			 * Whether this ad carries the disclosure label. The site's own
+			 * signup form is not an advertisement, so Email Capture ads go
+			 * without it unless this filter says otherwise.
+			 *
+			 * @since 3.2.0
+			 * @param bool   $show    Whether to print the label.
+			 * @param int    $ad_id   Ad ID.
+			 * @param string $ad_type Ad type ID.
+			 */
+			$show_label = (bool) apply_filters( 'wbam_show_ad_label', 'email_capture' !== $ad_type, $ad_id, $ad_type );
+			if ( $show_label && '' !== $label_text ) {
 				$label_html = sprintf(
 					'<span class="wbam-ad-label wbam-ad-label-%1$s">%2$s</span>',
 					esc_attr( $label_pos ),

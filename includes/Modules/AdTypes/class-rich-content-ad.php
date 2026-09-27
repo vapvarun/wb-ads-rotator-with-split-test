@@ -41,7 +41,7 @@ class Rich_Content_Ad implements Ad_Type_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Write the ad in HTML: text, links, images and basic formatting.', 'wb-ads-rotator-with-split-test' );
+		return __( 'Write the ad in simple HTML: text, links and images. Scripts are removed; for ad network code use HTML/JS Code.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**

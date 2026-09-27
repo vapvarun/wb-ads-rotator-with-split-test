@@ -212,11 +212,13 @@ class First_Install_Pointers {
 				'align'   => 'left',
 			),
 			'placement_cards' => array(
-				'target'  => '.wbam-placement-options',
-				'title'   => esc_html__( 'Where your ad can render', 'wb-ads-rotator-with-split-test' ),
-				'content' => esc_html__( 'These are the placements this ad qualifies for. Pick one or more. The rotation engine will decide which placement fires on each page load.', 'wb-ads-rotator-with-split-test' ),
-				'edge'    => 'top',
-				'align'   => 'left',
+				'target'      => '.wbam-placement-options',
+				'title'       => esc_html__( 'Where your ad can render', 'wb-ads-rotator-with-split-test' ),
+				'content'     => esc_html__( 'Tick every place this ad should show. It shows in each one you tick, sharing the spot with any other ad there.', 'wb-ads-rotator-with-split-test' ),
+				'edge'        => 'top',
+				'align'       => 'left',
+				// It opens over the checkboxes it describes; they stay clickable.
+				'passthrough' => true,
 			),
 		);
 	}
