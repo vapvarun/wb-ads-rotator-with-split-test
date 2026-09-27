@@ -1090,8 +1090,11 @@ class Admin {
 	 * @param string $hook Hook.
 	 */
 	public function enqueue_assets( $hook ) {
+		// The Settings page is under Ads on Free, but Pro moves it to its own
+		// menu, so it has no post type there; match its hook either way. Its
+		// styles (e.g. the Placements matrix cards at 390) live in admin.css.
 		$screen = get_current_screen();
-		if ( ! $screen || 'wbam-ad' !== $screen->post_type ) {
+		if ( ! $screen || ( 'wbam-ad' !== $screen->post_type && ! str_ends_with( (string) $hook, '_page_wbam-settings' ) ) ) {
 			return;
 		}
 
