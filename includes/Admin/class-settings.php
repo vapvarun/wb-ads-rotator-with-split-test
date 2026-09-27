@@ -691,6 +691,20 @@ class Settings {
 		$sanitized['geo_ipinfo_key']      = sanitize_text_field( $input['geo_ipinfo_key'] ?? '' );
 		$sanitized['geo_maxmind_db_path'] = sanitize_text_field( $input['geo_maxmind_db_path'] ?? '' );
 
+		// Saved either way, so nothing typed is lost, but never reported as
+		// a plain success while lookups can't work (card 10344381767).
+		$geo_problem = $sanitized['geo_enabled'] && array_key_exists( 'geo_enabled', $input )
+			? \WBAM\Modules\GeoTargeting\Geo_Engine::provider_problem( $sanitized )
+			: '';
+		if ( '' !== $geo_problem ) {
+			add_settings_error(
+				'wbam_messages',
+				'wbam_geo_provider',
+				/* translators: %s: what the provider still needs */
+				sprintf( __( 'Saved, but location lookups are not working: %s Country rules match no one until this is fixed.', 'wb-ads-rotator-with-split-test' ), $geo_problem )
+			);
+		}
+
 		// AdSense settings.
 		$sanitized['adsense_publisher_id'] = sanitize_text_field( $input['adsense_publisher_id'] ?? '' );
 		$sanitized['adsense_auto_ads']     = ! empty( $input['adsense_auto_ads'] );
@@ -948,8 +962,9 @@ class Settings {
 			return;
 		}
 
+		// One notice per save: a problem the save reported, or 'Settings saved.'.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Standard WP Settings API pattern, nonce verified by options.php.
-		if ( isset( $_GET['settings-updated'] ) ) {
+		if ( isset( $_GET['settings-updated'] ) && ! in_array( 'error', wp_list_pluck( get_settings_errors( 'wbam_messages' ), 'type' ), true ) ) {
 			add_settings_error( 'wbam_messages', 'wbam_message', __( 'Settings saved.', 'wb-ads-rotator-with-split-test' ), 'updated' );
 		}
 

@@ -568,9 +568,24 @@ class Display_Options {
 		// below are saved either way (never silently discarded) but won't
 		// take effect - or block/hide the ad - until both are true, so say
 		// so plainly instead of leaving the toggle looking broken.
-		$geo_active = Settings_Helper::is_enabled( 'geo_enabled' ) && '' !== Settings_Helper::get( 'geo_primary_provider', '' );
+		$geo_active  = Settings_Helper::is_enabled( 'geo_enabled' ) && '' !== Settings_Helper::get( 'geo_primary_provider', '' );
+		$geo_problem = $geo_active ? \WBAM\Modules\GeoTargeting\Geo_Engine::provider_problem() : '';
 		?>
 		<div class="wbam-geo-targeting">
+			<?php if ( '' !== $geo_problem ) : ?>
+				<div class="notice notice-warning inline">
+					<p>
+						<?php
+						printf(
+							/* translators: 1: what the location provider still needs, 2: link to the settings */
+							esc_html__( 'Location lookups are not working: %1$s Rules below have no effect until this is fixed. %2$s', 'wb-ads-rotator-with-split-test' ),
+							esc_html( $geo_problem ),
+							'<a href="' . esc_url( \WBAM\Core\Admin_Links::settings( 'location' ) ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Fix it in Settings', 'wb-ads-rotator-with-split-test' ) . '</a>'
+						);
+						?>
+					</p>
+				</div>
+			<?php endif; ?>
 			<?php if ( ! $geo_active ) : ?>
 				<div class="notice notice-warning inline">
 					<p>

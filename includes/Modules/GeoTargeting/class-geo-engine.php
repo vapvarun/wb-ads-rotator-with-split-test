@@ -247,6 +247,9 @@ class Geo_Engine {
 		$location = $this->query_provider( $primary, $ip, Settings_Helper::get() );
 
 		if ( empty( $location['country_code'] ) ) {
+			// Remember the miss for an hour: a bad key or an unknown IP used
+			// to cost one provider call on every page view.
+			set_transient( $cache_key, $default, HOUR_IN_SECONDS );
 			return $default;
 		}
 
@@ -266,7 +269,47 @@ class Geo_Engine {
 	 * @param array  $settings Plugin settings.
 	 * @return array|null
 	 */
+	/**
+	 * Why the chosen provider can't look anything up, or '' when it can.
+	 * One check for the settings save, the ad editor's warning and the
+	 * lookup itself (card 10344381767): a broken setup used to save as
+	 * 'Settings saved.' while country rules matched no one.
+	 *
+	 * @param array|null $settings Settings (defaults to the stored ones).
+	 * @return string Sentence for the owner, or ''.
+	 */
+	public static function provider_problem( $settings = null ) {
+		$settings = is_array( $settings ) ? $settings : Settings_Helper::get();
+
+		switch ( $settings['geo_primary_provider'] ?? '' ) {
+			case 'maxmind':
+				$path = (string) ( $settings['geo_maxmind_db_path'] ?? '' );
+				if ( '' === $path ) {
+					return __( 'Add the path to your MaxMind GeoLite2 database file.', 'wb-ads-rotator-with-split-test' );
+				}
+				if ( ! is_readable( $path ) ) {
+					/* translators: %s: file path the owner entered */
+					return sprintf( __( 'The MaxMind database file can\'t be read: %s', 'wb-ads-rotator-with-split-test' ), $path );
+				}
+				return '';
+
+			case 'ipinfo':
+				return '' === (string) ( $settings['geo_ipinfo_key'] ?? '' )
+					? __( 'Add your ipinfo.io API key.', 'wb-ads-rotator-with-split-test' )
+					: '';
+
+			case '':
+				return __( 'Choose a location provider.', 'wb-ads-rotator-with-split-test' );
+		}
+
+		return '';
+	}
+
 	private function query_provider( $provider, $ip, $settings ) {
+		if ( '' !== self::provider_problem( $settings ) ) {
+			return array(); // Not set up: no file to read, no call without a key.
+		}
+
 		switch ( $provider ) {
 			case 'maxmind':
 				$db_path = isset( $settings['geo_maxmind_db_path'] ) ? $settings['geo_maxmind_db_path'] : '';
