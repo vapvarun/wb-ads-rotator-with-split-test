@@ -223,7 +223,7 @@ inventory in `audit/manifest.json`.
 | `wbam_settings_links_content` | - | Fires inside the Links section's one `<form>`, after cloaking settings and before the single Save button (card 10343706274: one form, one Save per section). |
 | `wbam_settings_location_content` | $saving | Fires inside the Location section's one `<form>`, after visitor geolocation and before the single Save button (card 10343706274: one form, one Save per section). PRO's classified-maps card writes its own option (`wbam_pro_geolocation_settings`) directly - it cannot share this page's native `wbam_settings_group` Settings API processing the way `wbam_pro_settings` does elsewhere, so it is instead gated on the `$saving` flag this same submission already verified. save of this page's form. |
 | `wbam_settings_privacy_content` | - | Fires inside the Privacy & Data section's one `<form>`, after FREE's own cards and before the single Save button (card 10343706274: one form, one Save per section). PRO's analytics/GDPR card posts through this same `options.php` submission because `wbam_pro_settings` is also registered under this page's `wbam_settings_group`. |
-| `wbam_settings_tools_content` | - | Fires inside the Tools section. |
+| `wbam_settings_tools_content` | - | Fires inside the Tools section. Print a heading (`<h2 class="wbam-settings-heading">`) and one `.wbam-card`. |
 | `wbam_setup_wizard_complete` | - | Fires when setup wizard is completed. |
 | `wbam_setup_wizard_ready_after` | - | Fires after the ready step content. |
 | `wbam_setup_wizard_ready_after_steps` | - | Fires after the next steps links, before the dashboard button. |
@@ -261,6 +261,7 @@ inventory in `audit/manifest.json`.
 | `wbam_advertiser_placements` | $ids | Filter the placements sellable to advertisers. |
 | `wbam_analytics_raw_retention_days` | $days | Filters how many days raw analytics events are kept. Older events are summed into wbam_analytics_daily and deleted, so lifetime totals are unchanged. |
 | `wbam_asset_suffix` | $suffix, $relative_path | Filter the minification suffix an asset URL resolves to. Exists so the test suite can drive the SCRIPT_DEBUG-on (source file) path without defining the SCRIPT_DEBUG constant globally, which would leak into every other test in the run. |
+| `wbam_classifieds_label` | $label, $form | Filters the site's name for a classified item on Free screens. |
 | `wbam_code_ad_content` | $code, $ad_id, $options | Filter code ad content before rendering. Allows developers to apply custom sanitization or processing to code ads for additional security measures. |
 | `wbam_code_ad_sandbox_attrs` | $sandbox_attrs, $ad_id | Filter the sandbox attributes for code ad iframes. allow-same-origin is dropped whenever allow-scripts is present. |
 | `wbam_code_ad_use_sandbox` | $use_sandbox, $ad_id, $code | Filter whether to use iframe sandbox for this code ad. When enabled, the ad code will be rendered in a sandboxed iframe for additional security isolation. |
@@ -326,6 +327,7 @@ inventory in `audit/manifest.json`.
 | `wbam_popup_skip_mobile_first_view` | $skip, $ad_id | Whether to hold this popup back on a phone visitor's first page view. Ads saved while this was a field start from their stored value. |
 | `wbam_preload_frontend_assets` | $preload | Whether this request should preload the frontend ad CSS/JS in the head even though none of the built-in signals matched - e.g. a theme template that calls `do_shortcode('[wbam_ad id="1"]')` outside post_content, where has_shortcode() cannot see it. |
 | `wbam_rotation_pick` | $pick, $pool, $placement_id, $tier | Choose the winner from a pool of same-tier ads. Return an ID from the pool, or null for the default priority-weighted draw. |
+| `wbam_sample_content_card_owned` | $owned | Whether an add-on renders the Sample content card instead. |
 | `wbam_send_partnership_accepted_notification` | $send, $partnership | Filter whether the requester's "accepted" notification email sends. |
 | `wbam_send_partnership_admin_notification` | $send, $partnership | Filter whether the admin new-inquiry notification email sends. |
 | `wbam_send_partnership_rejected_notification` | $send, $partnership | Filter whether the requester's "rejected" notification email sends. |

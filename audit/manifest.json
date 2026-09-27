@@ -982,6 +982,13 @@
       "purpose": "Fired before partnership deletion"
     },
     {
+      "name": "wbam_classifieds_label",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Admin/class-help-docs.php",
+      "purpose": "The site's name for a classified item on Free screens (Help & Docs); Pro returns the owner's classifieds label. Default 'Classified'/'Classifieds' (card 10343726476)"
+    },
+    {
       "name": "wbam_code_ad_content",
       "type": "filter",
       "args": 3,
@@ -1841,6 +1848,13 @@
       "args": 4,
       "where": "includes/Modules/Placements/class-placement-engine.php",
       "purpose": "Choose the winner from a same-tier pool; null keeps the priority-weighted draw"
+    },
+    {
+      "name": "wbam_sample_content_card_owned",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-demo-data-cleaner.php",
+      "purpose": "True when an add-on renders the Tools > Sample content card (Pro lists the setup wizard's samples and its one Remove clears both); Free's own card then prints nothing (owner decision, card 10344381767)"
     },
     {
       "name": "wbam_save_ad_meta",
