@@ -39,10 +39,11 @@ class Test_Credits_Settings_Ordering extends Pro_Test_Case {
 	public function test_pricing_and_payments_renders_before_credit_mappings(): void {
 		$html = $this->render();
 
-		$payments_pos = strpos( $html, 'Pricing &amp; Payments' );
+		$payments_pos = strpos( $html, 'Direct Payment Gateways' );
 		$mappings_pos = strpos( $html, 'Payment Mappings' );
 
-		$this->assertNotFalse( $payments_pos, 'Pricing & Payments section must render.' );
+		$this->assertStringNotContainsString( 'Pricing &amp; Payments', $html, 'The section title "Payments" already heads it (card 10343706274).' );
+		$this->assertNotFalse( $payments_pos, 'The built-in gateways must render.' );
 		$this->assertNotFalse( $mappings_pos, 'Payment Mappings section must render.' );
 		$this->assertLessThan( $mappings_pos, $payments_pos, 'Stripe/PayPal (built-in) must render before the adapter-based Payment Mappings.' );
 	}

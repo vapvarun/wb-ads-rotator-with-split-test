@@ -42,6 +42,37 @@ class Test_Settings_Sections_Flat_Cards extends Pro_Test_Case {
 		}
 	}
 
+	/** Wave 6: Tools & License had the demo card and a License Benefits box inside a section card. */
+	public function test_tools_and_license_have_no_card_in_card(): void {
+		$admin = new Pro_Admin();
+		$tools = static function () use ( $admin ) {
+			$admin->render_tools_page( true );
+		};
+		$license = array( \WBAM_Pro_License_Manager::get_instance(), 'render_license_tab' );
+		add_action( 'wbam_settings_tools_content', $tools );
+		add_action( 'wbam_settings_tools_content', $license );
+
+		ob_start();
+		( new \WBAM\Admin\Settings() )->render_tools_section();
+		$html = (string) ob_get_clean();
+		remove_action( 'wbam_settings_tools_content', $tools );
+		remove_action( 'wbam_settings_tools_content', $license );
+
+		$dom = new \DOMDocument();
+		libxml_use_internal_errors( true );
+		$dom->loadHTML( '<?xml encoding="utf-8"?><div>' . $html . '</div>' );
+		libxml_clear_errors();
+		$xpath = new \DOMXPath( $dom );
+		$card  = "contains(concat(' ', normalize-space(@class), ' '), ' wbam-card ')";
+		$boxed = "{$card} or contains(@class, 'form-table') or contains(@class, 'license-info-box')";
+
+		$this->assertGreaterThan( 0, $xpath->query( "//*[{$card}]" )->length, 'The demo tool renders its card.' );
+		$this->assertSame( 0, $xpath->query( "//*[{$boxed}]//*[{$boxed}]" )->length, 'A box sits inside another box.' );
+		$this->assertSame( 0, $xpath->query( "//*[{$card}]//h2" )->length, 'Headings belong outside the card.' );
+		$this->assertStringNotContainsString( '<style', $html );
+		$this->assertStringNotContainsString( 'License Benefits</h4>', $html );
+	}
+
 	/** Owner review: no empty 'Classifieds Settings' heading directly above 'Label & URL'. */
 	public function test_classifieds_has_no_empty_heading(): void {
 		$sections = ( new Pro_Admin() )->map_settings_sections( array() );

@@ -90,10 +90,12 @@ class Demo_Data_Cleaner {
 			return;
 		}
 		?>
-		<h3><?php esc_html_e( 'Sample data', 'wb-ads-rotator-with-split-test' ); ?></h3>
-		<p><?php esc_html_e( 'Remove the sample ads created by the setup wizard.', 'wb-ads-rotator-with-split-test' ); ?></p>
+		<h2 class="wbam-settings-heading"><?php esc_html_e( 'Sample data', 'wb-ads-rotator-with-split-test' ); ?></h2>
+		<div class="wbam-card">
+			<p><?php esc_html_e( 'Remove the sample ads created by the setup wizard.', 'wb-ads-rotator-with-split-test' ); ?></p>
+			<?php self::render_clear_button(); ?>
+		</div>
 		<?php
-		self::render_clear_button();
 	}
 
 	/**

@@ -691,18 +691,23 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 	border-bottom: 1px solid var(--wbam-border);
 }
 
-.wbam-settings-page form h2 {
+/* .wbam-settings-heading: the same label for a card that is not inside a
+   form (Tools & License). */
+.wbam-settings-page form h2,
+.wbam-settings-page .wbam-settings-heading {
 	margin:      var(--wbam-space-6) 0 var(--wbam-space-2);
 	font-size:   var(--wbam-font-size-md);
 	font-weight: var(--wbam-weight-semibold);
 	color:       var(--wbam-text);
 }
 
-.wbam-settings-page form h2:first-of-type {
+.wbam-settings-page form h2:first-of-type,
+.wbam-settings-page .wbam-settings-content > :first-child .wbam-settings-heading:first-child {
 	margin-top: var(--wbam-space-2);
 }
 
-.wbam-settings-page form h2 + p.description {
+.wbam-settings-page form h2 + p.description,
+.wbam-settings-page .wbam-settings-heading + p.description {
 	margin: 0 0 var(--wbam-space-3);
 	color:  var(--wbam-text-muted);
 }

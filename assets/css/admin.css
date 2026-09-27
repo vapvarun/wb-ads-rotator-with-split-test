@@ -944,6 +944,7 @@
 
 	.wbam-placement-matrix__group th {
 		display: block;
+		box-sizing: border-box;
 		width: 100%;
 		padding: var(--wbam-space-2) var(--wbam-space-3);
 		margin-block-start: var(--wbam-space-4);

@@ -1411,19 +1411,19 @@ class Settings {
 	 * its own submenu (card 10343706274); the old `?section=email-captures`
 	 * URL redirects there — see render_page().
 	 *
+	 * No wrapping card: each tool prints its own `.wbam-settings-heading`
+	 * and card, so nothing nests a card inside a card (card 10343706274).
+	 *
 	 * @since 3.2.0
 	 */
 	public function render_tools_section() {
-		if ( has_action( 'wbam_settings_tools_content' ) ) {
-			echo '<div class="wbam-card">';
-			/**
-			 * Fires inside the Tools section.
-			 *
-			 * @since 3.2.0
-			 */
-			do_action( 'wbam_settings_tools_content' );
-			echo '</div>';
-		}
+		/**
+		 * Fires inside the Tools section. Print a heading
+		 * (`<h2 class="wbam-settings-heading">`) and one `.wbam-card`.
+		 *
+		 * @since 3.2.0
+		 */
+		do_action( 'wbam_settings_tools_content' );
 	}
 
 	/**
