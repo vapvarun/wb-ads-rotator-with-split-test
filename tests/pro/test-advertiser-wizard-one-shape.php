@@ -33,6 +33,14 @@ class Test_Advertiser_Wizard_One_Shape extends Pro_Test_Case {
 		$this->advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );
 	}
 
+	public function tear_down(): void {
+		// A charge in these tests commits (MySQL ends the test's own
+		// transaction), so remove the package or it piles up across runs.
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}wbam_packages WHERE name = 'Big Banner'" ); // phpcs:ignore WordPress.DB
+		parent::tear_down();
+	}
+
 	private function render_form(): string {
 		return (string) Template_Loader::load_template(
 			'portal/ad-form',

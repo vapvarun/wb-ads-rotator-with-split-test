@@ -19,6 +19,15 @@ class Test_No_Combined_Pricing_Model extends Pro_Test_Case {
 		delete_option( 'wbam_pro_combined_pricing_moved' );
 	}
 
+	public function tear_down(): void {
+		// A step in these tests commits (MySQL ends the test's own
+		// transaction), so remove what they insert or it piles up across runs.
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}wbam_packages WHERE name IN ( 'Combo package', 'Big Banner' )" ); // phpcs:ignore WordPress.DB
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}wbam_campaigns WHERE name IN ( 'Combo campaign', 'Click campaign' )" ); // phpcs:ignore WordPress.DB
+		parent::tear_down();
+	}
+
 	public function test_only_three_models_are_offered(): void {
 		$this->assertSame( array( 'flat', 'cpm', 'cpc' ), Pricing_Model::ALL );
 		$this->assertArrayNotHasKey( 'cpm_cpc', Pricing_Model::labels() );
