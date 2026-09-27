@@ -56,4 +56,39 @@ class Test_Honest_Sample_Ads extends \WP_UnitTestCase {
 		$this->assertSame( array( 'box', 'tower' ), Placement_Format_Map::accepted_shapes( array( 'square', 'skyscraper' ) ) );
 		$this->assertSame( array_keys( Placement_Format_Map::shapes() ), Placement_Format_Map::accepted_shapes( array() ), 'No size rule takes every shape.' );
 	}
+
+	private function old_sample( string $title, array $data, bool $edited = false ): int {
+		$id = (int) self::factory()->post->create(
+			array(
+				'post_type'   => 'wbam-ad',
+				'post_status' => 'publish',
+				'post_title'  => $title,
+			)
+		);
+		update_post_meta( $id, '_wbam_is_demo', 1 );
+		update_post_meta( $id, '_wbam_ad_data', $data );
+		if ( $edited ) {
+			global $wpdb;
+			$wpdb->update( $wpdb->posts, array( 'post_modified_gmt' => '2030-01-01 00:00:00' ), array( 'ID' => $id ) ); // phpcs:ignore WordPress.DB
+			clean_post_cache( $id );
+		}
+		return $id;
+	}
+
+	public function test_upgrade_rewrites_only_untouched_old_samples(): void {
+		$old     = array(
+			'type'    => 'rich-content',
+			'content' => '<p><strong>Advertise here</strong></p><p><a href="/">Get in touch</a></p>',
+		);
+		$fresh   = $this->old_sample( 'Sample Sidebar Ad', $old );
+		$edited  = $this->old_sample( 'Sample Sidebar Ad', $old, true );
+		$custom  = $this->old_sample( 'Sample Sidebar Ad', array( 'type' => 'rich-content', 'content' => '<p>My own copy</p>' ) );
+
+		$this->assertSame( 1, \WBAM\Core\Installer::rewrite_untouched_sample_ads() );
+		$this->assertSame( 0, \WBAM\Core\Installer::rewrite_untouched_sample_ads(), 'Idempotent.' );
+
+		$this->assertStringContainsString( 'Sample ad - replace me in WB Ad Manager', get_post_meta( $fresh, '_wbam_ad_data', true )['content'] );
+		$this->assertStringContainsString( 'Advertise here', get_post_meta( $edited, '_wbam_ad_data', true )['content'], 'Edited by the owner: left alone.' );
+		$this->assertSame( '<p>My own copy</p>', get_post_meta( $custom, '_wbam_ad_data', true )['content'] );
+	}
 }

@@ -26,7 +26,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.9.3';
+	const DB_VERSION = '1.9.4';
 
 	/**
 	 * Option name for database version.
@@ -308,6 +308,75 @@ class Installer {
 			wbam_drop_on_update_clock( 'wbam_links', 'updated_at' );
 			self::continue_utc_migration();
 		}
+
+		// Migration to 1.9.4: sample ads the owner never edited get the
+		// honest sample copy (owner decision 2026-10-03, card 10344383315).
+		if ( version_compare( $current_version, '1.9.4', '<' ) ) {
+			self::rewrite_untouched_sample_ads();
+		}
+	}
+
+	/**
+	 * Rewrite the setup wizard's sample ads that the owner never edited to
+	 * the current honest copy ("Sample ad - replace me in WB Ad Manager"),
+	 * replacing the old "Advertise here / with us" calls to action that
+	 * linked to the homepage.
+	 *
+	 * Untouched means all three: it carries the sample marker, it was never
+	 * saved after the wizard created it (post_modified_gmt equals
+	 * post_date_gmt), and it still holds the old sample copy. Anything the
+	 * owner changed is left alone. Idempotent: a rewritten ad no longer
+	 * holds the old copy.
+	 *
+	 * @since 3.2.0
+	 * @return int Ads rewritten.
+	 */
+	public static function rewrite_untouched_sample_ads() {
+		if ( ! class_exists( '\\WBAM\\Admin\\Setup_Wizard' ) ) {
+			return 0;
+		}
+
+		$definitions = \WBAM\Admin\Setup_Wizard::sample_ad_definitions();
+		$by_title    = array();
+		foreach ( $definitions as $definition ) {
+			$by_title[ (string) $definition['title'] ] = $definition;
+		}
+
+		$ids = get_posts(
+			array(
+				'post_type'      => 'wbam-ad',
+				'post_status'    => 'any',
+				'posts_per_page' => 50, // The wizard makes three; a cap keeps a bad marker cheap.
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				'meta_key'       => '_wbam_is_demo',
+				'meta_value'     => '1', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+			)
+		);
+
+		$rewritten = 0;
+		foreach ( $ids as $ad_id ) {
+			$post = get_post( $ad_id );
+			$old  = get_post_meta( $ad_id, '_wbam_ad_data', true );
+			if ( ! $post || ! isset( $by_title[ $post->post_title ] ) || $post->post_modified_gmt !== $post->post_date_gmt || ! is_array( $old ) ) {
+				continue;
+			}
+			$text = wp_json_encode( $old );
+			if ( ! preg_match( '/Advertise here|Advertise with us|Your message could be here|Get in touch|placehold\\.co/i', (string) $text ) ) {
+				continue;
+			}
+
+			$data = $by_title[ $post->post_title ]['data'];
+			// Keep the owner's in-content position if the wizard stored one.
+			if ( isset( $old['after_paragraph'] ) && isset( $data['after_paragraph'] ) ) {
+				$data['after_paragraph'] = $old['after_paragraph'];
+			}
+			update_post_meta( $ad_id, '_wbam_ad_data', $data );
+			++$rewritten;
+		}
+
+		return $rewritten;
 	}
 
 	/**

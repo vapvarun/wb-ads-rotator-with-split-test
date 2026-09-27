@@ -595,11 +595,14 @@ class Setup_Wizard {
 	}
 
 	/**
-	 * Create sample ads.
+	 * The sample ads, as the wizard creates them. Shared with the upgrade
+	 * that rewrites sample ads an owner never edited (Installer, 1.9.4), so
+	 * both always use the same honest copy.
 	 *
-	 * @param array $ads_to_create List of sample ads to create.
+	 * @since 3.2.0
+	 * @return array<string, array> Sample key => definition.
 	 */
-	private function create_sample_ads( $ads_to_create ) {
+	public static function sample_ad_definitions() {
 		// Samples say what they are. They link only to a real place a
 		// visitor can buy the spot (Pro's Advertise page), never a made-up
 		// "Advertise here" call to action.
@@ -650,6 +653,17 @@ class Setup_Wizard {
 				),
 			),
 		);
+
+		return $sample_ads;
+	}
+
+	/**
+	 * Create sample ads.
+	 *
+	 * @param array $ads_to_create List of sample ads to create.
+	 */
+	private function create_sample_ads( $ads_to_create ) {
+		$sample_ads = self::sample_ad_definitions();
 
 		/**
 		 * Filter the sample ads definitions.
@@ -786,7 +800,7 @@ class Setup_Wizard {
 					'url'         => home_url( '/' ),
 					'icon'        => 'external-link',
 					'title'       => __( 'View Your Site', 'wb-ads-rotator-with-split-test' ),
-					'description' => __( 'See the sample ads where visitors will', 'wb-ads-rotator-with-split-test' ),
+					'description' => __( 'See the sample ads where visitors will see them', 'wb-ads-rotator-with-split-test' ),
 				),
 				'view_ads' => array(
 					'url'         => admin_url( 'edit.php?post_type=wbam-ad' ),
