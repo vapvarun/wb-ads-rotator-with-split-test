@@ -120,4 +120,20 @@ class Test_Approve_Reject_Show_Money extends Pro_Test_Case {
 		$bodies = implode( "\n", wp_list_pluck( $sent, 'message' ) );
 		$this->assertStringContainsString( 'Charged $49.00. Balance now $51.00.', $bodies );
 	}
+
+	public function test_the_reject_form_preview_matches_what_reject_returns(): void {
+		$submission = $this->submission();
+		$manager    = Ad_Submission_Manager::get_instance();
+
+		$this->assertEqualsWithDelta( 0.0, $manager->rejection_refund( $submission ), 0.001, 'Nothing charged before approval.' );
+
+		$manager->approve( (int) $submission->id );
+		$this->assertEqualsWithDelta( 49.0, $manager->rejection_refund( $manager->get( (int) $submission->id ) ), 0.001 );
+	}
+
+	public function test_no_woocommerce_credit_products_means_no_currency_warning(): void {
+		update_option( 'wbam-pro_credit_mappings', array() );
+
+		$this->assertSame( '', \WBAM_Pro\Core\Credits_Bridge::woocommerce_currency_mismatch() );
+	}
 }
