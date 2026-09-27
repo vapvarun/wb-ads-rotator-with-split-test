@@ -252,6 +252,8 @@ function requireDatesInUtc() {
 function requireHooksDocumented() {
 	try {
 		run('bash', ['bin/check-hooks-documented.sh'], { stdio: 'inherit' });
+		// The committed reference must match the code, or it drifts.
+		run('php', ['bin/generate-hooks-reference.php', '--check'], { stdio: 'inherit' });
 	} catch (e) {
 		die(1, 'Undocumented or unlisted hooks - see above. Document them, run php bin/generate-hooks-reference.php, commit, then release.');
 	}

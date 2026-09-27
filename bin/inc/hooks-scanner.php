@@ -250,7 +250,7 @@ final class Hooks_Scanner {
 		foreach ( $lines as $line ) {
 			$line = trim( $line );
 			$line = preg_replace( '#^/?\*+/?#', '', $line );
-			$line = trim( $line );
+			$line = trim( preg_replace( '#\*+/$#', '', $line ) ); // One-line docblocks end in */.
 			if ( '' === $line ) {
 				continue;
 			}
@@ -274,7 +274,9 @@ final class Hooks_Scanner {
 				$summary[] = $line;
 			}
 		}
-		if ( ! empty( $summary ) ) {
+		// WordPress's "This filter is documented in <file>" is a pointer, not a
+		// description: leave it undocumented so the real docblock wins.
+		if ( ! empty( $summary ) && ! preg_match( '/^This (filter|action|hook) is documented in\b/i', $summary[0] ) ) {
 			$site->doc_summary = implode( ' ', $summary );
 		}
 	}

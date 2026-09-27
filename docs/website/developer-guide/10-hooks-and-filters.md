@@ -157,6 +157,7 @@ inventory in `audit/manifest.json`.
 | `wbam_ad_duplicated` | $new_id, $id | Fires after an ad has been duplicated. |
 | `wbam_ad_impression` | $ad_id, $placement | Action fired when an ad impression is recorded. |
 | `wbam_ad_metabox_options` | $post | Action for adding additional metabox options. |
+| `wbam_ad_status_prime` | $ad_ids | Batch-load anything a `wbam_ad_status` callback reads per ad. |
 | `wbam_before_link_delete` | $id, $link | Fires before a partnership link is deleted, while the link and its click records still exist. |
 | `wbam_before_link_redirect` | $link, $destination | Fires immediately before a partnership link click redirects the visitor. |
 | `wbam_before_partnership_delete` | $id, $partnership | Fires before a partnership inquiry is deleted, while it still exists. |
@@ -211,7 +212,7 @@ inventory in `audit/manifest.json`.
 | `wbam_partnership_rejected` | $partnership | Fires after a partnership inquiry is rejected. Notifies the requester by default (see Partnership_Emails::notify_requester_rejected()). |
 | `wbam_partnership_updated` | $updated_partnership, $existing | Fires after a partnership inquiry is updated. |
 | `wbam_placement_candidates` | $ad_ids, $placement_id | Fires with a placement's candidate ads before each one is checked, so an extension can batch-load what its `wbam_should_display_ad` callback needs in one query instead of one per ad. |
-| `wbam_placement_matrix_cell` | $id, $placement | Fires once per placement row in the matrix, after the built-in "Active ads" cell, when an active add-on has registered a callback here (see wbam_placement_matrix_head for the matching header cell). Echo one <td> matching the extra header column. |
+| `wbam_placement_matrix_cell` | $id, $placement | Fires once per placement row in the matrix, after the built-in "Live ads" cell, when an active add-on has registered a callback here (see wbam_placement_matrix_head for the matching header cell). Echo one <td> matching the extra header column. |
 | `wbam_placement_matrix_head` | - | Fires inside the placement matrix's <thead> row, after the built-in columns, when an active add-on has registered a wbam_placement_matrix_cell callback. Echo one <th> per extra column added in the row below. |
 | `wbam_placement_matrix_intro` | - | Fires after the Placements intro copy, before the matrix table. PRO's rotation module hooks this to explain the "Ads shown" column it adds to the matrix (see Placement_Settings::render_table()'s `wbam_placement_matrix_head`/`wbam_placement_matrix_cell` hooks). |
 | `wbam_placements_init` | $engine | Fires once the placement engine has registered its built-in ad types and placements and is ready to serve ads. |
@@ -219,7 +220,7 @@ inventory in `audit/manifest.json`.
 | `wbam_register_placements` | $engine | Fires after the built-in placements are registered. Call `$engine->register_placement( new My_Placement() )` here to add a custom placement; `My_Placement` must implement `Placement_Interface`. Placements registered after `init` (id est after `wbam_placements_init` has fired) still register immediately — see `register_placement()`. |
 | `wbam_rest_event_tracked` | $ad_id, $event_type, $placement | Fires after a REST-tracked impression/click is recorded. |
 | `wbam_save_ad_meta` | $post_id | Action fired after ad meta is saved. |
-| `wbam_settings_ads_display_content` | - | Fires inside the Ads & Display section's one `<form>`, after FREE's own cards and before the single Save button (card 10343706274: one form, one Save per section) - PRO hooks its Ad Rotation card here (when the rotation module is active); its role and member-type rows sit in the "Who sees ads" card as settings fields. PRO's fields post through this same `options.php` submission because `wbam_pro_settings` is also registered under this page's `wbam_settings_group` (see Pro_Admin::register_settings()) - its own sanitizer runs unchanged, only the physical form is shared. |
+| `wbam_settings_ads_display_content` | - | Fires inside the Ads & Display section's one `<form>`, after FREE's own cards and before the single Save button (card 10343706274: one form, one Save per section) - PRO hooks its Ad Rotation card here (when the rotation module is active). PRO's fields post through this same `options.php` submission because `wbam_pro_settings` is also registered under this page's `wbam_settings_group` (see Pro_Admin::register_settings()) - its own sanitizer runs unchanged, only the physical form is shared. |
 | `wbam_settings_links_content` | - | Fires inside the Links section's one `<form>`, after cloaking settings and before the single Save button (card 10343706274: one form, one Save per section). |
 | `wbam_settings_location_content` | $saving | Fires inside the Location section's one `<form>`, after visitor geolocation and before the single Save button (card 10343706274: one form, one Save per section). PRO's classified-maps card writes its own option (`wbam_pro_geolocation_settings`) directly - it cannot share this page's native `wbam_settings_group` Settings API processing the way `wbam_pro_settings` does elsewhere, so it is instead gated on the `$saving` flag this same submission already verified. save of this page's form. |
 | `wbam_settings_privacy_content` | - | Fires inside the Privacy & Data section's one `<form>`, after FREE's own cards and before the single Save button (card 10343706274: one form, one Save per section). PRO's analytics/GDPR card posts through this same `options.php` submission because `wbam_pro_settings` is also registered under this page's `wbam_settings_group`. |
@@ -248,13 +249,9 @@ inventory in `audit/manifest.json`.
 | `wbam_ad_event_totals` | $totals | Filters the lifetime event totals for a page of ads. |
 | `wbam_ad_formats` | $formats | Filter the canonical ad format taxonomy. Downstream consumers may append site-specific formats here, but should not remove or rename the built-in entries — ads and packages reference them by slug. |
 | `wbam_ad_link_rel` | $rel, $ad_id | Filter the rel attribute of an ad's click-through link. Return 'sponsored noopener' to mark a house ad as paid. |
-| `wbam_ad_status` | $status, $ad_id | An ad's state (live, scheduled, ended, not_showing, off, draft, pending) and one reason. Shown on All Ads, in the editor, in the WB Ad block and to editors in place of an empty shortcode or widget. |
-| `wbam_ad_status_prime` (action) | $ad_ids | Batch-load anything a `wbam_ad_status` callback reads, once per list page. |
-| `wbam_priority_hint` | $hint, $ad_id | The editor's priority hint. |
-| `wbam_show_ad_label` | $show, $ad_id, $ad_type | Whether an ad carries the disclosure label. Default: every type except Email Capture (the site's own signup form). |
-| `wbam_sample_ad_link` | $url | Where the setup wizard's sample ads link. Empty means no link; Pro returns its published Advertise page. |
 | `wbam_ad_not_delivering_reason` | $reason, $ad_id | Filter the editor notice for a WB Ad block whose ad renders nothing right now. |
 | `wbam_ad_output` | $output, $ad_id, $placement | Filter the ad output HTML. |
+| `wbam_ad_status` | $status, $ad_id | Filter an ad's state and reason. Pro adds campaign reasons. |
 | `wbam_ad_tag_taxonomy_args` | $args | Filter the ad tag taxonomy arguments. Lets a site relabel the taxonomy, widen its capabilities, or turn on hierarchy without forking the plugin. |
 | `wbam_ad_types_without_placements` | $types | Filter which ad type IDs are never served through a placement (e.g. a video ad played in-stream by the host plugin instead of painted into a header/sidebar slot). |
 | `wbam_ad_types_without_sizing` | $types | Filter which ad type IDs skip the fixed width/height sizing metabox. |
@@ -266,16 +263,15 @@ inventory in `audit/manifest.json`.
 | `wbam_advertiser_placements` | $ids | Filter the placements sellable to advertisers. |
 | `wbam_analytics_raw_retention_days` | $days | Filters how many days raw analytics events are kept. Older events are summed into wbam_analytics_daily and deleted, so lifetime totals are unchanged. |
 | `wbam_asset_suffix` | $suffix, $relative_path | Filter the minification suffix an asset URL resolves to. Exists so the test suite can drive the SCRIPT_DEBUG-on (source file) path without defining the SCRIPT_DEBUG constant globally, which would leak into every other test in the run. |
+| `wbam_bot_patterns` | $bot_patterns | Filter the user-agent fragments treated as bots. |
 | `wbam_classifieds_label` | $label, $form | Filters the site's name for a classified item on Free screens. |
 | `wbam_code_ad_content` | $code, $ad_id, $options | Filter code ad content before rendering. Allows developers to apply custom sanitization or processing to code ads for additional security measures. |
 | `wbam_code_ad_sandbox_attrs` | $sandbox_attrs, $ad_id | Filter the sandbox attributes for code ad iframes. allow-same-origin is dropped whenever allow-scripts is present. |
 | `wbam_code_ad_use_sandbox` | $use_sandbox, $ad_id, $code | Filter whether to use iframe sandbox for this code ad. When enabled, the ad code will be rendered in a sandboxed iframe for additional security isolation. |
+| `wbam_count_analytics_event` | $counts, $ad_id, $event_type, $placement | Filter whether this analytics event is counted. |
 | `wbam_count_visitor_views` | $counts, $ad_id | Filters whether visitor views of an ad are counted. Return true when a cap outside the ad's own daily limit reads get_ad_views() for this ad. |
-| `wbam_bot_patterns` | $bot_patterns | User-agent fragments treated as bots. Bots are not counted in reports and, with Pro, not billed. |
-| `wbam_count_analytics_event` | $counts, $ad_id, $event_type, $placement | Whether an impression or click is counted. False for bots and logged-in admins by default. |
-| `wbam_uninstall_data_items` | $items | The list shown under Delete Data on Uninstall. |
-| `wbam_currency_code` | $currency | The site currency code (USD unless Pro sets its Credits currency). |
-| `wbam_currency_symbol` | $symbol, $currency | Change the symbol for a currency code. The symbol otherwise follows the code. |
+| `wbam_currency_code` | $currency | Filter the site's currency code. |
+| `wbam_currency_symbol` | $symbol, $currency | Filter the currency symbol. |
 | `wbam_detected_device` | $device, $user_agent | Filter the detected device type. Allows themes/plugins to override device detection for custom logic. |
 | `wbam_email_capture_cookie_days` | $days, $ad_id | Filter how many days a dismissed email sign-up ad stays hidden. Plug and play (owner decision, card 10343726590): no Settings UI field any more. This ad's already-stored `cookie_days` is this filter's default, so nothing changes silently. |
 | `wbam_email_capture_success_message` | $success_message, $email, $ad_id | Filter the success message for email capture. |
@@ -335,7 +331,9 @@ inventory in `audit/manifest.json`.
 | `wbam_popup_repeat_days` | $days, $ad_id | Days before a visitor sees this popup again; 0 shows it on every page until they close it. Ads saved while this was a field start from their stored value. |
 | `wbam_popup_skip_mobile_first_view` | $skip, $ad_id | Whether to hold this popup back on a phone visitor's first page view. Ads saved while this was a field start from their stored value. |
 | `wbam_preload_frontend_assets` | $preload | Whether this request should preload the frontend ad CSS/JS in the head even though none of the built-in signals matched - e.g. a theme template that calls `do_shortcode('[wbam_ad id="1"]')` outside post_content, where has_shortcode() cannot see it. |
+| `wbam_priority_hint` | $hint, $post_id | Filter the editor's priority hint. Pro explains that a paid ad's share comes from its campaign's rotation, not Priority. |
 | `wbam_rotation_pick` | $pick, $pool, $placement_id, $tier | Choose the winner from a pool of same-tier ads. Return an ID from the pool, or null for the default priority-weighted draw. |
+| `wbam_sample_ad_link` | $url | Where a sample ad links. Empty (the default) means no link; Pro returns its Advertise page when one is published. |
 | `wbam_sample_content_card_owned` | $owned | Whether an add-on renders the Sample content card instead. |
 | `wbam_send_partnership_accepted_notification` | $send, $partnership | Filter whether the requester's "accepted" notification email sends. |
 | `wbam_send_partnership_admin_notification` | $send, $partnership | Filter whether the admin new-inquiry notification email sends. |
@@ -347,7 +345,9 @@ inventory in `audit/manifest.json`.
 | `wbam_setup_wizard_sample_options` | $options | Filter available sample ad options in setup wizard. |
 | `wbam_setup_wizard_steps` | $steps | Filter the setup wizard steps. Allows developers to add, remove, or modify wizard steps. |
 | `wbam_should_display_ad` | $should_display, $ad_id | Filter the final should-display decision for an ad, after the built-in schedule, targeting and frequency checks have all passed. |
+| `wbam_show_ad_label` | $show, $ad_id, $ad_type | Whether this ad carries the disclosure label. The site's own signup form is not an advertisement, so Email Capture ads go without it unless this filter says otherwise. |
 | `wbam_skip_content_injection` | $skip, $content | Filter whether to skip in-content ad injection (before/after content and after-paragraph) on the current page. Application pages - an account dashboard, a posting form, a message thread - render their UI through the_content, and ads injected there land inside forms. |
+| `wbam_uninstall_data_items` | $items | Filter the list of data 'Delete Data on Uninstall' removes. |
 | `wbam_viewable_beacon_url` | $url, $ad_id, $placement | Filters the URL the viewability beacon sends for an ad. |
 | `wbam_viewable_impressions` | $enabled | Whether "viewable" impressions (popup/sticky/code/AdSense ads count only once actually seen) are counted this way. Plug and play (owner decision, card 10343706274): this used to be a Settings UI checkbox; the field is gone, but a site that already had it on keeps counting this way — the current stored value is this filter's default, so nothing changes silently. A developer who wants a different default uses this filter. |
 

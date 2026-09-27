@@ -36,6 +36,7 @@ if ( '' === $html ) {
 	// get no markup at all.
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only preview flag, gated on edit_posts.
 	if ( ! empty( $_GET['wbam_preview'] ) && current_user_can( 'edit_posts' ) ) {
+		$wbam_status = \WBAM\Core\Ad_Status::get( $ad_id );
 		/**
 		 * Filter the editor notice for a WB Ad block whose ad renders
 		 * nothing right now.
@@ -44,8 +45,7 @@ if ( '' === $html ) {
 		 * @param string $reason Notice text.
 		 * @param int    $ad_id  Ad ID.
 		 */
-		$wbam_status = \WBAM\Core\Ad_Status::get( $ad_id );
-		$reason      = apply_filters(
+		$reason = apply_filters(
 			'wbam_ad_not_delivering_reason',
 			\WBAM\Core\Ad_Status::LIVE === $wbam_status['state']
 				? __( 'Not delivering: it is live, but its display rules keep it off this page.', 'wb-ads-rotator-with-split-test' )

@@ -30,7 +30,9 @@
 			var custom = 'custom' === inactiveAction.value;
 			var row = inactiveUrl.closest( 'tr' );
 			if ( row ) {
+				// WP's .form-table tr { display: table-row } beats [hidden].
 				row.hidden = ! custom;
+				row.style.display = custom ? '' : 'none';
 			}
 			inactiveUrl.required = custom;
 		};
