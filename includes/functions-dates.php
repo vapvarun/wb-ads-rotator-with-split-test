@@ -313,3 +313,35 @@ if ( ! function_exists( 'wbam_convert_columns_to_utc' ) ) {
 		return false;
 	}
 }
+
+if ( ! function_exists( 'wbam_site_day_range' ) ) {
+	/**
+	 * The site-calendar days from a start day to today, as 'Y-m-d' keys:
+	 * the axis of a daily chart whose data is grouped by site day.
+	 *
+	 * @since 3.2.0
+	 * @param string|null $start_day 'Y-m-d' in the site calendar; empty for the last $days days.
+	 * @param int         $days      When $start_day is empty: start this many days before today.
+	 * @return string[] Days, oldest first; at most 400.
+	 */
+	function wbam_site_day_range( $start_day = null, $days = 30 ) {
+		$tz    = wp_timezone();
+		$today = new DateTimeImmutable( 'now', $tz );
+		$start = null;
+		if ( $start_day && preg_match( '/^\d{4}-\d{2}-\d{2}$/', (string) $start_day ) ) {
+			$parsed = DateTimeImmutable::createFromFormat( '!Y-m-d', (string) $start_day, $tz );
+			$start  = $parsed ? $parsed : null;
+		}
+		if ( ! $start || $start > $today ) {
+			$start = $today->setTime( 0, 0 )->modify( '-' . max( 0, (int) $days ) . ' days' );
+		}
+
+		$keys = array();
+		$day  = $start->setTime( 0, 0 );
+		for ( $i = 0; $day <= $today && $i < 400; $i++ ) {
+			$keys[] = $day->format( 'Y-m-d' );
+			$day    = $day->modify( '+1 day' );
+		}
+		return $keys;
+	}
+}

@@ -29,10 +29,12 @@ WB Ad Manager follows the WordPress model: **store UTC, show and read in the sit
 - `\WBAM\Core\Formatter::date()` and `::datetime()` use these helpers.
 - Never pass a stored value to `date_i18n()`, `gmdate()` or `mysql2date()` for display: all three print UTC.
 - `human_time_diff( strtotime( $utc ), time() )` is correct.
+- A post's `post_date` is site time: use `post_date_gmt` for anything compared, sorted or returned.
+- "Today" for a daily report or chart is the site's today: `wp_date( 'Y-m-d' )`, never `gmdate( 'Y-m-d' )`. `wbam_site_day_range()` gives the site days from a start day to today.
 
 ## The REST API and abilities
 
-Every `*_at` field is the stored UTC value (`Y-m-d H:i:s`), the same as WordPress's own `date_gmt`. A field named `*_formatted` or `*_label` is already shown in the site's zone.
+Every `*_at` field, and a post's `created` / `modified`, is the stored UTC value (`Y-m-d H:i:s`), the same as WordPress's own `date_gmt`. A field named `*_formatted` or `*_label` is already shown in the site's zone.
 
 ## Enforced
 
@@ -40,7 +42,8 @@ Every `*_at` field is the stored UTC value (`Y-m-d H:i:s`), the same as WordPres
 - SQL `NOW()`, `CURDATE()` or `CURRENT_TIMESTAMP` outside a schema;
 - `current_time( 'mysql' )` without `true`;
 - `current_time( 'timestamp' )`;
-- `date_i18n()`.
+- `date_i18n()`;
+- `gmdate()` shown to a person: escaped for HTML, or a human format (`M j`, `F`, `g:i A`). HTTP and cookie dates (`GMT`) and machine ISO values (`gmdate( 'c' )`) are allowed.
 
 It runs in `bin/architecture-checks.sh` and in `npm run release`.
 

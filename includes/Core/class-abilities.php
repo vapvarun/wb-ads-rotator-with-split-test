@@ -926,8 +926,8 @@ class Abilities {
 			),
 			'enabled'    => (bool) get_post_meta( $id, '_wbam_enabled', true ),
 			'status'     => $post->post_status,
-			'created'    => $post->post_date,
-			'modified'   => $post->post_modified,
+			'created'    => $post->post_date_gmt, // UTC, like every stored moment.
+			'modified'   => $post->post_modified_gmt,
 		);
 	}
 

@@ -712,7 +712,7 @@ class Ads_API {
 			'title'   => $post->post_title,
 			'type'    => $this->get_ad_type_from_meta( $post->ID ),
 			'enabled' => (bool) get_post_meta( $post->ID, '_wbam_enabled', true ),
-			'created' => $post->post_date,
+			'created' => $post->post_date_gmt, // UTC, like every date this API returns.
 			'status'  => $post->post_status,
 		);
 
@@ -723,7 +723,7 @@ class Ads_API {
 			$ad_data          = get_post_meta( $post->ID, '_wbam_ad_data', true );
 			$data['ad_data']  = is_array( $ad_data ) ? $ad_data : array();
 			$data['priority'] = (int) get_post_meta( $post->ID, '_wbam_priority', true );
-			$data['modified'] = $post->post_modified;
+			$data['modified'] = $post->post_modified_gmt;
 		}
 
 		return $data;

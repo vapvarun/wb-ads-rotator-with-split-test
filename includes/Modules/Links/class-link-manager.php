@@ -949,17 +949,14 @@ class Link_Manager {
 	public function get_click_trends( $days = 30, $start_date = null ) {
 		global $wpdb;
 
-		$days     = max( 1, absint( $days ) );
-		$start_ts = $start_date ? strtotime( $start_date ) : strtotime( "-{$days} days" );
-		$end      = time();
-
-		// strtotime() returns false on parse failure; fall back to the days window.
-		$start = ( false === $start_ts ) ? ( $end - ( $days * DAY_IN_SECONDS ) ) : $start_ts;
+		// Days are the site's calendar days, the same days the query below
+		// groups clicks into (wbam_sql_site_date), from the start day to today.
+		$day_keys = wbam_site_day_range( $start_date, max( 1, absint( $days ) ) );
 
 		$labels = array();
 		$data   = array();
-		for ( $date = $start; $date <= $end; $date += DAY_IN_SECONDS ) {
-			$labels[] = gmdate( 'M j', $date );
+		foreach ( $day_keys as $key ) {
+			$labels[] = wbam_format_day( $key, 'M j' );
 			$data[]   = 0;
 		}
 
@@ -975,8 +972,8 @@ class Link_Manager {
 					 WHERE clicked_at >= %s AND clicked_at <= %s
 					 GROUP BY {$day_sql}
 					 ORDER BY date ASC",
-					gmdate( 'Y-m-d', $start ),
-					gmdate( 'Y-m-d', $end ) . ' 23:59:59'
+					wbam_site_to_utc( reset( $day_keys ) ),
+					wbam_site_to_utc( end( $day_keys ), true )
 				)
 			);
 
@@ -986,8 +983,7 @@ class Link_Manager {
 					$by_date[ $row->date ] = (int) $row->clicks;
 				}
 				$data = array();
-				for ( $date = $start; $date <= $end; $date += DAY_IN_SECONDS ) {
-					$key    = gmdate( 'Y-m-d', $date );
+				foreach ( $day_keys as $key ) {
 					$data[] = isset( $by_date[ $key ] ) ? $by_date[ $key ] : 0;
 				}
 			}
