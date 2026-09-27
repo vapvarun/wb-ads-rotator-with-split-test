@@ -20,6 +20,14 @@ use WBAM\Modules\Placements\Placement_Engine;
  */
 class Admin {
 
+	/**
+	 * Set when this request's save was kept as a draft (see
+	 * keep_incomplete_ad_draft()).
+	 *
+	 * @var bool
+	 */
+	private static $kept_as_draft = false;
+
 	use Singleton;
 
 	/**
@@ -65,7 +73,9 @@ class Admin {
 		add_filter( 'bulk_actions-edit-wbam-ad', array( $this, 'register_bulk_actions' ) );
 		add_filter( 'handle_bulk_actions-edit-wbam-ad', array( $this, 'handle_bulk_actions' ), 10, 3 );
 		add_action( 'admin_notices', array( $this, 'render_bulk_action_notice' ) );
-		add_action( 'admin_notices', array( $this, 'render_dropped_placements_notice' ) );
+		add_action( 'admin_notices', array( $this, 'render_save_notice' ) );
+		add_filter( 'wp_insert_post_data', array( $this, 'keep_incomplete_ad_draft' ), 10, 2 );
+		add_filter( 'redirect_post_location', array( $this, 'draft_saved_message' ), 10, 2 );
 		// Free-only surface for the one-time "size matching" opt-in notice
 		// (owner decision 13). Pro ships an equivalent CTA on its own
 		// next-step banner (class-next-step-banner.php) with its own action
@@ -2916,7 +2926,7 @@ class Admin {
 			$split      = wbam_split_placements_by_fit( $post_id, $placements, $unoffered );
 			$placements = $split['kept'];
 			if ( $split['dropped'] ) {
-				set_transient( self::dropped_notice_key( $post_id ), wbam_dropped_placements_message( $split['dropped'] ), MINUTE_IN_SECONDS );
+				self::add_save_notice( $post_id, 'warning', wbam_dropped_placements_message( $split['dropped'] ) );
 			}
 
 			update_post_meta( $post_id, '_wbam_placements', $placements );
@@ -2933,20 +2943,37 @@ class Admin {
 	}
 
 	/**
-	 * Transient key for the placements a save removed, per user and ad.
+	 * Transient key for the notices a save leaves for its edit screen, per
+	 * user and ad (the save redirects before admin_notices runs).
 	 *
 	 * @param int $post_id Ad ID.
 	 * @return string
 	 */
-	private static function dropped_notice_key( $post_id ) {
-		return 'wbam_dropped_' . get_current_user_id() . '_' . absint( $post_id );
+	private static function save_notice_key( $post_id ) {
+		return 'wbam_save_notice_' . get_current_user_id() . '_' . absint( $post_id );
 	}
 
 	/**
-	 * After a save that removed placements the ad's size does not fit, say
-	 * which ones on the edit screen (once).
+	 * Queue a notice for the edit screen the save redirects to.
+	 *
+	 * @param int    $post_id Ad ID.
+	 * @param string $type    'warning' or 'error'.
+	 * @param string $message Plain text.
 	 */
-	public function render_dropped_placements_notice() {
+	private static function add_save_notice( $post_id, $type, $message ) {
+		$notices   = (array) get_transient( self::save_notice_key( $post_id ) );
+		$notices[] = array(
+			'type'    => $type,
+			'message' => $message,
+		);
+		set_transient( self::save_notice_key( $post_id ), array_values( array_filter( $notices ) ), MINUTE_IN_SECONDS );
+	}
+
+	/**
+	 * Show (once) what the last save of this ad needs the owner to know:
+	 * placements its size does not fit, or why it stayed a draft.
+	 */
+	public function render_save_notice() {
 		$screen = get_current_screen();
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only: which ad the edit screen shows.
 		$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
@@ -2954,13 +2981,64 @@ class Admin {
 			return;
 		}
 
-		$message = get_transient( self::dropped_notice_key( $post_id ) );
-		if ( ! $message ) {
+		$notices = get_transient( self::save_notice_key( $post_id ) );
+		if ( ! is_array( $notices ) ) {
 			return;
 		}
-		delete_transient( self::dropped_notice_key( $post_id ) );
+		delete_transient( self::save_notice_key( $post_id ) );
 
-		printf( '<div class="notice notice-warning is-dismissible"><p>%s</p></div>', esc_html( $message ) );
+		foreach ( $notices as $notice ) {
+			printf(
+				'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
+				esc_attr( 'error' === $notice['type'] ? 'error' : 'warning' ),
+				esc_html( $notice['message'] )
+			);
+		}
+	}
+
+	/**
+	 * An ad whose type reports a missing required setting (AdSense without
+	 * a Slot or Publisher ID) is kept as a Draft instead of going live
+	 * broken, with a notice saying what to add (owner decision, card
+	 * 10344381767). Runs before the status is written.
+	 *
+	 * @param array $data    Post fields about to be saved.
+	 * @param array $postarr Raw post array (ID).
+	 * @return array
+	 */
+	public function keep_incomplete_ad_draft( $data, $postarr ) {
+		if ( 'wbam-ad' !== ( $data['post_type'] ?? '' ) || ! in_array( $data['post_status'] ?? '', array( 'publish', 'future' ), true ) ) {
+			return $data;
+		}
+		if ( ! isset( $_POST['wbam_nonce'], $_POST['wbam_data'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wbam_nonce'] ) ), 'wbam_save_ad' ) ) {
+			return $data;
+		}
+
+		$raw     = map_deep( wp_unslash( (array) $_POST['wbam_data'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized by map_deep.
+		$handler = Placement_Engine::get_instance()->get_ad_type( isset( $raw['type'] ) ? (string) $raw['type'] : '' );
+		$missing = ( $handler && method_exists( $handler, 'missing_setting' ) ) ? $handler->missing_setting( $raw ) : '';
+		if ( '' === $missing ) {
+			return $data;
+		}
+
+		$data['post_status'] = 'draft';
+		self::$kept_as_draft = true;
+		if ( ! empty( $postarr['ID'] ) ) {
+			self::add_save_notice( (int) $postarr['ID'], 'error', __( 'Saved as a draft, not published.', 'wb-ads-rotator-with-split-test' ) . ' ' . $missing );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * WordPress picks 'published' from the button pressed, not the status
+	 * saved; after keep_incomplete_ad_draft() say 'Draft updated'.
+	 *
+	 * @param string $location Redirect URL.
+	 * @return string
+	 */
+	public function draft_saved_message( $location ) {
+		return self::$kept_as_draft ? add_query_arg( 'message', 10, $location ) : $location;
 	}
 
 	/**
@@ -3346,11 +3424,12 @@ class Admin {
 					$ad_data      = get_post_meta( $post_id, '_wbam_ad_data', true );
 					$type_handler = Placement_Engine::get_instance()->get_ad_type( isset( $ad_data['type'] ) ? $ad_data['type'] : '' );
 					if ( $type_handler && method_exists( $type_handler, 'has_creative' ) && ! $type_handler->has_creative( $post_id ) ) {
+						$missing = method_exists( $type_handler, 'get_missing_label' ) ? $type_handler->get_missing_label( $post_id ) : __( 'Image missing', 'wb-ads-rotator-with-split-test' );
 						echo ' ' . wp_kses_post( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- UX::status_badge() output plus a translated title attribute, both escaped inline.
 							sprintf(
 								'<span class="wbam-status-badge wbam-status-badge--danger" title="%s">%s</span>',
-								esc_attr__( 'This ad is skipped by delivery until its image is restored.', 'wb-ads-rotator-with-split-test' ),
-								esc_html__( 'Image missing', 'wb-ads-rotator-with-split-test' )
+								esc_attr__( 'This ad is skipped by delivery until this is fixed.', 'wb-ads-rotator-with-split-test' ),
+								esc_html( $missing )
 							)
 						);
 					}

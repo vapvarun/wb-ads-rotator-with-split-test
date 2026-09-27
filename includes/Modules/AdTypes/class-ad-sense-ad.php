@@ -48,18 +48,9 @@ class AdSense_Ad implements Ad_Type_Interface {
 	private static $script_enqueued = false;
 
 	/**
-	 * Publisher ID from settings.
-	 *
-	 * @var string
-	 */
-	private $publisher_id = '';
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->publisher_id = Settings_Helper::get( 'adsense_publisher_id', '' );
-
 		// Print Google's loader ONLY if an AdSense ad actually rendered on
 		// this request (render() sets $ad_rendered), and only after every
 		// placement has: Footer renders at wp_footer 10 and Popup/Sticky at
@@ -156,7 +147,51 @@ class AdSense_Ad implements Ad_Type_Interface {
 			return sanitize_text_field( $data['publisher_id'] );
 		}
 
-		return $this->publisher_id;
+		// Read live, not cached at construction: the engine builds this
+		// handler once per request, before a settings save in that request.
+		return (string) Settings_Helper::get( 'adsense_publisher_id', '' );
+	}
+
+	/**
+	 * What this ad still needs before it can show, or '' when complete.
+	 * Without a Slot ID, or a Publisher ID on the ad or in Settings, the
+	 * unit renders nothing (owner decision, card 10344381767).
+	 *
+	 * @param array $data Ad data (stored, or as posted on save).
+	 * @return string Sentence for the owner, or ''.
+	 */
+	public function missing_setting( array $data ) {
+		if ( empty( $data['slot_id'] ) ) {
+			return __( 'Add the Ad Slot ID from your AdSense account to publish this ad.', 'wb-ads-rotator-with-split-test' );
+		}
+		if ( '' === $this->get_publisher_id( $data ) ) {
+			return __( 'Add a Publisher ID on this ad, or in Settings > Ads & Display > Google AdSense, to publish this ad.', 'wb-ads-rotator-with-split-test' );
+		}
+		return '';
+	}
+
+	/**
+	 * Whether the ad can render (read by the Ads list's health badge).
+	 *
+	 * @param int $ad_id Ad ID.
+	 * @return bool
+	 */
+	public function has_creative( $ad_id ) {
+		$data = get_post_meta( $ad_id, '_wbam_ad_data', true );
+		return '' === $this->missing_setting( is_array( $data ) ? $data : array() );
+	}
+
+	/**
+	 * Short badge text for the Ads list when has_creative() is false.
+	 *
+	 * @param int $ad_id Ad ID.
+	 * @return string
+	 */
+	public function get_missing_label( $ad_id ) {
+		$data = get_post_meta( $ad_id, '_wbam_ad_data', true );
+		return empty( $data['slot_id'] )
+			? __( 'Slot ID missing', 'wb-ads-rotator-with-split-test' )
+			: __( 'Publisher ID missing', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
@@ -260,7 +295,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 		$fixed_width  = isset( $data['fixed_width'] ) ? $data['fixed_width'] : '';
 		$fixed_height = isset( $data['fixed_height'] ) ? $data['fixed_height'] : '';
 
-		$global_publisher_id = $this->publisher_id;
+		$global_publisher_id = $this->get_publisher_id();
 		?>
 		<div class="wbam-field">
 			<label for="wbam_adsense_slot_id"><?php esc_html_e( 'Ad Slot ID', 'wb-ads-rotator-with-split-test' ); ?> <span class="required">*</span></label>
@@ -271,7 +306,7 @@ class AdSense_Ad implements Ad_Type_Interface {
 		</div>
 
 		<div class="wbam-field">
-			<label for="wbam_adsense_publisher_id"><?php esc_html_e( 'Publisher ID (Optional)', 'wb-ads-rotator-with-split-test' ); ?></label>
+			<label for="wbam_adsense_publisher_id"><?php esc_html_e( 'Publisher ID', 'wb-ads-rotator-with-split-test' ); ?></label>
 			<div class="wbam-field-input">
 				<input type="text" id="wbam_adsense_publisher_id" name="wbam_data[publisher_id]" value="<?php echo esc_attr( $publisher_id ); ?>" class="regular-text" placeholder="ca-pub-1234567890123456" />
 				<p class="description">
@@ -279,11 +314,11 @@ class AdSense_Ad implements Ad_Type_Interface {
 					if ( ! empty( $global_publisher_id ) ) {
 						printf(
 							/* translators: %s: Publisher ID */
-							esc_html__( 'Leave empty to use global Publisher ID: %s', 'wb-ads-rotator-with-split-test' ),
+							esc_html__( 'Uses the site Publisher ID if empty: %s', 'wb-ads-rotator-with-split-test' ),
 							'<code>' . esc_html( $global_publisher_id ) . '</code>'
 						);
 					} else {
-						esc_html_e( 'Enter your Publisher ID (e.g., ca-pub-1234567890123456) or set it in plugin settings.', 'wb-ads-rotator-with-split-test' );
+						esc_html_e( 'Required: no site Publisher ID is set. Enter one here (e.g., ca-pub-1234567890123456), or set it once in Settings > Ads & Display > Google AdSense.', 'wb-ads-rotator-with-split-test' );
 					}
 					?>
 				</p>

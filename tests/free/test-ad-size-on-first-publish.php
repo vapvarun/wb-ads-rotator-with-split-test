@@ -76,8 +76,8 @@ class Test_Ad_Size_On_First_Publish extends WP_UnitTestCase {
 		$placements = (array) get_post_meta( $ad_id, '_wbam_placements', true );
 		$this->assertContains( 'header', $placements );
 		$this->assertNotContains( $misfit, $placements );
-		$message = get_transient( 'wbam_dropped_' . get_current_user_id() . '_' . $ad_id );
-		$this->assertIsString( $message, 'A removed placement is reported, never silent.' );
-		$this->assertStringContainsString( 'Removed from', $message );
+		$notices = get_transient( 'wbam_save_notice_' . get_current_user_id() . '_' . $ad_id );
+		$this->assertIsArray( $notices, 'A removed placement is reported, never silent.' );
+		$this->assertStringContainsString( 'Removed from', $notices[0]['message'] );
 	}
 }
