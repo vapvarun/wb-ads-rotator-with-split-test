@@ -20,6 +20,7 @@ class Test_Ledger_Display_Note extends Pro_Test_Case {
 		$this->assertSame( 'Included with membership: Pro', Ledger_Row::display_note( 'Credits from PMPro membership: Pro' ) );
 		$this->assertSame( 'Paid top-up through Stripe', Ledger_Row::display_note( 'gateway:stripe:cs_test_123' ) );
 		$this->assertSame( 'Top-up refunded through PayPal', Ledger_Row::display_note( 'gateway:paypal:refund:ABC' ) );
+		$this->assertSame( 'Top-up reversed, WooCommerce order #417 refunded or cancelled', Ledger_Row::display_note( 'Credits reversed: WooCommerce order #417 refunded or cancelled' ) );
 	}
 
 	public function test_plugin_notes_are_left_alone(): void {
