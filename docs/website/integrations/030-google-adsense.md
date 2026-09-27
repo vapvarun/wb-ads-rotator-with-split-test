@@ -24,9 +24,9 @@ Turn on **Auto Ads** under **Settings -> Google AdSense** to let Google place ad
 
 ## Consent and privacy
 
-Under **Settings -> Privacy & GDPR**, enable **Require consent for AdSense** to load AdSense scripts only after the visitor consents (works with common consent plugins). See [Settings](../usage/10-settings.md).
+Under **Settings -> Privacy & GDPR**, enable **Require consent for AdSense** to load AdSense scripts only after the visitor consents (works with common consent plugins). See [Settings](../usage/010-settings.md).
 
 ## Next steps
 
-- [Ad Types](../features/00-ad-types.md)
-- [Settings](../usage/10-settings.md)
+- [Ad Types](../features/000-ad-types.md)
+- [Settings](../usage/010-settings.md)

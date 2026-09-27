@@ -1,6 +1,6 @@
 # Link Shortcodes
 
-Display managed (cloaked, tracked) links from the Links module. See [Link Management](../features/40-link-management.md) to create links first.
+Display managed (cloaked, tracked) links from the Links module. See [Link Management](../features/040-link-management.md) to create links first.
 
 ## `[wbam_link]` - a single tracked link
 
@@ -59,5 +59,5 @@ Outputs the cloaked URL as plain text, for use inside your own markup.
 
 ## Next steps
 
-- [Ad Shortcodes](00-ad-shortcodes.md)
-- [Partnership Inquiry Form](20-partnership-inquiry-form.md)
+- [Ad Shortcodes](000-ad-shortcodes.md)
+- [Partnership Inquiry Form](020-partnership-inquiry-form.md)

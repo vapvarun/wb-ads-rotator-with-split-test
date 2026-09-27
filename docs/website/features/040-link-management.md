@@ -25,13 +25,13 @@ Group links under **WB Ad Manager -> Links -> Categories** (for example: sponsor
 
 ## Cloak prefix and inactive links
 
-Under **Settings -> Link Cloaking**:
+Under **Settings -> Links -> Link Cloaking**:
 
 | Setting | What it does | Default |
 |---------|--------------|---------|
-| Cloak prefix | The URL segment for cloaked links, e.g. `go`. Rewrite rules refresh when you change it. | `go` |
+| Link URL Prefix | The URL segment for cloaked links, e.g. `go`. Links already published under an earlier prefix keep working after you change it. | `go` |
 | Inactive link action | What happens when an inactive or expired link is opened: show 404, redirect home, or redirect to a custom URL. | Show 404 |
-| Inactive link URL | The custom URL for the "redirect to custom URL" action. | (empty) |
+| Inactive link URL | The custom URL for the "redirect to custom URL" action (shown only for that action). | (empty) |
 
 ## Display links
 
@@ -39,13 +39,13 @@ Under **Settings -> Link Cloaking**:
 - A list of links: `[wbam_links category="5"]`
 - Just the URL: `[wbam_link_url id="123"]`
 
-See [Link Shortcodes](../shortcodes/10-link-shortcodes.md) for every attribute.
+See [Link Shortcodes](../shortcodes/010-link-shortcodes.md) for every attribute.
 
 ## Link partnerships
 
-The module also accepts inbound partnership requests (paid link, link exchange, sponsored post) through an on-site form, with an accept/reject workflow and automatic emails. See [Partnership Inquiry Form](../shortcodes/20-partnership-inquiry-form.md).
+The module also accepts inbound partnership requests (paid link, link exchange, sponsored post) through an on-site form, with an accept/reject workflow and automatic emails. See [Partnership Inquiry Form](../shortcodes/020-partnership-inquiry-form.md).
 
 ## Next steps
 
-- [Link Shortcodes](../shortcodes/10-link-shortcodes.md)
-- [Settings](../usage/10-settings.md)
+- [Link Shortcodes](../shortcodes/010-link-shortcodes.md)
+- [Settings](../usage/010-settings.md)

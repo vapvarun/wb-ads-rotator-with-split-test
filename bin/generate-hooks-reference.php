@@ -8,7 +8,7 @@
  * (+ _ref_array/_deprecated variants) calls whose hook name starts with
  * 'wbam_', reads the docblock immediately above each call site, and writes:
  *
- *   1. docs/website/developer-guide/10-hooks-and-filters.md — replaces the
+ *   1. docs/website/developer-guide/010-hooks-and-filters.md — replaces the
  *      block between the BEGIN/END GENERATED markers. Everything outside the
  *      markers (intro prose, recipes, deprecated section) is preserved.
  *   2. audit/manifest.json — replaces the "hooks" key with the current
@@ -154,7 +154,7 @@ $generated .= "<!-- END GENERATED HOOKS REFERENCE -->\n";
 
 // --- Merge into the doc file -----------------------------------------------
 
-$doc_path = $root . '/docs/website/developer-guide/10-hooks-and-filters.md';
+$doc_path = $root . '/docs/website/developer-guide/010-hooks-and-filters.md';
 $existing = is_file( $doc_path ) ? file_get_contents( $doc_path ) : "# Hooks and Filters\n\n<!-- BEGIN GENERATED HOOKS REFERENCE — DO NOT EDIT BY HAND. Run: php bin/generate-hooks-reference.php -->\n<!-- END GENERATED HOOKS REFERENCE -->\n";
 
 $begin = '<!-- BEGIN GENERATED HOOKS REFERENCE — DO NOT EDIT BY HAND. Run: php bin/generate-hooks-reference.php -->';

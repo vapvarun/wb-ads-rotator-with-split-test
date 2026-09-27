@@ -4,7 +4,7 @@ The Email Capture ad type renders an inline newsletter/subscribe form anywhere a
 
 ## Create an Email Capture ad
 
-1. Go to **WB Ad Manager -> Ads -> Add New**.
+1. Go to **Ad Manager -> Add New Ad** (or **Create an Email Capture ad** on the empty Email Captures screen, which opens the editor on this type).
 2. In **Ad Settings** choose ad type **Email Capture**.
 3. Fill in the form fields:
 
@@ -15,16 +15,15 @@ The Email Capture ad type renders an inline newsletter/subscribe form anywhere a
 | Button text | Submit button label | `Subscribe` |
 | Success message | Shown after a successful submit | - |
 | Show name field | Adds a name input | Off |
-| Cookie days | Days to hide the form from a visitor after they submit | 7 |
 | Redirect URL | Optional page to send subscribers to after submit | - |
 | Privacy text | Small print below the form | - |
 | Background / text / button colour | Form colours | `#ffffff` / `#1d2327` / `#2271b1` |
 
-4. Check placements, then publish.
+4. Check placements, then publish. An Email Capture ad sizes itself to its content, so there is no Sizing box, and it shows without the "Advertisement" label, because it is your own signup form (the `wbam_show_ad_label` filter can add the label back).
 
 ## Review captured leads
 
-Go to **WB Ad Manager -> Email Captures** to see submissions (newest first), export them to CSV, and delete individual rows for GDPR erasure requests.
+Go to **Ad Manager -> Email Captures** (right under Add New Ad) to see submissions (newest first), export them to CSV, and delete single rows for GDPR erasure requests. The CSV's **Visitor hash** column is a one-way hash of the visitor's IP, never the address itself.
 
 ## Forward leads to your email tool
 
@@ -36,13 +35,13 @@ add_action( 'wbam_email_captured', function ( $email, $name, $ad_id ) {
 }, 10, 3 );
 ```
 
-See [Hooks and Filters](../developer-guide/10-hooks-and-filters.md) for the full form-customization hook set.
+See [Hooks and Filters](../developer-guide/010-hooks-and-filters.md) for the full form hook set, including `wbam_email_capture_cookie_days` (how many days the form stays hidden after a visitor closes it; 7 by default).
 
 ## Privacy
 
-The form is nonce-protected and sanitized server-side. IP anonymization for tracking is controlled under **Settings -> Privacy & GDPR** (see [Settings](../usage/10-settings.md)).
+The form is nonce-protected and sanitized server-side. Visitor IP addresses are only ever stored as a one-way hash (see [Settings](../usage/010-settings.md#privacy--data)).
 
 ## Next steps
 
-- [Ad Types](00-ad-types.md)
-- [Email Captures REST endpoint](../developer-guide/00-rest-api.md)
+- [Ad Types](000-ad-types.md)
+- [Email Captures REST endpoint](../developer-guide/000-rest-api.md)

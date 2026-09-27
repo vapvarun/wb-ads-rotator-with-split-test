@@ -62,5 +62,5 @@ Base URL: `/wp-json/wbam/v1`
 
 ## Next steps
 
-- [Hooks and Filters](10-hooks-and-filters.md)
-- [Abilities API](30-abilities-api.md)
+- [Hooks and Filters](010-hooks-and-filters.md)
+- [Abilities API](030-abilities-api.md)

@@ -1,6 +1,6 @@
 # Placements
 
-A placement is a location where an ad can render. Each ad carries a **Placements** metabox - check every location where it should appear. Assign the same placement to several ads and they rotate (see [Rotation and Split Testing](20-rotation-and-split-testing.md)).
+A placement is a location where an ad can render. Each ad carries a **Placements** metabox - check every location where it should appear. Assign the same placement to several ads and they rotate (see [Rotation and Split Testing](020-rotation-and-split-testing.md)).
 
 ## Built-in placements
 
@@ -24,17 +24,17 @@ The **Shortcode** placement is used only through shortcodes, so it does not appe
 
 ## Choosing which placements are open
 
-Under **Settings -> Placements** you control which placement slots may serve ads on your site (a site-wide allowlist). By default every placement is open. This is a site owner gate, not a Free/Pro gate - all eleven placements above are in the free plugin, including sticky and popup.
+Under **Settings -> Ads & Display -> Placements**, the **On** column decides which placements may show ads on your site (a site-wide allowlist). By default every placement is open. This is a site owner gate, not a Free/Pro gate - all eleven placements above are in the free plugin, including sticky and popup.
 
 ## Community placements
 
 When a supported community platform is active, its placements register automatically:
 
-- **BuddyPress** - activity stream plus four directory positions. See [BuddyPress](../integrations/00-buddypress.md).
-- **bbPress** - one `bbpress` placement covering seven forum/topic/reply positions. See [bbPress](../integrations/10-bbpress.md).
-- **Jetonomy** - seven sidebar and topic/reply positions. See [Jetonomy](../integrations/20-jetonomy.md).
+- **BuddyPress** - activity stream plus four directory positions. See [BuddyPress](../integrations/000-buddypress.md).
+- **bbPress** - one `bbpress` placement covering seven forum/topic/reply positions. See [bbPress](../integrations/010-bbpress.md).
+- **Jetonomy** - seven sidebar and topic/reply positions. See [Jetonomy](../integrations/020-jetonomy.md).
 
 ## Next steps
 
-- [Rotation and Split Testing](20-rotation-and-split-testing.md) - how a placement picks which ad to show.
-- [Targeting and Scheduling](30-targeting-and-scheduling.md) - narrow where and to whom an ad runs.
+- [Rotation and Split Testing](020-rotation-and-split-testing.md) - how a placement picks which ad to show.
+- [Targeting and Scheduling](030-targeting-and-scheduling.md) - narrow where and to whom an ad runs.

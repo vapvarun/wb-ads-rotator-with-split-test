@@ -388,6 +388,6 @@ once one exists, sourced from the `@deprecated` tag on its docblock.
 
 ## Next steps
 
-- [REST API](00-rest-api.md)
-- [Helper Functions](20-helper-functions.md)
-- [Add-on UI Kit](40-addon-ui-kit.md)
+- [REST API](000-rest-api.md)
+- [Helper Functions](020-helper-functions.md)
+- [Add-on UI Kit](040-addon-ui-kit.md)

@@ -44,9 +44,9 @@ In a PHP theme template:
 echo do_shortcode( '[wbam_ad id="123"]' );
 ```
 
-Or call the helper directly - see [Helper Functions](../developer-guide/20-helper-functions.md).
+Or call the helper directly - see [Helper Functions](../developer-guide/020-helper-functions.md).
 
 ## Next steps
 
-- [Link Shortcodes](10-link-shortcodes.md)
-- [Partnership Inquiry Form](20-partnership-inquiry-form.md)
+- [Link Shortcodes](010-link-shortcodes.md)
+- [Partnership Inquiry Form](020-partnership-inquiry-form.md)

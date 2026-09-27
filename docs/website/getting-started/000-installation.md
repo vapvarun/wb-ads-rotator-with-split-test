@@ -32,7 +32,7 @@ On first activation the plugin:
 
 - Creates the **Ads** post type and its admin menu (icon: megaphone).
 - Creates its database tables for click/impression tracking, links, and captured emails.
-- Redirects you to the **Setup Wizard** so you can seed sample ads (see [Setup Wizard](../usage/20-setup-wizard.md)).
+- Redirects you to the **Setup Wizard** so you can seed sample ads (see [Setup Wizard](../usage/020-setup-wizard.md)).
 
 ## After activation
 
@@ -46,15 +46,15 @@ You will see a **WB Ad Manager** menu in the admin sidebar with:
 
 ## Verify the install
 
-1. Publish one ad (see [Quick Setup](10-quick-setup.md)).
+1. Publish one ad (see [Quick Setup](010-quick-setup.md)).
 2. Add `[wbam_ad id="123"]` to any page, replacing `123` with the real ad ID.
 3. View the page on the front end - the ad should render.
 
 ## Next steps
 
-- [Quick Setup](10-quick-setup.md) - publish your first ad in a few minutes.
-- [Ad Types](../features/00-ad-types.md) - pick the right ad format.
+- [Quick Setup](010-quick-setup.md) - publish your first ad in a few minutes.
+- [Ad Types](../features/000-ad-types.md) - pick the right ad format.
 
 ## Troubleshooting
 
-If the plugin will not activate, confirm PHP 8.1+ and WordPress 6.9+, then check the error log. See [Common Issues](../troubleshooting/00-common-issues.md).
+If the plugin will not activate, confirm PHP 8.1+ and WordPress 6.9+, then check the error log. See [Common Issues](../troubleshooting/000-common-issues.md).

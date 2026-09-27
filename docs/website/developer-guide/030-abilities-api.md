@@ -20,5 +20,5 @@ Registration happens on dedicated Abilities API hooks only when `wp_register_abi
 
 ## Next steps
 
-- [REST API](00-rest-api.md)
-- [Hooks and Filters](10-hooks-and-filters.md)
+- [REST API](000-rest-api.md)
+- [Hooks and Filters](010-hooks-and-filters.md)

@@ -49,7 +49,7 @@ Show or hide an ad by visitor country.
 2. Enable geo targeting.
 3. Add countries to **include** (show only there) or **exclude** (hide there), and choose whether to show the ad when the country is unknown.
 
-Country is resolved from the visitor's BuddyPress profile where present, otherwise from IP geolocation. Configure the provider under **Settings -> Geo Targeting** (see [Settings](../usage/10-settings.md)). Geo targeting in the free plugin is country-level.
+Country is resolved from the visitor's BuddyPress profile where present, otherwise from IP geolocation. Configure the provider under **Settings -> Geo Targeting** (see [Settings](../usage/010-settings.md)). Geo targeting in the free plugin is country-level.
 
 ## Frequency control
 
@@ -60,5 +60,5 @@ The **Ad Status** metabox exposes two caps:
 
 ## Next steps
 
-- [Rotation and Split Testing](20-rotation-and-split-testing.md)
-- [Settings](../usage/10-settings.md) - the geo provider and global display options.
+- [Rotation and Split Testing](020-rotation-and-split-testing.md)
+- [Settings](../usage/010-settings.md) - the geo provider and global display options.

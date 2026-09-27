@@ -56,5 +56,5 @@ The form is nonce-protected and sanitized server-side. The same email cannot sub
 
 ## Next steps
 
-- [Link Management](../features/40-link-management.md)
-- [Link Shortcodes](10-link-shortcodes.md)
+- [Link Management](../features/040-link-management.md)
+- [Link Shortcodes](010-link-shortcodes.md)

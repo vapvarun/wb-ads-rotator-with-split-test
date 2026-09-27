@@ -25,7 +25,7 @@ $ads = wbam_get_ads( 'header' );
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$placement_id` | string | A placement ID (see [Placements](../features/10-placements.md)) |
+| `$placement_id` | string | A placement ID (see [Placements](../features/010-placements.md)) |
 
 ## `wbam()`
 
@@ -45,6 +45,6 @@ echo do_shortcode( '[wbam_ad id="123"]' );
 
 ## Next steps
 
-- [Hooks and Filters](10-hooks-and-filters.md)
-- [Ad Shortcodes](../shortcodes/00-ad-shortcodes.md)
-- [Add-on UI Kit](40-addon-ui-kit.md)
+- [Hooks and Filters](010-hooks-and-filters.md)
+- [Ad Shortcodes](../shortcodes/000-ad-shortcodes.md)
+- [Add-on UI Kit](040-addon-ui-kit.md)

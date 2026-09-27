@@ -31,5 +31,5 @@ If Jetonomy is not active, the Ads list shows a dismissible notice pointing to i
 
 ## Next steps
 
-- [Placements](../features/10-placements.md)
-- [Targeting and Scheduling](../features/30-targeting-and-scheduling.md)
+- [Placements](../features/010-placements.md)
+- [Targeting and Scheduling](../features/030-targeting-and-scheduling.md)

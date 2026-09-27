@@ -7,14 +7,14 @@ When more than one ad targets the same placement, WB Ad Manager rotates them by 
 For each placement, on each page load, the plugin:
 
 1. Collects every published, enabled ad that has this placement checked.
-2. Drops any ad that fails targeting or scheduling (see [Targeting and Scheduling](30-targeting-and-scheduling.md)).
+2. Drops any ad that fails targeting or scheduling (see [Targeting and Scheduling](030-targeting-and-scheduling.md)).
 3. Picks one winner at **weighted random**, where each ad's weight is its **Priority** (1-10, default 5). A priority-8 ad is shown roughly twice as often as a priority-4 ad.
 
 If a picked ad cannot render, the next candidate is chosen until the pool is exhausted. By default an ad renders at most once per page across all its placements.
 
 ## Setting priority
 
-Open an ad, and in the **Ad Status** metabox drag the **Priority** slider (1-10). The higher the number, the bigger the share of impressions when ads compete for a slot.
+Open an ad, and in the **Ad Status** metabox drag the **Priority** slider (1-10). The higher the number, the bigger the share of impressions when ads compete for a placement.
 
 ## Comparing ads (built-in A/B comparison)
 
@@ -34,5 +34,5 @@ To run a test:
 
 ## Next steps
 
-- [Targeting and Scheduling](30-targeting-and-scheduling.md)
-- [Creating and Managing Ads](../usage/00-creating-and-managing-ads.md)
+- [Targeting and Scheduling](030-targeting-and-scheduling.md)
+- [Creating and Managing Ads](../usage/000-creating-and-managing-ads.md)

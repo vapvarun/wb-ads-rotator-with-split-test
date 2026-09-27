@@ -43,7 +43,7 @@ echo \WBAM\Admin\UX::status_badge( 'pending' );
 | `$status` | string | Status slug; also the fallback label (title-cased). |
 | `$label` | string\|null | Optional display label; defaults to the title-cased slug. |
 
-A status slug the built-in map doesn't recognise falls back to `muted` (grey) rather than erroring. Add your own slug's colour via the `wbam_admin_status_variant` filter (`$variant, $status`) instead of a new function — see [Hooks and Filters](10-hooks-and-filters.md).
+A status slug the built-in map doesn't recognise falls back to `muted` (grey) rather than erroring. Add your own slug's colour via the `wbam_admin_status_variant` filter (`$variant, $status`) instead of a new function — see [Hooks and Filters](010-hooks-and-filters.md).
 
 ## `UX::empty_state( $args = array() )`
 
@@ -181,9 +181,9 @@ echo \WBAM\Admin\UX::action_bar( array(
 
 ## Accent colour
 
-Buttons rendered through `action_bar()`/`page_header()` follow the same `--wbam-accent` CSS custom property the frontend ad chrome uses — see the accent-colour example in [Hooks and Filters](10-hooks-and-filters.md). You don't need your own colour variable for an add-on screen; token-driven CSS in `admin-family.css` already carries it.
+Buttons rendered through `action_bar()`/`page_header()` follow the same `--wbam-accent` CSS custom property the frontend ad chrome uses — see the accent-colour example in [Hooks and Filters](010-hooks-and-filters.md). You don't need your own colour variable for an add-on screen; token-driven CSS in `admin-family.css` already carries it.
 
 ## Next steps
 
-- [Hooks and Filters](10-hooks-and-filters.md)
-- [Helper Functions](20-helper-functions.md)
+- [Hooks and Filters](010-hooks-and-filters.md)
+- [Helper Functions](020-helper-functions.md)

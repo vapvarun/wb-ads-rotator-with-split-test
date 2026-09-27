@@ -1,108 +1,12 @@
-# WB Ad Manager Documentation
+# WB Ad Manager - Documentation
 
-Single documentation set covering **both** the Free plugin
-(`wb-ads-rotator-with-split-test`) and the **Pro** add-on
-(`wb-ad-manager-pro`). Per the team `wbcom-docs` guideline, all
-user-facing guides live under `docs/website/`. Guides marked
-**PRO** in the navigation below require the Pro add-on — every
-Pro doc also carries an inline callout at the top of the file so a
-reader opening the Markdown directly can tell at a glance.
+User guides live in [`website/`](website/README.md): start there. WB Ad Manager Pro keeps its own guides in the [Pro repository](https://github.com/vapvarun/wb-ad-manager-pro/tree/main/docs/website).
 
-**Plugin root docs:**
-- [`website/`](website/) — user-facing guides.
-- [`DEVELOPER-GUIDE.md`](DEVELOPER-GUIDE.md) — Free-plugin developer reference (hooks, REST routes, ad-type and placement extension points).
-- [`pro-developer/`](pro-developer/) — WB Ad Manager Pro developer reference.
+| Folder | What it holds |
+|---|---|
+| [`website/`](website/README.md) | User and developer guides for the free plugin, kept current with each release |
+| `standards/` | Team standards synced into this repo |
+| `qa/` | QA inventory and core paths |
+| `DEVELOPER-GUIDE.md`, `pro-developer/`, `pro-internal/`, `DOCS-PLAN.md`, `SCREENSHOT-PLAN.md`, `test-reports/` | Older planning and developer notes, kept for history. Where they disagree with `website/`, `website/` is right |
 
-**Pro developer reference** lives in [`pro-developer/`](pro-developer/):
-[`DEVELOPER-GUIDE.md`](pro-developer/DEVELOPER-GUIDE.md),
-[`HOOKS.md`](pro-developer/HOOKS.md), and
-[`REST.md`](pro-developer/REST.md).
-
----
-
-## Getting Started
-
-| Guide | Tier |
-|-------|------|
-| [Installation](website/getting-started/installation.md) | Free |
-| [Quick Setup Guide](website/getting-started/quick-setup-guide.md) | Free |
-| [Pro Installation & Requirements](website/getting-started/pro-installation-requirements.md) | **PRO** |
-
-## Ad Management — Free
-
-| Guide |
-|-------|
-| [Managing Ads](website/ad-management/managing-ads.md) |
-| [Ad Types](website/ad-management/ad-types.md) |
-| [Placements](website/ad-management/placements.md) |
-| [Targeting & Scheduling](website/ad-management/targeting.md) |
-| [Settings](website/ad-management/settings.md) |
-
-## Link Management — Free
-
-| Guide |
-|-------|
-| [Link Management](website/link-management/link-management.md) |
-| [Link Partnerships](website/link-management/partnership-inquiries.md) |
-
-## Advertiser Portal — **PRO**
-
-| Guide |
-|-------|
-| [Advertiser Portal Overview](website/advertiser-portal/advertiser-portal-overview.md) |
-| [Ad Submissions & Approval Workflow](website/advertiser-portal/ad-submissions-approval-workflow.md) |
-| [Campaign Management](website/advertiser-portal/campaign-management.md) |
-| [Link Management System](website/advertiser-portal/link-management-system.md) |
-
-## Analytics — **PRO**
-
-| Guide |
-|-------|
-| [Analytics Dashboard](website/analytics/analytics-dashboard.md) |
-
-## Classifieds — **PRO**
-
-| Guide |
-|-------|
-| [Setting Up Classifieds](website/classifieds/setting-up-classifieds.md) |
-
-## Payments & Wallet — **PRO**
-
-| Guide |
-|-------|
-| [Wallet and Payments](website/payments/wallet-and-payments.md) |
-
-## Pro Settings — **PRO**
-
-| Guide |
-|-------|
-| [Pro Settings Configuration](website/settings/pro-settings-configuration.md) |
-| [Creating Ad Packages](website/settings/creating-ad-packages.md) |
-
-## Shortcode Reference
-
-| Guide | Tier |
-|-------|------|
-| [Ad Shortcodes](website/shortcode-reference/ad-shortcodes.md) | Free |
-| [Link Shortcodes](website/shortcode-reference/link-shortcodes.md) | Free |
-| [Pro Shortcodes Reference](website/shortcode-reference/pro-shortcodes-reference.md) | **PRO** |
-
-## Troubleshooting
-
-| Guide | Tier |
-|-------|------|
-| [Common Issues](website/troubleshooting/common-issues.md) | Free |
-| [Pro Troubleshooting](website/troubleshooting/pro-troubleshooting.md) | **PRO** |
-
----
-
-## Editing guideline
-
-- All user-facing Markdown goes into `docs/website/<category>/<slug>.md`.
-- Add every new file to `docs/website/docs_config.json` under the
-  matching category so the `wbcom-docs` MCP can pick it up.
-- Pro-only pages set `"tier": "pro"` in the config entry **and**
-  start with the Pro callout blockquote:
-  > **PRO feature.** Requires the [WB Ad Manager Pro](https://wbcomdesigns.com/downloads/wb-ad-manager-pro/) add-on on top of the free plugin.
-- Developer-only content stays outside `website/` — at `DEVELOPER-GUIDE.md`
-  in the plugin that owns it.
+New user-facing pages go in `website/<section>/NNN-slug.md` (three-digit prefix, steps of 10) and their section must be listed in `website/docs_config.json`.

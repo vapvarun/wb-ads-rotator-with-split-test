@@ -57,7 +57,7 @@ Native AdSense support with the script managed for you (loaded once per page).
 | Responsive | Toggle responsive vs fixed sizing |
 | Fixed width / height | Used when responsive is off |
 
-Set your site-wide Publisher ID once under **Settings -> Google AdSense** (see [Google AdSense](../integrations/30-google-adsense.md)).
+Set your site-wide Publisher ID once under **Settings -> Google AdSense** (see [Google AdSense](../integrations/030-google-adsense.md)).
 
 ## Email Capture
 
@@ -75,9 +75,9 @@ An inline newsletter/subscribe form rendered as an ad.
 | Privacy text | Small print under the form | - |
 | Background / text / button colour | Form styling | `#ffffff` / `#1d2327` / `#2271b1` |
 
-Captured leads are stored and viewable/exportable under **WB Ad Manager -> Email Captures**. See [Email Capture](50-email-capture.md).
+Captured leads are stored and viewable/exportable under **WB Ad Manager -> Email Captures**. See [Email Capture](050-email-capture.md).
 
 ## Next steps
 
-- [Placements](10-placements.md) - where each ad can appear.
-- [Creating and Managing Ads](../usage/00-creating-and-managing-ads.md) - the full edit workflow.
+- [Placements](010-placements.md) - where each ad can appear.
+- [Creating and Managing Ads](../usage/000-creating-and-managing-ads.md) - the full edit workflow.

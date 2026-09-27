@@ -36,5 +36,5 @@ Two dedicated widgets are available for bbPress sidebars:
 
 ## Next steps
 
-- [BuddyPress Integration](00-buddypress.md)
-- [Jetonomy Integration](20-jetonomy.md)
+- [BuddyPress Integration](000-buddypress.md)
+- [Jetonomy Integration](020-jetonomy.md)

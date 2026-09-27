@@ -6,7 +6,7 @@ Work through the quick fixes first, then the specific sections.
 
 1. Clear caches - browser, WordPress page cache, and CDN.
 2. Flush permalinks - **Settings -> Permalinks -> Save Changes** (needed after changing the cloak prefix).
-3. Test in an incognito window to rule out session/impression limits.
+3. Test in an incognito window to rule out per-visitor daily limits (they reset at midnight, site time).
 4. Temporarily deactivate other plugins to check for conflicts.
 
 ## Plugin will not activate
@@ -24,15 +24,16 @@ Work through the quick fixes first, then the specific sections.
 
 ## Ads not showing
 
-Check each item:
+Open **Ad Manager -> All Ads** first: the **Status** column says Live, Scheduled, Ended, Not showing or Off, with the reason (for example "Display Rules say Specific pages but nothing is picked"). The ad's edit screen shows the same. Otherwise check each item:
 
 - The ad is **Published**, not Draft.
 - The **Enabled** toggle in the Ad Status metabox is on (a disabled ad never serves).
 - At least one placement is checked, or you are using a shortcode with the correct ID.
 - The start date has passed and the end date has not.
 - The **Max views per visitor per day** or **Impression cap** for this ad has not been reached - test in incognito.
-- **Disable for admins** or **Disable for logged-in users** is not hiding the ad from you (**Settings -> General**).
-- The placement is open under **Settings -> Placements**.
+- **Hide from administrators** or **Hide from logged-in users** is not hiding the ad from you (**Settings -> Ads & Display -> Who sees ads**).
+- The placement's **On** box is ticked under **Settings -> Ads & Display -> Placements**, and the ad's size fits it.
+- **Maximum Ads Per Page** has not already been reached on that page.
 
 Debug: try `[wbam_ad id="123"]` directly on a page, and view the page source to see whether the ad container renders.
 
@@ -57,8 +58,8 @@ Debug: try `[wbam_ad id="123"]` directly on a page, and view the page source to 
 
 ## Cloaked links 404 or redirect unexpectedly
 
-- Flush permalinks after changing the **Cloak prefix**.
-- Check **Settings -> Link Cloaking -> Inactive link action** - an expired or inactive link follows that setting (404, home, or custom URL).
+- Links published under an earlier **Link URL Prefix** keep working; if a new prefix 404s, flush permalinks once.
+- Check **Settings -> Links -> Inactive Link Action** - an expired or inactive link follows that setting (404, home, or custom URL).
 
 ## Partnership form submits but nothing happens
 

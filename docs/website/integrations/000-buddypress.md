@@ -19,9 +19,9 @@ When BuddyPress is active, WB Ad Manager registers extra placements automaticall
 3. In the **Placements** metabox, check the BuddyPress positions you want.
 4. Publish.
 
-Targeting, scheduling, and rotation work the same as for any other placement - see [Targeting and Scheduling](../features/30-targeting-and-scheduling.md).
+Targeting, scheduling, and rotation work the same as for any other placement - see [Targeting and Scheduling](../features/030-targeting-and-scheduling.md).
 
 ## Next steps
 
-- [bbPress Integration](10-bbpress.md)
-- [Jetonomy Integration](20-jetonomy.md)
+- [bbPress Integration](010-bbpress.md)
+- [Jetonomy Integration](020-jetonomy.md)

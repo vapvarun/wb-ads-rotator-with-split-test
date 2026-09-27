@@ -24,7 +24,7 @@ When you add or edit an ad you get these metaboxes:
 
 1. **WB Ad Manager -> Ads -> Add New**.
 2. Enter a **Title** (internal reference).
-3. Choose an ad type and fill in its content - see [Ad Types](../features/00-ad-types.md).
+3. Choose an ad type and fill in its content - see [Ad Types](../features/000-ad-types.md).
 4. Check placements.
 5. Set Priority and any caps in **Ad Status**.
 6. Add targeting and scheduling if you need it.
@@ -42,9 +42,9 @@ Ads support a flat **Ad Tags** taxonomy (**WB Ad Manager -> Ad Tags**). Tag ads 
 
 ## Track performance
 
-The Ads list shows impressions and clicks per ad. For deeper numbers, open an ad and read the **Ad Performance Comparison** metabox, or use the [Analytics REST endpoints](../developer-guide/00-rest-api.md).
+The Ads list shows impressions and clicks per ad. For deeper numbers, open an ad and read the **Ad Performance Comparison** metabox, or use the [Analytics REST endpoints](../developer-guide/000-rest-api.md).
 
 ## Next steps
 
-- [Rotation and Split Testing](../features/20-rotation-and-split-testing.md)
-- [Settings](10-settings.md)
+- [Rotation and Split Testing](../features/020-rotation-and-split-testing.md)
+- [Settings](010-settings.md)
