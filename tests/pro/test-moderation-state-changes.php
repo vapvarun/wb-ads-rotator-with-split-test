@@ -206,7 +206,7 @@ class Test_Moderation_State_Changes extends Pro_Test_Case {
 		);
 
 		$this->assertStringContainsString( 'error=action_failed', $redirect, 'A refused Approve says so.' );
-		$this->assertStringContainsString( 'reserves', (string) get_transient( 'wbam_pro_error_detail_1' ), 'The notice carries the real reason.' );
+		$this->assertStringContainsString( 'short by $5.00', (string) get_transient( 'wbam_pro_error_detail_1' ), 'The notice carries the real reason, with the amounts.' );
 		$this->assertSame( 'pending', Campaign_Manager::get_instance()->get( (int) $submission->campaign_id )->status );
 		$this->assertSame( 'pending', Ad_Submission_Manager::get_instance()->get( (int) $submission->id )->status );
 		$this->assertSame( 500, $this->balance(), 'Nothing is charged.' );
