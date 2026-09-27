@@ -606,7 +606,7 @@ class Help_Docs {
 			<div class="wbam-doc-section">
 				<h3><?php esc_html_e( 'Community & Developer Extras', 'wb-ads-rotator-with-split-test' ); ?></h3>
 				<ul>
-					<li><?php esc_html_e( 'Enhanced BuddyPress integration. Seller profiles in member directory, activity stream for listings, following/favorites system', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Enhanced BuddyPress integration. Seller profiles in member directory, following/favorites system', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Admin audit logs of every ad / balance / campaign action', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Ad review queue with approval workflow', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Priority support from Wbcom Designs', 'wb-ads-rotator-with-split-test' ); ?></li>

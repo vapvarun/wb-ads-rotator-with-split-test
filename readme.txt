@@ -132,7 +132,7 @@ Let advertisers sign up, submit ads, track performance, and manage billing thems
 
 **Community and Developer Extras:**
 
-* Enhanced BuddyPress integration: seller profiles in the member directory, activity stream for listings, following/favorites system
+* Enhanced BuddyPress integration: seller profiles in the member directory, following/favorites system
 * Admin audit logs of every ad, credit, and campaign action
 * Ad review queue with approval workflow
 * Priority support from Wbcom Designs
