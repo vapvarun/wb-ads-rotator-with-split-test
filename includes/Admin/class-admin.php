@@ -1094,7 +1094,7 @@ class Admin {
 		// menu, so it has no post type there; match its hook either way. Its
 		// styles (e.g. the Placements matrix cards at 390) live in admin.css.
 		$screen = get_current_screen();
-		if ( ! $screen || ( 'wbam-ad' !== $screen->post_type && ! str_ends_with( (string) $hook, '_page_wbam-settings' ) ) ) {
+		if ( ! $screen || ( 'wbam-ad' !== $screen->post_type && ! preg_match( '/_page_wbam-settings$/', (string) $hook ) ) ) {
 			return;
 		}
 

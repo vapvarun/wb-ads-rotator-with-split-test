@@ -3,7 +3,7 @@
 /node_modules/
 
 # Composer
-composer.lock
+# composer.lock is committed (pinned dev tools).
 
 # IDE and Editors
 .idea/
