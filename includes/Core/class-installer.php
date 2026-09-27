@@ -363,7 +363,7 @@ class Installer {
 				continue;
 			}
 			$text = wp_json_encode( $old );
-			if ( ! preg_match( '/Advertise here|Advertise with us|Your message could be here|Get in touch|placehold\\.co/i', (string) $text ) ) {
+			if ( ! preg_match( '/Advertise here|Advertise with us|Your message could be here|Get in touch|Learn More|Pro Tip|This is a sample|placehold\\.co/i', (string) $text ) ) {
 				continue;
 			}
 

@@ -91,4 +91,20 @@ class Test_Honest_Sample_Ads extends \WP_UnitTestCase {
 		$this->assertStringContainsString( 'Advertise here', get_post_meta( $edited, '_wbam_ad_data', true )['content'], 'Edited by the owner: left alone.' );
 		$this->assertSame( '<p>My own copy</p>', get_post_meta( $custom, '_wbam_ad_data', true )['content'] );
 	}
+
+	public function test_the_oldest_wizard_copy_is_rewritten_too(): void {
+		$oldest = $this->old_sample(
+			'Sample In-Content Promo',
+			array(
+				'type'            => 'rich-content',
+				'content'         => '<p>💡 <strong>Pro Tip:</strong> This is a sample in-content promotion.</p>',
+				'after_paragraph' => 3,
+			)
+		);
+
+		$this->assertSame( 1, \WBAM\Core\Installer::rewrite_untouched_sample_ads() );
+		$data = get_post_meta( $oldest, '_wbam_ad_data', true );
+		$this->assertStringContainsString( 'Sample ad - replace me', $data['content'] );
+		$this->assertSame( 3, $data['after_paragraph'], 'The owner\'s position is kept.' );
+	}
 }
