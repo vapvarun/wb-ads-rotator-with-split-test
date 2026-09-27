@@ -298,7 +298,7 @@ class Demo_Data_Cleaner {
 	 * to admin-post.php with a nonce and the `manage_options` check is
 	 * enforced on the handler side.
 	 *
-	 * @param string $label Optional button label. Defaults to "Remove demo data".
+	 * @param string $label Optional button label. Defaults to "Remove sample ads".
 	 */
 	public static function render_clear_button( $label = '' ) {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -322,14 +322,14 @@ class Demo_Data_Cleaner {
 		}
 
 		if ( '' === $label ) {
-			$label = __( 'Remove demo data', 'wb-ads-rotator-with-split-test' );
+			$label = __( 'Remove sample ads', 'wb-ads-rotator-with-split-test' );
 		}
 
 		$confirm = sprintf(
 			/* translators: %d: number of demo items that will be removed. */
 			_n(
-				'Remove %d demo item created by the setup wizard? This cannot be undone.',
-				'Remove %d demo items created by the setup wizard? This cannot be undone.',
+				'Remove %d sample item created by the setup wizard? This cannot be undone.',
+				'Remove %d sample items created by the setup wizard? This cannot be undone.',
 				$total,
 				'wb-ads-rotator-with-split-test'
 			),
@@ -383,10 +383,10 @@ class Demo_Data_Cleaner {
 		}
 
 		$removed_summary = empty( $parts )
-			? __( 'No demo items needed to be removed.', 'wb-ads-rotator-with-split-test' )
+			? __( 'There were no sample ads to remove.', 'wb-ads-rotator-with-split-test' )
 			: sprintf(
 				/* translators: %s: comma-separated list, e.g. "3 ads, 1 page". */
-				__( 'Demo data removed: %s.', 'wb-ads-rotator-with-split-test' ),
+				__( 'Sample ads removed: %s.', 'wb-ads-rotator-with-split-test' ),
 				implode( ', ', $parts )
 			);
 
@@ -395,8 +395,8 @@ class Demo_Data_Cleaner {
 			$skipped_notice = ' ' . sprintf(
 				/* translators: %d: number of skipped items. */
 				_n(
-					'%d item was skipped because it no longer has the demo marker (possibly edited by you).',
-					'%d items were skipped because they no longer have the demo marker (possibly edited by you).',
+					'%d item was kept because it is no longer marked as a sample (you may have edited it).',
+					'%d items were kept because they are no longer marked as samples (you may have edited them).',
 					$skipped,
 					'wb-ads-rotator-with-split-test'
 				),

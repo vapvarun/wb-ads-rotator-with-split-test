@@ -120,7 +120,7 @@ class Setup_Wizard {
 		<div class="notice notice-info wbam-setup-notice is-dismissible" data-nonce="<?php echo esc_attr( wp_create_nonce( 'wbam_dismiss_setup' ) ); ?>">
 			<p>
 				<strong><?php esc_html_e( 'Welcome to WB Ad Manager!', 'wb-ads-rotator-with-split-test' ); ?></strong>
-				<?php esc_html_e( 'Get started quickly with our setup wizard to create sample ads and configure basic settings.', 'wb-ads-rotator-with-split-test' ); ?>
+				<?php esc_html_e( 'Add three sample ads to see where ads show on your site. Free: show your own ads and AdSense. Pro: sell ad spots to advertisers.', 'wb-ads-rotator-with-split-test' ); ?>
 			</p>
 			<p>
 				<a href="<?php echo esc_url( $wizard_url ); ?>" class="button button-primary">
@@ -389,11 +389,11 @@ class Setup_Wizard {
 		?>
 		<div class="wbam-setup-step-content">
 			<h2><?php esc_html_e( 'Welcome to WB Ad Manager!', 'wb-ads-rotator-with-split-test' ); ?></h2>
-			<p><?php esc_html_e( 'Thank you for installing WB Ad Manager. This quick setup wizard will help you get started by:', 'wb-ads-rotator-with-split-test' ); ?></p>
+			<p><?php esc_html_e( 'This short setup adds sample ads so you can see where ads show on your site.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			<ul class="wbam-setup-features">
-				<li><?php echo wbam_icon( 'check', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?> <?php esc_html_e( 'Creating sample ads to demonstrate features', 'wb-ads-rotator-with-split-test' ); ?></li>
-				<li><?php echo wbam_icon( 'check', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?> <?php esc_html_e( 'Setting up different ad placements', 'wb-ads-rotator-with-split-test' ); ?></li>
-				<li><?php echo wbam_icon( 'check', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?> <?php esc_html_e( 'Getting you ready to manage your own ads', 'wb-ads-rotator-with-split-test' ); ?></li>
+				<li><?php echo wbam_icon( 'check', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?> <?php esc_html_e( 'Sample ads in the header, a sidebar and inside posts', 'wb-ads-rotator-with-split-test' ); ?></li>
+				<li><?php echo wbam_icon( 'check', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?> <?php esc_html_e( 'Free: show your own ads and AdSense', 'wb-ads-rotator-with-split-test' ); ?></li>
+				<li><?php echo wbam_icon( 'check', array( 'size' => 'sm' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper returns pre-escaped markup. ?> <?php esc_html_e( 'Pro: sell ad spots to advertisers', 'wb-ads-rotator-with-split-test' ); ?></li>
 			</ul>
 			<p class="wbam-setup-note">
 				<?php esc_html_e( 'This wizard is optional. You can skip it and create ads manually anytime.', 'wb-ads-rotator-with-split-test' ); ?>
@@ -452,7 +452,7 @@ class Setup_Wizard {
 		?>
 		<div class="wbam-setup-step-content">
 			<h2><?php esc_html_e( 'Create Sample Ads', 'wb-ads-rotator-with-split-test' ); ?></h2>
-			<p><?php esc_html_e( 'Select which sample ads you would like to create. These will help you understand how different ad types and placements work.', 'wb-ads-rotator-with-split-test' ); ?></p>
+			<p><?php esc_html_e( 'Pick the sample ads to add. Visitors will see these until you replace or remove them.', 'wb-ads-rotator-with-split-test' ); ?></p>
 
 			<form method="post">
 				<?php wp_nonce_field( 'wbam_setup_sample', 'wbam_setup_nonce' ); ?>
@@ -600,11 +600,23 @@ class Setup_Wizard {
 	 * @param array $ads_to_create List of sample ads to create.
 	 */
 	private function create_sample_ads( $ads_to_create ) {
-		// Visitor-facing house promos: themed through the plugin's tokens (no
-		// inline colours, so dark mode works), a bundled image instead of a
-		// hot-linked one, and links that go somewhere real.
-		$contact_url = home_url( '/' );
-		$sample_ads  = array(
+		// Samples say what they are. They link only to a real place a
+		// visitor can buy the spot (Pro's Advertise page), never a made-up
+		// "Advertise here" call to action.
+		$sample_text = __( 'Sample ad - replace me in WB Ad Manager', 'wb-ads-rotator-with-split-test' );
+
+		/**
+		 * Where a sample ad links. Empty (the default) means no link; Pro
+		 * returns its Advertise page when one is published.
+		 *
+		 * @since 3.2.0
+		 * @param string $url Link URL.
+		 */
+		$link_url  = (string) apply_filters( 'wbam_sample_ad_link', '' );
+		$link_html = $link_url ? ' <a href="' . esc_url( $link_url ) . '">' . esc_html__( 'Advertise on this site', 'wb-ads-rotator-with-split-test' ) . '</a>' : '';
+		$promo     = '<p><strong>' . esc_html( $sample_text ) . '</strong></p>';
+
+		$sample_ads = array(
 			'header_banner'  => array(
 				'title'      => __( 'Sample Header Banner', 'wb-ads-rotator-with-split-test' ),
 				'type'       => 'image',
@@ -613,8 +625,8 @@ class Setup_Wizard {
 				'data'       => array(
 					'type'      => 'image',
 					'image_url' => WBAM_URL . 'assets/images/sample-leaderboard.svg',
-					'link_url'  => $contact_url,
-					'alt_text'  => __( 'Advertise here. Put your brand in front of our readers.', 'wb-ads-rotator-with-split-test' ),
+					'link_url'  => $link_url,
+					'alt_text'  => $sample_text,
 					'target'    => '_self',
 				),
 			),
@@ -624,9 +636,7 @@ class Setup_Wizard {
 				'placements' => array( 'widget' ),
 				'data'       => array(
 					'type'    => 'rich-content',
-					'content' => '<p><strong>' . esc_html__( 'Advertise here', 'wb-ads-rotator-with-split-test' ) . '</strong></p>'
-						. '<p>' . esc_html__( 'Reach our readers with a spot in this sidebar.', 'wb-ads-rotator-with-split-test' ) . '</p>'
-						. '<p><a href="' . esc_url( $contact_url ) . '">' . esc_html__( 'Get in touch', 'wb-ads-rotator-with-split-test' ) . '</a></p>',
+					'content' => $promo . '<p>' . esc_html__( 'This is where a sidebar ad shows.', 'wb-ads-rotator-with-split-test' ) . $link_html . '</p>',
 				),
 			),
 			'content_promo'  => array(
@@ -635,8 +645,7 @@ class Setup_Wizard {
 				'placements' => array( 'after_paragraph' ),
 				'data'       => array(
 					'type'            => 'rich-content',
-					'content'         => '<p><strong>' . esc_html__( 'Your message could be here', 'wb-ads-rotator-with-split-test' ) . '</strong></p>'
-						. '<p>' . esc_html__( 'Readers see this spot in the middle of our most-read posts.', 'wb-ads-rotator-with-split-test' ) . ' <a href="' . esc_url( $contact_url ) . '">' . esc_html__( 'Advertise with us', 'wb-ads-rotator-with-split-test' ) . '</a></p>',
+					'content'         => $promo . '<p>' . esc_html__( 'This is where an ad inside a post shows.', 'wb-ads-rotator-with-split-test' ) . $link_html . '</p>',
 					'after_paragraph' => 2,
 				),
 			),
@@ -773,6 +782,12 @@ class Setup_Wizard {
 		$next_steps = apply_filters(
 			'wbam_setup_wizard_next_steps',
 			array(
+				'view_site' => array(
+					'url'         => home_url( '/' ),
+					'icon'        => 'external-link',
+					'title'       => __( 'View Your Site', 'wb-ads-rotator-with-split-test' ),
+					'description' => __( 'See the sample ads where visitors will', 'wb-ads-rotator-with-split-test' ),
+				),
 				'view_ads' => array(
 					'url'         => admin_url( 'edit.php?post_type=wbam-ad' ),
 					'icon'        => 'file-text',

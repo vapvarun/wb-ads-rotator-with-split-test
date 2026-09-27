@@ -37,6 +37,6 @@ class Test_Demo_Data_Cleaner_Tools_Section extends WP_UnitTestCase {
 		$html = (string) ob_get_clean();
 
 		$this->assertStringContainsString( 'wbam-demo-clear-form', $html );
-		$this->assertStringContainsString( 'Remove demo data', $html );
+		$this->assertStringContainsString( 'Remove sample ads', $html );
 	}
 }

@@ -891,6 +891,13 @@
       "purpose": "The ad editor's priority hint; Pro explains that a paid ad's share comes from its campaign rotation"
     },
     {
+      "name": "wbam_sample_ad_link",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-setup-wizard.php",
+      "purpose": "Where the setup wizard's sample ads link; empty by default, Pro returns its published Advertise page"
+    },
+    {
       "name": "wbam_ad_not_delivering_reason",
       "type": "filter",
       "args": 2,

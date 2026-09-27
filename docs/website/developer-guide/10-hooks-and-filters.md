@@ -251,6 +251,7 @@ inventory in `audit/manifest.json`.
 | `wbam_ad_status` | $status, $ad_id | An ad's state (live, scheduled, ended, not_showing, off, draft, pending) and one reason. Shown on All Ads, in the editor, in the WB Ad block and to editors in place of an empty shortcode or widget. |
 | `wbam_ad_status_prime` (action) | $ad_ids | Batch-load anything a `wbam_ad_status` callback reads, once per list page. |
 | `wbam_priority_hint` | $hint, $ad_id | The editor's priority hint. |
+| `wbam_sample_ad_link` | $url | Where the setup wizard's sample ads link. Empty means no link; Pro returns its published Advertise page. |
 | `wbam_ad_not_delivering_reason` | $reason, $ad_id | Filter the editor notice for a WB Ad block whose ad renders nothing right now. |
 | `wbam_ad_output` | $output, $ad_id, $placement | Filter the ad output HTML. |
 | `wbam_ad_tag_taxonomy_args` | $args | Filter the ad tag taxonomy arguments. Lets a site relabel the taxonomy, widen its capabilities, or turn on hierarchy without forking the plugin. |

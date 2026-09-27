@@ -161,6 +161,41 @@ class Placement_Format_Map {
 	}
 
 	/**
+	 * Shape names for people.
+	 *
+	 * @since 3.2.0
+	 * @return array<string, string> Shape => label.
+	 */
+	public static function shape_labels() {
+		return array(
+			'banner'    => __( 'Banner', 'wb-ads-rotator-with-split-test' ),
+			'billboard' => __( 'Billboard', 'wb-ads-rotator-with-split-test' ),
+			'box'       => __( 'Box', 'wb-ads-rotator-with-split-test' ),
+			'tower'     => __( 'Tower', 'wb-ads-rotator-with-split-test' ),
+		);
+	}
+
+	/**
+	 * The shapes a placement takes, from its accepted formats. A placement
+	 * with no size rule, or one that takes only responsive ads, takes
+	 * every shape.
+	 *
+	 * @since 3.2.0
+	 * @param string[] $accepted_formats The placement's accepted format slugs.
+	 * @return string[] Shape names.
+	 */
+	public static function accepted_shapes( array $accepted_formats ) {
+		$taken = array();
+		foreach ( self::shapes() as $shape => $formats ) {
+			if ( array_intersect( (array) $formats, $accepted_formats ) ) {
+				$taken[] = (string) $shape;
+			}
+		}
+
+		return $taken ? $taken : array_keys( self::shapes() );
+	}
+
+	/**
 	 * The shape ('banner', 'box', ...) an ad's own size belongs to.
 	 *
 	 * Lets the frontend reserve height by the creative's shape instead of

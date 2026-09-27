@@ -78,9 +78,9 @@ class Test_Setup_Wizard_Payment_Step extends Pro_Test_Case {
 		$html = $this->render();
 
 		$this->assertStringContainsString( 'name="wbam_credits_manual_topup"', $html );
-		// No working route yet - the wizard defaults the box to checked so
-		// the owner does not leave this screen with nothing selected.
-		$this->assertMatchesRegularExpression( '/name="wbam_credits_manual_topup"[^>]*checked/', $html );
+		// Never pre-ticked: the owner chooses (card 10344383315). Finishing
+		// with no route at all is refused by handle_save() instead.
+		$this->assertDoesNotMatchRegularExpression( '/name="wbam_credits_manual_topup"[^>]*checked/', $html );
 	}
 
 	public function test_manual_checkbox_unchecked_when_a_gateway_already_works(): void {

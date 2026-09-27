@@ -3242,12 +3242,7 @@ class Admin {
 			'placements'      => $placements_out,
 			// Why a greyed-out placement doesn't take this ad (card 10344382789).
 			'shapes'          => \WBAM\Core\Placement_Format_Map::shapes(),
-			'shapeLabels'     => array(
-				'banner'    => __( 'Banner', 'wb-ads-rotator-with-split-test' ),
-				'billboard' => __( 'Billboard', 'wb-ads-rotator-with-split-test' ),
-				'box'       => __( 'Box', 'wb-ads-rotator-with-split-test' ),
-				'tower'     => __( 'Tower', 'wb-ads-rotator-with-split-test' ),
-			),
+			'shapeLabels'     => \WBAM\Core\Placement_Format_Map::shape_labels(),
 			'i18n'            => self::compat_i18n(),
 			// Same live-disable rule the Placements metabox's inline script
 			// reads to decide whether to grey out a mismatched checkbox
