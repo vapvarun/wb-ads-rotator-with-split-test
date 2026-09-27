@@ -300,7 +300,7 @@ class Partnership_Admin {
 					</li>
 					<li>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbam-partnerships&status=pending' ) ); ?>" class="<?php echo 'pending' === $current_status ? 'current' : ''; ?>">
-							<?php esc_html_e( 'Pending', 'wb-ads-rotator-with-split-test' ); ?>
+							<?php echo esc_html( Partnership::get_statuses()['pending'] ); ?>
 							<span class="count">(<?php echo esc_html( $counts['pending'] ); ?>)</span>
 						</a> |
 					</li>

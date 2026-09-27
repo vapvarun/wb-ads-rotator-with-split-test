@@ -264,7 +264,7 @@ class Partnership {
 	 */
 	public static function get_statuses() {
 		return array(
-			'pending'  => __( 'Pending', 'wb-ads-rotator-with-split-test' ),
+			'pending'  => __( 'Pending review', 'wb-ads-rotator-with-split-test' ),
 			'accepted' => __( 'Accepted', 'wb-ads-rotator-with-split-test' ),
 			'rejected' => __( 'Rejected', 'wb-ads-rotator-with-split-test' ),
 			'spam'     => __( 'Spam', 'wb-ads-rotator-with-split-test' ),

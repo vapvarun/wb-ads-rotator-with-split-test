@@ -59,13 +59,13 @@ class Test_Status_Labels extends Pro_Test_Case {
 		$this->assertSame( 'Ended', Status_Labels::get_label( 'ab_test', 'completed' ) );
 	}
 
-	public function test_classified_statuses_keep_their_own_words(): void {
-		// Listings are not "live" like an ad — only the "pending" casing
-		// drift is fixed; Active/Sold/Expired/Rejected/Draft are unchanged.
+	public function test_classified_statuses_use_the_ad_words(): void {
+		// Owner decision (card 10343726476, wave 6): listings say Live and
+		// Ended like ads and campaigns; Sold stays, buyers need the reason.
 		$this->assertSame( 'Pending review', Status_Labels::get_label( 'classified', 'pending' ) );
-		$this->assertSame( 'Active', Status_Labels::get_label( 'classified', 'active' ) );
+		$this->assertSame( 'Live', Status_Labels::get_label( 'classified', 'active' ) );
 		$this->assertSame( 'Sold', Status_Labels::get_label( 'classified', 'sold' ) );
-		$this->assertSame( 'Expired', Status_Labels::get_label( 'classified', 'expired' ) );
+		$this->assertSame( 'Ended', Status_Labels::get_label( 'classified', 'expired' ) );
 		$this->assertSame( 'Rejected', Status_Labels::get_label( 'classified', 'rejected' ) );
 		$this->assertSame( 'Draft', Status_Labels::get_label( 'classified', 'draft' ) );
 	}

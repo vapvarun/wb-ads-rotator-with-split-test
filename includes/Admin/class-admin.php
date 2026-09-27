@@ -1162,9 +1162,9 @@ class Admin {
 			'wbam-placement-settings',
 			'wbamPlacementSettings',
 			array(
-				/* translators: %d is replaced client-side with the active ad count for the slot being closed. */
+				/* translators: %d is replaced client-side with the active ad count for the placement being turned off. */
 				'confirmDisable' => __(
-					'%d active ad(s) will stop rendering in this slot. Continue?',
+					'Active ads in this placement: %d. They will stop showing. Continue?',
 					'wb-ads-rotator-with-split-test'
 				),
 			)

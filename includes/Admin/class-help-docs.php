@@ -53,6 +53,30 @@ class Help_Docs {
 	}
 
 	/**
+	 * The site's name for a classified item. Pro's label setting reaches
+	 * Free through the `wbam_classifieds_label` filter (Free never calls
+	 * Pro); the upsell text for sites without Pro keeps the generic name.
+	 *
+	 * @param string $form  'singular' or 'plural'.
+	 * @param bool   $lower Lowercase, for use mid-sentence.
+	 * @return string
+	 */
+	private function item( $form = 'plural', $lower = true ) {
+		$default = 'singular' === $form ? __( 'Classified', 'wb-ads-rotator-with-split-test' ) : __( 'Classifieds', 'wb-ads-rotator-with-split-test' );
+
+		/**
+		 * Filters the site's name for a classified item on Free screens.
+		 *
+		 * @since 3.2.0
+		 * @param string $label Label.
+		 * @param string $form  'singular' or 'plural'.
+		 */
+		$label = (string) apply_filters( 'wbam_classifieds_label', $default, $form );
+
+		return $lower ? strtolower( $label ) : $label;
+	}
+
+	/**
 	 * Add admin menu.
 	 */
 	public function add_menu() {
@@ -159,7 +183,7 @@ class Help_Docs {
 		$settings_url = admin_url( 'edit.php?post_type=wbam-ad&page=wbam-settings' );
 		$links_url    = admin_url( 'admin.php?page=wbam-links' );
 		$wizard_url   = admin_url( 'index.php?page=wbam-setup' );
-		$tools_url    = admin_url( 'edit.php?post_type=wbam-ad&page=wbam-tools' );
+		$tools_url    = \WBAM\Core\Admin_Links::settings( 'tools' );
 		?>
 		<div class="wbam-help-section">
 			<?php if ( ! $this->is_pro_active ) : ?>
@@ -245,20 +269,22 @@ class Help_Docs {
 						<li>
 							<?php
 							printf(
-								/* translators: 1: opening anchor tag, 2: closing anchor tag */
-								esc_html__( 'Seed demo data from %1$sTools%2$s. Creates sample ads, classifieds, advertisers, and 30 days of analytics so you can explore every Pro screen with real numbers. The itemized "Remove" button wipes them when you are done.', 'wb-ads-rotator-with-split-test' ),
+								/* translators: 1: opening anchor tag, 2: closing anchor tag, 3: the site's plural item label, e.g. "classifieds" */
+								esc_html__( 'Seed demo data from %1$sTools%2$s. Creates sample ads, %3$s, advertisers, and 30 days of analytics so you can explore every Pro screen with real numbers. The itemized "Remove" button wipes them when you are done.', 'wb-ads-rotator-with-split-test' ),
 								'<a href="' . esc_url( $tools_url ) . '">',
-								'</a>'
+								'</a>',
+								esc_html( $this->item() )
 							);
 							?>
 						</li>
 						<li>
 							<?php
 							printf(
-								/* translators: 1: opening anchor tag, 2: closing anchor tag */
-								esc_html__( 'Turn modules on or off in %1$sSettings > General%2$s (Classifieds, Campaigns, Payments, A/B Testing, etc.). Each module adds its own submenu under WB Ad Manager.', 'wb-ads-rotator-with-split-test' ),
+								/* translators: 1: opening anchor tag, 2: closing anchor tag, 3: the site's plural item label, e.g. "Classifieds" */
+								esc_html__( 'Turn modules on or off in %1$sSettings > General%2$s (%3$s, Campaigns, Payments, A/B Testing, etc.). Each module adds its own submenu under WB Ad Manager.', 'wb-ads-rotator-with-split-test' ),
 								'<a href="' . esc_url( \WBAM\Core\Admin_Links::settings( 'general' ) ) . '">',
-								'</a>'
+								'</a>',
+								esc_html( $this->item( 'plural', false ) )
 							);
 							?>
 						</li>
@@ -411,12 +437,12 @@ class Help_Docs {
 			<h2><?php esc_html_e( 'PRO Features Guide', 'wb-ads-rotator-with-split-test' ); ?></h2>
 
 			<div class="wbam-doc-section">
-				<h3><?php esc_html_e( 'Classifieds Marketplace', 'wb-ads-rotator-with-split-test' ); ?></h3>
-				<p><?php esc_html_e( 'A full-featured classifieds system for your site.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<h3><?php echo esc_html( $this->item( 'plural', false ) ); ?></h3>
+				<p><?php printf( /* translators: %s: the site's plural item label, e.g. "classifieds" */ esc_html__( 'Members post %s on your site; visitors browse them and get in touch.', 'wb-ads-rotator-with-split-test' ), esc_html( $this->item() ) ); ?></p>
 				<ul>
-					<li><?php esc_html_e( 'Users post and browse classified listings with images', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Image galleries on every post', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Category and location filters with sidebar search', 'wb-ads-rotator-with-split-test' ); ?></li>
-					<li><?php esc_html_e( 'Listing upgrades: Featured, Highlighted, Urgent, Bump', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Upgrades: Featured, Highlighted, Urgent, Bump', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Inquiry system for buyer-seller communication', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Reviews and ratings for sellers', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Custom fields builder for category-specific data', 'wb-ads-rotator-with-split-test' ); ?></li>
@@ -427,7 +453,7 @@ class Help_Docs {
 				<h3><?php esc_html_e( 'Advertiser Portal', 'wb-ads-rotator-with-split-test' ); ?></h3>
 				<p><?php esc_html_e( 'A self-service dashboard for advertisers with 14 tabs.', 'wb-ads-rotator-with-split-test' ); ?></p>
 				<ul>
-					<li><?php esc_html_e( 'Overview, My Ads, Campaigns, Classifieds, Inquiries', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php printf( /* translators: %s: the site's plural item label, e.g. "Classifieds" */ esc_html__( 'Overview, My Ads, Campaigns, %s, Inquiries', 'wb-ads-rotator-with-split-test' ), esc_html( $this->item( 'plural', false ) ) ); ?></li>
 					<li><?php esc_html_e( 'Favorites, Following, Messages, Link Partnerships', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Balance (running total and transaction history)', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Membership plans, Analytics, Share of Voice, Profile', 'wb-ads-rotator-with-split-test' ); ?></li>
@@ -436,9 +462,9 @@ class Help_Docs {
 
 			<div class="wbam-doc-section">
 				<h3><?php esc_html_e( 'Balance & Payments System', 'wb-ads-rotator-with-split-test' ); ?></h3>
-				<p><?php esc_html_e( 'Built-in balance system advertisers use to pay for ads and listings.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p><?php printf( /* translators: %s: the site's plural item label, e.g. "classifieds" */ esc_html__( 'Built-in balance advertisers use to pay for ads and %s.', 'wb-ads-rotator-with-split-test' ), esc_html( $this->item() ) ); ?></p>
 				<ul>
-					<li><?php esc_html_e( 'Advertisers add funds to pay for ads and listings', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php printf( /* translators: %s: the site's plural item label, e.g. "classifieds" */ esc_html__( 'Advertisers add funds to pay for ads and %s', 'wb-ads-rotator-with-split-test' ), esc_html( $this->item() ) ); ?></li>
 					<li><?php esc_html_e( 'Supports WooCommerce, Stripe, PayPal, and manual payments', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Hold > Deduct > Refund lifecycle for safe billing', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Full transaction ledger with audit trail', 'wb-ads-rotator-with-split-test' ); ?></li>
@@ -478,7 +504,7 @@ class Help_Docs {
 			<div class="wbam-doc-section">
 				<h3><?php esc_html_e( 'Membership Plans', 'wb-ads-rotator-with-split-test' ); ?></h3>
 				<ul>
-					<li><?php esc_html_e( 'Create subscription plans with listing limits and billing cycles', 'wb-ads-rotator-with-split-test' ); ?></li>
+					<li><?php esc_html_e( 'Create subscription plans with posting limits and billing cycles', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Monthly, quarterly, and yearly billing', 'wb-ads-rotator-with-split-test' ); ?></li>
 					<li><?php esc_html_e( 'Automatic renewal and expiration notifications', 'wb-ads-rotator-with-split-test' ); ?></li>
 				</ul>
@@ -651,22 +677,40 @@ class Help_Docs {
 			</div>
 
 			<?php if ( $this->is_pro_active ) : ?>
-			<h3><?php esc_html_e( 'Classifieds', 'wb-ads-rotator-with-split-test' ); ?></h3>
+			<h3><?php echo esc_html( $this->item( 'plural', false ) ); ?></h3>
 
 			<div class="wbam-faq-item">
-				<h4><?php esc_html_e( 'How do users post classifieds?', 'wb-ads-rotator-with-split-test' ); ?></h4>
-				<p><?php esc_html_e( 'Users visit the Advertiser Dashboard page and use the Classifieds tab to submit listings. The multi-step wizard guides them through title, description, images, category, price, and contact info. Listings can require admin approval before going live.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<h4><?php printf( /* translators: %s: the site's plural item label, e.g. "classifieds" */ esc_html__( 'How do members post %s?', 'wb-ads-rotator-with-split-test' ), esc_html( $this->item() ) ); ?></h4>
+				<p>
+					<?php
+					printf(
+						/* translators: 1: the site's plural item label as a tab name, e.g. "Classifieds", 2: the singular label, e.g. "classified" */
+						esc_html__( 'Members open the Advertiser Dashboard and use the %1$s tab. A step-by-step form asks for the title, description, images, category, price and contact details. You can require your approval before a %2$s goes live.', 'wb-ads-rotator-with-split-test' ),
+						esc_html( $this->item( 'plural', false ) ),
+						esc_html( $this->item( 'singular' ) )
+					);
+					?>
+				</p>
 			</div>
 
 			<div class="wbam-faq-item">
 				<h4><?php esc_html_e( 'How does the balance system work?', 'wb-ads-rotator-with-split-test' ); ?></h4>
-				<p><?php esc_html_e( 'Advertisers add funds to pay for ad submissions, classified listings, and upgrades. Funds are held when a listing is submitted and deducted when approved (or refunded if rejected). Configure payment methods in Settings > Payments.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p>
+					<?php
+					printf(
+						/* translators: 1: the site's plural item label, e.g. "classifieds", 2: the singular label, e.g. "classified" */
+						esc_html__( 'Advertisers add funds to pay for ads, %1$s and upgrades. The amount is held when a %2$s is submitted, taken when it is approved, and returned if it is rejected. Set up payment methods in Settings > Payments.', 'wb-ads-rotator-with-split-test' ),
+						esc_html( $this->item() ),
+						esc_html( $this->item( 'singular' ) )
+					);
+					?>
+				</p>
 			</div>
 
 			<div class="wbam-faq-item">
 				<h4><?php esc_html_e( 'Where is the Advertiser Dashboard?', 'wb-ads-rotator-with-split-test' ); ?></h4>
 				<p>
-					<?php esc_html_e( 'The dashboard is created automatically on plugin activation. You can find or reassign it in', 'wb-ads-rotator-with-split-test' ); ?>
+					<?php esc_html_e( 'The page is created when you turn on a feature for advertisers (in the setup wizard or by choosing a site mode), or with Create Page. You can find or reassign it in', 'wb-ads-rotator-with-split-test' ); ?>
 					<a href="<?php echo esc_url( \WBAM\Core\Admin_Links::settings( 'general' ) ); ?>"><?php esc_html_e( 'Settings > General > Pages', 'wb-ads-rotator-with-split-test' ); ?></a>.
 				</p>
 			</div>
@@ -677,14 +721,20 @@ class Help_Docs {
 				<h4><?php esc_html_e( 'How do I import demo data?', 'wb-ads-rotator-with-split-test' ); ?></h4>
 				<p>
 					<?php esc_html_e( 'Go to', 'wb-ads-rotator-with-split-test' ); ?>
-					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=wbam-ad&page=wbam-tools' ) ); ?>"><?php esc_html_e( 'WB Ad Manager > Tools', 'wb-ads-rotator-with-split-test' ); ?></a>
-					<?php esc_html_e( 'and click "Import Demo Data". This creates sample ads, classifieds, advertisers, campaigns, and 30 days of analytics.', 'wb-ads-rotator-with-split-test' ); ?>
+					<a href="<?php echo esc_url( \WBAM\Core\Admin_Links::settings( 'tools' ) ); ?>"><?php esc_html_e( 'Settings > Tools & License', 'wb-ads-rotator-with-split-test' ); ?></a>
+					<?php
+					printf(
+						/* translators: %s: the site's plural item label, e.g. "classifieds" */
+						esc_html__( 'and click "Import Demo Data". This creates sample ads, %s, advertisers, campaigns, and 30 days of analytics.', 'wb-ads-rotator-with-split-test' ),
+						esc_html( $this->item() )
+					);
+					?>
 				</p>
 			</div>
 
 			<div class="wbam-faq-item">
 				<h4><?php esc_html_e( 'How do I remove demo data?', 'wb-ads-rotator-with-split-test' ); ?></h4>
-				<p><?php esc_html_e( 'After importing, the Tools page shows a "Remove All Demo Data" button with an itemized list of what will be deleted. Your real content is never touched. Every item is verified against the demo flag before removal.', 'wb-ads-rotator-with-split-test' ); ?></p>
+				<p><?php esc_html_e( 'After importing, Tools & License shows a "Remove All Demo Data" button with an itemized list of what will be deleted. Your real content is never touched. Every item is verified against the demo flag before removal.', 'wb-ads-rotator-with-split-test' ); ?></p>
 			</div>
 			<?php endif; ?>
 
