@@ -234,7 +234,9 @@ class Test_Settings_Contract_3_2 extends Pro_Test_Case {
 		$_REQUEST = $_POST;
 
 		// $saving=true: the one General-section form's nonce (card 10343706274).
-		$html = $this->render( 'render_pages_settings', true );
+		// The refusal is queued for General's one notice (wave 6).
+		$this->render( 'render_pages_settings', true );
+		$html = implode( ' ', wp_list_pluck( get_settings_errors( 'wbam_general' ), 'message' ) );
 
 		$this->assertStringContainsString( 'is used for more than one role', $html );
 		$this->assertStringContainsString( 'Shared Page', $html );

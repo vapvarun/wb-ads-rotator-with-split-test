@@ -19,16 +19,30 @@ class Test_No_Pages_Before_Opt_In extends Pro_Test_Case {
 	}
 
 	public function test_a_fresh_install_creates_no_page(): void {
-		delete_option( 'wbam_pro_db_version' );
-		delete_option( 'wbam_pro_settings' );
-		delete_option( 'wbam_page_advertiser_dashboard' );
-		delete_option( 'wbam_page_classifieds' );
+		global $wpdb;
+		$keys  = array( 'wbam_pro_db_version', 'wbam_pro_settings', 'wbam_page_advertiser_dashboard', 'wbam_page_classifieds' );
+		$saved = array();
+		foreach ( $keys as $key ) {
+			$saved[ $key ] = get_option( $key );
+			delete_option( $key );
+		}
 		$before = $this->page_count();
 
 		Installer::install( false );
 
-		$this->assertSame( $before, $this->page_count() );
-		$this->assertFalse( get_option( 'wbam_page_advertiser_dashboard' ) );
+		$after     = $this->page_count();
+		$dashboard = get_option( 'wbam_page_advertiser_dashboard' );
+
+		// install() runs DDL, which commits this test's transaction (MySQL
+		// does that), so put the options back by hand and commit before
+		// asserting; otherwise the deletes leak into later tests.
+		foreach ( $saved as $key => $value ) {
+			false === $value ? delete_option( $key ) : update_option( $key, $value );
+		}
+		$wpdb->query( 'COMMIT' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+		$this->assertSame( $before, $after );
+		$this->assertFalse( $dashboard );
 	}
 
 	public function test_picking_a_mode_with_advertisers_creates_the_dashboard_once(): void {

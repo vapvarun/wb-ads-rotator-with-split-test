@@ -28,8 +28,8 @@ class Test_Settings_One_Page_Rejects extends Pro_Test_Case {
 		parent::tear_down();
 	}
 
-	/** Rotation saves on admin_init of the same request; its notice must print in the leaf. */
-	public function test_rotation_save_prints_notice(): void {
+	/** Rotation saves with the section's one Save; that Save's notice covers it (card 10343706274, wave 6). */
+	public function test_rotation_save_adds_no_second_notice(): void {
 		$_POST = array(
 			'wbam_rotation_nonce' => wp_create_nonce( 'wbam_rotation_settings' ),
 			'enable_rotation'     => '1',
@@ -44,7 +44,7 @@ class Test_Settings_One_Page_Rejects extends Pro_Test_Case {
 		$admin->render_rotation_settings( get_option( 'wbam_pro_settings', array() ) );
 		$html = ob_get_clean();
 
-		$this->assertStringContainsString( 'Rotation settings saved.', $html );
+		$this->assertStringNotContainsString( 'Rotation settings saved.', $html );
 	}
 
 	/** The License save lands on the one Settings page with the flag its notice prints for. */
