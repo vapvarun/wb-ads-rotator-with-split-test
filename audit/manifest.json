@@ -1017,11 +1017,18 @@
       "purpose": "Whether visitor views of an ad are counted in the wbam_ad_views cookie (Pro advertiser/campaign caps)"
     },
     {
+      "name": "wbam_currency_code",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Core/class-formatter.php",
+      "purpose": "The site currency code (default USD); Pro supplies its Credits currency"
+    },
+    {
       "name": "wbam_currency_symbol",
       "type": "filter",
       "args": 2,
-      "where": "includes/Modules/Links/",
-      "purpose": "Filter currency symbol for partnership budgets — KEY EXTENSION POINT for PRO multi-currency"
+      "where": "includes/Core/class-formatter.php",
+      "purpose": "Change the symbol for a currency code; the symbol otherwise follows the code (Free and Pro)"
     },
     {
       "name": "wbam_demo_data_cleared",

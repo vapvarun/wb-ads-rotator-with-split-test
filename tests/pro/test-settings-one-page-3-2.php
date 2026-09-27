@@ -234,10 +234,7 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 	public function test_advertisers_billing_save_does_not_touch_currency(): void {
 		update_option(
 			'wbam_pro_settings',
-			array(
-				'currency'        => 'eur',
-				'currency_symbol' => '€',
-			)
+			array( 'currency' => 'eur' )
 		);
 
 		$_POST = array(
@@ -253,7 +250,6 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 		$this->assertTrue( $sanitized['admin_as_advertiser'] );
 		$this->assertSame( 25.0, $sanitized['low_balance_threshold'] );
 		$this->assertSame( 'eur', $sanitized['currency'], 'Currency must survive a save that never rendered it.' );
-		$this->assertSame( '€', $sanitized['currency_symbol'] );
 	}
 
 	/** Saving Classifieds settings must not reset the featured-email toggles it no longer renders. */

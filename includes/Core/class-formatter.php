@@ -25,7 +25,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Formatter {
 
 	/**
-	 * Default currency symbols.
+	 * Symbol for each currency the site can pick. The symbol always follows
+	 * the currency code (owner decision 2026-10-03); a site that wants
+	 * another uses the wbam_currency_symbol filter. Codes not listed show
+	 * as the code itself ("CHF 10.00").
 	 *
 	 * @var array
 	 */
@@ -33,12 +36,41 @@ class Formatter {
 		'USD' => '$',
 		'EUR' => '€',
 		'GBP' => '£',
-		'INR' => '₹',
-		'AUD' => 'A$',
 		'CAD' => 'C$',
+		'AUD' => 'A$',
+		'NZD' => 'NZ$',
 		'JPY' => '¥',
+		'CHF' => 'CHF ',
+		'INR' => '₹',
 		'CNY' => '¥',
+		'SGD' => 'S$',
+		'HKD' => 'HK$',
+		'SEK' => 'kr ',
+		'NOK' => 'kr ',
+		'DKK' => 'kr ',
+		'MXN' => 'MX$',
+		'BRL' => 'R$',
+		'PLN' => 'zł ',
+		'CZK' => 'Kč ',
+		'ZAR' => 'R ',
 	);
+
+	/**
+	 * The site's currency code. USD unless an add-on (Pro's Credits
+	 * setting) says otherwise through the wbam_currency_code filter.
+	 *
+	 * @since 3.2.0
+	 * @return string Upper-case ISO 4217 code.
+	 */
+	public static function site_currency() {
+		/**
+		 * Filter the site's currency code.
+		 *
+		 * @since 3.2.0
+		 * @param string $currency ISO 4217 code.
+		 */
+		return strtoupper( (string) apply_filters( 'wbam_currency_code', 'USD' ) );
+	}
 
 	/**
 	 * Format currency amount.
@@ -57,12 +89,11 @@ class Formatter {
 	/**
 	 * Get currency symbol.
 	 *
-	 * Uses filter hook so PRO plugin can override with settings.
-	 *
-	 * @param string $currency Currency code.
+	 * @param string $currency Currency code; the site currency when empty.
 	 * @return string Currency symbol.
 	 */
-	public static function get_currency_symbol( $currency = 'USD' ) {
+	public static function get_currency_symbol( $currency = '' ) {
+		$currency       = '' === $currency ? self::site_currency() : strtoupper( $currency );
 		$default_symbol = isset( self::$currency_symbols[ $currency ] )
 			? self::$currency_symbols[ $currency ]
 			: $currency . ' ';

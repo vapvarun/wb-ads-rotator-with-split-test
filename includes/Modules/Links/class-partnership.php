@@ -200,7 +200,7 @@ class Partnership {
 			return __( 'Not specified', 'wb-ads-rotator-with-split-test' );
 		}
 
-		// The site currency: Pro overrides this symbol from its Credits setting.
+		// The site currency (Pro sets it through wbam_currency_code).
 		$symbol = \WBAM\Core\Formatter::get_currency_symbol();
 
 		if ( null !== $this->budget_min && null !== $this->budget_max ) {

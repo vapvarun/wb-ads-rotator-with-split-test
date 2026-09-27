@@ -266,7 +266,8 @@ inventory in `audit/manifest.json`.
 | `wbam_code_ad_sandbox_attrs` | $sandbox_attrs, $ad_id | Filter the sandbox attributes for code ad iframes. allow-same-origin is dropped whenever allow-scripts is present. |
 | `wbam_code_ad_use_sandbox` | $use_sandbox, $ad_id, $code | Filter whether to use iframe sandbox for this code ad. When enabled, the ad code will be rendered in a sandboxed iframe for additional security isolation. |
 | `wbam_count_visitor_views` | $counts, $ad_id | Filters whether visitor views of an ad are counted. Return true when a cap outside the ad's own daily limit reads get_ad_views() for this ad. |
-| `wbam_currency_symbol` | $symbol, $currency | Filter the currency symbol. |
+| `wbam_currency_code` | $currency | The site currency code (USD unless Pro sets its Credits currency). |
+| `wbam_currency_symbol` | $symbol, $currency | Change the symbol for a currency code. The symbol otherwise follows the code. |
 | `wbam_detected_device` | $device, $user_agent | Filter the detected device type. Allows themes/plugins to override device detection for custom logic. |
 | `wbam_email_capture_cookie_days` | $days, $ad_id | Filter how many days a dismissed email sign-up ad stays hidden. Plug and play (owner decision, card 10343726590): no Settings UI field any more. This ad's already-stored `cookie_days` is this filter's default, so nothing changes silently. |
 | `wbam_email_capture_success_message` | $success_message, $email, $ad_id | Filter the success message for email capture. |
