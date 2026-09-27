@@ -55,6 +55,7 @@ class Admin {
 		add_action( 'admin_menu', array( $this, 'reorder_submenu_into_sections' ), 99 );
 		add_action( 'admin_head', array( $this, 'print_menu_section_css' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_metaboxes' ) );
+		add_action( 'post_submitbox_misc_actions', array( $this, 'render_publish_box_status' ) );
 		add_action( 'save_post', array( $this, 'save_meta' ), 10, 2 );
 		// Publishing an ad should make it live. The sidebar "Ad Status" radio
 		// is separate from WP's Publish box, so an admin who reviews a pending
@@ -141,7 +142,7 @@ class Admin {
 			UX::page_header(
 				array(
 					'title'       => __( 'Ads', 'wb-ads-rotator-with-split-test' ),
-					'desc'        => __( 'Every ad running on your site.', 'wb-ads-rotator-with-split-test' ),
+					'desc'        => __( 'Every ad on your site, and whether it is showing.', 'wb-ads-rotator-with-split-test' ),
 					'core_screen' => true,
 					'actions'     => '<a href="' . esc_url( \WBAM\Core\Admin_Links::ads_new() ) . '" class="wbam-admin-btn wbam-admin-btn--primary">' . esc_html__( 'Add New', 'wb-ads-rotator-with-split-test' ) . '</a>',
 				)
@@ -1720,6 +1721,8 @@ class Admin {
 				return;
 			}
 
+			var i18n = wbamFormatData.i18n || {};
+
 			function detectFormat( w, h ) {
 				var found = 'custom';
 				$.each( wbamFormatData.formats, function( slug, dims ) {
@@ -1773,6 +1776,26 @@ class Admin {
 				return { format: format, width: 0, height: 0 };
 			}
 
+			// "Accepts Banner shapes. This ad is a Box (300x250)."
+			function unfitReason( state, accepted ) {
+				var shapes = wbamFormatData.shapes || {};
+				var labels = wbamFormatData.shapeLabels || {};
+				var takes  = [];
+				var mine   = '';
+				$.each( shapes, function( shape, formats ) {
+					if ( formats.some( function( f ) { return accepted.indexOf( f ) !== -1; } ) ) {
+						takes.push( labels[ shape ] || shape );
+					}
+					if ( formats.indexOf( state.format ) !== -1 ) {
+						mine = labels[ shape ] || shape;
+					}
+				} );
+				var dims = wbamFormatData.formats[ state.format ] || { w: state.width, h: state.height };
+				var size = dims.w + 'x' + dims.h;
+				var ad   = mine ? i18n.adShape.replace( '%1$s', mine ).replace( '%2$s', size ) : i18n.adSize.replace( '%s', size );
+				return i18n.acceptsShapes.replace( '%1$s', takes.join( ', ' ) ).replace( '%2$s', ad );
+			}
+
 			function refreshPlacementAvailability() {
 				var state = currentSizingState();
 
@@ -1788,6 +1811,11 @@ class Admin {
 
 					$option.toggleClass( 'wbam-placement-option--disabled', ! fits );
 					$checkbox.prop( 'disabled', ! fits );
+					$option.find( '.wbam-placement-reason' ).remove();
+					if ( ! fits ) {
+						var $body = $option.find( '.wbam-option-body' );
+						$( '<span class="wbam-placement-reason"></span>' ).text( unfitReason( state, entry.accepted || [] ) ).appendTo( $body.length ? $body : $option );
+					}
 
 					if ( ! fits && $checkbox.is( ':checked' ) ) {
 						$checkbox.prop( 'checked', false );
@@ -1896,53 +1924,103 @@ class Admin {
 	 * @return array{others:int,template:string}
 	 */
 	private static function priority_hint_data( $post_id ) {
-		$placements = get_post_meta( $post_id, '_wbam_placements', true );
-		$others     = array();
+		$placements = array_values( array_filter( (array) get_post_meta( $post_id, '_wbam_placements', true ) ) );
+		$engine     = Placement_Engine::get_instance();
+		$tier       = $engine->get_delivery_tier( $post_id, '' );
 
-		if ( is_array( $placements ) && $placements ) {
-			$like = array( 'relation' => 'OR' );
-			foreach ( $placements as $slug ) {
-				$like[] = array(
-					'key'     => '_wbam_placements',
-					'value'   => sprintf( 's:%d:"%s"', strlen( $slug ), $slug ),
-					'compare' => 'LIKE',
+		if ( ! $placements ) {
+			$hint = array(
+				'others' => 0,
+				'fixed'  => __( 'Tick a placement to see how often this ad would show there.', 'wb-ads-rotator-with-split-test' ),
+			);
+		} elseif ( Placement_Engine::TIER_SAMPLE === $tier ) {
+			$hint = array(
+				'others' => 0,
+				'fixed'  => __( 'Sample ads step aside whenever another ad can fill the placement.', 'wb-ads-rotator-with-split-test' ),
+			);
+		} else {
+			$hint = self::priority_share_hint( $post_id, $placements, $tier );
+		}
+
+		/**
+		 * Filter the editor's priority hint. Pro explains that a paid ad's
+		 * share comes from its campaign's rotation, not Priority.
+		 *
+		 * @since 3.2.0
+		 * @param array{others:int,template?:string,fixed?:string} $hint    Hint data.
+		 * @param int                                               $post_id Ad ID.
+		 */
+		return (array) apply_filters( 'wbam_priority_hint', $hint, $post_id );
+	}
+
+	/**
+	 * Share of impressions among the enabled ads in the same placements and
+	 * the same delivery tier. Sample ads are left out (they step aside), and
+	 * a higher tier in the same placements means this ad only fills in.
+	 *
+	 * @param int      $post_id    Ad ID.
+	 * @param string[] $placements Its placements.
+	 * @param int      $tier       Its delivery tier.
+	 * @return array{others:int,template?:string,fixed?:string}
+	 */
+	private static function priority_share_hint( $post_id, array $placements, $tier ) {
+		$like = array( 'relation' => 'OR' );
+		foreach ( $placements as $slug ) {
+			$like[] = array(
+				'key'     => '_wbam_placements',
+				'value'   => sprintf( 's:%d:"%s"', strlen( $slug ), $slug ),
+				'compare' => 'LIKE',
+			);
+		}
+		// ponytail: capped at 100 rivals; the share is a hint, not billing.
+		$rivals = get_posts(
+			array(
+				'post_type'      => 'wbam-ad',
+				'post_status'    => 'publish',
+				'posts_per_page' => 100,
+				'fields'         => 'ids',
+				'post__not_in'   => array( (int) $post_id ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- one ad excluded from a capped admin query.
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- admin edit screen only, capped.
+					'relation' => 'AND',
+					array(
+						'key'   => '_wbam_enabled',
+						'value' => '1',
+					),
+					$like,
+				),
+			)
+		);
+
+		update_postmeta_cache( $rivals );
+		$engine = Placement_Engine::get_instance();
+		$same   = array();
+		foreach ( $rivals as $rival ) {
+			$rival_tier = $engine->get_delivery_tier( $rival, '' );
+			if ( $rival_tier > $tier ) {
+				return array(
+					'others' => 0,
+					'fixed'  => __( 'Paid ads fill these placements first. This ad shows only when none of them can.', 'wb-ads-rotator-with-split-test' ),
 				);
 			}
-			// ponytail: capped at 100 rivals; the share is a hint, not billing.
-			$others = get_posts(
-				array(
-					'post_type'      => 'wbam-ad',
-					'post_status'    => 'publish',
-					'posts_per_page' => 100,
-					'fields'         => 'ids',
-					'post__not_in'   => array( (int) $post_id ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- one ad excluded from a capped admin query.
-					'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- admin edit screen only, capped.
-						'relation' => 'AND',
-						array(
-							'key'   => '_wbam_enabled',
-							'value' => '1',
-						),
-						$like,
-					),
-				)
-			);
+			if ( $rival_tier === $tier ) {
+				$same[] = $rival;
+			}
 		}
 
-		if ( ! $others ) {
+		if ( ! $same ) {
 			return array(
-				'others'   => 0,
-				'template' => __( 'No other enabled ad shares this ad\'s placements, so it gets every impression there.', 'wb-ads-rotator-with-split-test' ),
+				'others' => 0,
+				'fixed'  => __( 'No other ad competes for these placements, so this ad gets every impression there.', 'wb-ads-rotator-with-split-test' ),
 			);
 		}
 
-		update_postmeta_cache( $others );
 		$sum = 0;
-		foreach ( $others as $other_id ) {
-			$priority = (int) get_post_meta( $other_id, '_wbam_priority', true );
+		foreach ( $same as $rival ) {
+			$priority = (int) get_post_meta( $rival, '_wbam_priority', true );
 			$sum     += $priority ? $priority : 5;
 		}
 
-		$count = count( $others );
+		$count = count( $same );
 		return array(
 			'others'   => $sum,
 			// %2$d is filled in by the slider script as the priority changes.
@@ -1958,6 +2036,41 @@ class Admin {
 				)
 			),
 		);
+	}
+
+
+	/**
+	 * Publish box: the ad's state and reason, and "Where will this show?"
+	 * (card 10344382789), from the same Ad_Status the All Ads list uses.
+	 *
+	 * @since 3.2.0
+	 * @param \WP_Post $post Post.
+	 */
+	public function render_publish_box_status( $post ) {
+		if ( ! $post instanceof \WP_Post || 'wbam-ad' !== $post->post_type || 'auto-draft' === $post->post_status ) {
+			return;
+		}
+
+		$status = \WBAM\Core\Ad_Status::get( $post->ID );
+		$kept   = wbam_split_placements_by_fit( $post->ID, array_values( array_filter( (array) get_post_meta( $post->ID, '_wbam_placements', true ) ) ) )['kept'];
+		$engine = Placement_Engine::get_instance();
+		$names  = array();
+		foreach ( $kept as $slug ) {
+			$placement = $engine->get_placement( $slug );
+			$names[]   = $placement ? $placement->get_name() : $slug;
+		}
+		?>
+		<div class="misc-pub-section wbam-publish-status">
+			<?php echo wp_kses_post( UX::status_badge( $status['state'], $status['label'] ) ); ?>
+			<?php if ( '' !== $status['reason'] ) : ?>
+				<span class="wbam-status-reason"><?php echo esc_html( $status['reason'] ); ?></span>
+			<?php endif; ?>
+			<p class="wbam-publish-where">
+				<strong><?php esc_html_e( 'Where will this show?', 'wb-ads-rotator-with-split-test' ); ?></strong>
+				<?php echo esc_html( $names ? implode( ', ', $names ) : __( 'Only where its shortcode, block or widget is used. Tick a placement below to show it automatically.', 'wb-ads-rotator-with-split-test' ) ); ?>
+			</p>
+		</div>
+		<?php
 	}
 
 	/**
@@ -2009,6 +2122,10 @@ class Admin {
 			var priorityHint = <?php echo wp_json_encode( self::priority_hint_data( $post->ID ) ); ?>;
 
 			function updatePriorityHint( value ) {
+				if ( priorityHint.fixed ) {
+					$( '.wbam-priority-share-hint' ).text( priorityHint.fixed );
+					return;
+				}
 				var p     = parseInt( value, 10 ) || 5;
 				var share = Math.round( ( p / ( p + priorityHint.others ) ) * 100 );
 				$( '.wbam-priority-share-hint' ).text(
@@ -2265,7 +2382,7 @@ class Admin {
 					} else if ( compatible.length === Object.keys(wbamFormatData.placements).length ) {
 						$compat.text( i18n.every + ' ' + i18n.untickedHint );
 					} else {
-						$compat.text( namesFor(compatible).join(', ') + ' ' + i18n.untickedHint );
+						$compat.text( namesFor(compatible).join(', ') + '. ' + i18n.untickedHint );
 					}
 					return;
 				}
@@ -3123,6 +3240,14 @@ class Admin {
 		return array(
 			'formats'         => $formats_out,
 			'placements'      => $placements_out,
+			// Why a greyed-out placement doesn't take this ad (card 10344382789).
+			'shapes'          => \WBAM\Core\Placement_Format_Map::shapes(),
+			'shapeLabels'     => array(
+				'banner'    => __( 'Banner', 'wb-ads-rotator-with-split-test' ),
+				'billboard' => __( 'Billboard', 'wb-ads-rotator-with-split-test' ),
+				'box'       => __( 'Box', 'wb-ads-rotator-with-split-test' ),
+				'tower'     => __( 'Tower', 'wb-ads-rotator-with-split-test' ),
+			),
 			'i18n'            => self::compat_i18n(),
 			// Same live-disable rule the Placements metabox's inline script
 			// reads to decide whether to grey out a mismatched checkbox
@@ -3170,6 +3295,12 @@ class Admin {
 			'untickedHint'    => __( 'Tick a placement below to enable rendering.', 'wb-ads-rotator-with-split-test' ),
 			'mismatchPrefix'  => __( 'Wrong size for:', 'wb-ads-rotator-with-split-test' ),
 			'noneOfSelected'  => __( 'None of the selected placements accept this size:', 'wb-ads-rotator-with-split-test' ),
+			/* translators: 1: shape names, e.g. "Banner", 2: this ad's shape and size, e.g. "a Box (300x250)" */
+			'acceptsShapes'   => __( 'Accepts %1$s shapes. This ad is %2$s.', 'wb-ads-rotator-with-split-test' ),
+			/* translators: 1: shape name, 2: width x height */
+			'adShape'         => __( 'a %1$s (%2$s)', 'wb-ads-rotator-with-split-test' ),
+			/* translators: %s: width x height */
+			'adSize'          => __( '%s in size', 'wb-ads-rotator-with-split-test' ),
 		);
 	}
 
@@ -3236,7 +3367,7 @@ class Admin {
 			} elseif ( $total > 0 && count( $compat['compatible'] ) === $total ) {
 				$value = $i18n['every'] . ' ' . $i18n['untickedHint'];
 			} else {
-				$value = implode( ', ', array_map( $name_of, $compat['compatible'] ) ) . ' ' . $i18n['untickedHint'];
+				$value = implode( ', ', array_map( $name_of, $compat['compatible'] ) ) . '. ' . $i18n['untickedHint'];
 			}
 
 			return array(
@@ -3439,45 +3570,20 @@ class Admin {
 				break;
 
 			case 'status':
-				// An ad awaiting moderation sits at core post_status 'pending'
-				// (Ad_Submission_Manager::reject()/revert_to_pending() set it),
-				// with `_wbam_enabled` still '1' from creation - this column
-				// read only the toggle and showed "Enabled" on ads that were
-				// not actually live because they had not been approved yet.
-				// post_status is core WordPress, so this stays a Free-only
-				// check with no Pro coupling.
-				$post_status = get_post_status( $post_id );
-				if ( 'pending' === $post_status ) {
-					echo wp_kses_post( \WBAM\Admin\UX::status_badge( 'pending', __( 'Pending review', 'wb-ads-rotator-with-split-test' ) ) );
-					break;
+				// Live / Scheduled / Ended / Not showing, with the one reason an
+				// owner needs (card 10344382789). The page's ads are primed once,
+				// so a 2,000-ad list costs a query per page, not per row.
+				static $status_primed = false;
+				if ( ! $status_primed ) {
+					global $wp_query;
+					$page_ids = ( $wp_query instanceof \WP_Query && is_array( $wp_query->posts ) ) ? wp_list_pluck( $wp_query->posts, 'ID' ) : array( $post_id );
+					\WBAM\Core\Ad_Status::prime( $page_ids );
+					$status_primed = true;
 				}
-				if ( 'draft' === $post_status ) {
-					echo wp_kses_post( \WBAM\Admin\UX::status_badge( 'draft', __( 'Draft', 'wb-ads-rotator-with-split-test' ) ) );
-					break;
-				}
-
-				$enabled = get_post_meta( $post_id, '_wbam_enabled', true );
-				$status  = '1' === $enabled ? 'enabled' : 'disabled';
-				$text    = '1' === $enabled ? __( 'Enabled', 'wb-ads-rotator-with-split-test' ) : __( 'Disabled', 'wb-ads-rotator-with-split-test' );
-				echo wp_kses_post( \WBAM\Admin\UX::status_badge( $status, $text ) );
-
-				// Creative-health marker: an enabled ad whose creative cannot
-				// render (image deleted from the media library) is skipped by
-				// delivery - without this badge the list said "Enabled" while
-				// the slot served nothing and revenue stopped silently.
-				if ( '1' === $enabled ) {
-					$ad_data      = get_post_meta( $post_id, '_wbam_ad_data', true );
-					$type_handler = Placement_Engine::get_instance()->get_ad_type( isset( $ad_data['type'] ) ? $ad_data['type'] : '' );
-					if ( $type_handler && method_exists( $type_handler, 'has_creative' ) && ! $type_handler->has_creative( $post_id ) ) {
-						$missing = method_exists( $type_handler, 'get_missing_label' ) ? $type_handler->get_missing_label( $post_id ) : __( 'Image missing', 'wb-ads-rotator-with-split-test' );
-						echo ' ' . wp_kses_post( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- UX::status_badge() output plus a translated title attribute, both escaped inline.
-							sprintf(
-								'<span class="wbam-status-badge wbam-status-badge--danger" title="%s">%s</span>',
-								esc_attr__( 'This ad is skipped by delivery until this is fixed.', 'wb-ads-rotator-with-split-test' ),
-								esc_html( $missing )
-							)
-						);
-					}
+				$ad_status = \WBAM\Core\Ad_Status::get( $post_id );
+				echo wp_kses_post( \WBAM\Admin\UX::status_badge( $ad_status['state'], $ad_status['label'] ) );
+				if ( '' !== $ad_status['reason'] ) {
+					echo '<span class="wbam-status-reason">' . esc_html( $ad_status['reason'] ) . '</span>';
 				}
 				break;
 		}

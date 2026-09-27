@@ -870,6 +870,27 @@
       "purpose": "Extension point in ad edit metabox"
     },
     {
+      "name": "wbam_ad_status",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Core/class-ad-status.php",
+      "purpose": "An ad's state (live, scheduled, ended, not_showing, off, draft, pending) and one reason, shared by All Ads, the editor, the WB Ad block and empty-shortcode hints. Pro adds campaign reasons."
+    },
+    {
+      "name": "wbam_ad_status_prime",
+      "type": "action",
+      "args": 1,
+      "where": "includes/Core/class-ad-status.php",
+      "purpose": "Batch-load data a wbam_ad_status callback reads, once per list page (Pro primes campaigns)"
+    },
+    {
+      "name": "wbam_priority_hint",
+      "type": "filter",
+      "args": 2,
+      "where": "includes/Admin/class-admin.php",
+      "purpose": "The ad editor's priority hint; Pro explains that a paid ad's share comes from its campaign rotation"
+    },
+    {
       "name": "wbam_ad_not_delivering_reason",
       "type": "filter",
       "args": 2,

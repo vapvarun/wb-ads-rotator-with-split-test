@@ -234,11 +234,13 @@ class UX {
 			'banned'            => 'danger',
 			'failed'            => 'danger',
 			'incomplete'        => 'danger',
+			'not_showing'       => 'danger',
 
 			// Info — neutral, final, or waiting for its start date.
 			'scheduled'         => 'info',
 			'granted'           => 'info',
 			'completed'         => 'info',
+			'ended'             => 'info',
 			'sold'              => 'info',
 			'draft'             => 'info',
 			'refunded'          => 'info',

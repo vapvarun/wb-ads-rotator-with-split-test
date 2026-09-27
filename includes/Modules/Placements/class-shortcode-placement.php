@@ -74,14 +74,15 @@ class Shortcode_Placement implements Placement_Interface {
 			return '';
 		}
 
-		$engine = Placement_Engine::get_instance();
-		return $engine->render_ad(
+		$html = Placement_Engine::get_instance()->render_ad(
 			$ad_id,
 			array(
 				'placement' => 'shortcode',
 				'class'     => sanitize_html_class( $atts['class'] ),
 			)
 		);
+
+		return '' === $html ? \WBAM\Core\Ad_Status::editor_hint( $ad_id ) : $html;
 	}
 
 	/**

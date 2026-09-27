@@ -73,7 +73,7 @@ class Ad_Formats {
 				'responsive' => false,
 			),
 			'banner'              => array(
-				'label'      => __( 'Banner (468x60)', 'wb-ads-rotator-with-split-test' ),
+				'label'      => __( 'Full Banner (468x60)', 'wb-ads-rotator-with-split-test' ),
 				'width'      => 468,
 				'height'     => 60,
 				'responsive' => false,

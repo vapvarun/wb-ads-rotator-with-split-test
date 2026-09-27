@@ -52,7 +52,7 @@ class Test_Ad_Edit_Screen_Helpers extends \WP_UnitTestCase {
 		$admin->render_status_metabox( get_post( $ad_id ) );
 		$alone = ob_get_clean();
 		$this->assertStringNotContainsString( '3-way tie', $alone );
-		$this->assertStringContainsString( 'No other enabled ad shares', $alone );
+		$this->assertStringContainsString( 'No other ad competes for these placements', $alone );
 
 		$this->ad( array( 'header' ), 10 );
 		ob_start();

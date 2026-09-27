@@ -1212,3 +1212,14 @@
 .wbam-ad-slot--responsive .adsbygoogle {
 	width: 100% !important;
 }
+
+/* Editors-only note in place of an empty ad (card 10344382789). */
+.wbam-editor-hint {
+	margin-block: var(--wbam-spacing-sm);
+	padding: var(--wbam-spacing-sm) var(--wbam-spacing);
+	border-inline-start: 3px solid var(--wbam-accent);
+	background: var(--wbam-surface-alt);
+	color: var(--wbam-text);
+	font-size: var(--wbam-font-size-sm);
+	line-height: 1.5;
+}

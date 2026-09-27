@@ -387,7 +387,20 @@
    portal wizard's .wbam-disabled slot card. */
 .wbam-placement-option--disabled {
 	cursor: not-allowed;
+}
+
+/* Dim the checkbox and title only: the reason below them stays readable
+   (card 10344382789). */
+.wbam-placement-option--disabled input[type="checkbox"],
+.wbam-placement-option--disabled .wbam-option-body > :not(.wbam-placement-reason) {
 	opacity: 0.55;
+}
+
+.wbam-placement-reason {
+	margin-block-start: var(--wbam-space-1);
+	font-size: var(--wbam-font-size-xs);
+	line-height: 1.4;
+	color: var(--wbam-text-muted);
 }
 
 .wbam-placement-option--disabled:hover {

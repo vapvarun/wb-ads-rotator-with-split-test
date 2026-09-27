@@ -605,6 +605,16 @@ body.edit-tags-php.taxonomy-wbam-classified-loc #wpbody-content > .wrap {
 	background: var(--wbam-surface-alt);
 }
 
+/* The one reason under an ad's status (All Ads, editor). */
+.wbam-status-reason {
+	display:    block;
+	margin-block-start: var(--wbam-space-1);
+	font-size:  var(--wbam-font-size-xs);
+	line-height: 1.4;
+	color:      var(--wbam-text-muted);
+	white-space: normal;
+}
+
 /* ── Amount (ledger / money columns) ─────────────────────────────────────── */
 
 .wbam-amount-positive {

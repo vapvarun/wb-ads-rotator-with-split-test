@@ -98,7 +98,13 @@ class WBAM_Ad_Widget extends \WP_Widget {
 		}
 
 		if ( '' === $output ) {
-			return;
+			// Editors see why the widget is empty; visitors see nothing.
+			$output = $ad_id
+				? \WBAM\Core\Ad_Status::editor_hint( $ad_id )
+				: ( current_user_can( 'edit_posts' ) ? \WBAM\Core\Ad_Status::note( __( 'No live ad has the Widget placement ticked.', 'wb-ads-rotator-with-split-test' ) ) : '' );
+			if ( '' === $output ) {
+				return;
+			}
 		}
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget wrapper HTML from theme is trusted.

@@ -44,9 +44,13 @@ if ( '' === $html ) {
 		 * @param string $reason Notice text.
 		 * @param int    $ad_id  Ad ID.
 		 */
-		$reason = apply_filters(
+		$wbam_status = \WBAM\Core\Ad_Status::get( $ad_id );
+		$reason      = apply_filters(
 			'wbam_ad_not_delivering_reason',
-			__( 'Not delivering: this ad is turned off, outside its schedule, or kept off this page by its display rules.', 'wb-ads-rotator-with-split-test' ),
+			\WBAM\Core\Ad_Status::LIVE === $wbam_status['state']
+				? __( 'Not delivering: it is live, but its display rules keep it off this page.', 'wb-ads-rotator-with-split-test' )
+				/* translators: 1: status, e.g. "Not showing", 2: reason */
+				: sprintf( __( '%1$s: %2$s', 'wb-ads-rotator-with-split-test' ), $wbam_status['label'], $wbam_status['reason'] ),
 			$ad_id
 		);
 		printf(
