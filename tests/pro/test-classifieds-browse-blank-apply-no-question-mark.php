@@ -15,24 +15,18 @@
 
 namespace WBAM\Tests\Pro;
 
-use WBAM_Pro\Core\Template_Loader;
-
 class Test_Classifieds_Browse_Blank_Apply_No_Question_Mark extends Pro_Test_Case {
 
 	public function test_all_blank_submit_navigates_without_a_query_string(): void {
-		$html = (string) Template_Loader::get_template(
-			'classifieds/sidebar-filters',
-			array(
-				'categories' => array(),
-				'locations'  => array(),
-			)
-		);
+		// The handler moved from sidebar-filters.php into classified.js
+		// (block themes texturized the inline copy, card 10342783037).
+		$js = (string) file_get_contents( WBAM_PRO_PATH . 'assets/js/classified.js' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 
 		$this->assertStringContainsString(
 			'window.location.assign(form.action)',
-			$html,
+			$js,
 			'A fully-blank Apply submit must be intercepted and sent to the bare action URL, not a GET submit that appends "?".'
 		);
-		$this->assertStringContainsString( 'if (!hasValue)', $html );
+		$this->assertStringContainsString( 'if (!hasValue)', $js );
 	}
 }

@@ -49,14 +49,49 @@ class Test_Input_Border_Token_Contrast extends \WP_UnitTestCase {
 		return end( $hex[0] );
 	}
 
-	public function test_input_border_is_solid_and_reaches_3_to_1_on_every_surface(): void {
+	/**
+	 * The light tokens mix the theme's contrast preset into its base preset
+	 * (card 10342783037), so resolve them for a given pair.
+	 */
+	private function resolve( $block, $token, $base, $contrast ) {
+		preg_match( '/' . preg_quote( $token, '/' ) . ':([^;]*);/', $block, $m );
+		$this->assertNotEmpty( $m, "{$token} is declared." );
+		if ( ! preg_match( '/color-mix\(in srgb, var\(--wbam-contrast\) (\d+)%, var\(--wbam-base\)\)/', $m[1], $mix ) ) {
+			$this->assertStringContainsString( 'var(--wbam-base)', $m[1], "{$token} ends in the base preset." );
+			return $base;
+		}
+		$out = '#';
+		for ( $i = 0; $i < 3; $i++ ) {
+			$c    = hexdec( substr( $contrast, 1 + $i * 2, 2 ) );
+			$b    = hexdec( substr( $base, 1 + $i * 2, 2 ) );
+			$out .= sprintf( '%02x', (int) round( $c * $mix[1] / 100 + $b * ( 100 - $mix[1] ) / 100 ) );
+		}
+		return $out;
+	}
+
+	public function test_light_input_border_reaches_3_to_1_for_light_and_dark_presets(): void {
+		$css  = file_get_contents( WBAM_PATH . 'assets/css/frontend-tokens.css' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$css  = preg_replace( '#/\*.*?\*/#s', '', $css );
+		$root = substr( $css, strpos( $css, ':root {' ), strpos( $css, '}', strpos( $css, ':root {' ) ) - strpos( $css, ':root {' ) );
+
+		// No presets (classic), TT5, and TT5 Evening (a dark style).
+		foreach ( array( array( '#ffffff', '#1d2327' ), array( '#ffffff', '#111111' ), array( '#1b1b1b', '#f0f0f0' ) ) as $pair ) {
+			$field = $this->resolve( $root, '--wbam-input-border', $pair[0], $pair[1] );
+			foreach ( array( '--wbam-card-bg', '--wbam-surface', '--wbam-surface-alt' ) as $surface ) {
+				$ratio = $this->ratio( $field, $this->resolve( $root, $surface, $pair[0], $pair[1] ) );
+				$this->assertGreaterThanOrEqual( 3.0, $ratio, "{$pair[0]}/{$pair[1]}: field border on {$surface} is " . round( $ratio, 2 ) . ':1.' );
+			}
+		}
+	}
+
+	public function test_dark_input_border_is_solid_and_reaches_3_to_1_on_every_surface(): void {
 		$css   = file_get_contents( WBAM_PATH . 'assets/css/frontend-tokens.css' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$css   = preg_replace( '#/\*.*?\*/#s', '', $css );
 		$root  = substr( $css, strpos( $css, ':root {' ), strpos( $css, '}', strpos( $css, ':root {' ) ) - strpos( $css, ':root {' ) );
 		$start = strpos( $css, 'html[data-bx-mode="dark"],' );
 		$dark  = substr( $css, $start, strpos( $css, '}', $start ) - $start );
 
-		foreach ( array( 'light' => $root, 'dark' => $dark ) as $mode => $block ) {
+		foreach ( array( 'dark' => $dark ) as $mode => $block ) {
 			preg_match( '/--wbam-input-border:\s*([^;]+);/', $block, $m );
 			$this->assertNotEmpty( $m, "{$mode}: --wbam-input-border is declared." );
 			$this->assertMatchesRegularExpression( '/^#[0-9a-f]{6}$/i', trim( $m[1] ), "{$mode}: the field border is one solid colour." );
