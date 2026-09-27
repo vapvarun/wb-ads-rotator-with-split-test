@@ -243,7 +243,7 @@ class Test_Moderation_Lifecycle_Edges extends Pro_Test_Case {
 		unset( $_GET['wbam_publish_failed'] );
 
 		$this->assertStringContainsString( 'Not published', $notice );
-		$this->assertStringContainsString( 'Failed to charge the advertiser', $notice, 'The notice must carry the approval failure reason.' );
+		$this->assertStringContainsString( 'short by $49.00', $notice, 'The notice must carry the approval failure reason, with the amounts.' );
 	}
 
 	/**
