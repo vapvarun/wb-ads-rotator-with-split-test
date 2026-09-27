@@ -83,8 +83,8 @@ class Test_Classified_Promote_Purchase extends Pro_Test_Case {
 	}
 
 	public function test_the_purchase_button_buys_and_applies_urgent(): void {
-		$this->assertMatchesRegularExpression( '/data-upgrade-type="urgent"\s+data-price="[^"]*"\s+data-nonce="([^"]+)"/', $this->promote_html() );
-		preg_match( '/data-upgrade-type="urgent"\s+data-price="[^"]*"\s+data-nonce="([^"]+)"/', $this->promote_html(), $m );
+		$this->assertMatchesRegularExpression( '/data-upgrade-type="urgent"\s+data-upgrade-name="[^"]*"\s+data-price="[^"]*"\s+data-nonce="([^"]+)"/', $this->promote_html() );
+		preg_match( '/data-upgrade-type="urgent"\s+data-upgrade-name="[^"]*"\s+data-price="[^"]*"\s+data-nonce="([^"]+)"/', $this->promote_html(), $m );
 
 		// What classified.js posts.
 		$this->assertStringContainsString( 'upgrades: [upgradeType]', (string) file_get_contents( WBAM_PRO_PATH . 'assets/js/classified.js' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading a plugin file in a test.
