@@ -217,11 +217,41 @@ final class Ad_Status {
 		if ( empty( $split['kept'] ) ) {
 			return self::make( self::LIVE, __( 'Its size fits none of its placements: it shows only where its shortcode, block or widget is used.', 'wb-ads-rotator-with-split-test' ) );
 		}
-		if ( array( 'widget' ) === array_values( $split['kept'] ) && ! is_active_widget( false, false, 'wbam_ad_widget', true ) ) {
+		if ( array( 'widget' ) === array_values( $split['kept'] ) && ! self::widget_placement_in_use() ) {
 			return self::make( self::NOT_SHOWING, __( 'Its only placement is Widget, and no WB Ad Manager widget is in a widget area.', 'wb-ads-rotator-with-split-test' ) );
 		}
 
 		return self::make( self::LIVE );
+	}
+
+	/**
+	 * Whether any widget area shows the Widget placement: the classic
+	 * WB Ad Manager widget, or a block widget area holding the WB Ad
+	 * placement block set to Widget. Both read autoloaded options, so
+	 * this is cheap per call.
+	 *
+	 * @return bool
+	 */
+	private static function widget_placement_in_use() {
+		$in_use = (bool) is_active_widget( false, false, 'wbam_ad_widget', true );
+		if ( ! $in_use ) {
+			$blocks = (array) get_option( 'widget_block', array() );
+			foreach ( wp_get_sidebars_widgets() as $sidebar => $widget_ids ) {
+				if ( 'wp_inactive_widgets' === $sidebar ) {
+					continue;
+				}
+				foreach ( (array) $widget_ids as $widget_id ) {
+					$number  = (int) str_replace( 'block-', '', (string) $widget_id );
+					$content = isset( $blocks[ $number ]['content'] ) ? (string) $blocks[ $number ]['content'] : '';
+					if ( 0 === strpos( (string) $widget_id, 'block-' ) && false !== strpos( $content, 'wp:wb-ads/placement' ) && false !== strpos( $content, '"placementId":"widget"' ) ) {
+						$in_use = true;
+						break 2;
+					}
+				}
+			}
+		}
+
+		return $in_use;
 	}
 
 	/**

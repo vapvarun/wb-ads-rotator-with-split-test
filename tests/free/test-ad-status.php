@@ -107,4 +107,15 @@ class Test_Ad_Status extends WP_UnitTestCase {
 
 		remove_filter( 'wbam_ad_status', $add );
 	}
+
+	public function test_a_placement_block_in_a_widget_area_counts_as_the_widget_placement(): void {
+		update_option( 'widget_block', array( 7 => array( 'content' => '<!-- wp:wb-ads/placement {"placementId":"widget"} /-->' ) ) );
+		update_option( 'sidebars_widgets', array( 'sidebar-1' => array( 'block-7' ), 'array_version' => 3 ) );
+		global $_wp_sidebars_widgets;
+		$_wp_sidebars_widgets = array(); // wp_get_sidebars_widgets() caches the option per request.
+
+		$status = Ad_Status::get( $this->ad( array( '_wbam_placements' => array( 'widget' ) ) ) );
+
+		$this->assertSame( Ad_Status::LIVE, $status['state'] );
+	}
 }
