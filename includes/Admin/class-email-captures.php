@@ -57,7 +57,7 @@ class Email_Captures {
 			'manage_options',
 			'wbam-email-captures',
 			array( $this, 'render_page' ),
-			// Right under All Ads / Add New, next to the ads it collects for.
+			// Kept under All Ads / Add New by Admin::reorder_submenu_into_sections().
 			2
 		);
 	}

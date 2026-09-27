@@ -885,6 +885,10 @@ class Admin {
 				// Ads.
 				'edit.php?post_type=wbam-ad'     => 'ads',
 				'post-new.php?post_type=wbam-ad' => 'ads',
+				// Right under Add New, next to the ads it collects for. The
+				// add_submenu_page() position alone does not hold: this
+				// regroup puts every unmapped page at the end.
+				'wbam-email-captures'            => 'ads',
 				// Ad Tags organises ads, so it sits with them. Unmapped it falls
 				// into the trailing bucket and renders under Settings, which
 				// reads as a configuration screen rather than an inventory one.

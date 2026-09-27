@@ -1665,8 +1665,8 @@ class Settings {
 	}
 
 	/**
-	 * Store an uploaded MaxMind database under uploads/wbam-geo/ and return
-	 * its path for the MaxMind Database field.
+	 * Store an uploaded MaxMind database where the web server cannot serve
+	 * it, and return its path for the MaxMind Database field.
 	 *
 	 * @since 3.2.0
 	 */
@@ -1687,10 +1687,11 @@ class Settings {
 			wp_send_json_error( array( 'message' => __( 'That is not a MaxMind .mmdb database file.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
-		$to_geo_dir = static function ( $dirs ) {
-			$dirs['subdir'] = '/wbam-geo';
-			$dirs['path']   = $dirs['basedir'] . '/wbam-geo';
-			$dirs['url']    = $dirs['baseurl'] . '/wbam-geo';
+		$geo_dir    = self::geo_db_dir();
+		$to_geo_dir = static function ( $dirs ) use ( $geo_dir ) {
+			$dirs['subdir'] = '';
+			$dirs['path']   = $geo_dir;
+			$dirs['url']    = '';
 			return $dirs;
 		};
 		add_filter( 'upload_dir', $to_geo_dir );
@@ -1709,7 +1710,7 @@ class Settings {
 			wp_send_json_error( array( 'message' => isset( $moved['error'] ) ? (string) $moved['error'] : __( 'The file could not be saved.', 'wb-ads-rotator-with-split-test' ) ) );
 		}
 
-		// Not for download: only this site reads it.
+		// Belt and braces for Apache when the folder is under uploads.
 		$dir = dirname( $moved['file'] );
 		if ( ! file_exists( $dir . '/.htaccess' ) ) {
 			file_put_contents( $dir . '/.htaccess', "Require all denied\nDeny from all\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- tiny guard file in our own uploads folder.
@@ -1722,6 +1723,51 @@ class Settings {
 				'message' => __( 'Uploaded. Click Save Changes to use it.', 'wb-ads-rotator-with-split-test' ),
 			)
 		);
+	}
+
+	/**
+	 * Where an uploaded MaxMind database is kept.
+	 *
+	 * The database is read by PHP, never served, and the GeoLite licence
+	 * does not allow redistributing it. An .htaccess guard only works on
+	 * Apache: on nginx (Local, WP Engine, Kinsta) a file under uploads is
+	 * downloadable by URL. So it goes one level above the WordPress folder
+	 * when that is writable (outside the web root on most hosts), otherwise
+	 * into an uploads folder with an unguessable name. The option remembers
+	 * the folder, so later uploads replace the file in the same place.
+	 *
+	 * @since 3.2.0
+	 * @return string Absolute folder path, created.
+	 */
+	private static function geo_db_dir() {
+		/**
+		 * Folder for the uploaded MaxMind database. Return a path outside
+		 * the web root to choose it yourself.
+		 *
+		 * @since 3.2.0
+		 * @param string $dir Folder, or '' to let the plugin choose.
+		 */
+		$dir = (string) apply_filters( 'wbam_geo_db_dir', (string) get_option( 'wbam_geo_db_dir', '' ) );
+		if ( '' !== $dir && wp_mkdir_p( $dir ) && wp_is_writable( $dir ) ) {
+			return untrailingslashit( $dir );
+		}
+
+		$candidates = array();
+		// Outside the web root, unless open_basedir would refuse to look there.
+		if ( '' === (string) ini_get( 'open_basedir' ) ) {
+			$candidates[] = dirname( untrailingslashit( ABSPATH ) ) . '/wbam-geo';
+		}
+		$uploads      = wp_get_upload_dir();
+		$candidates[] = $uploads['basedir'] . '/wbam-geo-' . strtolower( wp_generate_password( 24, false ) );
+
+		foreach ( $candidates as $candidate ) {
+			if ( wp_mkdir_p( $candidate ) && wp_is_writable( $candidate ) ) {
+				update_option( 'wbam_geo_db_dir', $candidate, false );
+				return $candidate;
+			}
+		}
+
+		return $uploads['basedir'];
 	}
 
 	/**

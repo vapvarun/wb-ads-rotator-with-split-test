@@ -97,7 +97,20 @@ $wbam_options_to_delete = array(
 	'wbam_demo_data_backfilled_v2',
 	'wbam_setup_complete',
 	'wbam_analytics_rolled_before', // Goes with wbam_analytics_daily, dropped above.
+	'wbam_geo_db_dir',
 );
+
+// The folder this plugin made for an uploaded MaxMind database: its files,
+// then the folder itself (only ours: .mmdb files and the two guard files).
+$wbam_geo_dir = (string) get_option( 'wbam_geo_db_dir', '' );
+if ( '' !== $wbam_geo_dir && is_dir( $wbam_geo_dir ) && 0 === strpos( basename( $wbam_geo_dir ), 'wbam-geo' ) ) {
+	foreach ( array_merge( (array) glob( $wbam_geo_dir . '/*.mmdb' ), array( $wbam_geo_dir . '/.htaccess', $wbam_geo_dir . '/index.php' ) ) as $wbam_geo_file ) {
+		if ( is_file( $wbam_geo_file ) ) {
+			wp_delete_file( $wbam_geo_file );
+		}
+	}
+	@rmdir( $wbam_geo_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged,WordPress.WP.AlternativeFunctions.file_system_operations_rmdir -- leaves the folder if anything else is in it.
+}
 
 foreach ( $wbam_options_to_delete as $wbam_option ) {
 	delete_option( $wbam_option );
