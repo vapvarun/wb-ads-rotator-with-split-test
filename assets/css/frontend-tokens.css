@@ -22,14 +22,23 @@
 	   BuddyX 5.1 (--bx-color-*) wins first, then Reign (--reign-*), then the
 	   plugin's own literal fallback. On a BuddyX/Reign dark theme these tokens
 	   resolve to the theme's dark values automatically; the explicit dark block
-	   below covers every other dark trigger. */
-	--wbam-bg:            var(--bx-color-bg-page, var(--reign-site-body-bg-color, var(--bg, var(--wp--preset--color--base, #ffffff))));
-	--wbam-surface:       var(--bx-color-bg-elevated, var(--reign-site-sections-bg-color, var(--surface, #f6f7f7)));
-	--wbam-card-bg:       var(--bx-color-bg-elevated, var(--reign-site-sections-bg-color, var(--surface, #ffffff)));
-	--wbam-surface-alt:   var(--bx-color-bg-subtle, var(--reign-site-secondary-bg-color, var(--surface-alt, #f0f0f1)));
-	--wbam-text:          var(--bx-color-fg, var(--reign-site-body-text-color, var(--text-1, var(--wp--preset--color--contrast, #1d2327))));
-	--wbam-text-muted:    var(--bx-color-fg-muted, var(--reign-site-alternate-text-color, var(--text-2, #646970)));
-	--wbam-text-subtle:   #8c8f94;
+	   below covers every other dark trigger.
+
+	   Block themes have no dark class: a dark style (TT5 Evening) swaps the
+	   base and contrast presets. Every surface, border and muted text below
+	   therefore ends in a mix of those two, so background and text always
+	   flip together; a fixed light hex here gave white cards under the
+	   theme's light text (card 10342783037). With no presets (classic
+	   themes) the mixes land within a shade of the old literals. */
+	--wbam-base:          var(--wp--preset--color--base, #ffffff);
+	--wbam-contrast:      var(--wp--preset--color--contrast, #1d2327);
+	--wbam-bg:            var(--bx-color-bg-page, var(--reign-site-body-bg-color, var(--bg, var(--wbam-base))));
+	--wbam-surface:       var(--bx-color-bg-elevated, var(--reign-site-sections-bg-color, var(--surface, color-mix(in srgb, var(--wbam-contrast) 3%, var(--wbam-base)))));
+	--wbam-card-bg:       var(--bx-color-bg-elevated, var(--reign-site-sections-bg-color, var(--surface, var(--wbam-base))));
+	--wbam-surface-alt:   var(--bx-color-bg-subtle, var(--reign-site-secondary-bg-color, var(--surface-alt, color-mix(in srgb, var(--wbam-contrast) 6%, var(--wbam-base)))));
+	--wbam-text:          var(--bx-color-fg, var(--reign-site-body-text-color, var(--text-1, var(--wbam-contrast))));
+	--wbam-text-muted:    var(--bx-color-fg-muted, var(--reign-site-alternate-text-color, var(--text-2, color-mix(in srgb, var(--wbam-contrast) 72%, var(--wbam-base)))));
+	--wbam-text-subtle:   color-mix(in srgb, var(--wbam-contrast) 58%, var(--wbam-base));
 	--wbam-text-inverse:  #ffffff;
 	/* Block themes: --wbam-theme-button is the theme.json button colour,
 	   printed by Frontend::enqueue_assets() (TT5: contrast). To pick your own
@@ -48,16 +57,16 @@
 	--wbam-link:          var(--bx-color-link, var(--reign-site-link-color, var(--brand, var(--wbam-accent))));
 	--wbam-success:       #00a32a;
 	--wbam-danger:        #d63638;
-	--wbam-danger-bg:     #f8d7da;
+	--wbam-danger-bg:     color-mix(in srgb, var(--wbam-danger) 16%, var(--wbam-base));
 	--wbam-warning:       #dba617;
-	--wbam-border:        var(--bx-color-border, var(--reign-site-border-color, #e5e5e5));
-	--wbam-border-strong: #c3c4c7;
+	--wbam-border:        var(--bx-color-border, var(--reign-site-border-color, color-mix(in srgb, var(--wbam-contrast) 12%, var(--wbam-base))));
+	--wbam-border-strong: color-mix(in srgb, var(--wbam-contrast) 26%, var(--wbam-base));
 	/* Form field edge (WCAG 1.4.11): a solid colour, at least 3:1 on every
 	   surface a field sits on - 3.66 on white, 3.41 on --wbam-surface, 3.22
 	   on --wbam-surface-alt. Dark value in the dark block below. A theme can
 	   set its own by declaring --wbam-input-border on html:root. */
-	--wbam-input-border:  #82868b;
-	--wbam-border-subtle: #dcdcde;
+	--wbam-input-border:  color-mix(in srgb, var(--wbam-contrast) 58%, var(--wbam-base));
+	--wbam-border-subtle: color-mix(in srgb, var(--wbam-contrast) 15%, var(--wbam-base));
 	--wbam-shadow-sm:     0 1px 2px rgba(0, 0, 0, 0.04);
 	--wbam-shadow-md:     0 2px 6px rgba(0, 0, 0, 0.08);
 	--wbam-shadow-lg:     0 4px 12px rgba(0, 0, 0, 0.12);
@@ -117,7 +126,7 @@
 	--wbam-hover-bg-darker: rgba(0, 0, 0, 0.1);
 	--wbam-success-color: var(--wbam-success);
 	--wbam-error-color:   var(--wbam-danger);
-	--wbam-error-bg:      #fcf0f1;
+	--wbam-error-bg:      color-mix(in srgb, var(--wbam-danger) 7%, var(--wbam-base));
 	--wbam-error-bg-dark: rgba(214, 54, 56, 0.1);
 	--wbam-shadow-color: rgba(0, 0, 0, 0.15);
 	--wbam-shadow-medium: rgba(0, 0, 0, 0.1);
