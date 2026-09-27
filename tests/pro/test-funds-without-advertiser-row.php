@@ -57,4 +57,30 @@ class Test_Funds_Without_Advertiser_Row extends Pro_Test_Case {
 
 		$this->assertStringContainsString( 'Advertiser Account Required', $html );
 	}
+
+	public function test_the_balance_tab_opens_for_money_on_an_ads_only_site(): void {
+		$user = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		Factory::topup_user( $user, 1000 );
+
+		$html = $this->portal( $user, 'wallet' );
+
+		// QA wave 11: the sidebar linked here but the tab said "not available".
+		$this->assertStringNotContainsString( 'not available', $html );
+		$this->assertStringNotContainsString( 'Advertiser Account Required', $html );
+	}
+
+	public function test_revenue_booked_before_the_member_row_gets_its_owner(): void {
+		global $wpdb;
+		$user = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		Factory::topup_user( $user, 1000 );
+		$table = \WBAM_Pro\Core\Revenue_Ledger::table_name();
+		$ledger = \Wbcom\Credits\Ledger::table_name( Credits_Bridge::PREFIX );
+		$owner = static fn () => $wpdb->get_col( $wpdb->prepare( "SELECT r.advertiser_id FROM {$table} r INNER JOIN {$ledger} l ON l.id = r.ledger_id WHERE l.user_id = %d", $user ) ); // phpcs:ignore WordPress.DB
+		$this->assertSame( array( '0' ), $owner(), 'Booked before any advertiser row.' );
+
+		$this->portal( $user ); // Creates the member row.
+		$member = Advertiser_Manager::get_instance()->get_by_user( $user );
+
+		$this->assertSame( array( (string) $member->id ), $owner() );
+	}
 }
