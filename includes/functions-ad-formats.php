@@ -366,7 +366,7 @@ if ( ! function_exists( 'wbam_placement_sizes_label' ) ) {
 		} elseif ( $sizes && $responsive ) {
 			$label = sprintf(
 				/* translators: %s: comma-separated list of pixel sizes, e.g. "728×90, 970×90" */
-				__( '%s, or responsive', 'wb-ads-rotator-with-split-test' ),
+				__( '%s, or a responsive ad that resizes to fit', 'wb-ads-rotator-with-split-test' ),
 				implode( ', ', $sizes )
 			);
 		} elseif ( $sizes ) {

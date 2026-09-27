@@ -41,7 +41,7 @@ class Popup_Placement implements Placement_Interface {
 	 * @return string
 	 */
 	public function get_description() {
-		return __( 'Display ad in a modal popup with configurable trigger.', 'wb-ads-rotator-with-split-test' );
+		return __( 'Shows the ad in a popup over the page.', 'wb-ads-rotator-with-split-test' );
 	}
 
 	/**
