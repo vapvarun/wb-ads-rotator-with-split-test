@@ -87,14 +87,21 @@ class Demo_Data_Cleaner {
 
 	/**
 	 * Wrapper for the `wbam_settings_tools_content` action: the Sample
-	 * content card, only when there is something to remove. With Pro active
-	 * Pro's card lists these samples next to its demo set and its one Remove
-	 * clears both (owner decision, card 10344381767), so this prints nothing.
+	 * content card, only when there is something to remove. An add-on that
+	 * shows its own Sample content card (Pro lists these samples next to its
+	 * demo set, and its one Remove clears both: owner decision, card
+	 * 10344381767) says so through the filter, and this prints nothing.
 	 *
 	 * @since 3.2.0
 	 */
 	public static function render_clear_button_section() {
-		if ( defined( 'WBAM_PRO_VERSION' ) || self::count() <= 0 ) {
+		/**
+		 * Whether an add-on renders the Sample content card instead.
+		 *
+		 * @since 3.2.0
+		 * @param bool $owned Default false.
+		 */
+		if ( apply_filters( 'wbam_sample_content_card_owned', false ) || self::count() <= 0 ) {
 			return;
 		}
 		?>

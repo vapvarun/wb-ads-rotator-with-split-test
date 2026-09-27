@@ -23,12 +23,14 @@ class Test_Sample_Content_Card extends Pro_Test_Case {
 	}
 
 	public function test_one_card_lists_the_wizard_samples(): void {
+		$admin = new Pro_Admin(); // Registers wbam_sample_content_card_owned.
+
 		ob_start();
 		Demo_Data_Cleaner::render_clear_button_section();
 		$this->assertSame( '', (string) ob_get_clean(), 'With Pro active, Free prints no second card.' );
 
 		ob_start();
-		( new Pro_Admin() )->render_tools_page( true );
+		$admin->render_tools_page( true );
 		$html = (string) ob_get_clean();
 
 		$this->assertSame( 1, substr_count( $html, '>Sample content</h2>' ) );
