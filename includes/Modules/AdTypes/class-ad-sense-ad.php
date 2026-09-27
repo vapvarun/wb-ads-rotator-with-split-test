@@ -20,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 use WBAM\Core\Settings_Helper;
+use WBAM\Core\Privacy_Helper;
 
 /**
  * AdSense Ad class.
@@ -27,16 +28,17 @@ use WBAM\Core\Settings_Helper;
 class AdSense_Ad implements Ad_Type_Interface {
 
 	/**
-	 * Whether an AdSense ad has rendered on this request.
+	 * Publisher ID of the first AdSense ad rendered on this request, or ''.
 	 *
 	 * Set by render(); read by maybe_enqueue_adsense_script() so the
 	 * pagead script only loads on pages that actually contain an
-	 * AdSense ad. Without this gate, ad-blockers see the AdSense URL on
-	 * every page and block sibling non-AdSense ads as collateral damage.
+	 * AdSense ad (ad-blockers otherwise block sibling non-AdSense ads as
+	 * collateral damage), and with the ID that ad uses: a per-ad Publisher
+	 * ID on a site with no default used to render a unit with no script.
 	 *
-	 * @var bool
+	 * @var string
 	 */
-	private static $ad_rendered = false;
+	private static $ad_rendered = '';
 
 	/**
 	 * Whether the pagead script has already been enqueued (idempotency).
@@ -58,9 +60,11 @@ class AdSense_Ad implements Ad_Type_Interface {
 	public function __construct() {
 		$this->publisher_id = Settings_Helper::get( 'adsense_publisher_id', '' );
 
-		// Enqueue AdSense script in footer ONLY if an AdSense ad actually
-		// rendered on this request — render() sets $ad_rendered.
-		add_action( 'wp_footer', array( $this, 'maybe_enqueue_adsense_script' ), 5 );
+		// Print Google's loader ONLY if an AdSense ad actually rendered on
+		// this request (render() sets $ad_rendered), and only after every
+		// placement has: Footer renders at wp_footer 10 and Popup/Sticky at
+		// 50, so the old priority 5 never saw their ads (card 10344381767).
+		add_action( 'wp_footer', array( $this, 'maybe_enqueue_adsense_script' ), 1000 );
 	}
 
 	/**
@@ -124,36 +128,20 @@ class AdSense_Ad implements Ad_Type_Interface {
 			return;
 		}
 
-		$publisher_id = $this->get_publisher_id();
-		if ( empty( $publisher_id ) ) {
-			return;
-		}
+		$publisher_id = self::$ad_rendered;
 
-		// Enqueue in footer (true) — render() runs during the_content,
-		// which is past wp_head, so head-enqueue would be a no-op.
-		$adsense_url = add_query_arg( 'client', $publisher_id, 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js' );
-		wp_enqueue_script( 'wbam-adsense-ad', $adsense_url, array(), null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
-
-		// Add async and crossorigin attributes via filter.
-		add_filter( 'script_loader_tag', array( $this, 'add_adsense_script_attributes' ), 10, 2 );
+		// Printed directly: footer scripts are already out by now (they
+		// print at wp_footer 20). The units' adsbygoogle.push() calls queue
+		// until this async script arrives.
+		wp_print_script_tag(
+			array(
+				'src'         => add_query_arg( 'client', $publisher_id, 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js' ),
+				'async'       => true,
+				'crossorigin' => 'anonymous',
+			)
+		);
 
 		self::$script_enqueued = true;
-	}
-
-	/**
-	 * Add async and crossorigin attributes to AdSense script tag.
-	 *
-	 * @param string $tag    Script tag HTML.
-	 * @param string $handle Script handle.
-	 * @return string Modified script tag.
-	 */
-	public function add_adsense_script_attributes( $tag, $handle ) {
-		if ( 'wbam-adsense-ad' !== $handle ) {
-			return $tag;
-		}
-
-		// Add async and crossorigin attributes.
-		return str_replace( ' src=', ' async crossorigin="anonymous" src=', $tag );
 	}
 
 	/**
@@ -187,9 +175,17 @@ class AdSense_Ad implements Ad_Type_Interface {
 			return '';
 		}
 
-		// Signal to maybe_enqueue_adsense_script() that an AdSense ad
-		// has rendered, so the pagead script may be enqueued.
-		self::$ad_rendered = true;
+		// 'Require consent for AdSense' covers ad units too, not only Auto
+		// Ads: without consent there is no unit and no Google script.
+		if ( ! Privacy_Helper::has_consent( 'marketing' ) ) {
+			return '';
+		}
+
+		// Signal to maybe_enqueue_adsense_script() that an AdSense ad has
+		// rendered, and with which Publisher ID.
+		if ( '' === self::$ad_rendered ) {
+			self::$ad_rendered = $publisher_id;
+		}
 
 		$ad_format    = isset( $data['ad_format'] ) ? $data['ad_format'] : 'auto';
 		$ad_layout    = isset( $data['ad_layout'] ) ? $data['ad_layout'] : '';
