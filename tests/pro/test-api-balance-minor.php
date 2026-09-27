@@ -79,7 +79,8 @@ class Test_Api_Balance_Minor extends Pro_Test_Case {
 
 		$balance = $abilities->execute_get_balance( array() );
 		$this->assertSame( 549, $balance['balance_minor'] );
-		$this->assertSame( 5, $balance['balance'], 'The existing integer balance field is unchanged.' );
+		$this->assertSame( Credits_Bridge::get_balance( $this->advertiser_id ), $balance['balance'], 'The rounded decimal the schema declares, never truncated.' );
+		$this->assertSame( wbam_get_currency_code(), $balance['currency'] );
 
 		wp_set_current_user( (int) self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$one = $abilities->execute_get_advertiser( array( 'id' => $this->advertiser_id ) );

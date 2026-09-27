@@ -209,6 +209,7 @@ class UX {
 			'approved'          => 'success',
 			'accepted'          => 'success',
 			'paid'              => 'success',
+			'plan'              => 'success',
 			'resolved'          => 'success',
 			'running'           => 'success',
 			'replied'           => 'success',
@@ -236,6 +237,7 @@ class UX {
 
 			// Info — neutral, final, or waiting for its start date.
 			'scheduled'         => 'info',
+			'granted'           => 'info',
 			'completed'         => 'info',
 			'sold'              => 'info',
 			'draft'             => 'info',
