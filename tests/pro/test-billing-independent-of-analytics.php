@@ -61,7 +61,7 @@ class Test_Billing_Independent_Of_Analytics extends Pro_Test_Case {
 			)
 		);
 
-		$this->make_campaign( 'cpm_cpc' );
+		$this->make_campaign( 'cpc' );
 	}
 
 	/**
@@ -181,7 +181,7 @@ class Test_Billing_Independent_Of_Analytics extends Pro_Test_Case {
 			array(
 				'impressions' => 1,
 				'clicks'      => 1,
-				'spent'       => 5.005, // 5/1000 for the impression + 5 for the click.
+				'spent'       => 5.0, // The click; a CPC impression is counted, not charged.
 			),
 			$this->billed()
 		);
