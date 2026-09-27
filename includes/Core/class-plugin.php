@@ -309,10 +309,11 @@ class Plugin {
 			wp_register_script(
 				'wbam-toast',
 				wbam_asset_url( 'js/toast.js' ),
-				array(),
+				array( 'wp-i18n' ),
 				WBAM_VERSION,
 				true
 			);
+			wp_set_script_translations( 'wbam-toast', 'wb-ads-rotator-with-split-test', WBAM_PATH . 'languages' );
 		}
 
 		// The frontend palette: frontend.css (ads) and Pro's portal both

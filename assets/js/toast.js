@@ -42,6 +42,10 @@
 (function () {
 	'use strict';
 
+	// wp-i18n is a dependency (Plugin::register_shared_assets()); the
+	// fallback only guards a page that printed this file by hand.
+	var __ = ( window.wp && window.wp.i18n ) ? window.wp.i18n.__ : function ( text ) { return text; };
+
 	var CONTAINER_ID = 'wbam-toast-container';
 	var TOAST_DURATION = 4000;
 
@@ -110,7 +114,7 @@
 		var closeBtn = document.createElement('button');
 		closeBtn.type = 'button';
 		closeBtn.className = 'wbam-toast__close';
-		closeBtn.setAttribute('aria-label', 'Dismiss');
+		closeBtn.setAttribute('aria-label', __( 'Dismiss', 'wb-ads-rotator-with-split-test' ));
 		closeBtn.textContent = '×';
 		closeBtn.addEventListener('click', function () { dismiss(toast); });
 		toast.appendChild(closeBtn);
@@ -135,8 +139,10 @@
 
 	function confirm(message, onConfirm, onCancel, options) {
 		options = options || {};
-		var confirmText = options.confirmText || 'Yes, proceed';
-		var cancelText = options.cancelText || 'Cancel';
+		var confirmText = options.confirmText || __( 'Yes, proceed', 'wb-ads-rotator-with-split-test' );
+		var cancelText = options.cancelText || __( 'Cancel', 'wb-ads-rotator-with-split-test' );
+		// Focus goes back where it was when the dialog closes.
+		var returnFocus = document.activeElement;
 		var type = options.type || 'warning';
 
 		var overlay = document.createElement('div');
@@ -152,8 +158,10 @@
 
 		var msg = document.createElement('p');
 		msg.className = 'wbam-confirm-dialog__message';
+		msg.id = 'wbam-confirm-message-' + Date.now();
 		msg.textContent = message;
 		body.appendChild(msg);
+		dialog.setAttribute('aria-labelledby', msg.id);
 
 		// Optional structured detail rows rendered beneath the headline.
 		// Each entry is either a plain string (single line) or an object
@@ -203,6 +211,10 @@
 		dialog.appendChild(body);
 
 		function cleanup() {
+			document.removeEventListener('keydown', onKeydown, true);
+			if (returnFocus && typeof returnFocus.focus === 'function' && document.contains(returnFocus)) {
+				returnFocus.focus();
+			}
 			overlay.classList.add('wbam-confirm-overlay--leaving');
 			dialog.classList.add('wbam-confirm-dialog--leaving');
 			setTimeout(function () {
@@ -224,13 +236,30 @@
 			if (typeof onCancel === 'function') onCancel();
 		});
 
+		// A modal alert dialog (WAI-ARIA APG): Escape cancels, and Tab stays
+		// on the two buttons while it is open.
+		function onKeydown(event) {
+			if ('Escape' === event.key) {
+				event.preventDefault();
+				cancelBtn.click();
+				return;
+			}
+			if ('Tab' === event.key) {
+				event.preventDefault();
+				(document.activeElement === cancelBtn ? confirmBtn : cancelBtn).focus();
+			}
+		}
+		document.addEventListener('keydown', onKeydown, true);
+
 		document.body.appendChild(overlay);
 		document.body.appendChild(dialog);
 		requestAnimationFrame(function () {
 			overlay.classList.add('wbam-confirm-overlay--visible');
 			dialog.classList.add('wbam-confirm-dialog--visible');
 		});
-		confirmBtn.focus();
+		// The least destructive choice gets focus, so Enter never confirms
+		// by accident.
+		cancelBtn.focus();
 	}
 
 	window.wbamToast = {

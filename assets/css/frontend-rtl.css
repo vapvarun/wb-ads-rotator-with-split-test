@@ -297,10 +297,18 @@
    Code and AdSense creatives are third-party markup whose real height is
    decided by the network, so they only get a floor at their declared
    height: no aspect-ratio, no max-height, no vertical clip, so taller
-   markup always grows. */
+   markup always grows.
+
+   Header, footer and archive take the same reserve (card 10344285037): a
+   fixed 90px/100px Banner floor left a 30px gap under a 468x60 at 1440
+   and 52px at 390. */
 .wbam-placement-before-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image,
 .wbam-placement-after-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image,
-.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image {
+.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image,
+.wbam-placement-header .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image,
+.wbam-placement-footer .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image,
+.wbam-placement-before-archive .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image,
+.wbam-placement-after-archive .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-image {
 	min-height: auto;
 	aspect-ratio: var(--wbam-ad-ar);
 	width: 100%;
@@ -313,7 +321,15 @@
 .wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-code,
 .wbam-placement-before-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense,
 .wbam-placement-after-content .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense,
-.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense {
+.wbam-placement-paragraph .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense,
+.wbam-placement-header .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-code,
+.wbam-placement-footer .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-code,
+.wbam-placement-before-archive .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-code,
+.wbam-placement-after-archive .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-code,
+.wbam-placement-header .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense,
+.wbam-placement-footer .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense,
+.wbam-placement-before-archive .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense,
+.wbam-placement-after-archive .wbam-ad-slot--sized.wbam-ad-slot > .wbam-ad-adsense {
 	min-height: var(--wbam-ad-h);
 }
 
@@ -1196,3 +1212,4 @@
 .wbam-ad-slot--responsive .adsbygoogle {
 	width: 100% !important;
 }
+
