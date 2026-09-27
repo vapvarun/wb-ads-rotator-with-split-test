@@ -65,6 +65,7 @@ class Admin {
 		add_filter( 'bulk_actions-edit-wbam-ad', array( $this, 'register_bulk_actions' ) );
 		add_filter( 'handle_bulk_actions-edit-wbam-ad', array( $this, 'handle_bulk_actions' ), 10, 3 );
 		add_action( 'admin_notices', array( $this, 'render_bulk_action_notice' ) );
+		add_action( 'admin_notices', array( $this, 'render_dropped_placements_notice' ) );
 		// Free-only surface for the one-time "size matching" opt-in notice
 		// (owner decision 13). Pro ships an equivalent CTA on its own
 		// next-step banner (class-next-step-banner.php) with its own action
@@ -2121,6 +2122,8 @@ class Admin {
 					</div>
 				</div>
 
+				<p class="wbam-sizing-detect description" aria-live="polite" hidden></p>
+
 				<div class="wbam-sizing-compat" aria-live="polite">
 					<span class="wbam-sizing-compat__label"><?php echo esc_html( $sizing_compat['label'] ); ?></span>
 					<span class="wbam-sizing-compat__value"><?php echo esc_html( $sizing_compat['value'] ); ?></span>
@@ -2784,6 +2787,53 @@ class Admin {
 		$is_responsive = 'responsive' === $mode_input || ! empty( $_POST['wbam_is_responsive'] ) ? '1' : '0';
 		update_post_meta( $post_id, '_wbam_is_responsive', $is_responsive );
 
+		// Save ad data FIRST: the size auto-detect below and the placement
+		// fit check read it, and on a first Publish nothing was stored yet,
+		// so a new image ad saved as responsive 0x0 (card 10344381767).
+		if ( isset( $_POST['wbam_data'] ) ) {
+			$raw_data = wp_unslash( $_POST['wbam_data'] ); // phpcs:ignore
+			$ad_type  = isset( $raw_data['type'] ) ? sanitize_text_field( $raw_data['type'] ) : 'image';
+
+			$engine  = Placement_Engine::get_instance();
+			$handler = $engine->get_ad_type( $ad_type );
+
+			$data = array( 'type' => $ad_type );
+
+			if ( $handler ) {
+				$type_data = $handler->save( $post_id, $raw_data );
+				$data      = array_merge( $data, $type_data );
+			}
+
+			// Per-placement options. Only placements the form offered, so a
+			// hidden one cannot reset to defaults.
+			foreach ( $engine->get_selectable_placements() as $placement ) {
+				if ( method_exists( $placement, 'save_options' ) ) {
+					$data = array_merge( $data, (array) $placement->save_options( $post_id, $raw_data ) );
+				}
+			}
+
+			// Paragraph settings.
+			$data['after_paragraph']  = isset( $raw_data['after_paragraph'] ) ? absint( $raw_data['after_paragraph'] ) : 2;
+			$data['paragraph_repeat'] = isset( $raw_data['paragraph_repeat'] ) ? true : false;
+
+			// Activity settings.
+			$data['after_activity']  = isset( $raw_data['after_activity'] ) ? absint( $raw_data['after_activity'] ) : 3;
+			$data['activity_repeat'] = isset( $raw_data['activity_repeat'] ) ? true : false;
+
+			/**
+			 * Filter ad data before saving.
+			 *
+			 * @since 2.3.0
+			 * @param array $data     Ad data to save.
+			 * @param int   $post_id  Ad post ID.
+			 * @param array $raw_data Raw POST data.
+			 */
+			$data = apply_filters( 'wbam_ad_data_before_save', $data, $post_id, $raw_data );
+
+			// Merged, so options of placements the form did not offer survive.
+			wbam_update_ad_data( $post_id, $data );
+		}
+
 		// Save ad format + dimensions. Resolution order:
 		// 1. If Responsive ticked: format is 'responsive', dims cleared.
 		// 2. Else if admin picked a named format (non-custom): store slug,
@@ -2861,55 +2911,17 @@ class Admin {
 			// shared check every save path routes through (QA wave 4,
 			// 10343726460): the admin editor here, the advertiser portal's
 			// edit path, the FREE REST API, and the Abilities executor.
-			$placements = wbam_filter_placements_to_fitting( $post_id, $placements, $unoffered );
+			// Never untick silently (card 10344381767): what the size check
+			// removed is named on the edit screen after the save redirects.
+			$split      = wbam_split_placements_by_fit( $post_id, $placements, $unoffered );
+			$placements = $split['kept'];
+			if ( $split['dropped'] ) {
+				set_transient( self::dropped_notice_key( $post_id ), wbam_dropped_placements_message( $split['dropped'] ), MINUTE_IN_SECONDS );
+			}
 
 			update_post_meta( $post_id, '_wbam_placements', $placements );
 		}
 
-		// Save ad data.
-		if ( isset( $_POST['wbam_data'] ) ) {
-			$raw_data = wp_unslash( $_POST['wbam_data'] ); // phpcs:ignore
-			$ad_type  = isset( $raw_data['type'] ) ? sanitize_text_field( $raw_data['type'] ) : 'image';
-
-			$engine  = Placement_Engine::get_instance();
-			$handler = $engine->get_ad_type( $ad_type );
-
-			$data = array( 'type' => $ad_type );
-
-			if ( $handler ) {
-				$type_data = $handler->save( $post_id, $raw_data );
-				$data      = array_merge( $data, $type_data );
-			}
-
-			// Per-placement options. Only placements the form offered, so a
-			// hidden one cannot reset to defaults.
-			foreach ( $engine->get_selectable_placements() as $placement ) {
-				if ( method_exists( $placement, 'save_options' ) ) {
-					$data = array_merge( $data, (array) $placement->save_options( $post_id, $raw_data ) );
-				}
-			}
-
-			// Paragraph settings.
-			$data['after_paragraph']  = isset( $raw_data['after_paragraph'] ) ? absint( $raw_data['after_paragraph'] ) : 2;
-			$data['paragraph_repeat'] = isset( $raw_data['paragraph_repeat'] ) ? true : false;
-
-			// Activity settings.
-			$data['after_activity']  = isset( $raw_data['after_activity'] ) ? absint( $raw_data['after_activity'] ) : 3;
-			$data['activity_repeat'] = isset( $raw_data['activity_repeat'] ) ? true : false;
-
-			/**
-			 * Filter ad data before saving.
-			 *
-			 * @since 2.3.0
-			 * @param array $data     Ad data to save.
-			 * @param int   $post_id  Ad post ID.
-			 * @param array $raw_data Raw POST data.
-			 */
-			$data = apply_filters( 'wbam_ad_data_before_save', $data, $post_id, $raw_data );
-
-			// Merged, so options of placements the form did not offer survive.
-			wbam_update_ad_data( $post_id, $data );
-		}
 
 		/**
 		 * Action fired after ad meta is saved.
@@ -2918,6 +2930,37 @@ class Admin {
 		 * @param int $post_id Post ID.
 		 */
 		do_action( 'wbam_save_ad_meta', $post_id );
+	}
+
+	/**
+	 * Transient key for the placements a save removed, per user and ad.
+	 *
+	 * @param int $post_id Ad ID.
+	 * @return string
+	 */
+	private static function dropped_notice_key( $post_id ) {
+		return 'wbam_dropped_' . get_current_user_id() . '_' . absint( $post_id );
+	}
+
+	/**
+	 * After a save that removed placements the ad's size does not fit, say
+	 * which ones on the edit screen (once).
+	 */
+	public function render_dropped_placements_notice() {
+		$screen = get_current_screen();
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only: which ad the edit screen shows.
+		$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+		if ( ! $screen || 'wbam-ad' !== $screen->post_type || 'post' !== $screen->base || ! $post_id ) {
+			return;
+		}
+
+		$message = get_transient( self::dropped_notice_key( $post_id ) );
+		if ( ! $message ) {
+			return;
+		}
+		delete_transient( self::dropped_notice_key( $post_id ) );
+
+		printf( '<div class="notice notice-warning is-dismissible"><p>%s</p></div>', esc_html( $message ) );
 	}
 
 	/**
@@ -2985,6 +3028,11 @@ class Admin {
 		return array(
 			'autoDetect'      => __( 'Auto-detected from your image on save.', 'wb-ads-rotator-with-split-test' ),
 			'enterDims'       => __( 'Enter width x height to see matches.', 'wb-ads-rotator-with-split-test' ),
+			// Read from the image in the browser (owner decision, card
+			// 10344381767): Media Library and pasted URLs alike.
+			/* translators: 1: width in pixels, 2: height in pixels */
+			'detected'        => __( 'Detected from the image: %1$d x %2$d px.', 'wb-ads-rotator-with-split-test' ),
+			'detectFailed'    => __( "Couldn't read the image size - pick a size.", 'wb-ads-rotator-with-split-test' ),
 			'noMatch'         => __( 'No placements match this size yet.', 'wb-ads-rotator-with-split-test' ),
 			'every'           => __( 'Every placement.', 'wb-ads-rotator-with-split-test' ),
 			// Ad has at least one placement ticked: the summary now names

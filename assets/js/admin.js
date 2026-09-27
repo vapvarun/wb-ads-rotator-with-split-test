@@ -59,8 +59,45 @@
 			$(this).hide();
 		});
 
+		// Image size, read in the browser (owner decision, card 10344381767):
+		// the preview already loads the image, so its real size is known here
+		// for Media Library and pasted URLs alike, with no server fetch. Fills
+		// Custom W x H only while the format is on Auto-detect; an owner's own
+		// choice is never overridden. The save upgrades a matching size to
+		// its named format.
+		function detectImageSize(url) {
+			var $format = $('#wbam_ad_format'),
+				$note   = $('.wbam-sizing-detect'),
+				i18n    = window.wbamFormatData ? window.wbamFormatData.i18n : null;
+
+			if (!url || !$format.length || !i18n || ($format.val() !== '' && $format.val() !== 'custom') || ($format.val() === 'custom' && !$format.data('wbamDetected'))) {
+				return;
+			}
+
+			var img = new Image();
+			img.onload = function() {
+				if (!img.naturalWidth || !img.naturalHeight) {
+					img.onerror();
+					return;
+				}
+				$('input[name="wbam_ad_width"]').val(img.naturalWidth);
+				$('input[name="wbam_ad_height"]').val(img.naturalHeight);
+				$format.val('custom').data('wbamDetected', true).trigger('change');
+				$note.text(i18n.detected.replace('%1$d', img.naturalWidth).replace('%2$d', img.naturalHeight)).prop('hidden', false);
+			};
+			img.onerror = function() {
+				$note.text(i18n.detectFailed).prop('hidden', false);
+			};
+			img.src = url;
+		}
+
 		// Image URL manual input - update preview.
-		$(document).on('input change', '#wbam_image_url', function() {
+		$(document).on('input change', '#wbam_image_url', function(e) {
+			// On change only (a finished paste or a Media pick), so a
+			// half-typed URL never flashes 'Couldn't read'.
+			if ('change' === e.type) {
+				detectImageSize($(this).val().trim());
+			}
 			var url = $(this).val().trim();
 			var $field = $(this).closest('.wbam-field');
 			var $preview = $field.find('.wbam-image-preview');
