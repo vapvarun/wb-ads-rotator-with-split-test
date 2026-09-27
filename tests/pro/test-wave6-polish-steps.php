@@ -19,6 +19,8 @@ class Test_Wave6_Polish_Steps extends Pro_Test_Case {
 		$this->assertStringContainsString( "'Tab' === event.key", $js );
 		$this->assertStringContainsString( 'returnFocus.focus();', $js );
 		$this->assertStringContainsString( "__( 'Yes, proceed', 'wb-ads-rotator-with-split-test' )", $js, 'Button labels are translatable.' );
+		wp_deregister_script( 'wbam-toast' );
+		\WBAM\Core\Plugin::get_instance()->register_shared_assets();
 		$this->assertContains( 'wp-i18n', wp_scripts()->registered['wbam-toast']->deps );
 	}
 
