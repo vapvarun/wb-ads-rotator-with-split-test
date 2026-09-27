@@ -594,7 +594,7 @@ class Links_API {
 				'link_id'      => $id,
 				'visitor_hash' => $visitor_hash,
 				'referrer'     => isset( $request['referrer'] ) ? esc_url_raw( $request['referrer'] ) : '',
-				'clicked_at'   => current_time( 'mysql' ),
+				'clicked_at'   => current_time( 'mysql', true ),
 			),
 			array( '%d', '%s', '%s', '%s' )
 		);
@@ -670,8 +670,10 @@ class Links_API {
 				'slug'        => $slug,
 				'description' => $description,
 				'count'       => 0,
+				'created_at' => current_time( 'mysql', true ),
+				'updated_at' => current_time( 'mysql', true ),
 			),
-			array( '%s', '%s', '%s', '%d' )
+			array( '%s', '%s', '%s', '%d', '%s', '%s' )
 		);
 
 		if ( false === $result ) {

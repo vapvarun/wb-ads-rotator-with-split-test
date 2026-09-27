@@ -429,7 +429,7 @@ class Frontend {
 				'user_agent'   => $user_agent,
 				'referer'      => $referer,
 				'device_type'  => $device_type,
-				'created_at'   => current_time( 'mysql' ),
+				'created_at'   => current_time( 'mysql', true ),
 			),
 			array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
@@ -731,7 +731,7 @@ class Frontend {
 				'email' => $email,
 				'name'  => $name,
 				'ad_id' => $ad_id,
-				'date'  => current_time( 'mysql' ),
+				'date'  => current_time( 'mysql', true ),
 				'ip'    => $ip_address, // GDPR: Store anonymized IP hash.
 			);
 
@@ -752,7 +752,7 @@ class Frontend {
 				'email'      => $email,
 				'name'       => $name,
 				'ip_address' => $ip_address, // GDPR: Anonymized based on settings.
-				'created_at' => current_time( 'mysql' ),
+				'created_at' => current_time( 'mysql', true ),
 			),
 			array( '%d', '%s', '%s', '%s', '%s' )
 		);

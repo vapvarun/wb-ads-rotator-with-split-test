@@ -277,8 +277,8 @@ class Partnership {
 	 * @return string
 	 */
 	public function get_time_ago() {
-		// created_at is site-local time; read it in the site timezone.
-		$created = '' !== (string) $this->created_at ? date_create_immutable( (string) $this->created_at, wp_timezone() ) : false;
+		// created_at is stored in UTC (docs/standards/dates.md).
+		$created = '' !== (string) $this->created_at ? date_create_immutable( (string) $this->created_at, new \DateTimeZone( 'UTC' ) ) : false;
 		if ( false === $created ) {
 			return '';
 		}

@@ -26,7 +26,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	const DB_VERSION = '1.9.2';
+	const DB_VERSION = '1.9.3';
 
 	/**
 	 * Option name for database version.
@@ -300,6 +300,67 @@ class Installer {
 		// option. Safe if the wizard was never run — it will simply
 		// find zero matches and mark itself done.
 		$this->maybe_backfill_demo_markers();
+
+		// Migration to 1.9.3: every stored moment becomes UTC
+		// (docs/standards/dates.md). updated_at stops taking the server
+		// clock first, so converting other columns cannot rewrite it.
+		if ( version_compare( $current_version, '1.9.3', '<' ) ) {
+			wbam_drop_on_update_clock( 'wbam_links', 'updated_at' );
+			self::continue_utc_migration();
+		}
+	}
+
+	/**
+	 * Option that records the 1.9.3 UTC conversion's progress.
+	 */
+	const UTC_MIGRATION_OPTION = 'wbam_utc_migration';
+
+	/**
+	 * Background event that resumes a UTC conversion that ran out of time.
+	 */
+	const UTC_MIGRATION_HOOK = 'wbam_utc_migration';
+
+	/**
+	 * Free's date columns and the clock 3.1.1 wrote each with: 'local' for
+	 * current_time( 'mysql' ) or a picked time, 'server' for the MySQL
+	 * DEFAULT CURRENT_TIMESTAMP. Columns 3.1.1 already wrote in UTC are not
+	 * listed. link_clicks.clicked_at had both writers; the redirect path
+	 * (DEFAULT) is the one that records nearly every click.
+	 *
+	 * @since 1.9.3
+	 * @return array<string,array<string,string>>
+	 */
+	public static function utc_plan() {
+		return array(
+			'wbam_analytics'         => array( 'created_at' => 'local' ),
+			'wbam_email_submissions' => array( 'created_at' => 'local' ),
+			'wbam_link_partnerships' => array(
+				'created_at'   => 'local',
+				'responded_at' => 'local',
+			),
+			'wbam_links'             => array(
+				'created_at' => 'server',
+				'updated_at' => 'server',
+				'expires_at' => 'local',
+			),
+			'wbam_link_categories'   => array( 'created_at' => 'server' ),
+			'wbam_link_clicks'       => array( 'clicked_at' => 'server' ),
+		);
+	}
+
+	/**
+	 * Run (or resume) the 1.9.3 UTC conversion; re-arms itself while work
+	 * remains, so a large analytics table is done over several requests.
+	 *
+	 * @since 1.9.3
+	 * @return void
+	 */
+	public static function continue_utc_migration() {
+		if ( wbam_convert_columns_to_utc( self::utc_plan(), self::UTC_MIGRATION_OPTION ) ) {
+			if ( ! wp_next_scheduled( self::UTC_MIGRATION_HOOK ) ) {
+				wp_schedule_single_event( time() + MINUTE_IN_SECONDS, self::UTC_MIGRATION_HOOK );
+			}
+		}
 	}
 
 	/**
@@ -520,7 +581,7 @@ class Installer {
 			total_revenue decimal(10,2) DEFAULT 0.00,
 			created_by bigint(20) UNSIGNED DEFAULT 0,
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
-			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			updated_at datetime DEFAULT NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY slug (slug),
 			KEY status (status),

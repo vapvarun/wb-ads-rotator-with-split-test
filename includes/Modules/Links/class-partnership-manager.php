@@ -96,7 +96,7 @@ class Partnership_Manager {
 				'ip_address'       => $data['ip_address'],
 				// Site time, like responded_at. The column default is the DB
 				// server's clock, which is hours off on most hosts.
-				'created_at'       => current_time( 'mysql' ),
+				'created_at'       => current_time( 'mysql', true ),
 			),
 			array( '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%f', '%f', '%s', '%s', '%s', '%s' )
 		);
@@ -373,7 +373,7 @@ class Partnership_Manager {
 			array(
 				'status'       => 'accepted',
 				'admin_notes'  => $notes,
-				'responded_at' => current_time( 'mysql' ),
+				'responded_at' => current_time( 'mysql', true ),
 			)
 		);
 
@@ -405,7 +405,7 @@ class Partnership_Manager {
 			array(
 				'status'       => 'rejected',
 				'admin_notes'  => $notes,
-				'responded_at' => current_time( 'mysql' ),
+				'responded_at' => current_time( 'mysql', true ),
 			)
 		);
 
@@ -435,7 +435,7 @@ class Partnership_Manager {
 			$id,
 			array(
 				'status'       => 'spam',
-				'responded_at' => current_time( 'mysql' ),
+				'responded_at' => current_time( 'mysql', true ),
 			)
 		);
 	}
@@ -573,7 +573,7 @@ class Partnership_Manager {
 				AND created_at > %s",
 				$email,
 				$website,
-				wp_date( 'Y-m-d H:i:s', time() - ( (int) $hours_back * HOUR_IN_SECONDS ) )
+				gmdate( 'Y-m-d H:i:s', time() - ( (int) $hours_back * HOUR_IN_SECONDS ) ) // UTC, like created_at.
 			)
 		);
 		// phpcs:enable

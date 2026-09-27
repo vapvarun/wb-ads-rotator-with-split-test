@@ -532,8 +532,8 @@ class Links_Admin {
 				// strtotime() returns false on malformed input. PHP 8.1+ deprecates
 				// passing false to gmdate(). Guard so the form renders blank for
 				// corrupted stored values instead of throwing a deprecation notice.
-				$expires_ts    = ( $link && $link->expires_at ) ? strtotime( $link->expires_at ) : false;
-				$expires_value = false !== $expires_ts ? gmdate( 'Y-m-d\TH:i', $expires_ts ) : '';
+				// Stored in UTC; shown in the site's time zone (docs/standards/dates.md).
+				$expires_value = ( $link && $link->expires_at ) ? wbam_format_datetime( $link->expires_at, 'Y-m-d\TH:i' ) : '';
 				?>
 				<tr>
 					<th scope="row">
@@ -660,11 +660,11 @@ class Links_Admin {
 					</tr>
 					<tr>
 						<th><?php esc_html_e( 'Created', 'wb-ads-rotator-with-split-test' ); ?></th>
-						<td><?php echo esc_html( $link->created_at ); ?></td>
+						<td><?php echo esc_html( wbam_format_datetime( $link->created_at ) ); ?></td>
 					</tr>
 					<tr>
 						<th><?php esc_html_e( 'Last Updated', 'wb-ads-rotator-with-split-test' ); ?></th>
-						<td><?php echo esc_html( $link->updated_at ); ?></td>
+						<td><?php echo esc_html( wbam_format_datetime( $link->updated_at ) ); ?></td>
 					</tr>
 				</table>
 			</div>
@@ -687,17 +687,10 @@ class Links_Admin {
 		$link_id = isset( $_POST['link_id'] ) ? (int) $_POST['link_id'] : 0;
 		$is_edit = (bool) $link_id;
 
-		// Expiration: parse the datetime-local input. strtotime() returns false
-		// on malformed input; in that case treat the field as empty rather than
-		// storing a 1970-01-01 timestamp (or triggering a PHP 8.1+ deprecation
-		// notice by passing false to gmdate).
-		$expires_at = null;
-		if ( ! empty( $_POST['expires_at'] ) ) {
-			$expires_ts = strtotime( sanitize_text_field( wp_unslash( $_POST['expires_at'] ) ) );
-			if ( false !== $expires_ts ) {
-				$expires_at = gmdate( 'Y-m-d H:i:s', $expires_ts );
-			}
-		}
+		// Expiration: picked in the site's time zone, stored in UTC
+		// (docs/standards/dates.md). A malformed value becomes null (no
+		// expiry), never a 1970-01-01 timestamp.
+		$expires_at = empty( $_POST['expires_at'] ) ? null : wbam_site_to_utc( sanitize_text_field( wp_unslash( $_POST['expires_at'] ) ) );
 
 		$data = array(
 			'name'             => isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '',

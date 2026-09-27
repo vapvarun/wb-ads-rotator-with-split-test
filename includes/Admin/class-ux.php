@@ -234,7 +234,8 @@ class UX {
 			'failed'            => 'danger',
 			'incomplete'        => 'danger',
 
-			// Info — neutral, final, awaiting nothing.
+			// Info — neutral, final, or waiting for its start date.
+			'scheduled'         => 'info',
 			'completed'         => 'info',
 			'sold'              => 'info',
 			'draft'             => 'info',

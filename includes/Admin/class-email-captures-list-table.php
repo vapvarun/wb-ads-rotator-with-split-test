@@ -132,7 +132,7 @@ class Email_Captures_List_Table extends \WP_List_Table {
 				$title = $item->ad_id ? get_the_title( (int) $item->ad_id ) : '';
 				return '' !== $title ? esc_html( $title ) : esc_html( '#' . (int) $item->ad_id );
 			case 'created_at':
-				return esc_html( (string) mysql2date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $item->created_at ) );
+				return esc_html( (string) wbam_format_datetime( $item->created_at, get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ) );
 			default:
 				return isset( $item->$column_name ) ? esc_html( (string) $item->$column_name ) : '';
 		}

@@ -240,6 +240,15 @@ function requireCleanGeneratedFiles() {
 }
 
 // Every wbam_ hook has a docblock and a manifest entry (card 10344031466).
+// Every stored moment is UTC, shown in the site's zone (docs/standards/dates.md).
+function requireDatesInUtc() {
+	try {
+		run('bash', ['bin/check-date-clocks.sh', '.'], { stdio: 'inherit' });
+	} catch (e) {
+		die(1, 'Date rule broken - see above and docs/standards/dates.md.');
+	}
+}
+
 function requireHooksDocumented() {
 	try {
 		run('bash', ['bin/check-hooks-documented.sh'], { stdio: 'inherit' });
@@ -253,6 +262,7 @@ function main() {
 	console.log(BOLD(`\nBuilding release: ${releaseName} ${version}`));
 
 	requireHooksDocumented();
+	requireDatesInUtc();
 	regenerateRtlStylesheets();
 	minifyAssets();
 	regeneratePot( slug );

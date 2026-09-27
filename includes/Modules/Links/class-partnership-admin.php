@@ -232,7 +232,7 @@ class Partnership_Admin {
 				$update_data = array( 'admin_notes' => $admin_notes );
 				if ( $new_status ) {
 					$update_data['status']       = $new_status;
-					$update_data['responded_at'] = current_time( 'mysql' );
+					$update_data['responded_at'] = current_time( 'mysql', true );
 				}
 				$this->manager->update( $id, $update_data );
 			}
@@ -406,14 +406,14 @@ class Partnership_Admin {
 									<?php echo wp_kses_post( \WBAM\Admin\UX::status_badge( $partnership->status, $partnership->get_status_label() ) ); ?>
 								</td>
 								<td>
-									<span title="<?php echo esc_attr( $partnership->created_at ); ?>">
+									<span title="<?php echo esc_attr( wbam_format_datetime( $partnership->created_at ) ); ?>">
 										<?php
 										$time_ago = $partnership->get_time_ago();
 										if ( '' !== $time_ago ) {
 											/* translators: %s: human-readable time diff, e.g. "3 hours" */
 											printf( esc_html__( '%s ago', 'wb-ads-rotator-with-split-test' ), esc_html( $time_ago ) );
 										} else {
-											echo esc_html( $partnership->created_at );
+											echo esc_html( wbam_format_datetime( $partnership->created_at ) );
 										}
 										?>
 									</span>
@@ -693,12 +693,12 @@ class Partnership_Admin {
 							</tr>
 							<tr>
 								<th><?php esc_html_e( 'Submitted', 'wb-ads-rotator-with-split-test' ); ?></th>
-								<td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $partnership->created_at ) ) ); ?></td>
+								<td><?php echo esc_html( wbam_format_datetime( $partnership->created_at, get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ) ); ?></td>
 							</tr>
 							<?php if ( $partnership->responded_at ) : ?>
 							<tr>
 								<th><?php esc_html_e( 'Responded', 'wb-ads-rotator-with-split-test' ); ?></th>
-								<td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $partnership->responded_at ) ) ); ?></td>
+								<td><?php echo esc_html( wbam_format_datetime( $partnership->responded_at, get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ) ); ?></td>
 							</tr>
 							<?php endif; ?>
 						</table>

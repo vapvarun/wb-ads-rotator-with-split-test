@@ -128,8 +128,10 @@ class Link_Manager {
 				'commission_rate'  => $data['commission_rate'],
 				'total_revenue'    => $data['total_revenue'],
 				'created_by'       => $data['created_by'],
+				'created_at' => current_time( 'mysql', true ),
+				'updated_at' => current_time( 'mysql', true ),
 			),
-			array( '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%f', '%s', '%s', '%s', '%f', '%f', '%d' )
+			array( '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%f', '%s', '%s', '%s', '%f', '%f', '%d', '%s', '%s' )
 		);
 
 		if ( false === $result ) {
@@ -387,6 +389,10 @@ class Link_Manager {
 			return true;
 		}
 
+		// Set here, in UTC: the column no longer uses the server clock (docs/standards/dates.md).
+		$update_data['updated_at'] = current_time( 'mysql', true );
+		$update_format[]           = '%s';
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->update(
 			$this->table,
@@ -497,8 +503,10 @@ class Link_Manager {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->insert(
 			$this->clicks_table,
-			array( 'link_id' => $id ),
-			array( '%d' )
+			array( 'link_id' => $id,
+			'clicked_at' => current_time( 'mysql', true ),
+		),
+			array( '%d', '%s' )
 		);
 
 		do_action( 'wbam_link_clicked', $id );
@@ -695,8 +703,9 @@ class Link_Manager {
 				'slug'        => $data['slug'],
 				'description' => sanitize_textarea_field( $data['description'] ),
 				'parent_id'   => (int) $data['parent_id'],
+				'created_at' => current_time( 'mysql', true ),
 			),
-			array( '%s', '%s', '%s', '%d' )
+			array( '%s', '%s', '%s', '%d', '%s' )
 		);
 
 		return false !== $result ? $wpdb->insert_id : false;
@@ -905,16 +914,10 @@ class Link_Manager {
 		$where  = 'link_id = %d';
 		$values = array( $link_id );
 
-		switch ( $period ) {
-			case 'today':
-				$where .= ' AND DATE(clicked_at) = CURDATE()';
-				break;
-			case 'week':
-				$where .= ' AND clicked_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
-				break;
-			case 'month':
-				$where .= ' AND clicked_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)';
-				break;
+		$start = in_array( $period, array( 'today', 'week', 'month' ), true ) ? wbam_period_start( $period ) : null;
+		if ( null !== $start ) {
+			$where   .= ' AND clicked_at >= %s';
+			$values[] = $start['utc'];
 		}
 
 		// $this->clicks_table from $wpdb->prefix (ctor); $where built from
@@ -966,10 +969,10 @@ class Link_Manager {
 		if ( $table_exists ) {
 			$results = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT DATE(clicked_at) as date, COUNT(*) as clicks
+					"SELECT " . wbam_sql_site_date( 'clicked_at' ) . " as date, COUNT(*) as clicks
 					 FROM {$this->clicks_table}
 					 WHERE clicked_at >= %s AND clicked_at <= %s
-					 GROUP BY DATE(clicked_at)
+					 GROUP BY " . wbam_sql_site_date( 'clicked_at' ) . "
 					 ORDER BY date ASC",
 					gmdate( 'Y-m-d', $start ),
 					gmdate( 'Y-m-d', $end ) . ' 23:59:59'

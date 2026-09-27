@@ -275,6 +275,7 @@ class Plugin {
 		add_action( 'init', array( $this, 'register_shared_assets' ), 1 );
 
 		Analytics_Rollup::register();
+		add_action( Installer::UTC_MIGRATION_HOOK, array( Installer::class, 'continue_utc_migration' ) );
 		Ad_Type_Meta::register();
 
 		// Invalidate the per-placement ad-count cache (Settings screen,

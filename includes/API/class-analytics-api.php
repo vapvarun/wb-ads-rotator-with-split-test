@@ -235,7 +235,7 @@ class Analytics_API {
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-				"SELECT DATE(created_at) as day, event_type, COUNT(*) as count FROM {$table} WHERE {$where_sql} GROUP BY day, event_type ORDER BY day ASC",
+				"SELECT " . wbam_sql_site_date( 'created_at' ) . " as day, event_type, COUNT(*) as count FROM {$table} WHERE {$where_sql} GROUP BY day, event_type ORDER BY day ASC",
 				$values
 			)
 		);

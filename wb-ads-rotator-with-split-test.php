@@ -39,6 +39,7 @@ require_once WBAM_PATH . 'includes/Core/trait-singleton.php';
 // Global helper functions for format matching. Load early so hooks
 // fired during plugins_loaded (pro plugin, mu-plugins) can call them.
 require_once WBAM_PATH . 'includes/functions-ad-formats.php';
+require_once WBAM_PATH . 'includes/functions-dates.php';
 
 /**
  * Autoloader for plugin classes.

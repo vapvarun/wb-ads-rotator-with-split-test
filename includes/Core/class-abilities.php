@@ -1520,7 +1520,7 @@ class Abilities {
 		$by_date_raw = $wpdb->get_results(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Placeholders interpolated via  /  fragments; safe.
-				"SELECT DATE(clicked_at) as day, COUNT(*) as clicks, COUNT(DISTINCT visitor_hash) as unique_clicks FROM {$clicks_table} WHERE {$where_sql} GROUP BY day ORDER BY day ASC",
+				"SELECT " . wbam_sql_site_date( 'clicked_at' ) . " as day, COUNT(*) as clicks, COUNT(DISTINCT visitor_hash) as unique_clicks FROM {$clicks_table} WHERE {$where_sql} GROUP BY day ORDER BY day ASC",
 				$values
 			)
 		);

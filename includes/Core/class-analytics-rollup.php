@@ -266,6 +266,31 @@ class Analytics_Rollup {
 	}
 
 	/**
+	 * The watermark and cutoffs are site-calendar midnights ('Y-m-d 00:00:00'
+	 * in the site's zone); raw created_at is UTC (docs/standards/dates.md).
+	 * This is that site midnight as a UTC moment, for comparing the two.
+	 *
+	 * @since 3.2.0
+	 * @param string $site_midnight Site-local 'Y-m-d 00:00:00'.
+	 * @return string UTC 'Y-m-d H:i:s'.
+	 */
+	public static function utc_start_of( $site_midnight ) {
+		$day = substr( (string) $site_midnight, 0, 10 );
+		return wbam_site_day_utc_bounds( $day, $day )[0];
+	}
+
+	/**
+	 * The watermark as a UTC moment, for comparing with raw created_at, or ''.
+	 *
+	 * @since 3.2.0
+	 * @return string UTC 'Y-m-d H:i:s' or ''.
+	 */
+	public static function rolled_before_utc() {
+		$before = self::rolled_before();
+		return '' === $before ? '' : self::utc_start_of( $before );
+	}
+
+	/**
 	 * Start of the first day whose raw rows are not yet in the daily table,
 	 * or '' when every raw row is uncounted there.
 	 *
@@ -294,7 +319,7 @@ class Analytics_Rollup {
 			return '';
 		}
 
-		return $wpdb->prepare( " AND {$column} >= %s", $from ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- column whitelisted above.
+		return $wpdb->prepare( " AND {$column} >= %s", self::utc_start_of( $from ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- column whitelisted above.
 	}
 
 	/**
@@ -344,7 +369,7 @@ class Analytics_Rollup {
 
 		$raw   = $wpdb->prefix . 'wbam_analytics';
 		$daily = $wpdb->prefix . 'wbam_analytics_daily';
-		$where = $wpdb->prepare( 'created_at < %s', $before ) . self::unrolled_sql();
+		$where = $wpdb->prepare( 'created_at < %s', self::utc_start_of( $before ) ) . self::unrolled_sql();
 		if ( $max_id > 0 ) {
 			$where .= $wpdb->prepare( ' AND id <= %d', $max_id );
 		}
@@ -352,13 +377,13 @@ class Analytics_Rollup {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- plugin tables from $wpdb->prefix; $where is prepared above.
 		$result = $wpdb->query(
 			"INSERT INTO {$daily} ( ad_id, campaign_id, date, impressions, clicks, unique_impressions, unique_clicks )
-			SELECT ad_id, MAX(campaign_id), DATE(created_at),
+			SELECT ad_id, MAX(campaign_id), " . wbam_sql_site_date( 'created_at' ) . ",
 				SUM( event_type = 'impression' ), SUM( event_type = 'click' ),
 				COUNT( DISTINCT CASE WHEN event_type = 'impression' THEN COALESCE( NULLIF( visitor_hash, '' ), ip_hash ) END ),
 				COUNT( DISTINCT CASE WHEN event_type = 'click' THEN COALESCE( NULLIF( visitor_hash, '' ), ip_hash ) END )
 			FROM {$raw}
 			WHERE {$where}
-			GROUP BY ad_id, DATE(created_at)
+			GROUP BY ad_id, " . wbam_sql_site_date( 'created_at' ) . "
 			ON DUPLICATE KEY UPDATE
 				impressions = impressions + VALUES(impressions),
 				clicks = clicks + VALUES(clicks),
@@ -405,7 +430,7 @@ class Analytics_Rollup {
 		global $wpdb;
 
 		$raw    = $wpdb->prefix . 'wbam_analytics';
-		$cutoff = wp_date( 'Y-m-d 00:00:00', time() - self::retention_days() * DAY_IN_SECONDS );
+		$cutoff = self::utc_start_of( wp_date( 'Y-m-d 00:00:00', time() - self::retention_days() * DAY_IN_SECONDS ) );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- plugin tables from $wpdb->prefix; values bound.
 		$max_id = (int) $wpdb->get_var(

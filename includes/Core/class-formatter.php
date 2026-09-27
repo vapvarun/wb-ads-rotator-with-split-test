@@ -114,7 +114,7 @@ class Formatter {
 	/**
 	 * Format a date.
 	 *
-	 * @param string|int $date   Date string or timestamp.
+	 * @param string|int $date   A site-calendar 'Y-m-d', a stored UTC moment, or a Unix timestamp.
 	 * @param string     $format Date format (default: WordPress date format).
 	 * @return string Formatted date.
 	 */
@@ -123,18 +123,18 @@ class Formatter {
 			$format = get_option( 'date_format' );
 		}
 
-		$timestamp = is_numeric( $date ) ? (int) $date : strtotime( (string) $date );
-		if ( false === $timestamp ) {
-			return '';
+		if ( is_numeric( $date ) ) {
+			return (string) wp_date( $format, (int) $date );
 		}
 
-		return date_i18n( $format, $timestamp );
+		// A bare 'Y-m-d' is a site-calendar day; anything longer is a stored UTC moment.
+		return 10 === strlen( trim( (string) $date ) ) ? wbam_format_day( $date, $format ) : wbam_format_datetime( $date, $format );
 	}
 
 	/**
 	 * Format a datetime.
 	 *
-	 * @param string|int $datetime DateTime string or timestamp.
+	 * @param string|int $datetime A stored UTC moment or a Unix timestamp.
 	 * @param string     $format   DateTime format (default: WordPress datetime format).
 	 * @return string Formatted datetime.
 	 */
@@ -143,12 +143,7 @@ class Formatter {
 			$format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 		}
 
-		$timestamp = is_numeric( $datetime ) ? (int) $datetime : strtotime( (string) $datetime );
-		if ( false === $timestamp ) {
-			return '';
-		}
-
-		return date_i18n( $format, $timestamp );
+		return is_numeric( $datetime ) ? (string) wp_date( $format, (int) $datetime ) : wbam_format_datetime( $datetime, $format );
 	}
 
 	/**

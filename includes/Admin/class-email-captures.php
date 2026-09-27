@@ -281,7 +281,7 @@ class Email_Captures {
 						$row->ad_id ? get_the_title( (int) $row->ad_id ) : '',
 						(int) $row->ad_id,
 						$row->ip_address,
-						mysql2date( $date_format, $row->created_at ),
+						wbam_format_datetime( $row->created_at, $date_format ),
 					)
 				);
 			}
