@@ -93,7 +93,6 @@ class Test_BP_Notifications extends Pro_Test_Case {
 		$wpdb->insert( $table, array( 'user_id' => 7, 'component_name' => 'messages', 'component_action' => 'new_message' ) );
 
 		$upgrade = new \ReflectionMethod( \WBAM_Pro\Core\Installer::class, 'upgrade_to_4_3_19' );
-		$upgrade->setAccessible( true );
 		$upgrade->invoke( null );
 
 		$left = $wpdb->get_col( "SELECT component_name FROM {$table} WHERE user_id = 7" ); // phpcs:ignore WordPress.DB
