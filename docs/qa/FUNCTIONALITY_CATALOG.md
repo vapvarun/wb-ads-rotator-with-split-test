@@ -30,6 +30,7 @@ Kinds (every one is read from the running site by the check):
 | `widget` | classic widget | `placement` / `adtype` | placement / ad type class |
 | `email` | email-sending method | `template` | template file under `templates/`; `*` patterns allowed |
 | `gateway` | payment gateway (bundled SDK) | `adapter` | store adapter that sells balance (bundled SDK) |
+| `privacy` | personal data exporter or eraser, `export/<key>` or `erase/<key>` | | |
 
 On a site without Pro, Free also shows its own General settings section; with Pro
 active, Pro's General section replaces it (listed in Pro's catalog).
@@ -222,9 +223,7 @@ active, Pro's General section replaces it (listed in Pro's catalog).
   `post:wbam_delete_email_capture`
 - **Expected behaviour:** `docs/website/features/050-email-capture.md`
 - **Also check:** the CSV opens cleanly and contains no formula injection; the list
-  pages at 2,000+ rows. Neither plugin registers a WordPress personal data exporter
-  or eraser (Tools > Export/Erase Personal Data finds nothing from WB Ad Manager);
-  tracked as a finding, see AUDIT_PROTOCOL.md section 5.
+  pages at 2,000+ rows; the person's sign-ups export and erase (F-PRIVACY).
 
 ## F-BP - BuddyPress
 
@@ -256,6 +255,20 @@ active, Pro's General section replaces it (listed in Pro's catalog).
 - **Where:** Jetonomy pages (needs Jetonomy active).
 - **Surfaces:** `placement:Jetonomy_Placement`
 - **Expected behaviour:** `docs/website/integrations/020-jetonomy.md`
+
+## F-PRIVACY - Personal data export and erase
+
+- **Promise:** Tools > Export Personal Data and Erase Personal Data include what the
+  free plugin holds about a person, found by their email address: their email
+  sign-ups and partnership requests. Both are the person's own, so erasing deletes
+  them.
+- **Roles:** admin (runs the tools); the email subscriber or requester (the subject).
+- **Where:** Tools > Export Personal Data, Tools > Erase Personal Data.
+- **Surfaces:** `privacy:export/wbam-email-signups` `privacy:erase/wbam-email-signups`
+  `privacy:export/wbam-partnership-requests` `privacy:erase/wbam-partnership-requests`
+- **Expected behaviour:** card 10345179396 (owner rules); `includes/Core/class-privacy.php`
+- **Also check:** a person with 101+ sign-ups exports all of them (paged) and erases
+  all of them; another person's rows stay; an unknown email finds nothing.
 
 ## F-UPGRADE - Upgrades and background jobs
 

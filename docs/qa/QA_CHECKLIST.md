@@ -118,11 +118,16 @@ section 4.
 - [ ] bbPress forum and topic ads and widgets.
 - [ ] Jetonomy pages show their placement (Jetonomy active).
 
+### F-PRIVACY - Personal data export and erase (admin)
+- [ ] Tools > Export Personal Data for an email subscriber: the zip lists their sign-ups (email, name, ad, date).
+- [ ] Same for a partnership requester: name, email, website, message, IP, date.
+- [ ] Tools > Erase Personal Data for each: their rows are gone; another person's rows stay.
+- [ ] A person with 101+ rows: export has all of them; erase removes all of them.
+
 ### F-UPGRADE - Update and uninstall
 - [ ] Update from the previous release on a copy of real data: ads, stats and settings kept; the UTC migration runs once.
 - [ ] Uninstall with "Delete data on uninstall" off keeps data; on, lists what goes and removes it.
 
-## 3. Known gaps (do not re-file)
+## 3. Do not re-file
 
-- No WordPress personal data exporter or eraser in either plugin: card 10345179396.
 - Owner decisions that are not bugs: AUDIT_PROTOCOL.md section 5.

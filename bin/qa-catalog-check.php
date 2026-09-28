@@ -16,8 +16,8 @@
  * loops resolve: REST routes, admin screens, settings sections, editor meta
  * boxes, dashboard widgets, shortcodes, blocks, widgets, abilities, AJAX and
  * admin-post handlers, URL routes, cron jobs, post types, taxonomies, roles,
- * placements, ad types, emails, template files, payment gateways and purchase
- * adapters. Each is attributed to Free or Pro by its callback's file.
+ * placements, ad types, emails, template files, payment gateways, purchase
+ * adapters, and personal data exporters and erasers. Each is attributed to Free or Pro by its callback's file.
  * A catalog lists a surface as `kind:id` in backticks, e.g. `rest:/wbam/v1/ads`.
  *
  * Read-only. Loads the admin menu as user 1 in memory; writes nothing.
@@ -42,7 +42,7 @@ $wbam_plugins = array(
 $wbam_list    = in_array( 'list', $args ?? array(), true );
 
 // Every surface kind a catalog entry may name.
-const WBAM_QA_KINDS = 'rest|admin|settings|metabox|dashboard|shortcode|block|widget|ability|ajax|post|route|cron|cpt|tax|role|placement|adtype|email|template|gateway|adapter';
+const WBAM_QA_KINDS = 'rest|admin|settings|metabox|dashboard|shortcode|block|widget|ability|ajax|post|route|cron|cpt|tax|role|placement|adtype|email|template|gateway|adapter|privacy';
 
 /** Which plugin a callable lives in, as array( owner, file:line ). */
 $wbam_owner = static function ( $cb ) use ( $wbam_plugins ) {
@@ -218,6 +218,13 @@ if ( class_exists( 'Wbcom\\Credits\\Gateways\\Gateway_Registry' ) ) {
 		if ( is_subclass_of( $class, 'Wbcom\\Credits\\Adapters\\AdapterInterface' ) ) {
 			$wbam_add( 'adapter:' . ( new ReflectionClass( $class ) )->getShortName(), array( 'pro', 'libs/wbcom-credits-sdk' ) );
 		}
+	}
+}
+
+// Personal data exporters and erasers (Tools > Export / Erase Personal Data).
+foreach ( array( 'export' => 'wp_privacy_personal_data_exporters', 'erase' => 'wp_privacy_personal_data_erasers' ) as $verb => $filter ) {
+	foreach ( (array) apply_filters( $filter, array() ) as $key => $tool ) {
+		$wbam_add( 'privacy:' . $verb . '/' . $key, $wbam_owner( $tool['callback'] ?? null ) );
 	}
 }
 

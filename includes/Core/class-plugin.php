@@ -158,6 +158,10 @@ class Plugin {
 		// wbam_get_placements registry sees the format metadata.
 		Placement_Format_Map::register();
 
+		// Tools > Export / Erase Personal Data. On every request, not only
+		// is_admin(): the data outlives any setting that hides its screens.
+		Privacy::register();
+
 		// Placements engine.
 		$this->placements = Placement_Engine::get_instance();
 		$this->placements->init();
