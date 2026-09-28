@@ -78,6 +78,7 @@ class Test_Privacy_Pro extends Pro_Test_Case {
 		update_user_meta( $this->user, 'wbam_profile_extra', array( 'contact_name' => 'Priv Person', 'city' => 'Pune' ) );
 		update_user_meta( $this->user, '_wbam_favorite_classifieds', array( $this->classified ) );
 		update_user_meta( $this->user, '_wbam_following_sellers', array( $this->advertiser_id ) );
+		update_user_meta( $this->user, 'billing_address_1', '9 Billing Rd' );
 	}
 
 	public function tear_down(): void {
@@ -139,6 +140,9 @@ class Test_Privacy_Pro extends Pro_Test_Case {
 			$this->assertStringContainsString( $expected, $all, "Export includes: $expected" );
 		}
 		$this->assertStringNotContainsString( 'Guest question', $all, 'Another person\'s inquiry is not in this export.' );
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			$this->assertStringContainsString( '9 Billing Rd', $all, 'The checkout billing profile is exported when WooCommerce does not own it.' );
+		}
 	}
 
 	public function test_guest_export_finds_their_inquiry_and_messages(): void {
@@ -171,6 +175,9 @@ class Test_Privacy_Pro extends Pro_Test_Case {
 		$this->assertSame( array( '', '', '', '' ), array( $adv->company_name, $adv->phone, $adv->address, $adv->website ) );
 		$this->assertSame( '', get_user_meta( $this->user, 'wbam_profile_extra', true ) );
 		$this->assertSame( '', get_user_meta( $this->user, '_wbam_favorite_classifieds', true ) );
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			$this->assertSame( '', get_user_meta( $this->user, 'billing_address_1', true ) );
+		}
 		$listing = $wpdb->get_row( $wpdb->prepare( "SELECT contact_name, contact_email, contact_phone FROM {$p}wbam_classifieds WHERE id = %d", $this->classified ) );
 		$this->assertSame( array( '', '', '' ), array( $listing->contact_name, $listing->contact_email, $listing->contact_phone ) );
 
