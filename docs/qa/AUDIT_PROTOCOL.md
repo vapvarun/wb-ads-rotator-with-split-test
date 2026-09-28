@@ -10,6 +10,15 @@ Your job is to **find and file**, not to fix. Do not push to either repo. Every
 finding becomes a Basecamp card (section 6). The owner and the developer decide what
 gets fixed.
 
+**Quick start (any agent, cold):**
+
+1. Read this file, then `CORE_PATHS.md` and `FUNCTIONALITY_CATALOG.md` in both repos.
+2. Run the surface check (section 1, step 3). It must print "Every surface is in a
+   catalog" before you audit; if not, the catalogs are behind the code.
+3. Create the test users (section 1, step 4) and take a DB dump.
+4. Walk the core paths, then every feature ID, with the section 4 checklist.
+5. File each finding as its own card (section 6) and write the report (section 7).
+
 ---
 
 ## 1. Before you start (once per release)
@@ -26,10 +35,11 @@ gets fixed.
    wp --exec='define("WP_ADMIN", true);' eval-file bin/qa-catalog-check.php
    ```
 
-   It lists every admin screen, REST route, shortcode, block, widget, AJAX and
-   admin-post handler, cron job, post type, taxonomy, placement, ad type and email that
-   the running site registers for Free and Pro. It then compares them with both
-   catalogs. **MISSING** means the release added a surface nobody catalogued: add it
+   It reads the running site and lists every surface of Free and Pro: admin screens,
+   settings sections, editor meta boxes, dashboard widgets, REST routes, Abilities API
+   entries, shortcodes, blocks, widgets, AJAX and admin-post handlers, URL routes, cron
+   jobs, post types, taxonomies, roles, placements, ad types, emails, template files,
+   payment gateways and store adapters. It then compares them with both catalogs. **MISSING** means the release added a surface nobody catalogued: add it
    to the right feature before auditing (or file a card if you cannot tell what it
    does, which is itself a finding). **STALE** means a catalogued surface is gone:
    confirm it was removed on purpose. Add `list` at the end to print everything with
@@ -67,6 +77,15 @@ gets fixed.
   and REST. The theme's markup, another plugin's data and server config are context,
   not findings against us. But a plugin screen that breaks because the theme styles
   bare `button`/`a`/`input` **is** our defect: the plugin must own its look.
+
+**What the check cannot see**, and where it lives instead:
+
+- Every option and its default: `docs/qa/OWNER_INVENTORY.md` in each repo (generated;
+  walk it as the settings map, each option must change something).
+- Every developer hook: `docs/website/developer-guide/010-hooks-and-filters.md`, kept
+  honest by `bin/check-hooks-documented.sh`.
+- States that exist only in the browser (loading, empty, error, dark mode, phone
+  layout): the section 4 checklist, per feature.
 
 ## 3. Which features to walk
 

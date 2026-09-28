@@ -16,9 +16,23 @@ audit Free first.
   way.
 - **Core**: the rank in `CORE_PATHS.md`, if the feature is on a core path.
 
-Kinds: `admin` screen slug, `rest` route, `shortcode`, `block`, `widget`, `ajax`
-action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy,
-`placement` class, `adtype` class, `email` method.
+Kinds (every one is read from the running site by the check):
+
+| Kind | What it is | Kind | What it is |
+|---|---|---|---|
+| `admin` | admin screen slug | `ability` | Abilities API name (WP 6.9) |
+| `settings` | settings section | `ajax` | admin-ajax action |
+| `metabox` | editor meta box, `post-type/id` | `post` | admin-post action |
+| `dashboard` | dashboard widget | `route` | custom URL route, by query var |
+| `rest` | REST route | `cron` | scheduled hook |
+| `shortcode` | shortcode tag | `cpt` / `tax` | post type / taxonomy |
+| `block` | block name | `role` | user role |
+| `widget` | classic widget | `placement` / `adtype` | placement / ad type class |
+| `email` | email-sending method | `template` | template file under `templates/`; `*` patterns allowed |
+| `gateway` | payment gateway (bundled SDK) | `adapter` | store adapter that sells balance (bundled SDK) |
+
+On a site without Pro, Free also shows its own General settings section; with Pro
+active, Pro's General section replaces it (listed in Pro's catalog).
 
 ---
 
@@ -32,6 +46,10 @@ action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy
 - **Surfaces:** `cpt:wbam-ad` `tax:wbam_ad_tag` `rest:/wbam/v1/ads`
   `rest:/wbam/v1/ads/(?P<id>\d+)` `rest:/wbam/v1/ads/(?P<id>\d+)/duplicate`
   `rest:/wbam/v1/ads/types`
+  `metabox:wbam-ad/wbam-ad-settings` `metabox:wbam-ad/wbam-ad-status`
+  `metabox:wbam-ad/wbam-ad-sizing` `metabox:wbam-ad/wbam-ad-pro-options` `ability:wbam/list-ads` `ability:wbam/get-ad`
+  `ability:wbam/create-ad` `ability:wbam/update-ad` `ability:wbam/delete-ad`
+  `ability:wbam/list-ad-types`
 - **Expected behaviour:** `docs/website/usage/000-creating-and-managing-ads.md`
 - **Core:** 1
 - **Also check:** the status column (Live / Scheduled / Ended / Not showing, with one
@@ -64,6 +82,7 @@ action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy
   `placement:Before_Archive_Placement` `placement:After_Archive_Placement`
   `placement:Comment_Placement` `placement:Sticky_Placement`
   `placement:Popup_Placement` `rest:/wbam/v1/ads/placements`
+  `metabox:wbam-ad/wbam-ad-placements` `ability:wbam/list-placements`
 - **Expected behaviour:** `docs/website/features/010-placements.md`
 - **Core:** 2
 - **Also check:** block themes (ads inside the FSE header/footer and on block archives);
@@ -90,6 +109,9 @@ action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy
 - **Roles:** admin; anon, logged-in member (to prove the rules).
 - **Where:** ad editor > Display Rules, Visitor Conditions, Schedule; Settings > Location.
 - **Surfaces:** `ajax:wbam_upload_geo_db`
+  `metabox:wbam-ad/wbam-display-rules` `metabox:wbam-ad/wbam-visitor-conditions`
+  `metabox:wbam-ad/wbam-schedule` `metabox:wbam-ad/wbam-geo-targeting`
+  `settings:location`
 - **Expected behaviour:** `docs/website/features/030-targeting-and-scheduling.md`
 - **Core:** 3
 - **Also check:** start and end dates are picked and shown in the site time zone and
@@ -104,6 +126,7 @@ action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy
 - **Where:** any page with two or more ads in one placement.
 - **Surfaces:** `rest:/wbam/v1/ads/serve` `rest:/wbam/v1/ads/track`
   `rest:/wbam/v1/analytics/track` `ajax:wbam_track_click`
+  `ability:wbam/serve-ad`
 - **Expected behaviour:** `docs/website/features/020-rotation-and-split-testing.md`
 - **Core:** 4
 - **Also check:** page caching does not freeze rotation; bots and admins are not
@@ -116,6 +139,7 @@ action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy
 - **Where:** ad editor > Performance meta box; the All Ads list columns.
 - **Surfaces:** `rest:/wbam/v1/ads/(?P<id>\d+)/stats` `rest:/wbam/v1/analytics/overview`
   `rest:/wbam/v1/analytics/daily` `rest:/wbam/v1/analytics/ads/(?P<id>\d+)`
+  `ability:wbam/get-analytics-overview` `ability:wbam/get-ad-stats`
 - **Expected behaviour:** `docs/website/features/020-rotation-and-split-testing.md`
 - **Core:** 4
 - **Also check:** the numbers match between the ad editor, the dashboard and REST;
@@ -129,6 +153,7 @@ action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy
 - **Where:** Ads > Settings (sections in the left sidebar).
 - **Surfaces:** `admin:wbam-settings` `rest:/wbam/v1/settings`
   `rest:/wbam/v1/settings/display` `post:wbam_dismiss_size_matching`
+  `settings:ads-display` `settings:privacy`
 - **Expected behaviour:** `docs/website/usage/010-settings.md`
 - **Also check:** every option is read somewhere (a saved option that changes nothing
   is a finding); privacy line says IPs are always hashed; with Pro active the layout
@@ -143,6 +168,7 @@ action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy
   Ads > Help & Docs, Ads > Settings > Tools & License > Sample content.
 - **Surfaces:** `admin:wbam-setup` `ajax:wbam_dismiss_setup` `post:wbam_skip_setup`
   `ajax:wbam_dismiss_pointer` `post:wbam_clear_demo_data` `admin:wbam-help`
+  `settings:tools`
 - **Expected behaviour:** `docs/website/usage/020-setup-wizard.md`,
   `docs/website/getting-started/010-quick-setup.md`
 - **Core:** 7
@@ -161,6 +187,9 @@ action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy
   `rest:/wbam/v1/links/(?P<id>\d+)/track` `rest:/wbam/v1/links/categories`
   `ajax:wbam_track_link_click` `shortcode:wbam_link` `shortcode:wbam_link_url`
   `shortcode:wbam_links`
+  `route:wbam_link` `settings:links` `ability:wbam/list-links`
+  `ability:wbam/create-link` `ability:wbam/update-link` `ability:wbam/delete-link`
+  `ability:wbam/get-link-stats`
 - **Expected behaviour:** `docs/website/features/040-link-management.md`,
   `docs/website/shortcodes/010-link-shortcodes.md`
 - **Core:** 6
@@ -193,7 +222,9 @@ action, `post` (admin-post action), `cron` hook, `cpt` post type, `tax` taxonomy
   `post:wbam_delete_email_capture`
 - **Expected behaviour:** `docs/website/features/050-email-capture.md`
 - **Also check:** the CSV opens cleanly and contains no formula injection; the list
-  pages at 2,000+ rows; personal data export and erase include captures.
+  pages at 2,000+ rows. Neither plugin registers a WordPress personal data exporter
+  or eraser (Tools > Export/Erase Personal Data finds nothing from WB Ad Manager);
+  tracked as a finding, see AUDIT_PROTOCOL.md section 5.
 
 ## F-BP - BuddyPress
 

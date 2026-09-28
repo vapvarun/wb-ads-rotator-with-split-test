@@ -12,10 +12,12 @@
  * WP_ADMIN makes both plugins load their admin classes (menus, admin AJAX);
  * admin_init is never fired, so no redirects, saves or upgrades run.
  *
- * Surfaces are read from the live registries (REST, admin menu, shortcodes,
- * blocks, widgets, AJAX, admin-post, cron, post types, taxonomies,
- * placements, ad types, emails), not grepped, so constants and
- * loops resolve. Each is attributed to Free or Pro by its callback's file.
+ * Surfaces are read from the live registries, not grepped, so constants and
+ * loops resolve: REST routes, admin screens, settings sections, editor meta
+ * boxes, dashboard widgets, shortcodes, blocks, widgets, abilities, AJAX and
+ * admin-post handlers, URL routes, cron jobs, post types, taxonomies, roles,
+ * placements, ad types, emails, template files, payment gateways and purchase
+ * adapters. Each is attributed to Free or Pro by its callback's file.
  * A catalog lists a surface as `kind:id` in backticks, e.g. `rest:/wbam/v1/ads`.
  *
  * Read-only. Loads the admin menu as user 1 in memory; writes nothing.
@@ -38,6 +40,9 @@ $wbam_plugins = array(
 	'pro'  => WP_PLUGIN_DIR . '/wb-ad-manager-pro',
 );
 $wbam_list    = in_array( 'list', $args ?? array(), true );
+
+// Every surface kind a catalog entry may name.
+const WBAM_QA_KINDS = 'rest|admin|settings|metabox|dashboard|shortcode|block|widget|ability|ajax|post|route|cron|cpt|tax|role|placement|adtype|email|template|gateway|adapter';
 
 /** Which plugin a callable lives in, as array( owner, file:line ). */
 $wbam_owner = static function ( $cb ) use ( $wbam_plugins ) {
@@ -110,6 +115,7 @@ wp_set_current_user( 1 );
 set_current_screen( 'dashboard' );
 require_once ABSPATH . 'wp-admin/includes/admin.php';
 global $menu, $submenu, $_registered_pages, $wp_filter;
+$wbam_settings = null;
 $menu    = array();
 $submenu = array();
 do_action( 'admin_menu' );
@@ -120,10 +126,113 @@ foreach ( array_keys( (array) $_registered_pages ) as $hook ) {
 	foreach ( $wp_filter[ $hook ]->callbacks ?? array() as $cbs ) {
 		foreach ( $cbs as $cb ) {
 			$wbam_add( 'admin:' . $m[1], $wbam_owner( $cb['function'] ) );
+			if ( is_array( $cb['function'] ) && $cb['function'][0] instanceof WBAM\Admin\Settings ) {
+				$wbam_settings = $cb['function'][0];
+			}
 		}
 	}
 	if ( str_starts_with( $m[1], 'wbam' ) ) {
 		$wbam_add( 'admin:' . $m[1], $wbam_by_source( $m[1], '_page(' ) );
+	}
+}
+
+// Settings sections (Free's registry plus what Pro adds through the filter).
+if ( $wbam_settings ) {
+	$sections = new ReflectionMethod( $wbam_settings, 'get_sections' );
+	$sections->setAccessible( true );
+	foreach ( (array) $sections->invoke( $wbam_settings ) as $key => $section ) {
+		$wbam_add( 'settings:' . $key, $wbam_owner( $section['render'] ?? null ) );
+	}
+}
+
+// Editor meta boxes for the plugins' post types. Registration only: the
+// default post is built in memory, never saved.
+global $wp_meta_boxes;
+foreach ( array( 'wbam-ad', 'wbam-classified' ) as $pt ) {
+	if ( ! post_type_exists( $pt ) ) {
+		continue;
+	}
+	set_current_screen( $pt );
+	$draft = get_default_post_to_edit( $pt, false );
+	do_action( 'add_meta_boxes', $pt, $draft );
+	do_action( "add_meta_boxes_{$pt}", $draft );
+	foreach ( (array) ( $wp_meta_boxes[ $pt ] ?? array() ) as $contexts ) {
+		foreach ( $contexts as $boxes ) {
+			foreach ( (array) $boxes as $id => $box ) {
+				if ( $box ) {
+					$wbam_add( 'metabox:' . $pt . '/' . $id, $wbam_owner( $box['callback'] ) );
+				}
+			}
+		}
+	}
+}
+
+// Dashboard widgets.
+require_once ABSPATH . 'wp-admin/includes/dashboard.php';
+set_current_screen( 'dashboard' );
+$wp_meta_boxes = array();
+do_action( 'wp_dashboard_setup' );
+foreach ( (array) ( $wp_meta_boxes['dashboard'] ?? array() ) as $contexts ) {
+	foreach ( $contexts as $boxes ) {
+		foreach ( (array) $boxes as $id => $box ) {
+			if ( $box ) {
+				$wbam_add( 'dashboard:' . $id, $wbam_owner( $box['callback'] ) );
+			}
+		}
+	}
+}
+
+// Abilities API (WordPress 6.9): owned by name prefix.
+if ( function_exists( 'wp_get_abilities' ) ) {
+	foreach ( wp_get_abilities() as $ability ) {
+		$name = $ability->get_name();
+		$who  = str_starts_with( $name, 'wbam-pro/' ) ? 'pro' : ( str_starts_with( $name, 'wbam/' ) ? 'free' : '' );
+		$wbam_add( 'ability:' . $name, $who ? array( $who, 'abilities' ) : null );
+	}
+}
+
+// Custom URL routes (add_rewrite_rule), keyed by query var because the URL
+// prefix is a setting. Post type and taxonomy archives are covered by cpt/tax.
+global $wp_rewrite;
+foreach ( (array) $wp_rewrite->extra_rules_top as $query ) {
+	if ( preg_match( '/[?&](wbam[\w-]*)=/', (string) $query, $q ) && ! post_type_exists( $q[1] ) && ! taxonomy_exists( $q[1] ) ) {
+		$wbam_add( 'route:' . $q[1], $wbam_by_source( $q[1], 'add_rewrite_rule' ) );
+	}
+}
+
+// Roles.
+foreach ( array_keys( wp_roles()->roles ) as $role ) {
+	if ( str_starts_with( $role, 'wbam' ) ) {
+		$wbam_add( 'role:' . $role, $wbam_by_source( $role, 'add_role' ) );
+	}
+}
+
+// Payment gateways and purchase adapters of Pro's bundled Credits SDK.
+if ( class_exists( 'Wbcom\\Credits\\Gateways\\Gateway_Registry' ) ) {
+	foreach ( array_keys( Wbcom\Credits\Gateways\Gateway_Registry::for_slug( 'wbam-pro' )->get_all() ) as $id ) {
+		$wbam_add( 'gateway:' . $id, array( 'pro', 'libs/wbcom-credits-sdk' ) );
+	}
+	// The adapter registry boots straight away (no hook to find it on), so
+	// list the adapters by interface; the SDK ships one class per store.
+	foreach ( get_declared_classes() as $class ) {
+		if ( is_subclass_of( $class, 'Wbcom\\Credits\\Adapters\\AdapterInterface' ) ) {
+			$wbam_add( 'adapter:' . ( new ReflectionClass( $class ) )->getShortName(), array( 'pro', 'libs/wbcom-credits-sdk' ) );
+		}
+	}
+}
+
+// Template files (the presentation layer). A catalog may cover a folder with
+// a pattern such as `template:emails/*`.
+foreach ( $wbam_plugins as $who => $dir ) {
+	if ( ! is_dir( $dir . '/templates' ) ) {
+		continue;
+	}
+	$it = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir . '/templates', FilesystemIterator::SKIP_DOTS ) );
+	foreach ( $it as $f ) {
+		if ( 'php' === $f->getExtension() ) {
+			$rel = substr( $f->getPathname(), strlen( $dir . '/templates/' ) );
+			$wbam_add( 'template:' . $rel, array( $who, 'templates/' . $rel ) );
+		}
 	}
 }
 
@@ -206,8 +315,17 @@ foreach ( $wbam_plugins as $who => $dir ) {
 	$mine    = array_filter( $wbam_found, static fn ( $o ) => $who === $o[0] );
 	$catalog = $dir . '/docs/qa/FUNCTIONALITY_CATALOG.md';
 	$text    = is_readable( $catalog ) ? (string) file_get_contents( $catalog ) : '';
-	preg_match_all( '/`((?:rest|admin|shortcode|block|widget|ajax|post|cron|cpt|tax|placement|adtype|email):[^`\s]+)`/', $text, $m );
+	preg_match_all( '/`((?:' . WBAM_QA_KINDS . '):[^`\s]+)`/', $text, $m );
 	$listed = array_unique( $m[1] );
+	// An entry covers a surface exactly, or by pattern when it holds a `*`.
+	$covered = static function ( $key ) use ( $listed ) {
+		foreach ( $listed as $entry ) {
+			if ( $entry === $key || ( str_contains( $entry, '*' ) && fnmatch( $entry, $key ) ) ) {
+				return true;
+			}
+		}
+		return false;
+	};
 
 	WP_CLI::log( sprintf( '== %s: %d surfaces, %d listed in %s', strtoupper( $who ), count( $mine ), count( $listed ), $text ? 'docs/qa/FUNCTIONALITY_CATALOG.md' : 'NO CATALOG' ) );
 	if ( $wbam_list ) {
@@ -216,11 +334,15 @@ foreach ( $wbam_plugins as $who => $dir ) {
 		}
 		continue;
 	}
-	foreach ( array_diff( array_keys( $mine ), $listed ) as $key ) {
+	foreach ( array_filter( array_keys( $mine ), static fn ( $k ) => ! $covered( $k ) ) as $key ) {
 		WP_CLI::log( sprintf( '  MISSING from catalog: %-60s %s', $key, $mine[ $key ][1] ) );
 		++$wbam_gaps;
 	}
-	foreach ( array_diff( $listed, array_keys( $wbam_found ) ) as $key ) {
+	$stale = array_filter(
+		$listed,
+		static fn ( $e ) => str_contains( $e, '*' ) ? ! array_filter( array_keys( $wbam_found ), static fn ( $k ) => fnmatch( $e, $k ) ) : ! isset( $wbam_found[ $e ] )
+	);
+	foreach ( $stale as $key ) {
 		WP_CLI::log( '  STALE in catalog (not registered): ' . $key );
 		++$wbam_gaps;
 	}
