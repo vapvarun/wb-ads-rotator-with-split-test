@@ -249,6 +249,7 @@ class Abilities {
 						'title'              => array( 'type' => 'string' ),
 						'edit_url'           => array( 'type' => 'string' ),
 						'dropped_placements' => self::dropped_placements_schema(),
+						'notice'             => array( 'type' => 'string' ),
 					),
 				),
 				'execute_callback'    => array( $this, 'execute_create_ad' ),
@@ -302,6 +303,7 @@ class Abilities {
 						'id'                 => array( 'type' => 'integer' ),
 						'updated'            => array( 'type' => 'boolean' ),
 						'dropped_placements' => self::dropped_placements_schema(),
+						'notice'             => array( 'type' => 'string' ),
 					),
 				),
 				'execute_callback'    => array( $this, 'execute_update_ad' ),
@@ -991,6 +993,7 @@ class Abilities {
 			'title'              => $title,
 			'edit_url'           => get_edit_post_link( $post_id, 'raw' ),
 			'dropped_placements' => $dropped,
+			'notice'             => self::draft_notice( $post_id ),
 		);
 	}
 
@@ -1067,7 +1070,20 @@ class Abilities {
 			'id'                 => $id,
 			'updated'            => true,
 			'dropped_placements' => $dropped,
+			'notice'             => self::draft_notice( $id ),
 		);
+	}
+
+	/**
+	 * Keep an ad missing a required setting (AdSense without a Slot ID) as a
+	 * Draft, as the editor does, and say why. '' when nothing was wrong.
+	 *
+	 * @param int $ad_id Ad ID, after its data was saved.
+	 * @return string
+	 */
+	private static function draft_notice( $ad_id ) {
+		$missing = \WBAM\Core\Ad_Status::draft_if_incomplete( $ad_id );
+		return '' === $missing ? '' : __( 'Saved as a draft, not published.', 'wb-ads-rotator-with-split-test' ) . ' ' . $missing;
 	}
 
 	/**

@@ -3187,8 +3187,7 @@ class Admin {
 		}
 
 		$raw     = map_deep( wp_unslash( (array) $_POST['wbam_data'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized by map_deep.
-		$handler = Placement_Engine::get_instance()->get_ad_type( isset( $raw['type'] ) ? (string) $raw['type'] : '' );
-		$missing = ( $handler && method_exists( $handler, 'missing_setting' ) ) ? $handler->missing_setting( $raw ) : '';
+		$missing = \WBAM\Core\Ad_Status::missing_setting( $raw );
 		if ( '' === $missing ) {
 			return $data;
 		}

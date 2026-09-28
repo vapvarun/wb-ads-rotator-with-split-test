@@ -71,7 +71,7 @@ class Shortcode_Placement implements Placement_Interface {
 
 		$ad_id = absint( $atts['id'] );
 		if ( $ad_id <= 0 ) {
-			return '';
+			return \WBAM\Core\Ad_Status::editor_hint( 0 );
 		}
 
 		$html = Placement_Engine::get_instance()->render_ad(

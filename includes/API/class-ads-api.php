@@ -329,7 +329,7 @@ class Ads_API {
 			array(
 				'post_title'  => $title,
 				'post_type'   => 'wbam-ad',
-				'post_status' => 'publish',
+				'post_status' => $this->requested_status( $request, 'publish' ),
 			),
 			true
 		);
@@ -342,11 +342,7 @@ class Ads_API {
 			);
 		}
 
-		$dropped = $this->save_ad_meta( $post_id, $request );
-
-		$data                       = $this->prepare_ad_for_response( get_post( $post_id ), true );
-		$data['dropped_placements'] = $dropped;
-		return rest_ensure_response( $data );
+		return $this->saved_ad_response( $post_id, $this->save_ad_meta( $post_id, $request ) );
 	}
 
 	/**
@@ -375,11 +371,9 @@ class Ads_API {
 			$update_data['post_title'] = sanitize_text_field( $request['title'] );
 		}
 
-		if ( isset( $request['status'] ) ) {
-			$allowed_statuses = array( 'publish', 'draft', 'pending' );
-			if ( in_array( $request['status'], $allowed_statuses, true ) ) {
-				$update_data['post_status'] = $request['status'];
-			}
+		$status = $this->requested_status( $request, '' );
+		if ( '' !== $status ) {
+			$update_data['post_status'] = $status;
 		}
 
 		$result = wp_update_post( $update_data, true );
@@ -392,10 +386,38 @@ class Ads_API {
 			);
 		}
 
-		$dropped = $this->save_ad_meta( $id, $request );
+		return $this->saved_ad_response( $id, $this->save_ad_meta( $id, $request ) );
+	}
+
+	/**
+	 * The status a create/update request asks for.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @param string           $default  Status when the request names none (or an unknown one).
+	 * @return string
+	 */
+	private function requested_status( $request, $default ) {
+		$status = isset( $request['status'] ) ? (string) $request['status'] : '';
+		return in_array( $status, array( 'publish', 'draft', 'pending' ), true ) ? $status : $default;
+	}
+
+	/**
+	 * Response for a saved ad. An ad missing a required setting (AdSense
+	 * without a Slot ID) is kept as a Draft, like the editor does, and the
+	 * response says why.
+	 *
+	 * @param int   $id      Ad ID.
+	 * @param array $dropped Placements dropped by the fit check.
+	 * @return \WP_REST_Response
+	 */
+	private function saved_ad_response( $id, $dropped ) {
+		$notice = \WBAM\Core\Ad_Status::draft_if_incomplete( $id );
 
 		$data                       = $this->prepare_ad_for_response( get_post( $id ), true );
 		$data['dropped_placements'] = $dropped;
+		if ( '' !== $notice ) {
+			$data['notice'] = __( 'Saved as a draft, not published.', 'wb-ads-rotator-with-split-test' ) . ' ' . $notice;
+		}
 		return rest_ensure_response( $data );
 	}
 

@@ -129,7 +129,23 @@ final class Ad_Status {
 	 * @return string Note HTML, escaped.
 	 */
 	public static function editor_hint( $ad_id ) {
-		if ( ! current_user_can( 'edit_post', (int) $ad_id ) ) {
+		$ad_id = (int) $ad_id;
+
+		// No ad behind this ID: edit_post cannot be checked on a post that is
+		// not there, so ask for the ability to edit ads instead.
+		if ( $ad_id <= 0 || 'wbam-ad' !== get_post_type( $ad_id ) ) {
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				return '';
+			}
+			return self::note(
+				$ad_id > 0
+					/* translators: %d: ad ID */
+					? sprintf( __( 'There is no ad with ID %d.', 'wb-ads-rotator-with-split-test' ), $ad_id )
+					: __( 'Add the ad to show, for example [wbam_ad id="123"].', 'wb-ads-rotator-with-split-test' )
+			);
+		}
+
+		if ( ! current_user_can( 'edit_post', $ad_id ) ) {
 			return '';
 		}
 
@@ -146,6 +162,44 @@ final class Ad_Status {
 				$reason
 			)
 		);
+	}
+
+	/**
+	 * What an ad still needs before it can show, or '' when it is complete
+	 * (AdSense without a Slot or Publisher ID today). One check for the
+	 * editor, REST and Abilities.
+	 *
+	 * @param array $data Ad data (stored, or as posted on save).
+	 * @return string Sentence for the owner, or ''.
+	 */
+	public static function missing_setting( array $data ) {
+		$handler = Placement_Engine::get_instance()->get_ad_type( isset( $data['type'] ) ? (string) $data['type'] : '' );
+		return ( $handler && method_exists( $handler, 'missing_setting' ) ) ? $handler->missing_setting( $data ) : '';
+	}
+
+	/**
+	 * Keep a saved ad that is missing a required setting as a Draft instead
+	 * of live and broken (owner decision, card 10344381767). For saves that
+	 * bypass the editor (REST, Abilities), where no save filter runs.
+	 *
+	 * @param int $ad_id Ad ID, after its data was saved.
+	 * @return string Why it was kept as a draft, or '' when nothing changed.
+	 */
+	public static function draft_if_incomplete( $ad_id ) {
+		if ( ! in_array( get_post_status( $ad_id ), array( 'publish', 'future' ), true ) ) {
+			return '';
+		}
+		$data    = get_post_meta( $ad_id, '_wbam_ad_data', true );
+		$missing = self::missing_setting( is_array( $data ) ? $data : array() );
+		if ( '' !== $missing ) {
+			wp_update_post(
+				array(
+					'ID'          => (int) $ad_id,
+					'post_status' => 'draft',
+				)
+			);
+		}
+		return $missing;
 	}
 
 	/**

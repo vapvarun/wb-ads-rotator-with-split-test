@@ -65,4 +65,67 @@ class Test_AdSense_Incomplete_Stays_Draft extends WP_UnitTestCase {
 		$this->assertFalse( $ad->has_creative( $ad_id ) );
 		$this->assertSame( 'Slot ID missing', $ad->get_missing_label( $ad_id ) );
 	}
+
+	private function rest_create( array $body ): array {
+		$request = new \WP_REST_Request( 'POST', '/wbam/v1/ads' );
+		$request->set_body_params( array_merge( array( 'title' => 'REST ad' ), $body ) );
+		return rest_do_request( $request )->get_data();
+	}
+
+	public function test_rest_adsense_without_a_slot_id_is_kept_a_draft_with_the_reason(): void {
+		$data = $this->rest_create( array( 'status' => 'publish', 'ad_data' => array( 'type' => 'adsense' ) ) );
+
+		$this->assertSame( 'draft', get_post_status( $data['id'] ) );
+		$this->assertStringContainsString( 'Ad Slot ID', $data['notice'] );
+	}
+
+	public function test_rest_complete_adsense_publishes(): void {
+		Settings_Helper::update( 'adsense_publisher_id', 'ca-pub-1234567890123456' );
+		$data = $this->rest_create( array( 'ad_data' => array( 'type' => 'adsense', 'slot_id' => '1234567890' ) ) );
+
+		$this->assertSame( 'publish', get_post_status( $data['id'] ) );
+		$this->assertArrayNotHasKey( 'notice', $data );
+	}
+
+	public function test_rest_create_honours_the_requested_status(): void {
+		$data = $this->rest_create( array( 'status' => 'draft', 'ad_data' => array( 'type' => 'rich-content', 'content' => '<p>x</p>' ) ) );
+		$this->assertSame( 'draft', get_post_status( $data['id'] ) );
+
+		$data = $this->rest_create( array( 'ad_data' => array( 'type' => 'rich-content', 'content' => '<p>x</p>' ) ) );
+		$this->assertSame( 'publish', get_post_status( $data['id'] ), 'No status asked for: publish, as before.' );
+	}
+
+	public function test_rest_update_that_empties_the_slot_id_drops_a_live_ad_to_draft(): void {
+		Settings_Helper::update( 'adsense_publisher_id', 'ca-pub-1234567890123456' );
+		$data = $this->rest_create( array( 'ad_data' => array( 'type' => 'adsense', 'slot_id' => '1234567890' ) ) );
+		$this->assertSame( 'publish', get_post_status( $data['id'] ) );
+
+		$request = new \WP_REST_Request( 'PUT', '/wbam/v1/ads/' . $data['id'] );
+		$request->set_body_params( array( 'ad_data' => array( 'type' => 'adsense', 'slot_id' => '' ) ) );
+		rest_do_request( $request );
+
+		$this->assertSame( 'draft', get_post_status( $data['id'] ) );
+	}
+
+	public function test_abilities_create_adsense_without_a_slot_id_is_kept_a_draft(): void {
+		$result = ( new \WBAM\Core\Abilities() )->execute_create_ad(
+			array(
+				'title'   => 'Ability ad',
+				'type'    => 'adsense',
+				'content' => array( 'publisher_id' => 'ca-pub-1234567890123456' ),
+			)
+		);
+
+		$this->assertSame( 'draft', get_post_status( $result['id'] ) );
+		$this->assertStringContainsString( 'Ad Slot ID', $result['notice'] );
+	}
+
+	public function test_an_empty_shortcode_hints_to_editors_and_shows_visitors_nothing(): void {
+		$this->assertStringContainsString( 'Add the ad to show', do_shortcode( '[wbam_ad]' ) );
+		$this->assertStringContainsString( 'no ad with ID 999991', do_shortcode( '[wbam_ad id="999991"]' ) );
+
+		wp_set_current_user( 0 );
+		$this->assertSame( '', do_shortcode( '[wbam_ad]' ) );
+		$this->assertSame( '', do_shortcode( '[wbam_ad id="999991"]' ) );
+	}
 }
