@@ -131,4 +131,31 @@ class Test_Email_Settings_Gate extends Pro_Test_Case {
 
 		$this->assertTrue( Email_Notifications::deliver( 'a@example.org', 'Subject', 'Body' ), 'No type: account status mail is not switchable.' );
 	}
+
+	public function test_the_featured_ending_soon_warning_follows_the_listing_switch(): void {
+		$stub = new class( $this->user ) {
+			public $id = 0;
+			public $featured_expires_at = '2030-01-01 00:00:00';
+			public function __construct( private int $user_id ) {}
+			public function get_advertiser() {
+				return (object) array( 'user_id' => $this->user_id );
+			}
+			public function get_remaining_featured_days() {
+				return 2;
+			}
+			public function get_title() {
+				return 'Old bike';
+			}
+		};
+		$warn = new \ReflectionMethod( \WBAM_Pro\Modules\Classifieds\Classified_Billing::class, 'send_expiration_warning_email' );
+
+		update_option( 'wbam_pro_email_settings', array() );
+		$warn->invoke( null, $stub );
+		$this->assertCount( 1, $this->sent, 'On by default.' );
+
+		$this->sent = array();
+		update_option( 'wbam_pro_email_settings', array( 'listing_lifecycle' => false ) );
+		$warn->invoke( null, $stub );
+		$this->assertCount( 0, $this->sent );
+	}
 }
