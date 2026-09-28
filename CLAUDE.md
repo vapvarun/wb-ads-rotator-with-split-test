@@ -180,6 +180,8 @@ Use `/wp-plugin-release` when ready to ship. Build output goes to `build/` (giti
 
 Requires `npm install` once (grunt + rtlcss) and WP-CLI (`wp`) on `PATH`.
 
+**Functionality catalog.** Every admin screen, REST route, shortcode, block, widget, AJAX/admin-post handler, cron job, post type, taxonomy, placement, ad type and email belongs to a feature row in `docs/qa/FUNCTIONALITY_CATALOG.md` (Pro: its own copy). Add or remove the row in the same change that adds or removes the surface. `wp --exec='define("WP_ADMIN", true);' eval-file bin/qa-catalog-check.php` (on a site with Free + Pro active) must print "Every surface is in a catalog" before a release. Independent audits follow `docs/qa/AUDIT_PROTOCOL.md`.
+
 **Release discipline** (from global memory):
 - `distignore` is plugin-root-relative
 - The builder's runtime-reference scanner catches forgot-to-ship bugs

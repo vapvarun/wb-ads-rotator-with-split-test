@@ -33,6 +33,11 @@ The gate between "fixes are merged" and "customers get an update". Work top to b
 - [ ] `docs/qa/.last-smoke-pass.json` exists, `release_version` matches, `failures[]` and `debug_log_issues[]` both empty
 - [ ] Or `PRE_RELEASE_SMOKE.md` completed by hand and attached
 - [ ] Report is under 24h old
+- [ ] Functionality catalogs are complete: on a site running both plugins,
+      `wp --exec='define("WP_ADMIN", true);' eval-file bin/qa-catalog-check.php` prints
+      "Every surface is in a catalog" (Free and Pro `docs/qa/FUNCTIONALITY_CATALOG.md`)
+- [ ] Independent audit done per `docs/qa/AUDIT_PROTOCOL.md`: the report lists every
+      feature ID as PASS, a card link, or NOT COVERED with the environment it needs
 
 ## 4 — Journey re-run after the last code change
 
