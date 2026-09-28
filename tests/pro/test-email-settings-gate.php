@@ -83,4 +83,52 @@ class Test_Email_Settings_Gate extends Pro_Test_Case {
 		$this->assertContains( 'Content-Type: text/plain; charset=UTF-8', $this->sent[0]['headers'] );
 		$this->assertNotContains( 'Content-Type: text/html; charset=UTF-8', $this->sent[0]['headers'] );
 	}
+
+	public function test_a_switched_off_family_stops_every_email_in_it(): void {
+		$notify = Email_Notifications::get_instance();
+		$stub   = new class( $this->user ) {
+			public $listing_title = 'Old bike';
+			public $sender_email  = 'buyer@example.org';
+			public $sender_name  = 'Buyer';
+			public $views_count   = 0;
+			public $inquiries_count = 0;
+			public function __construct( private int $user_id ) {}
+			public function get_advertiser() {
+				return (object) array( 'user_id' => $this->user_id );
+			}
+			public function get_title() {
+				return 'Old bike';
+			}
+		};
+
+		$send_family = static function ( $notify, $stub, $user ) {
+			$notify->send_advertiser_welcome( $user, '' );
+			$notify->send_admin_new_advertiser( $user );
+			$notify->send_classified_expired( $stub );
+			$notify->send_inquiry_reply( $stub, 'Still for sale', 'Seller', 'seller@example.org' );
+		};
+
+		update_option( 'wbam_pro_email_settings', array() );
+		$send_family( $notify, $stub, $this->user );
+		$on = count( $this->sent );
+		$this->assertGreaterThanOrEqual( 4, $on, 'With no switch saved, every family is on.' );
+
+		$this->sent = array();
+		update_option(
+			'wbam_pro_email_settings',
+			array(
+				'advertiser_signup'   => false,
+				'listing_lifecycle'   => false,
+				'marketplace_updates' => false,
+			)
+		);
+		$send_family( $notify, $stub, $this->user );
+		$this->assertCount( 0, $this->sent );
+	}
+
+	public function test_account_status_mail_still_goes_out_when_every_switch_is_off(): void {
+		update_option( 'wbam_pro_email_settings', array_fill_keys( array( 'advertiser_signup', 'ad_status_updates', 'campaign_updates', 'listing_lifecycle', 'marketplace_updates', 'membership_updates' ), false ) );
+
+		$this->assertTrue( Email_Notifications::deliver( 'a@example.org', 'Subject', 'Body' ), 'No type: account status mail is not switchable.' );
+	}
 }
