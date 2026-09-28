@@ -3182,11 +3182,18 @@ class Admin {
 		if ( 'wbam-ad' !== ( $data['post_type'] ?? '' ) || ! in_array( $data['post_status'] ?? '', array( 'publish', 'future' ), true ) ) {
 			return $data;
 		}
-		if ( ! isset( $_POST['wbam_nonce'], $_POST['wbam_data'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wbam_nonce'] ) ), 'wbam_save_ad' ) ) {
+
+		if ( isset( $_POST['wbam_nonce'], $_POST['wbam_data'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wbam_nonce'] ) ), 'wbam_save_ad' ) ) {
+			$raw = map_deep( wp_unslash( (array) $_POST['wbam_data'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized by map_deep.
+		} elseif ( ! empty( $postarr['ID'] ) && ! in_array( get_post_status( (int) $postarr['ID'] ), array( 'publish', 'future' ), true ) ) {
+			// Quick Edit, Bulk Edit or a status change: no form to read, so an
+			// ad being published is judged on what it has stored.
+			$stored = get_post_meta( (int) $postarr['ID'], '_wbam_ad_data', true );
+			$raw    = is_array( $stored ) ? $stored : array();
+		} else {
 			return $data;
 		}
 
-		$raw     = map_deep( wp_unslash( (array) $_POST['wbam_data'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized by map_deep.
 		$missing = \WBAM\Core\Ad_Status::missing_setting( $raw );
 		if ( '' === $missing ) {
 			return $data;

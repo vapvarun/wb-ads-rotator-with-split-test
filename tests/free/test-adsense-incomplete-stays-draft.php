@@ -128,4 +128,32 @@ class Test_AdSense_Incomplete_Stays_Draft extends WP_UnitTestCase {
 		$this->assertSame( '', do_shortcode( '[wbam_ad]' ) );
 		$this->assertSame( '', do_shortcode( '[wbam_ad id="999991"]' ) );
 	}
+
+	public function test_quick_or_bulk_edit_publishing_an_incomplete_ad_keeps_it_a_draft(): void {
+		$ad_id = self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'draft' ) );
+		update_post_meta( $ad_id, '_wbam_ad_data', array( 'type' => 'adsense', 'publisher_id' => 'ca-pub-1234567890123456' ) );
+
+		wp_update_post( array( 'ID' => $ad_id, 'post_status' => 'publish' ) );
+
+		$this->assertSame( 'draft', get_post_status( $ad_id ), 'No form is posted, so the stored data decides.' );
+	}
+
+	public function test_a_complete_ad_still_publishes_from_quick_edit(): void {
+		Settings_Helper::update( 'adsense_publisher_id', 'ca-pub-1234567890123456' );
+		$ad_id = self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'draft' ) );
+		update_post_meta( $ad_id, '_wbam_ad_data', array( 'type' => 'adsense', 'slot_id' => '1234567890' ) );
+
+		wp_update_post( array( 'ID' => $ad_id, 'post_status' => 'publish' ) );
+
+		$this->assertSame( 'publish', get_post_status( $ad_id ) );
+	}
+
+	public function test_an_ad_that_is_already_live_is_not_demoted_by_an_unrelated_update(): void {
+		$ad_id = self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
+		update_post_meta( $ad_id, '_wbam_ad_data', array( 'type' => 'adsense' ) );
+
+		wp_update_post( array( 'ID' => $ad_id, 'post_title' => 'Renamed' ) );
+
+		$this->assertSame( 'publish', get_post_status( $ad_id ), 'Only the moment of publishing is judged, so an import or rename cannot take a live ad off the air.' );
+	}
 }
