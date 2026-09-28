@@ -20,6 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 $ad_id = isset( $attributes['adId'] ) ? absint( $attributes['adId'] ) : 0;
 
 if ( ! $ad_id ) {
+	// Editors are told the block has no ad yet; visitors get nothing.
+	echo \WBAM\Core\Ad_Status::editor_hint( 0 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- note() escapes its own output.
 	return;
 }
 

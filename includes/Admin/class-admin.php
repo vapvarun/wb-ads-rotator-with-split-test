@@ -1590,21 +1590,7 @@ class Admin {
 		// Same rule the portal wizard already enforces on its slot grid.
 		// Existing sites that have not opted into format_matching keep
 		// every placement tickable, same as today.
-		/**
-		 * Filter whether the ad editor greys out placements the ad's
-		 * resolved size doesn't fit, instead of letting every placement
-		 * stay tickable regardless of shape.
-		 *
-		 * @since 3.2.0
-		 * @param bool $enforce Whether to enforce format matching. Defaults
-		 *                      to the site's format_matching setting.
-		 * @param int  $post_id Ad post ID.
-		 */
-		$enforce_format = (bool) apply_filters(
-			'wbam_enforce_format_matching',
-			\WBAM\Core\Settings_Helper::format_matching_enabled(),
-			$post->ID
-		);
+		$enforce_format = \WBAM\Core\Settings_Helper::format_matching_enforced( $post->ID );
 
 		// Owner decision (card 10343726460, QA wave 5): a stored placement
 		// the ad no longer fits (matching turned on after the ad existed)
@@ -3202,7 +3188,7 @@ class Admin {
 		$data['post_status'] = 'draft';
 		self::$kept_as_draft = true;
 		if ( ! empty( $postarr['ID'] ) ) {
-			self::add_save_notice( (int) $postarr['ID'], 'error', __( 'Saved as a draft, not published.', 'wb-ads-rotator-with-split-test' ) . ' ' . $missing );
+			self::add_save_notice( (int) $postarr['ID'], 'error', \WBAM\Core\Ad_Status::draft_notice( $missing ) );
 		}
 
 		return $data;
@@ -3264,10 +3250,7 @@ class Admin {
 			// reads to decide whether to grey out a mismatched checkbox
 			// (card 10343726460). Off = existing site that hasn't opted in;
 			// every placement stays tickable exactly as it does today.
-			'enforceMatching' => (bool) apply_filters(
-				'wbam_enforce_format_matching',
-				\WBAM\Core\Settings_Helper::format_matching_enabled()
-			),
+			'enforceMatching' => \WBAM\Core\Settings_Helper::format_matching_enforced(),
 		);
 	}
 

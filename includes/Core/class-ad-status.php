@@ -178,6 +178,16 @@ final class Ad_Status {
 	}
 
 	/**
+	 * The sentence that says an ad was kept as a Draft and what it needs.
+	 *
+	 * @param string $missing What the ad still needs ('' when nothing).
+	 * @return string The notice, or '' when nothing was missing.
+	 */
+	public static function draft_notice( $missing ) {
+		return '' === $missing ? '' : __( 'Saved as a draft, not published.', 'wb-ads-rotator-with-split-test' ) . ' ' . $missing;
+	}
+
+	/**
 	 * Keep a saved ad that is missing a required setting as a Draft instead
 	 * of live and broken (owner decision, card 10344381767). For saves that
 	 * bypass the editor (REST, Abilities), where no save filter runs.

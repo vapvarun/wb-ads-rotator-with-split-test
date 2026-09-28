@@ -158,4 +158,36 @@ class Test_Email_Settings_Gate extends Pro_Test_Case {
 		$warn->invoke( null, $stub );
 		$this->assertCount( 0, $this->sent );
 	}
+
+	/**
+	 * Every sender in a family passes that family's switch key, and the mail an
+	 * owner may not switch off passes none. Read from the source because the
+	 * senders need campaigns, plans and advertisers to run for real.
+	 */
+	public function test_each_sender_passes_its_familys_switch_key_and_account_mail_passes_none(): void {
+		$en  = \WBAM_Pro\Modules\Notifications\Email_Notifications::class;
+		$aen = \WBAM_Pro\Modules\Advertisers\Advertiser_Email_Notifications::class;
+		$sub = static fn( $n ) => array( $en, "send_subscription_$n" );
+
+		$families = array(
+			'campaign_updates'  => array( array( $en, 'send_campaign_started' ), array( $en, 'send_campaign_completed' ), array( $en, 'send_campaign_budget_low' ), array( $aen, 'campaign_budget_depleted' ), array( $aen, 'campaign_ended' ) ),
+			'ad_status_updates' => array( array( $en, 'send_ad_changes_requested' ), array( $aen, 'send_ad_paused' ) ),
+			'membership_updates' => array( $sub( 'created' ), $sub( 'switched' ), $sub( 'cancelled' ), $sub( 'reactivated' ), $sub( 'expiring' ), $sub( 'expired' ) ),
+		);
+		$source   = static function ( array $method ): string {
+			$r = new \ReflectionMethod( $method[0], $method[1] );
+			return implode( '', array_slice( file( $r->getFileName() ), $r->getStartLine() - 1, $r->getEndLine() - $r->getStartLine() + 1 ) );
+		};
+
+		foreach ( $families as $key => $methods ) {
+			foreach ( $methods as $method ) {
+				$this->assertStringContainsString( "'$key'", $source( $method ), "$method[1] must pass '$key'." );
+			}
+		}
+
+		$always_on = array( array( $aen, 'send_account_suspended' ), array( $aen, 'send_account_banned' ), array( $aen, 'send_account_reactivated' ), $sub( 'renewed' ), $sub( 'payment_failed' ) );
+		foreach ( $always_on as $method ) {
+			$this->assertDoesNotMatchRegularExpression( '/send\([^;]*\'[a-z_]+\'\s*\);/', $source( $method ), "$method[1] is not switchable." );
+		}
+	}
 }

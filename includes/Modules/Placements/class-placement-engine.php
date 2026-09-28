@@ -388,11 +388,7 @@ class Placement_Engine {
 		// so sites opt in after they've had a chance to review the
 		// backfilled formats on their existing ads. Filterable for
 		// A/B testing and per-env control.
-		$enforce_format = (bool) apply_filters(
-			'wbam_enforce_format_matching',
-			\WBAM\Core\Settings_Helper::format_matching_enabled(),
-			$placement_id
-		);
+		$enforce_format = \WBAM\Core\Settings_Helper::format_matching_enforced( $placement_id );
 
 		foreach ( $ad_ids as $ad_id ) {
 			// Some ad types are not served through placements at all - a video

@@ -1232,7 +1232,7 @@
       "name": "wbam_enforce_format_matching",
       "type": "filter",
       "args": 2,
-      "where": "includes/Admin/class-admin.php, includes/Modules/Placements/class-placement-engine.php, includes/functions-ad-formats.php",
+      "where": "includes/Core/class-settings-helper.php",
       "purpose": "Whether a placement must fit the ad's resolved size before it can be saved/rendered there (owner decision 13, card 10343726460); default is Settings_Helper::format_matching_enabled()"
     },
     {
@@ -1248,6 +1248,13 @@
       "args": 1,
       "where": "includes/Core/class-placement-format-map.php",
       "purpose": "Tolerance for placement-format fitness check"
+    },
+    {
+      "name": "wbam_geo_db_dir",
+      "type": "filter",
+      "args": 1,
+      "where": "includes/Admin/class-settings.php",
+      "purpose": "Folder for the uploaded MaxMind database; return a path outside the web root to choose it yourself."
     },
     {
       "name": "wbam_get_placements",

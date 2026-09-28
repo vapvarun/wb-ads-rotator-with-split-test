@@ -9,7 +9,7 @@ Base URL: `/wp-json/wbam/v1`
 | Method | Path | Access | Purpose |
 |--------|------|--------|---------|
 | GET | `/ads` | Public | List published, enabled ads (`per_page` 1-100 default 20, `page`) |
-| POST | `/ads` | `manage_options` | Create an ad (`title` required) |
+| POST | `/ads` | `manage_options` | Create an ad (`title` required; `status` publish, draft or pending, default publish). An ad missing a required setting, such as AdSense without a Slot ID, is kept as a draft and the response carries a `notice` saying why |
 | GET | `/ads/serve` | Public | Rendered ad HTML for a placement (`placement` required, `post_id`, `page_url`) |
 | GET | `/ads/placements` | Public | Selectable placement types (respects the site gate) |
 | GET | `/ads/types` | Public | Available ad types |

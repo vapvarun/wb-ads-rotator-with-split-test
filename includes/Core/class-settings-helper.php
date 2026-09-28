@@ -95,6 +95,30 @@ class Settings_Helper {
 	}
 
 	/**
+	 * Whether ad formats are matched against placements (and, in Pro,
+	 * packages): the site's Format Matching setting, filterable. Every layer
+	 * (render, editor, save, package guard, submission) asks here, so they turn
+	 * on together.
+	 *
+	 * @since 3.2.0
+	 * @param int|string $context Ad ID, placement slug, or '' when there is none yet.
+	 * @return bool
+	 */
+	public static function format_matching_enforced( $context = '' ) {
+		/**
+		 * Filter whether ad format matching is enforced. Owner decision 13:
+		 * matching is all-or-nothing per placement, but only once a site has
+		 * opted in (or is a fresh 3.2.0+ install).
+		 *
+		 * @since 3.2.0
+		 * @param bool       $enforce Whether to enforce format matching. Defaults
+		 *                            to the site's format_matching setting.
+		 * @param int|string $context Ad ID, placement slug, or '' when none.
+		 */
+		return (bool) apply_filters( 'wbam_enforce_format_matching', self::format_matching_enabled(), $context );
+	}
+
+	/**
 	 * Update a specific setting.
 	 *
 	 * @param string $key   Setting key.

@@ -156,4 +156,22 @@ class Test_AdSense_Incomplete_Stays_Draft extends WP_UnitTestCase {
 
 		$this->assertSame( 'publish', get_post_status( $ad_id ), 'Only the moment of publishing is judged, so an import or rename cannot take a live ad off the air.' );
 	}
+
+	public function test_a_rest_rename_does_not_take_a_live_incomplete_ad_off_the_air(): void {
+		$ad_id = self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
+		update_post_meta( $ad_id, '_wbam_ad_data', array( 'type' => 'adsense' ) );
+
+		$request = new \WP_REST_Request( 'PUT', '/wbam/v1/ads/' . $ad_id );
+		$request->set_body_params( array( 'title' => 'Renamed' ) );
+		rest_do_request( $request );
+
+		$this->assertSame( 'publish', get_post_status( $ad_id ) );
+	}
+
+	public function test_an_ad_block_with_no_ad_hints_to_editors_only(): void {
+		$this->assertStringContainsString( 'Add the ad to show', do_blocks( '<!-- wp:wb-ads/ad /-->' ) );
+
+		wp_set_current_user( 0 );
+		$this->assertStringNotContainsString( 'Add the ad to show', do_blocks( '<!-- wp:wb-ads/ad /-->' ) );
+	}
 }

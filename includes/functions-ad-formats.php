@@ -440,11 +440,7 @@ if ( ! function_exists( 'wbam_split_placements_by_fit' ) ) {
 	 * @return array{kept:string[],dropped:array<int,array{id:string,label:string}>}
 	 */
 	function wbam_split_placements_by_fit( $ad_id, array $placements, array $exempt = array() ) {
-		$enforce = (bool) apply_filters(
-			'wbam_enforce_format_matching',
-			Settings_Helper::format_matching_enabled(),
-			$ad_id
-		);
+		$enforce = Settings_Helper::format_matching_enforced( $ad_id );
 
 		$split = array(
 			'kept'    => $placements,

@@ -342,7 +342,7 @@ class Ads_API {
 			);
 		}
 
-		return $this->saved_ad_response( $post_id, $this->save_ad_meta( $post_id, $request ) );
+		return $this->saved_ad_response( $post_id, $this->save_ad_meta( $post_id, $request ), true );
 	}
 
 	/**
@@ -386,7 +386,9 @@ class Ads_API {
 			);
 		}
 
-		return $this->saved_ad_response( $id, $this->save_ad_meta( $id, $request ) );
+		// Only a save that changes the data or the status is judged, so a
+		// rename never takes a live ad off the air.
+		return $this->saved_ad_response( $id, $this->save_ad_meta( $id, $request ), isset( $request['ad_data'] ) || '' !== $status );
 	}
 
 	/**
@@ -408,15 +410,16 @@ class Ads_API {
 	 *
 	 * @param int   $id      Ad ID.
 	 * @param array $dropped Placements dropped by the fit check.
+	 * @param bool  $judge   Whether this save can leave the ad incomplete.
 	 * @return \WP_REST_Response
 	 */
-	private function saved_ad_response( $id, $dropped ) {
-		$notice = \WBAM\Core\Ad_Status::draft_if_incomplete( $id );
+	private function saved_ad_response( $id, $dropped, $judge ) {
+		$notice = $judge ? \WBAM\Core\Ad_Status::draft_notice( \WBAM\Core\Ad_Status::draft_if_incomplete( $id ) ) : '';
 
 		$data                       = $this->prepare_ad_for_response( get_post( $id ), true );
 		$data['dropped_placements'] = $dropped;
 		if ( '' !== $notice ) {
-			$data['notice'] = __( 'Saved as a draft, not published.', 'wb-ads-rotator-with-split-test' ) . ' ' . $notice;
+			$data['notice'] = $notice;
 		}
 		return rest_ensure_response( $data );
 	}
