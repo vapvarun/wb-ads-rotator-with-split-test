@@ -26,7 +26,7 @@ class Test_Campaign_Delete_Drafts_Ad extends Pro_Test_Case {
 		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );
 		Advertiser_Manager::get_instance()->update_status( (int) $advertiser->id, 'active' );
 
-		$ad_id = (int) self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
+		$ad_id = (int) self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish', 'post_author' => $user ) );
 		update_post_meta( $ad_id, '_wbam_enabled', '1' );
 		update_post_meta( $ad_id, '_wbam_status', 'active' );
 
@@ -64,7 +64,7 @@ class Test_Campaign_Delete_Drafts_Ad extends Pro_Test_Case {
 		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );
 		Advertiser_Manager::get_instance()->update_status( (int) $advertiser->id, 'active' );
 
-		$ad_id = (int) self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
+		$ad_id = (int) self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish', 'post_author' => $user ) );
 		update_post_meta( $ad_id, '_wbam_enabled', '0' );
 		update_post_meta( $ad_id, '_wbam_status', 'paused' );
 
@@ -94,7 +94,7 @@ class Test_Campaign_Delete_Drafts_Ad extends Pro_Test_Case {
 
 		// A takedown: post_status stays publish, but _wbam_status is 'rejected'
 		// (Ad_Submission_Manager::reject(), which never changes post_status).
-		$ad_id = (int) self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish' ) );
+		$ad_id = (int) self::factory()->post->create( array( 'post_type' => 'wbam-ad', 'post_status' => 'publish', 'post_author' => $user ) );
 		update_post_meta( $ad_id, '_wbam_enabled', '0' );
 		update_post_meta( $ad_id, '_wbam_status', 'rejected' );
 
