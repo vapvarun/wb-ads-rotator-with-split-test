@@ -8,6 +8,7 @@
 
 namespace WBAM\Tests\Pro;
 
+use WBAM_Pro\Core\Credits_Bridge;
 use WBAM_Pro\Core\Settings_Helper;
 use WBAM_Pro\Modules\Advertisers\Advertiser_Manager;
 use WBAM_Pro\Modules\Classifieds\Classified_Manager;
@@ -33,9 +34,9 @@ class Test_Classified_Listing_Packages_Owner extends Pro_Test_Case {
 		$packages = Classified_Manager::get_listing_packages();
 
 		$this->assertCount( 3, $packages );
-		$this->assertSame( 'Free', $packages[0]['name'] );
-		$this->assertSame( 30, $packages[0]['duration'] );
-		$this->assertSame( 0.0, (float) $packages[0]['price'] );
+		$this->assertSame( array( '30 days', '60 days', '90 days' ), wp_list_pluck( $packages, 'name' ) );
+		$this->assertSame( array( 30, 60, 90 ), wp_list_pluck( $packages, 'duration' ) );
+		$this->assertSame( array( 0.0, 5.0, 15.0 ), array_map( 'floatval', wp_list_pluck( $packages, 'price' ) ) );
 	}
 
 	public function test_owner_list_replaces_the_starter_set(): void {
@@ -110,5 +111,29 @@ class Test_Classified_Listing_Packages_Owner extends Pro_Test_Case {
 		$this->assertNotWPError( $classified, is_wp_error( $classified ) ? $classified->get_error_message() : '' );
 		$days = (int) round( ( strtotime( $classified->expires_at ) - time() ) / DAY_IN_SECONDS );
 		$this->assertSame( 14, $days );
+	}
+
+	/** The card's own check: Gold, 14 days, $10 - posted as a seller, it charges $10 and lasts 14 days. */
+	public function test_a_paid_owner_package_charges_its_price_and_sets_its_length(): void {
+		Settings_Helper::update( 'classified_packages', array( array( 'name' => 'Gold', 'duration' => 14, 'price' => 10 ) ) );
+
+		$user       = (int) self::factory()->user->create( array( 'role' => 'subscriber' ) );
+		$advertiser = Advertiser_Manager::get_instance()->get_or_create( $user );
+		Credits_Bridge::adjust( $advertiser->id, 50, 'Test funds' );
+		$term = wp_insert_term( 'Paid pkg ' . wp_generate_password( 6, false ), Classified_Manager::TAXONOMY_CATEGORY );
+
+		$classified = Classified_Manager::get_instance()->submit(
+			$advertiser,
+			array(
+				'title'           => 'Paid package listing',
+				'description'     => 'Charged the owner Gold price.',
+				'categories'      => array( (int) $term['term_id'] ),
+				'listing_package' => 0,
+			)
+		);
+
+		$this->assertNotWPError( $classified, is_wp_error( $classified ) ? $classified->get_error_message() : '' );
+		$this->assertSame( 40.0, round( (float) Credits_Bridge::get_balance( $advertiser->id ), 2 ), '$50 funded, $10 package charged.' );
+		$this->assertSame( 14, (int) round( ( strtotime( $classified->expires_at ) - time() ) / DAY_IN_SECONDS ) );
 	}
 }
