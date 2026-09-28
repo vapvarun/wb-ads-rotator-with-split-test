@@ -200,6 +200,9 @@ class Test_Settings_One_Page_3_2 extends Pro_Test_Case {
 
 		$this->assertStringContainsString( 'wbam-page-jump', $html );
 		$this->assertStringContainsString( 'href="#wbam-jump-classifieds-label-url"', $html );
+		$this->assertStringContainsString( 'href="#wbam-jump-classifieds-listing-packages"', $html );
+		$this->assertStringContainsString( 'id="wbam-jump-classifieds-listing-packages"', $html );
+		$this->assertStringContainsString( 'name="wbam_listing_packages[0][name]"', $html );
 		$this->assertStringContainsString( 'id="wbam-jump-classifieds-inquiries"', $html );
 		$this->assertStringNotContainsString( 'wbam-jump-classifieds-seller-profile', $html, 'No BuddyPress in this suite, so that card (and its jump link) must not render.' );
 		// Promote a live listing (card 10343726590, owner decision 15): folded
