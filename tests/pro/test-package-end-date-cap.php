@@ -81,7 +81,23 @@ class Test_Package_End_Date_Cap extends Pro_Test_Case {
 	}
 
 	/**
-	 * Create an active 30-day package campaign starting at a fixed time.
+	 * A running 30-day campaign: started 5 days ago, so the dates stay in the
+	 * same relation to today whenever the suite runs.
+	 */
+	private function start_dt(): string {
+		return gmdate( 'Y-m-d 17:21:00', strtotime( '-5 days' ) );
+	}
+
+	private function end_dt(): string {
+		return gmdate( 'Y-m-d 17:21:00', strtotime( '+25 days' ) );
+	}
+
+	private function far_date(): string {
+		return gmdate( 'Y-m-d', strtotime( '+400 days' ) );
+	}
+
+	/**
+	 * Create an active 30-day package campaign starting 5 days ago.
 	 */
 	private function active_campaign(): int {
 		$ad_id    = self::factory()->post->create( array( 'post_type' => 'wbam-ad' ) );
@@ -93,8 +109,8 @@ class Test_Package_End_Date_Cap extends Pro_Test_Case {
 			$wpdb->prefix . 'wbam_campaigns',
 			array(
 				'status'     => 'active',
-				'start_date' => '2026-09-25 17:21:00',
-				'end_date'   => '2026-10-25 17:21:00',
+				'start_date' => $this->start_dt(),
+				'end_date'   => $this->end_dt(),
 			),
 			array( 'id' => $campaign->id )
 		);
@@ -109,14 +125,14 @@ class Test_Package_End_Date_Cap extends Pro_Test_Case {
 		$updated = Campaign_Manager::get_instance()->update(
 			$id,
 			array(
-				'start_date' => '2026-09-25',
-				'end_date'   => '2027-06-30',
+				'start_date' => substr( $this->start_dt(), 0, 10 ),
+				'end_date'   => $this->far_date(),
 			)
 		);
 		$this->assertNotWPError( $updated );
 
-		$this->assertSame( '2026-09-25 17:21:00', $updated->start_date, 'An unchanged start date must keep its time.' );
-		$this->assertSame( '2026-10-25 17:21:00', $updated->end_date, 'End date must stay capped at start + package duration.' );
+		$this->assertSame( $this->start_dt(), $updated->start_date, 'An unchanged start date must keep its time.' );
+		$this->assertSame( $this->end_dt(), $updated->end_date, 'End date must stay capped at start + package duration.' );
 	}
 
 	public function test_moving_the_start_later_on_a_running_campaign_buys_no_extra_days(): void {
@@ -126,12 +142,12 @@ class Test_Package_End_Date_Cap extends Pro_Test_Case {
 		$updated = Campaign_Manager::get_instance()->update(
 			$id,
 			array(
-				'start_date' => '2026-12-01',
-				'end_date'   => '2026-12-31',
+				'start_date' => gmdate( 'Y-m-d', strtotime( '+40 days' ) ),
+				'end_date'   => gmdate( 'Y-m-d', strtotime( '+70 days' ) ),
 			)
 		);
 
-		$this->assertLessThanOrEqual( strtotime( '2026-10-25 17:21:00' ), strtotime( $updated->end_date ) );
+		$this->assertLessThanOrEqual( strtotime( $this->end_dt() ), strtotime( $updated->end_date ) );
 	}
 
 	public function test_admin_extends_only_with_the_explicit_flag(): void {
@@ -139,17 +155,17 @@ class Test_Package_End_Date_Cap extends Pro_Test_Case {
 		$id      = $this->active_campaign();
 		$manager = Campaign_Manager::get_instance();
 
-		$capped = $manager->update( $id, array( 'end_date' => '2027-06-30' ) );
-		$this->assertSame( '2026-10-25 17:21:00', $capped->end_date, 'Without the flag an admin edit is capped too.' );
+		$capped = $manager->update( $id, array( 'end_date' => $this->far_date() ) );
+		$this->assertSame( $this->end_dt(), $capped->end_date, 'Without the flag an admin edit is capped too.' );
 
 		$extended = $manager->update(
 			$id,
 			array(
-				'end_date'             => '2027-06-30',
+				'end_date'             => $this->far_date(),
 				'allow_term_extension' => true,
 			)
 		);
-		$this->assertSame( '2027-06-30 23:59:59', $extended->end_date );
+		$this->assertSame( $this->far_date() . ' 23:59:59', $extended->end_date );
 	}
 
 	public function test_advertiser_cannot_pass_the_admin_flag(): void {
@@ -159,10 +175,10 @@ class Test_Package_End_Date_Cap extends Pro_Test_Case {
 		$updated = Campaign_Manager::get_instance()->update(
 			$id,
 			array(
-				'end_date'             => '2027-06-30',
+				'end_date'             => $this->far_date(),
 				'allow_term_extension' => true,
 			)
 		);
-		$this->assertSame( '2026-10-25 17:21:00', $updated->end_date );
+		$this->assertSame( $this->end_dt(), $updated->end_date );
 	}
 }
