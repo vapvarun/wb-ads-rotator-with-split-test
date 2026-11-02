@@ -14,6 +14,7 @@ namespace WBAM\Modules\Links;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+use WBAM\Core\Privacy_Helper;
 use WBAM\Core\Singleton;
 
 /**
@@ -489,6 +490,14 @@ class Link_Manager {
 	public function increment_clicks( $id ) {
 		global $wpdb;
 
+		// Link-preview fetchers, crawlers and HEAD probes follow the redirect
+		// but are not a person clicking, so they count for nothing. The
+		// visitor still gets redirected by the caller.
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) : 'GET';
+		if ( 'HEAD' === $method || Privacy_Helper::is_bot() ) {
+			return true;
+		}
+
 		// Update click count on link. $this->table from $wpdb->prefix (ctor).
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$result = $wpdb->query(
@@ -503,10 +512,13 @@ class Link_Manager {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->insert(
 			$this->clicks_table,
-			array( 'link_id' => $id,
-			'clicked_at' => current_time( 'mysql', true ),
-		),
-			array( '%d', '%s' )
+			array(
+				'link_id'      => $id,
+				'visitor_hash' => Privacy_Helper::get_visitor_hash(),
+				'referrer'     => isset( $_SERVER['HTTP_REFERER'] ) ? substr( esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ), 0, 255 ) : '',
+				'clicked_at'   => current_time( 'mysql', true ),
+			),
+			array( '%d', '%s', '%s', '%s' )
 		);
 
 		do_action( 'wbam_link_clicked', $id );
