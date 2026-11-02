@@ -38,7 +38,7 @@ WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. 
 **Ad Types:**
 
 1. **Image Ad** - Banner images with link, alt text, and target options
-2. **Rich Content** - WYSIWYG editor for HTML content
+2. **Rich Content** - HTML and text content with links, images and formatting
 3. **HTML/JS Code** - Paste ad network code (custom scripts)
 4. **Google AdSense** - Native integration with auto script management
 5. **Email Capture** - Inline newsletter subscribe form as an ad type
@@ -49,7 +49,7 @@ WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. 
 * Footer (wp_footer)
 * Before/After Post Content
 * After Paragraph X (with repeat option)
-* Archive Pages (between posts)
+* Before/After Archive Pages (above or below the post list)
 * Sticky/Floating Ads (corners, bars)
 * Popup/Modal Ads (time delay, scroll, exit intent)
 * Comment Areas
