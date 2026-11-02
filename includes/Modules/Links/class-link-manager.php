@@ -77,7 +77,7 @@ class Link_Manager {
 			'link_type'        => 'affiliate',
 			'cloaking_enabled' => 1,
 			'nofollow'         => 1,
-			'sponsored'        => 0,
+			'sponsored'        => 1,
 			'new_tab'          => 1,
 			'category_id'      => 0,
 			'description'      => '',

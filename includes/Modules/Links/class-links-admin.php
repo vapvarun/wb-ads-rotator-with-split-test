@@ -465,7 +465,7 @@ class Links_Admin {
 
 							<label>
 								<input type="checkbox" name="sponsored" value="1"
-									<?php checked( $link ? $link->sponsored : false ); ?>>
+									<?php checked( $link ? $link->sponsored : true ); ?>>
 								<?php esc_html_e( 'Add rel="sponsored"', 'wb-ads-rotator-with-split-test' ); ?>
 							</label>
 							<p class="description" style="margin:4px 0 10px 24px;">
