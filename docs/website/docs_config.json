@@ -6,6 +6,7 @@
         { "name": "Getting Started", "folder": "getting-started" },
         { "name": "Features", "folder": "features" },
         { "name": "Usage", "folder": "usage" },
+        { "name": "How-To Guides", "folder": "how-to", "description": "Step-by-step guides for the jobs you do most often." },
         { "name": "Shortcodes", "folder": "shortcodes" },
         { "name": "Integrations", "folder": "integrations" },
         { "name": "Developer Guide", "folder": "developer-guide" },
