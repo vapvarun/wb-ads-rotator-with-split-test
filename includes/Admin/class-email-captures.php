@@ -216,8 +216,9 @@ class Email_Captures {
 		global $wpdb;
 		$table = $this->table();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table; full export for the site owner.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table name from $wpdb->prefix, not user input; full export for the site owner.
 		$rows = $wpdb->get_results( "SELECT ad_id, email, name, ip_address, created_at FROM {$table} ORDER BY created_at DESC, id DESC" );
+		// phpcs:enable
 
 		nocache_headers();
 		header( 'Content-Type: text/csv; charset=utf-8' );

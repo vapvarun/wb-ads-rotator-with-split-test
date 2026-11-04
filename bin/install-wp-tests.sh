@@ -12,6 +12,12 @@ DB_HOST="${4:-localhost}"
 WP_VERSION="${5:-latest}"
 SKIP_DB="${6:-false}"
 
+# "latest" has no develop.svn tag, so the suite fell back to trunk and broke
+# against the released core. Resolve it to the real version number.
+if [ "$WP_VERSION" = "latest" ]; then
+	WP_VERSION="$(curl -fsSL https://api.wordpress.org/core/version-check/1.7/ | grep -o '"version":"[^"]*"' | head -1 | cut -d'"' -f4)"
+fi
+
 WP_TESTS_DIR="${WP_TESTS_DIR:-/tmp/wordpress-tests-lib}"
 WP_CORE_DIR="${WP_CORE_DIR:-/tmp/wordpress/}"
 
