@@ -105,6 +105,8 @@ class Test_Placement_Gates extends WP_UnitTestCase {
 	 * @param string[] $offered   Rows the matrix drew.
 	 * @param string[] $site      Site boxes ticked.
 	 * @param string[]|null $adv  Advertiser boxes ticked. Null = same as site.
+	 *                            Passing a list means the Advertisers column
+	 *                            was drawn (Pro), so its flag is posted too.
 	 * @return array
 	 */
 	private function matrix_post( array $offered, array $site, ?array $adv = null ): array {
@@ -112,6 +114,10 @@ class Test_Placement_Gates extends WP_UnitTestCase {
 			'placement_gates_submitted' => '1',
 			'placement_gates_offered'   => implode( ',', $offered ),
 		);
+
+		if ( null !== $adv ) {
+			$post['placement_gates_adv_submitted'] = '1';
+		}
 
 		// An unticked checkbox posts nothing, so an empty tick list means
 		// the key is absent entirely — that is the whole reason the two
