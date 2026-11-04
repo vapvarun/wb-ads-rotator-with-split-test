@@ -8,7 +8,7 @@
 **Plugin Name:** WB Ads Rotator with Split Test (FREE)
 **Slug:** `wb-ads-rotator-with-split-test`
 **Main File:** `wb-ads-rotator-with-split-test.php`
-**Current Stable:** `3.0.0` (free + Pro share one version number and release together)
+**Current Stable:** `3.1.2` (free + Pro share one version number and release together)
 **Type:** WordPress Plugin (Free — paired with `wb-ad-manager-pro`)
 
 Ad rotation + A/B split-test plugin. Renamed from the legacy `buddypress-ads-rotator` plugin. **The old directory layout (`admin/`, `public/`, `buddypress-ads-rotator.php`) no longer exists** — everything is now under `includes/` with PSR-like class organization.
@@ -114,7 +114,7 @@ wb-ads-rotator-with-split-test/
 
 | Branch | Purpose |
 |--------|---------|
-| `main` | Stable, latest release (currently `2.8.0`) |
+| `main` | Stable, latest release |
 | `2.8.1` | Current dev branch (latest) |
 | `2.8.0`, `2.7.0`, `2.6.1`, `2.5.0` | Historical release branches |
 

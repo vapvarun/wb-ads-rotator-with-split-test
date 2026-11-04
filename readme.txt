@@ -1,11 +1,10 @@
 === Wbcom Designs - WB Ad Manager ===
 Contributors: vapvarun, wbcomdesigns
-Donate link: https://wbcomdesigns.com/
 Tags: ads, ad manager, ad rotation, split test, adsense
 Requires at least: 5.8
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.1.1
+Stable tag: 3.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,7 +12,7 @@ Ad management for WordPress: ad rotation, split testing, multiple placements, Go
 
 == Description ==
 
-WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. It allows you to create and manage ads with multiple placement options, targeting rules, and supports BuddyPress, bbPress, and Jetonomy.
+WB Ad Manager places ads on your WordPress site and decides who sees them. Create an ad, pick where it shows, and set targeting rules for device, location, schedule and user. It also works inside BuddyPress, bbPress and Jetonomy.
 
 **Key Features:**
 
@@ -70,7 +69,7 @@ WB Ad Manager is a powerful and easy-to-use ad management plugin for WordPress. 
 * Geographic location (country)
 * Custom scheduling
 
-**Everything listed above is included in the free plugin** — no account, no ad limit, no add-on required. The features below are part of the separate **WB Ad Manager Pro** upgrade and are not included in this free plugin.
+**Everything listed above is included in the free plugin.** No account, no ad limit, no add-on required. The features below are part of the separate **WB Ad Manager Pro** upgrade and are not included in this free plugin.
 
 = Turn your site into a revenue engine with WB Ad Manager Pro =
 
@@ -141,7 +140,7 @@ Let advertisers sign up, submit ads, track performance, and manage billing thems
 
 == Installation ==
 
-1. Upload the plugin files to `/wp-content/plugins/wb-ad-manager/` directory, or install through WordPress plugins screen.
+1. In your WordPress admin, go to Plugins > Add New, search for "WB Ad Manager", and click Install Now. Or upload the plugin folder to `/wp-content/plugins/wb-ads-rotator-with-split-test/`.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 3. Complete the Setup Wizard or go to WB Ad Manager menu to create your first ad.
 
@@ -157,15 +156,15 @@ Use the shortcode `[wbam_ad id="123"]` where 123 is your ad ID. For multiple ads
 
 = Does this plugin support Google AdSense? =
 
-Yes! WB Ad Manager has native AdSense support. Set your Publisher ID in Settings, then create AdSense ad types. The AdSense script is automatically managed and only loads once per page.
+Yes. WB Ad Manager has native AdSense support. Set your Publisher ID in Settings, then create AdSense ad types. The AdSense script is automatically managed and only loads once per page.
 
 = Does this plugin support BuddyPress? =
 
-Yes! If BuddyPress is active, you can display ads in activity streams, member directories, group directories, and use BuddyPress-specific widgets.
+Yes. If BuddyPress is active, you can display ads in activity streams, member directories, group directories, and use BuddyPress-specific widgets.
 
 = Does this plugin support bbPress? =
 
-Yes! If bbPress is active, you can display ads in forums, topics, and between replies.
+Yes. If bbPress is active, you can display ads in forums, topics, and between replies.
 
 = Can I schedule ads? =
 
@@ -185,7 +184,18 @@ The plugin supports ip-api.com (free), ipinfo.io (free tier), and ipapi.co for I
 6. Help & Docs, "What's in PRO". Clear breakdown of Pro-only additions (advertiser portal, wallet, campaigns, classifieds marketplace, advanced analytics, link scanner).
 7. Free vs PRO comparison. Row-by-row feature table so you know exactly what you're getting at each tier.
 
+== More from Wbcom Designs ==
+
+* [BuddyX](https://wordpress.org/themes/buddyx/) - free community theme for BuddyPress and BuddyBoss sites.
+* [BuddyNext](https://buddynext.com/features/) - a complete community platform for WordPress.
+* [Jetonomy](https://jetonomy.org/features/) - modern discussion forums for WordPress.
+* [WB Gamification](https://wbcomdesigns.com/downloads/wordpress-gamification-plugin/) - points, badges and leaderboards for your members.
+
 == Changelog ==
+
+= 3.1.2 - November 2026 =
+
+* Dev      - Tested up to WordPress 7.1. No code changes; readme refreshed.
 
 = 3.1.1 - September 2026 =
 
@@ -256,7 +266,7 @@ Frontend dark mode that follows your active theme, plus RTL support.
 * Dev      - Clean pass on WordPress Plugin Check (zero errors and warnings) and PHPStan level 7, plus a documented RTL stylesheet load.
 
 = 2.8.1 =
-* Performance: The Google AdSense script is now loaded only on pages that actually display an AdSense ad. Pages with no AdSense ad no longer pay for the extra script request — faster page loads and a cleaner Lighthouse score across the rest of the site.
+* Performance: The Google AdSense script is now loaded only on pages that actually display an AdSense ad. Pages with no AdSense ad no longer pay for the extra script request - faster page loads and a cleaner Lighthouse score across the rest of the site.
 * Fix: A/B test winners are now declared only when one variant beats the other by a meaningful margin. Previously the dashboard could flag a winner when the two variants were within normal click-rate noise, so admins could be misled into picking a variant that wasn't actually better.
 * Fix: The analytics dashboard now records the visitor's device type (desktop / mobile / tablet) on every event. The "Device" breakdown chart now reflects real traffic instead of showing every event as Unknown.
 
@@ -335,6 +345,9 @@ Frontend dark mode that follows your active theme, plus RTL support.
 * Legacy version
 
 == Upgrade Notice ==
+
+= 3.1.2 =
+Tested with WordPress 7.1. No code changes. WB Ad Manager Pro 3.1.1 keeps working with this version.
 
 = 2.5.0 =
 Build system improvements and translation updates.
