@@ -19,7 +19,7 @@ This flow takes you from a freshly-activated Pro plugin to the first advertiser 
 
 - The free plugin is installed and you have published at least one ad yourself — complete [Publish Your First Ad](publish-first-ad.md) if you have not.
 - You have a valid Pro license key.
-- You have one of these payment stacks already running on the site: **WooCommerce** (with at least one working gateway), **WooCommerce Subscriptions**, **WooCommerce Memberships**, **Paid Memberships Pro**, or **MemberPress**. Pro can also sell credits directly through Stripe or PayPal with no store plugin (Ad Manager > Credits > Direct Payment Gateways, using hosted checkout pages and a webhook). Razorpay is not supported. Otherwise credit top-ups are collected by the source plugin of whichever adapter you enable.
+- You have one of these payment stacks already running on the site: **WooCommerce** (with at least one working gateway), **WooCommerce Subscriptions**, **WooCommerce Memberships**, **Paid Memberships Pro**, or **MemberPress**. Pro can also sell credits directly through Stripe or PayPal with no store plugin (Ad Manager > Credits > Direct Payment Gateways, using hosted checkout pages and a webhook). Otherwise credit top-ups are collected by the source plugin of whichever adapter you enable.
 - You have a second WordPress user you can log in as to play the advertiser role (or you can create one mid-flow).
 
 ## Step 1 — Activate Pro and accept the license
