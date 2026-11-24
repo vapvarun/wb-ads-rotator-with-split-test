@@ -24,6 +24,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// One copy only: stop if this plugin is already loaded from another folder.
+if ( defined( 'WB_ADS_ROTATOR_WITH_SPLIT_TEST_LOADED' ) ) {
+	return;
+}
+define( 'WB_ADS_ROTATOR_WITH_SPLIT_TEST_LOADED', __FILE__ ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Wbcom one-copy guard, named after the WordPress.org slug.
+
 /**
  * Plugin constants.
  */
@@ -85,69 +91,81 @@ spl_autoload_register(
 	}
 );
 
-/**
- * Plugin activation.
- */
-function wbam_activate() {
-	flush_rewrite_rules();
+if ( ! function_exists( 'wbam_activate' ) ) {
+	/**
+	 * Plugin activation.
+	 */
+	function wbam_activate() {
+		flush_rewrite_rules();
 
-	if ( false === get_option( 'wbam_settings' ) ) {
-		add_option( 'wbam_settings', array() );
+		if ( false === get_option( 'wbam_settings' ) ) {
+			add_option( 'wbam_settings', array() );
+		}
+
+		// Run installer to create database tables.
+		require_once WBAM_PATH . 'includes/Core/trait-singleton.php';
+		require_once WBAM_PATH . 'includes/Core/class-installer.php';
+		$installer = WBAM\Core\Installer::get_instance();
+		$installer->install();
+
+		set_transient( '_wbam_activation_redirect', true, 30 );
 	}
-
-	// Run installer to create database tables.
-	require_once WBAM_PATH . 'includes/Core/trait-singleton.php';
-	require_once WBAM_PATH . 'includes/Core/class-installer.php';
-	$installer = WBAM\Core\Installer::get_instance();
-	$installer->install();
-
-	set_transient( '_wbam_activation_redirect', true, 30 );
 }
 register_activation_hook( __FILE__, 'wbam_activate' );
 
-/**
- * Plugin deactivation.
- */
-function wbam_deactivate() {
-	flush_rewrite_rules();
+if ( ! function_exists( 'wbam_deactivate' ) ) {
+	/**
+	 * Plugin deactivation.
+	 */
+	function wbam_deactivate() {
+		flush_rewrite_rules();
+	}
 }
 register_deactivation_hook( __FILE__, 'wbam_deactivate' );
 
-/**
- * Initialize the plugin.
- */
-function wbam_init() {
-	// Initialize plugin.
-	WBAM\Core\Plugin::get_instance()->init();
+if ( ! function_exists( 'wbam_init' ) ) {
+	/**
+	 * Initialize the plugin.
+	 */
+	function wbam_init() {
+		// Initialize plugin.
+		WBAM\Core\Plugin::get_instance()->init();
+	}
 }
 add_action( 'plugins_loaded', 'wbam_init' );
 
-/**
- * Helper function to get plugin instance.
- *
- * @return WBAM\Core\Plugin
- */
-function wbam() {
-	return WBAM\Core\Plugin::get_instance();
+if ( ! function_exists( 'wbam' ) ) {
+	/**
+	 * Helper function to get plugin instance.
+	 *
+	 * @return WBAM\Core\Plugin
+	 */
+	function wbam() {
+		return WBAM\Core\Plugin::get_instance();
+	}
 }
 
-/**
- * Helper function to display an ad.
- *
- * @param int   $ad_id   Ad post ID.
- * @param array $options Display options.
- * @return string
- */
-function wbam_display_ad( $ad_id, $options = array() ) {
-	return wbam()->placements()->render_ad( $ad_id, $options );
+if ( ! function_exists( 'wbam_display_ad' ) ) {
+	/**
+	 * Helper function to display an ad.
+	 *
+	 * @param int   $ad_id   Ad post ID.
+	 * @param array $options Display options.
+	 * @return string
+	 */
+	function wbam_display_ad( $ad_id, $options = array() ) {
+		return wbam()->placements()->render_ad( $ad_id, $options );
+	}
 }
 
-/**
- * Helper function to get ads for a placement.
- *
- * @param string $placement_id Placement ID.
- * @return array
- */
-function wbam_get_ads( $placement_id ) {
-	return wbam()->placements()->get_ads_for_placement( $placement_id );
+if ( ! function_exists( 'wbam_get_ads' ) ) {
+	/**
+	 * Helper function to get ads for a placement.
+	 *
+	 * @param string $placement_id Placement ID.
+	 * @return array
+	 */
+	function wbam_get_ads( $placement_id ) {
+		return wbam()->placements()->get_ads_for_placement( $placement_id );
+	}
 }
