@@ -195,9 +195,11 @@ rsync -a "${FREE_EXCLUDES[@]}" "$FREE_DIR/" "$FREE_TARGET/"
 verify_runtime_assets "$FREE_TARGET"
 verify_no_internal_artifacts "$FREE_TARGET" "free"
 
+# The free zip itself comes from the standard WordPress.org builder: git archive of
+# HEAD, folder locked to the .org slug. The rsync payload above still feeds the checks
+# and the combo.
 FREE_ZIP="$DIST_DIR/wb-ads-rotator-with-split-test-${FREE_VERSION}.zip"
-rm -f "$FREE_ZIP"
-( cd "$BUILD_DIR/free" && zip -rq "$FREE_ZIP" "wb-ads-rotator-with-split-test" )
+bash "$FREE_DIR/bin/build-release.sh"
 
 # ------------------------------------------------------------------
 # Pro rsync rules — defined once, used by both the standalone Pro zip
